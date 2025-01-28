@@ -1,0 +1,25 @@
+# Mac OS X
+.DS_Store
+
+# Xcode
+build/
+DerivedData
+
+*.pbxuser
+!default.pbxuser
+xcuserdata
+
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/

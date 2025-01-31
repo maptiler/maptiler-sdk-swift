@@ -1,0 +1,33 @@
+disabled_rules:
+  - identifier_name
+  - private_over_fileprivate
+  - todo
+  - type_name
+opt_in_rules:
+  - closure_end_indentation
+  - closure_spacing
+  - fatal_error_message
+  - first_where
+  - indentation_width
+  - joined_default_parameter
+  - operator_usage_whitespace
+  - private_outlet
+  - quick_discouraged_call
+  - redundant_nil_coalescing
+  - trailing_closure
+  - unneeded_parentheses_in_closure_argument
+  - vertical_parameter_alignment_on_call
+indentation_width: 4
+cyclomatic_complexity:
+  ignores_case_statements: true
+file_length:
+  warning: 500
+function_body_length:
+  warning: 60
+type_body_length:
+  warning: 250
+included:
+  - Sources
+excluded:
+  - .build
+  - Tests

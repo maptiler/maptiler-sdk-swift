@@ -12,7 +12,7 @@ extension CLLocationCoordinate2D {
     package func toLngLat() -> LngLat {
         return (self.longitude, self.latitude)
     }
-    
+
     package func fromLngLat(lngLat: LngLat) -> CLLocationCoordinate2D {
         return CLLocationCoordinate2D(latitude: lngLat.lat, longitude: lngLat.lng)
     }

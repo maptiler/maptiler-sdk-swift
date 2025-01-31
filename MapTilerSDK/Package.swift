@@ -12,7 +12,7 @@ let package = Package(
     products: [
         .library(
             name: "MapTilerSDK",
-            targets: ["MapTilerSDK"]),
+            targets: ["MapTilerSDK"])
     ],
     targets: [
         .target(
@@ -20,6 +20,6 @@ let package = Package(
         .testTarget(
             name: "MapTilerSDKTests",
             dependencies: ["MapTilerSDK"]
-        ),
+        )
     ]
 )

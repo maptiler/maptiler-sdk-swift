@@ -16,7 +16,10 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "MapTilerSDK"),
+            name: "MapTilerSDK",
+            resources: [
+                .process("Resources")
+            ]),
         .testTarget(
             name: "MapTilerSDKTests",
             dependencies: ["MapTilerSDK"]

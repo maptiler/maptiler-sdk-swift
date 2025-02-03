@@ -17,6 +17,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return true
         }
 
+        Task {
+            await MTConfig.shared.setAPIKey(mapTilerAPIKey)
+        }
+
         return true
     }
 

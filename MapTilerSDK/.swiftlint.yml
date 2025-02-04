@@ -3,6 +3,7 @@ disabled_rules:
   - private_over_fileprivate
   - todo
   - type_name
+  - nesting
 opt_in_rules:
   - closure_end_indentation
   - closure_spacing

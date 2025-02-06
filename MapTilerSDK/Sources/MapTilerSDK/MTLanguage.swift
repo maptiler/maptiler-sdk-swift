@@ -3,168 +3,305 @@
 //  MapTilerSDK
 //
 
-/// Languages available for MTMapView object.
-public enum MTLanguage {
+public enum MTLanguage: Codable {
+    case special(MTSpecialLanguage)
+    case country(MTCountryLanguage)
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+
+        switch self {
+        case .special(let language):
+            try container.encode("maptilersdk.Language.\(language.rawValue.uppercased())")
+        case .country(let country):
+            try container.encode(country.rawValue)
+        }
+    }
+}
+
+public enum MTSpecialLanguage: String, Codable {
     /// The default language of the device.
     case auto
+
     /// The international name. This option is equivalent to OSM's name int_name.
     case international
+
     /// The default fallback language in the Latin charset.
     case latin
+
     /// The local language for each country.
     case local
+
     /// The default fallback language in the non-Latin charset.
     case nonLatin
+
     /// The language defined by the style.
     case style
+
+    /// Preferred language from the user settings and "default name"
+    ///
+    /// This mode is useful when a user needs to access both local names and English names,
+    /// for example, when traveling abroad where signs are likely to be available only in the local language
+    case visitor
+
+    /// English and "default name"
+    ///
+    /// This mode is useful when a user needs to access both local names and English names,
+    /// for example, when traveling abroad where signs are likely to be available only in the local language
+    case visitorEnglish
+}
+
+/// Languages available for MTMapView object.
+public enum MTCountryLanguage: String, Codable {
     /// Albanian language.
-    case albanian
+    case albanian = "sq"
+
     /// Amharic language.
-    case amharic
+    case amharic = "am"
+
     /// Arabic language.
-    case arabic
+    case arabic = "ar"
+
     /// Armenian language.
-    case armenian
+    case armenian = "hy"
+
     /// Azerbaijani language.
-    case azerbaijani
+    case azerbaijani = "az"
+
     /// Basque language.
-    case basque
+    case basque = "eu"
+
     /// Belarusian language.
-    case belarusian
+    case belarusian = "be"
+
     /// Bengali language.
-    case bengali
+    case bengali = "bn"
+
     /// Bosnian language.
-    case bosnian
+    case bosnian = "bs"
+
     /// Breton language.
-    case breton
+    case breton = "br"
+
     /// Bulgarian language.
-    case bulgarian
+    case bulgarian = "bg"
+
     /// Catalan language.
-    case catalan
+    case catalan = "ca"
+
     /// Chinese  language.
-    case chinese
+    case chinese = "zh"
+
     /// Traditional Chinese language.
-    case traditionalChinese
+    case traditionalChinese = "zh-Hant"
+
     /// Simplified Chinese language.
-    case simplifiedChinese
+    case simplifiedChinese = "zh-Hans"
+
     /// Corsican language.
-    case corsican
+    case corsican = "co"
+
     /// Croatian language.
-    case croatian
+    case croatian = "hr"
+
     /// Czech language.
-    case czech
+    case czech = "cs"
+
     /// Danish language.
-    case danish
+    case danish = "da"
+
     /// Dutch language.
-    case dutch
+    case dutch = "nl"
+
     /// English language.
-    case english
+    case english = "en"
+
     /// Esperanto language.
-    case esperanto
+    case esperanto = "eo"
+
     /// Estonian language.
-    case estonian
+    case estonian = "et"
+
     /// Finnish language.
-    case finnish
+    case finnish = "fi"
+
     /// French language.
-    case french
+    case french = "fr"
+
     /// Frisian language.
-    case frisian
+    case frisian = "fy"
+
     /// Galician language.
-    case galician
+    case galician = "gl"
+
     /// Georgian language.
-    case georgian
+    case georgian = "ka"
+
     /// German language.
-    case german
+    case german = "de"
+
     /// Greek language.
-    case greek
+    case greek = "el"
+
     /// Hebrew language.
-    case hebrew
+    case hebrew = "he"
+
     /// Hindi language.
-    case hindi
+    case hindi = "hi"
+
     /// Hungarian language.
-    case hungarian
+    case hungarian = "hu"
+
     /// Icelandic language.
-    case icelandic
+    case icelandic = "is"
+
     /// Indonesian language.
-    case indonesian
+    case indonesian = "id"
+
     /// Irish language.
-    case irish
+    case irish = "ga"
+
     /// Italian language.
-    case italian
+    case italian = "it"
+
     /// Japanese language.
-    case japanese
+    case japanese = "ja"
+
+    /// Japanese language in Hiragana form.
+    case japaneseHiragana = "ja-Hira"
+
+    /// Japanese language (latin script).
+    case japaneseLatin = "ja-Latn"
+
+    /// Japanese language in Kana form (non-latin script).
+    case japaneseKana = "ja_kana"
+
+    /// Kannada language
+    case kannada = "kn"
+
     /// Kazakh language.
-    case kazakh
+    case kazakh = "kk"
+
     /// Korean language.
-    case korean
+    case korean = "ko"
+
+    /// Korean language (latin script).
+    case koreanlatin = "ko-Latn"
+
     /// Kurdish language.
-    case kurdish
+    case kurdish = "ku"
+
+    /// Classical latin language.
+    case classicalLatin = "la"
+
     /// Latvian language.
-    case latvian
+    case latvian = "lv"
+
     /// Lithuanian language.
-    case lithuanian
+    case lithuanian = "lt"
+
     /// Luxembourgish language.
-    case luxembourgish
+    case luxembourgish = "lb"
+
     /// Macedonian language.
-    case macedonian
+    case macedonian = "mk"
+
     /// Malay language.
-    case malay
+    case malay = "ml"
+
     /// Maltese language.
-    case maltese
+    case maltese = "mt"
+
     /// Marathi language.
-    case marathi
+    case marathi = "mr"
+
     /// Mongolian language.
-    case mongolian
+    case mongolian = "mn"
+
     /// Nepali language.
-    case nepali
+    case nepali = "ne"
+
     /// Norwegian language.
-    case norwegian
+    case norwegian = "no"
+
     /// Occitan language.
-    case occitan
+    case occitan = "oc"
+
     /// Persian language.
-    case persian
+    case persian = "fa"
+
     /// Polish language.
-    case polish
+    case polish = "pl"
+
     /// Portuguese language.
-    case portuguese
+    case portuguese = "pt"
+
     /// Punjabi language.
-    case punjabi
+    case punjabi = "pa"
+
+    /// Western Punjabi language.
+    case westernPunjabi = "pnb"
+
     /// Romanian language.
-    case romanian
+    case romanian = "ro"
+
+    /// Romansh language.
+    case romansh = "rm"
+
     /// Russian language.
-    case russian
+    case russian = "ru"
+
     /// Sardinian language.
-    case sardinian
+    case sardinian = "sc"
+
     /// Scottish Gaelic language.
-    case scottishGaelic
+    case scottishGaelic = "gd"
+
     /// Serbian language.
-    case serbian
+    case serbianCyrillic = "sr"
+
+    /// Serbian language.
+    case serbianLatin = "sr-Latn"
+
     /// Slovak language.
-    case slovak
+    case slovak = "sk"
+
     /// Slovenian language.
-    case slovenian
+    case slovene = "sl"
+
     /// Spanish language.
-    case spanish
+    case spanish = "es"
+
     /// Swahili language.
-    case swahili
+    case swahili = "sw"
+
     /// Swedish language.
-    case swedish
+    case swedish = "sv"
+
     /// Tagalog language.
-    case tagalog
+    case tagalog = "tl"
+
     /// Tamil language.
-    case tamil
+    case tamil = "ta"
+
     /// Telugu language.
-    case telugu
+    case telugu = "te"
+
     /// Thai language.
-    case thai
+    case thai = "th"
+
     /// Turkish language.
-    case turkish
+    case turkish = "tr"
+
     /// Ukrainian language.
-    case ukrainian
+    case ukrainian = "uk"
+
     /// Urdu language.
-    case urdu
+    case urdu = "ur"
+
     /// Vietnamese language.
-    case vietnamese
+    case vietnamese = "vi"
+
     /// Welsh language.
-    case welsh
+    case welsh = "cy"
 }

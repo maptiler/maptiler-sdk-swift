@@ -13,8 +13,8 @@ import WebKit
 open class MTMapView: UIView {
     private var webViewExecutor: WebViewExecutor!
 
-    /// A camera representing the current viewpoint of the map.
-    public private(set) var camera: MTMapCamera = MTMapCamera.getCameraFromMapStyle()
+    /// A camera representing the current viewpoint of the map, allowing navigation
+    private var camera: MTMapCamera = MTMapCamera.getCameraFromMapStyle()
 
     /// Current reference style of the map object.
     public var referenceStyle: MTMapReferenceStyle = .streets

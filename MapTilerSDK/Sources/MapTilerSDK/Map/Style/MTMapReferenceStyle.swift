@@ -29,18 +29,18 @@ public enum MTMapReferenceStyle: String, @unchecked Sendable {
     /// A minimalist style for high contrast navigation.
     case bright
 
-    /// Reference style for topographic study
+    /// Reference style for topographic study.
     case topo
 
-    /// Reference style for stylish yet minimalist maps
+    /// Reference style for stylish yet minimalist maps.
     case voyager
 
-    /// Reference style for very high contrast stylish maps
+    /// Reference style for very high contrast stylish maps.
     case toner
 
-    /// Neutral greyscale style with hillshading suitable for colorful terrain-aware visualization
+    /// Neutral greyscale style with hillshading suitable for colorful terrain-aware visualization.
     case backdrop
 
-    /// Reference style without any variants
+    /// Reference style without any variants.
     case openStreetMap
 }

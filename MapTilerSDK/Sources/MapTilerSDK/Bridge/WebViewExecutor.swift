@@ -5,12 +5,31 @@
 
 import WebKit
 
+@MainActor
+protocol WebViewExecutorDelegate: AnyObject {
+    func webViewExecutor(_ executor: WebViewExecutor, didFinishNavigation navigation: WKNavigation)
+}
+
 // Class responsible for JS execution in WKWebView
+@MainActor
 package final class WebViewExecutor: MTCommandExecutable {
     private var webView: WKWebView?
+    private var webViewManager: WebViewManager!
+    weak var delegate: WebViewExecutorDelegate?
 
-    init(webView: WKWebView) {
+    init(frame: CGRect) {
+        webViewManager = WebViewManager()
+        webViewManager.delegate = self
+
+        guard let webView = webViewManager.getAttachableWebView(frame: frame) else {
+            return
+        }
+
         self.webView = webView
+    }
+
+    func getWebView() -> WKWebView? {
+        return webView
     }
 
     @MainActor
@@ -20,5 +39,11 @@ package final class WebViewExecutor: MTCommandExecutable {
         }
 
         webView.evaluateJavaScript(command.toJS())
+    }
+}
+
+extension WebViewExecutor: WebViewManagerDelegate {
+    func webViewManager(_ manager: WebViewManager, didFinishNavigation navigation: WKNavigation) {
+        delegate?.webViewExecutor(self, didFinishNavigation: navigation)
     }
 }

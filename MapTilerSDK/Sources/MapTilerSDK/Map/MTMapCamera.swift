@@ -71,6 +71,19 @@ public class MTMapCamera {
         return MTMapCamera()
     }
 
+    /// Returns camera object constructed from given options object.
+    /// - Parameters:
+    ///   - options: MTMapOptions object with initial camera options.
+    public static func getCameraWith(_ options: MTMapOptions) -> MTMapCamera {
+        return MTMapCamera(
+            centerCoordinate: options.center,
+            bearing: options.bearing,
+            pitch: options.pitch,
+            roll: options.roll,
+            elevation: options.elevation
+        )
+    }
+
     /// Returns camera object with the given center coordinate, bearing, pitch, roll and elevation.
     /// - Parameters:
     ///   - centerCoordinate: Latitude and longitude pair.

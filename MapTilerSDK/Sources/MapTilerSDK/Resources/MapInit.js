@@ -8,7 +8,7 @@ function initializeMap(apiKey, style, options) {
 
     const baseOptions = {
         container: 'map',
-        style: `https://api.maptiler.com/maps/${style}/style.json?key=${apiKey}`
+        style: style
     }
 
     const mapOptions = {...baseOptions, ...options}

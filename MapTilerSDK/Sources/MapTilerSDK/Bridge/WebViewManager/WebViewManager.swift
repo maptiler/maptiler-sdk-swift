@@ -6,8 +6,9 @@
 import WebKit
 import UIKit
 
+@MainActor
 protocol WebViewManagerDelegate: AnyObject {
-    func webViewManager(_ manager: WebViewManager, didFinishNavigation: WKNavigation)
+    func webViewManager(_ manager: WebViewManager, didFinishNavigation navigation: WKNavigation)
 }
 
 // Class responsible for initializing webview for JS bridging

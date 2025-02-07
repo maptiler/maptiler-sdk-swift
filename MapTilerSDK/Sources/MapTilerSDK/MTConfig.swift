@@ -12,7 +12,7 @@ public actor MTConfig {
 
     private var apiKey: String?
     private var unit: MTUnit = .metric
-    private var primaryLanguage: MTLanguage = .auto
+    private var primaryLanguage: MTLanguage = .special(.auto)
 
     /// Boolean indicating whether caching is enabled.
     public private(set) var isCachingEnabled: Bool = true

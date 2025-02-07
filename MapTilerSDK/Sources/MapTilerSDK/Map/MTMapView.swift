@@ -61,6 +61,8 @@ open class MTMapView: UIView {
         }
 
         MTBridge.shared.setExecutor(webViewExecutor)
+
+        initConfiguration()
     }
 
     private func initializeMap() {
@@ -78,6 +80,10 @@ open class MTMapView: UIView {
                 styleVariant: styleVariant)
             )
         }
+    }
+
+    private func initConfiguration() {
+        setUpDoubleTapGestureRecognizer()
     }
 }
 

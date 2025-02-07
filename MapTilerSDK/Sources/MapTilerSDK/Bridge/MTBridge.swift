@@ -13,6 +13,8 @@ package final class MTBridge: @unchecked Sendable {
     var executor: MTCommandExecutable?
     private var queue: DispatchQueue = DispatchQueue(label: "com.bridge.queue")
 
+    let mapObject: JSString = "map"
+
     private init() {}
 
     func setExecutor(_ executor: MTCommandExecutable) {

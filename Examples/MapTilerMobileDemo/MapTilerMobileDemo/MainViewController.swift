@@ -7,7 +7,12 @@ import UIKit
 import MapTilerSDK
 
 class MainViewController: UIViewController {
-    @IBOutlet weak var mapView: MTMapView!
+    @IBOutlet weak var mapView: MTMapView! {
+        didSet {
+            mapView.delegate = self
+        }
+    }
+
     @IBOutlet weak var mapControlView: MapControlView! {
         didSet {
             mapControlView.delegate = self
@@ -30,5 +35,20 @@ extension MainViewController: MapControlViewDelegate {
         Task {
             await mapView.zoomOut()
         }
+    }
+}
+
+extension MainViewController: MTMapViewDelegate {
+    func mapViewDidInitialize(_ mapView: MTMapView) {
+        print("-------------------------")
+        print(">>> MapTiler SDK Demo <<<")
+        print("--- Map Initialized ---")
+        print("-------------------------")
+    }
+    
+    func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent) {
+        print(">>> Event Propagation Demo <<<")
+        print("Event Triggered: \(event.rawValue)")
+        print("------------------------------")
     }
 }

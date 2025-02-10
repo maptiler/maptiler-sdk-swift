@@ -8,6 +8,7 @@ import WebKit
 @MainActor
 protocol WebViewExecutorDelegate: AnyObject {
     func webViewExecutor(_ executor: WebViewExecutor, didFinishNavigation navigation: WKNavigation)
+    func webViewExecutor(_ executor: WebViewExecutor, didTriggerEvent event: MTEvent)
 }
 
 // Class responsible for JS execution in WKWebView
@@ -43,6 +44,10 @@ package final class WebViewExecutor: MTCommandExecutable {
 }
 
 extension WebViewExecutor: WebViewManagerDelegate {
+    func webViewManager(_ manager: WebViewManager, didTriggerEvent event: MTEvent) {
+        delegate?.webViewExecutor(self, didTriggerEvent: event)
+    }
+
     func webViewManager(_ manager: WebViewManager, didFinishNavigation navigation: WKNavigation) {
         delegate?.webViewExecutor(self, didFinishNavigation: navigation)
     }

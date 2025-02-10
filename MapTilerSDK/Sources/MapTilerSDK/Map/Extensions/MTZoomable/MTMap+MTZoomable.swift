@@ -15,14 +15,4 @@ extension MTMapView: MTZoomable {
     public func zoomOut() async {
         await MTBridge.shared.execute(ZoomOut())
     }
-
-    package func setUpDoubleTapGestureRecognizer() {
-        let doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
-        doubleTapGestureRecognizer.numberOfTapsRequired = 2
-        addGestureRecognizer(doubleTapGestureRecognizer)
-    }
-
-    @objc package func doubleTapped() async {
-        await zoomIn()
-    }
 }

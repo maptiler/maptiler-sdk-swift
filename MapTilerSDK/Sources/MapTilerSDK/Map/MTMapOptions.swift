@@ -120,7 +120,7 @@ public struct MTMapOptions: @unchecked Sendable {
     /// Boolean indicating whether MapTiler logo is visible on the map.
     ///
     /// If true, the MapTiler logo will be shown. false will only work on premium accounts
-    public private(set) var maptilerLogoIsVisible: Bool? = true
+    public private(set) var maptilerLogoIsVisible: Bool?
 
     /// The maximum number of tiles stored in the tile cache for a given source.
     ///
@@ -155,6 +155,7 @@ public struct MTMapOptions: @unchecked Sendable {
 
     /// Boolean indicating whether the drag to pan interaction is enabled.
     public private(set) var dragPanIsEnabled: Bool?
+
     /// Boolean indicating whether the drag to rotate interaction is enabled.
     public private(set) var dragRotateIsEnabled: Bool?
 

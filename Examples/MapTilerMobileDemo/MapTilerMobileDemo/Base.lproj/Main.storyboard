@@ -17,10 +17,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vtk-8K-li4">
-                                <rect key="frame" x="0.0" y="130" width="393" height="688"/>
+                                <rect key="frame" x="0.0" y="130" width="393" height="588"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uRD-JF-5ak" customClass="MTMapView" customModule="MapTilerSDK">
-                                        <rect key="frame" x="0.0" y="0.0" width="393" height="688"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="588"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </view>
                                 </subviews>
@@ -39,19 +39,30 @@
                                     <constraint firstAttribute="height" constant="60" id="clK-nr-5Hb"/>
                                 </constraints>
                             </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bPo-zQ-sJh" customClass="MapControlView" customModule="MapTilerMobileDemo" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="718" width="393" height="100"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="100" id="hAh-nG-6dj"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="bPo-zQ-sJh" firstAttribute="top" secondItem="Vtk-8K-li4" secondAttribute="bottom" id="5K0-wB-XEe"/>
                             <constraint firstItem="MDW-cT-npx" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="6" id="E5k-DQ-jZv"/>
+                            <constraint firstItem="bPo-zQ-sJh" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="KLC-x2-5ki"/>
+                            <constraint firstItem="bPo-zQ-sJh" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="Oc2-en-SUX"/>
                             <constraint firstItem="Vtk-8K-li4" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="dNQ-Nk-Rrt"/>
                             <constraint firstItem="Vtk-8K-li4" firstAttribute="top" secondItem="MDW-cT-npx" secondAttribute="bottom" constant="5" id="eep-Zc-LPJ"/>
-                            <constraint firstItem="Vtk-8K-li4" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="oFy-gB-zJa"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="bPo-zQ-sJh" secondAttribute="trailing" id="iBu-fL-cY5"/>
                             <constraint firstItem="MDW-cT-npx" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="ri4-pi-WQJ"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="xxb-4C-0bd"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="mapControlView" destination="bPo-zQ-sJh" id="t9H-nD-HJn"/>
                         <outlet property="mapView" destination="uRD-JF-5ak" id="u5s-Un-4aZ"/>
                     </connections>
                 </viewController>

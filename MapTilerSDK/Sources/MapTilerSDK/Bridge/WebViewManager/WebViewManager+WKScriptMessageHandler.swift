@@ -28,7 +28,7 @@ extension WebViewManager: WKScriptMessageHandler {
 
     private func handleEvent(with message: WKScriptMessage) {
         if let messageBody = message.body as? [String: Any], let event = messageBody[Constants.Map.event] as? String {
-            _ = event
+            eventProcessor.registerEvent(MTEvent(rawValue: event))
         }
     }
 }

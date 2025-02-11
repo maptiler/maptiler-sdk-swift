@@ -17,10 +17,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vtk-8K-li4">
-                                <rect key="frame" x="0.0" y="130" width="393" height="588"/>
+                                <rect key="frame" x="0.0" y="130" width="393" height="568"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uRD-JF-5ak" customClass="MTMapView" customModule="MapTilerSDK">
-                                        <rect key="frame" x="0.0" y="0.0" width="393" height="588"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="568"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </view>
                                 </subviews>
@@ -40,10 +40,10 @@
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bPo-zQ-sJh" customClass="MapControlView" customModule="MapTilerMobileDemo" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="718" width="393" height="100"/>
+                                <rect key="frame" x="0.0" y="698" width="393" height="120"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="100" id="hAh-nG-6dj"/>
+                                    <constraint firstAttribute="height" constant="120" id="hAh-nG-6dj"/>
                                 </constraints>
                             </view>
                         </subviews>

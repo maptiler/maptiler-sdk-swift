@@ -58,3 +58,18 @@ extension MainViewController: MTMapViewDelegate {
         print("------------------------------")
     }
 }
+
+extension MainViewController: MTMapViewDelegate {
+    func mapViewDidInitialize(_ mapView: MTMapView) {
+        print("-------------------------")
+        print(">>> MapTiler SDK Demo <<<")
+        print("--- Map Initialized ---")
+        print("-------------------------")
+    }
+
+    func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent) {
+        print(">>> Event Propagation Demo <<<")
+        print("Event Triggered: \(event.rawValue)")
+        print("------------------------------")
+    }
+}

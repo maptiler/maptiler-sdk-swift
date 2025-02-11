@@ -7,4 +7,7 @@
 @MainActor
 public enum MTGestureType {
     case doubleTapZoomIn
+    case dragPan
+    case twoFingersDragPitch
+    case pinchRotateAndZoom
 }

@@ -26,7 +26,9 @@ package final class WebViewExecutor: MTCommandExecutable {
             return
         }
 
+        webView.scrollView.isScrollEnabled = false
         self.webView = webView
+
     }
 
     func getWebView() -> WKWebView? {

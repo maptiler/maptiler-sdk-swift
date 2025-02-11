@@ -76,7 +76,7 @@ open class MTMapView: UIView {
         MTBridge.shared.setExecutor(webViewExecutor)
     }
 
-    private func initializeMap() {
+    package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {
                 return
@@ -93,15 +93,5 @@ open class MTMapView: UIView {
 
             delegate?.mapViewDidInitialize(self)
         }
-    }
-}
-
-extension MTMapView: WebViewExecutorDelegate {
-    func webViewExecutor(_ executor: WebViewExecutor, didTriggerEvent event: MTEvent) {
-        delegate?.mapView(self, didTriggerEvent: event)
-    }
-
-    package func webViewExecutor(_ executor: WebViewExecutor, didFinishNavigation navigation: WKNavigation) {
-        initializeMap()
     }
 }

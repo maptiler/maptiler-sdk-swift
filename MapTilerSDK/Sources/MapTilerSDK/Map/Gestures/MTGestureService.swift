@@ -9,14 +9,17 @@ public class MTGestureService {
     public private(set) var enabledGestures: [MTGestureType: MTGesture] = [:]
 
     init() {
-        enabledGestures[.doubleTapZoomIn] = MTDoubleTapZoomInGesture()
+        enabledGestures[.doubleTapZoomIn] = MTGestureFactory.makeGesture(with: .doubleTapZoomIn)
+        enabledGestures[.dragPan] = MTGestureFactory.makeGesture(with: .dragPan)
+        enabledGestures[.twoFingersDragPitch] = MTGestureFactory.makeGesture(with: .twoFingersDragPitch)
+        enabledGestures[.pinchRotateAndZoom] = MTGestureFactory.makeGesture(with: .pinchRotateAndZoom)
     }
 
     /// Registers the gesture with the provided type.
     /// - Parameters:
     ///   - type: type of gesture to enable.
     public func enableGesture(with type: MTGestureType) async {
-        enabledGestures[type] = MTDoubleTapZoomInGesture()
+        enabledGestures[type] = MTGestureFactory.makeGesture(with: type)
 
         await enabledGestures[type]!.enable()
     }

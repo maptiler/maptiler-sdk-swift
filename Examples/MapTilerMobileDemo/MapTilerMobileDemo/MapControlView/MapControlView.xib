@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -10,6 +11,8 @@
             <connections>
                 <outlet property="bearingPickerView" destination="E5U-tC-jw2" id="IIz-Ti-uTh"/>
                 <outlet property="contentView" destination="Coz-jU-X8N" id="BAv-JN-gtb"/>
+                <outlet property="easeToButton" destination="2lc-Tz-nWX" id="1pc-SM-sge"/>
+                <outlet property="flyToButton" destination="Vsn-IW-FB2" id="zNe-Rz-vUg"/>
                 <outlet property="zoomInButton" destination="79k-4f-Lmf" id="j5u-iN-GLG"/>
                 <outlet property="zoomOutButton" destination="icN-St-MUz" id="Ajj-ug-vhJ"/>
                 <outlet property="zoomView" destination="Ifn-xc-LH1" id="vBm-sN-cfX"/>
@@ -71,11 +74,13 @@
                         <constraint firstAttribute="width" constant="68" id="L4D-us-jLm"/>
                     </constraints>
                     <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
-                    <nil key="textColor"/>
+                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="E5U-tC-jw2">
-                    <rect key="frame" x="78" y="30" width="100" height="85"/>
+                    <rect key="frame" x="78" y="31" width="100" height="84"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="100" id="xtv-oi-Mga"/>
                     </constraints>
@@ -84,16 +89,49 @@
                         <outlet property="delegate" destination="-1" id="RTc-l1-CSh"/>
                     </connections>
                 </pickerView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vsn-IW-FB2">
+                    <rect key="frame" x="180" y="12" width="186" height="36"/>
+                    <color key="backgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="36" id="2Gc-53-Dgi"/>
+                        <constraint firstAttribute="width" constant="186" id="YRE-Be-f5H"/>
+                    </constraints>
+                    <color key="tintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="filled" title="FLY TO UNTERÄGERI">
+                        <color key="baseBackgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    </buttonConfiguration>
+                    <connections>
+                        <action selector="flyToButtonTouchUpInside:" destination="-1" eventType="touchUpInside" id="2HX-vl-KT9"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2lc-Tz-nWX">
+                    <rect key="frame" x="180" y="63" width="186" height="35"/>
+                    <color key="backgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="tintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="filled" title="EASE TO BRNO">
+                        <color key="baseBackgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    </buttonConfiguration>
+                    <connections>
+                        <action selector="easeToButtonTouchUpInside:" destination="-1" eventType="touchUpInside" id="W3b-u0-65U"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
-                <constraint firstItem="E5U-tC-jw2" firstAttribute="top" secondItem="QXy-gh-zc1" secondAttribute="bottom" constant="-2" id="9mS-iH-XD2"/>
+                <constraint firstItem="E5U-tC-jw2" firstAttribute="top" secondItem="QXy-gh-zc1" secondAttribute="bottom" constant="-1" id="9mS-iH-XD2"/>
+                <constraint firstItem="2lc-Tz-nWX" firstAttribute="trailing" secondItem="Vsn-IW-FB2" secondAttribute="trailing" id="Jtz-mo-lnp"/>
                 <constraint firstAttribute="leading" secondItem="Ifn-xc-LH1" secondAttribute="leading" constant="-14" id="L9c-kg-ZOG"/>
                 <constraint firstItem="QXy-gh-zc1" firstAttribute="top" secondItem="79k-4f-Lmf" secondAttribute="top" constant="-6" id="Mn9-LD-Nvv"/>
                 <constraint firstItem="E5U-tC-jw2" firstAttribute="centerX" secondItem="QXy-gh-zc1" secondAttribute="centerX" id="PKF-Op-J8H"/>
+                <constraint firstItem="2lc-Tz-nWX" firstAttribute="top" secondItem="Vsn-IW-FB2" secondAttribute="bottom" constant="15" id="Pbh-8j-daJ"/>
                 <constraint firstAttribute="bottom" secondItem="E5U-tC-jw2" secondAttribute="bottom" constant="5" id="So8-tx-G8E"/>
                 <constraint firstItem="Ifn-xc-LH1" firstAttribute="centerY" secondItem="Coz-jU-X8N" secondAttribute="centerY" id="ZIo-e5-PjV"/>
+                <constraint firstItem="Vsn-IW-FB2" firstAttribute="top" secondItem="Coz-jU-X8N" secondAttribute="top" constant="12" id="g6e-Kr-0MF"/>
+                <constraint firstItem="2lc-Tz-nWX" firstAttribute="leading" secondItem="Vsn-IW-FB2" secondAttribute="leading" id="nyb-UU-Uh7"/>
                 <constraint firstItem="QXy-gh-zc1" firstAttribute="leading" secondItem="Ifn-xc-LH1" secondAttribute="trailing" constant="20" id="s3u-ma-ZTP"/>
+                <constraint firstItem="Vsn-IW-FB2" firstAttribute="leading" secondItem="QXy-gh-zc1" secondAttribute="trailing" constant="18" id="uY1-0s-ldr"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="196.94656488549617" y="-244.36619718309859"/>

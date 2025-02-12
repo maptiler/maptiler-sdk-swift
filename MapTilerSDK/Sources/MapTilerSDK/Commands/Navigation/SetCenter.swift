@@ -1,0 +1,14 @@
+//
+//  SetCenter.swift
+//  MapTilerSDK
+//
+import CoreLocation
+
+package struct SetCenter: MTCommand {
+    var center: CLLocationCoordinate2D
+
+    package func toJS() -> JSString {
+        let centerLngLat: LngLat = center.toLngLat()
+        return "\(MTBridge.shared.mapObject).setCenter([\(centerLngLat.lng), \(centerLngLat.lat)]);"
+    }
+}

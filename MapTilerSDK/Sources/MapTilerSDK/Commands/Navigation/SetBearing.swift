@@ -1,0 +1,12 @@
+//
+//  SetBearing.swift
+//  MapTilerSDK
+//
+
+package struct SetBearing: MTCommand {
+    var bearing: Double
+
+    package func toJS() -> JSString {
+        return "\(MTBridge.shared.mapObject).setBearing(\(bearing));"
+    }
+}

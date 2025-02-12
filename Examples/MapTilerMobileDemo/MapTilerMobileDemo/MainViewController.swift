@@ -36,6 +36,12 @@ extension MainViewController: MapControlViewDelegate {
             await mapView.zoomOut()
         }
     }
+
+    func mapControlView(_ mapControlView: MapControlView, didSelectBearing bearing: Double) {
+        Task {
+            await mapView.setBearing(bearing)
+        }
+    }
 }
 
 extension MainViewController: MTMapViewDelegate {

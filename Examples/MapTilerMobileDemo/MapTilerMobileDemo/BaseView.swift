@@ -20,7 +20,7 @@ class BaseView: UIView {
         commonInit()
     }
 
-    private func commonInit() {
+    func commonInit() {
         Bundle.main.loadNibNamed(String(describing: type(of: self)), owner: self)
         addSubview(contentView)
     }

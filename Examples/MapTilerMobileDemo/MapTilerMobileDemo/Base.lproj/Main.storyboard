@@ -2,9 +2,9 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -20,13 +20,13 @@
                                 <rect key="frame" x="0.0" y="130" width="393" height="568"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uRD-JF-5ak" customClass="MTMapView" customModule="MapTilerSDK">
-                                        <rect key="frame" x="0.0" y="0.0" width="393" height="568"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="403" height="568"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="uRD-JF-5ak" secondAttribute="trailing" id="DMj-vh-MQm"/>
+                                    <constraint firstAttribute="trailing" secondItem="uRD-JF-5ak" secondAttribute="trailing" constant="-10" id="DMj-vh-MQm"/>
                                     <constraint firstAttribute="bottom" secondItem="uRD-JF-5ak" secondAttribute="bottom" id="jKH-Qf-0Ca"/>
                                     <constraint firstItem="uRD-JF-5ak" firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="tMB-SC-Ixd"/>
                                     <constraint firstItem="uRD-JF-5ak" firstAttribute="top" secondItem="Vtk-8K-li4" secondAttribute="top" id="uMT-d3-2Im"/>
@@ -41,14 +41,22 @@
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bPo-zQ-sJh" customClass="MapControlView" customModule="MapTilerMobileDemo" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="698" width="393" height="120"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="120" id="hAh-nG-6dj"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JMD-r8-val" userLabel="JumpContainerView">
+                                <rect key="frame" x="0.0" y="130" width="393" height="60"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.25326849489795916" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="2s7-f3-ASs"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="bPo-zQ-sJh" firstAttribute="top" secondItem="Vtk-8K-li4" secondAttribute="bottom" id="5K0-wB-XEe"/>
                             <constraint firstItem="MDW-cT-npx" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="6" id="E5k-DQ-jZv"/>
@@ -58,10 +66,14 @@
                             <constraint firstItem="Vtk-8K-li4" firstAttribute="top" secondItem="MDW-cT-npx" secondAttribute="bottom" constant="5" id="eep-Zc-LPJ"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="bPo-zQ-sJh" secondAttribute="trailing" id="iBu-fL-cY5"/>
                             <constraint firstItem="MDW-cT-npx" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="ri4-pi-WQJ"/>
+                            <constraint firstItem="JMD-r8-val" firstAttribute="top" secondItem="Vtk-8K-li4" secondAttribute="top" id="vIk-d0-2OM"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="xxb-4C-0bd"/>
+                            <constraint firstItem="JMD-r8-val" firstAttribute="trailing" secondItem="Vtk-8K-li4" secondAttribute="trailing" id="zHu-Sz-v8C"/>
+                            <constraint firstItem="JMD-r8-val" firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="zuk-Fz-80W"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="jumpContainerView" destination="JMD-r8-val" id="zW0-Rd-P2l"/>
                         <outlet property="mapControlView" destination="bPo-zQ-sJh" id="t9H-nD-HJn"/>
                         <outlet property="mapView" destination="uRD-JF-5ak" id="u5s-Un-4aZ"/>
                     </connections>
@@ -73,8 +85,5 @@
     </scenes>
     <resources>
         <image name="Image" width="812" height="212"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
     </resources>
 </document>

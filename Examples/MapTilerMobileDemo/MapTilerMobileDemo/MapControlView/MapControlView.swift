@@ -8,6 +8,8 @@ import UIKit
 protocol MapControlViewDelegate: AnyObject {
     func mapControlViewDidTapZoomIn(_ mapControlView: MapControlView)
     func mapControlViewDidTapZoomOut(_ mapControlView: MapControlView)
+    func mapControlViewDidTapFlyTo(_ mapControlView: MapControlView)
+    func mapControlViewDidTapEaseTo(_ mapControlView: MapControlView)
     func mapControlView(_ mapControlView: MapControlView, didSelectBearing bearing: Double)
 }
 
@@ -22,6 +24,8 @@ class MapControlView: BaseView {
 
     @IBOutlet weak var zoomInButton: UIButton!
     @IBOutlet weak var zoomOutButton: UIButton!
+    @IBOutlet weak var flyToButton: UIButton!
+    @IBOutlet weak var easeToButton: UIButton!
     @IBOutlet weak var zoomView: UIView!
     @IBOutlet weak var bearingPickerView: UIPickerView!
 
@@ -33,6 +37,7 @@ class MapControlView: BaseView {
         super.commonInit()
 
         configZoomView()
+        configNavigationButtons()
     }
 
     private func configZoomView() {
@@ -41,12 +46,25 @@ class MapControlView: BaseView {
         zoomView.layer.cornerRadius = Constants.defaultCornerRadius
     }
 
+    private func configNavigationButtons() {
+        flyToButton.layer.cornerRadius = Constants.defaultCornerRadius
+        easeToButton.layer.cornerRadius = Constants.defaultCornerRadius
+    }
+
     @IBAction func zoomInButtonTouchUpInside(_ sender: UIButton) {
         delegate?.mapControlViewDidTapZoomIn(self)
     }
 
     @IBAction func zoomOutButtonTouchUpInside(_ sender: UIButton) {
         delegate?.mapControlViewDidTapZoomOut(self)
+    }
+
+    @IBAction func flyToButtonTouchUpInside(_ sender: UIButton) {
+        delegate?.mapControlViewDidTapFlyTo(self)
+    }
+
+    @IBAction func easeToButtonTouchUpInside(_ sender: UIButton) {
+        delegate?.mapControlViewDidTapEaseTo(self)
     }
 }
 
@@ -59,8 +77,8 @@ extension MapControlView: UIPickerViewDataSource, UIPickerViewDelegate {
         return Constants.bearingPickerViewNumberOfRows
     }
 
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return "\(bearings[row])°"
+    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+        return NSAttributedString(string: "\(bearings[row])°", attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
     }
 
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {

@@ -27,7 +27,9 @@ class MapControlView: BaseView {
     @IBOutlet weak var flyToButton: UIButton!
     @IBOutlet weak var easeToButton: UIButton!
     @IBOutlet weak var zoomView: UIView!
-    @IBOutlet weak var bearingPickerView: UIPickerView!
+    @IBOutlet weak var bearingTextField: UITextField!
+
+    private var bearingPickerView: UIPickerView!
 
     weak var delegate: MapControlViewDelegate?
 
@@ -36,13 +38,20 @@ class MapControlView: BaseView {
     override func commonInit() {
         super.commonInit()
 
+        configPickerView()
         configZoomView()
         configNavigationButtons()
     }
 
+    private func configPickerView() {
+        bearingPickerView = UIPickerView()
+
+        bearingPickerView.dataSource = self
+        bearingPickerView.delegate = self
+        bearingTextField.inputView = bearingPickerView
+    }
+
     private func configZoomView() {
-        zoomView.layer.borderWidth = Constants.defaultBorderWidth
-        zoomView.layer.borderColor = Constants.accentColor.cgColor
         zoomView.layer.cornerRadius = Constants.defaultCornerRadius
     }
 
@@ -78,10 +87,11 @@ extension MapControlView: UIPickerViewDataSource, UIPickerViewDelegate {
     }
 
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-        return NSAttributedString(string: "\(bearings[row])°", attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
+        return NSAttributedString(string: "\(bearings[row])°", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
     }
 
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         delegate?.mapControlView(self, didSelectBearing: Double(bearings[row]))
+        bearingTextField.text = "^\(bearings[row])°"
     }
 }

@@ -13,4 +13,5 @@ public protocol MTNavigable {
     func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?) async
     func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async
     func jumpTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async
+    func setPadding(_ options: MTPaddingOptions) async
 }

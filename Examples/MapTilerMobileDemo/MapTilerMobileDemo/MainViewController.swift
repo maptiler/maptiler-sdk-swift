@@ -86,9 +86,6 @@ extension MainViewController: MapControlViewDelegate {
             let unterageriCoordinates: CLLocationCoordinate2D = Constants.unterageriCoordinates
 
             await mapView.flyTo(unterageriCoordinates, options: nil)
-
-            dataModel.latitude = unterageriCoordinates.latitude
-            dataModel.longitude = unterageriCoordinates.longitude
         }
     }
 
@@ -98,9 +95,6 @@ extension MainViewController: MapControlViewDelegate {
             let options = MTCameraOptions(zoom: Constants.defaultZoomLevel)
 
             await mapView.easeTo(brnoCoordinates, options: options)
-
-            dataModel.latitude = brnoCoordinates.latitude
-            dataModel.longitude = brnoCoordinates.longitude
         }
     }
 

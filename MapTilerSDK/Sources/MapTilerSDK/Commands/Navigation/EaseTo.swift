@@ -10,8 +10,6 @@ package struct EaseTo: MTCommand {
     var options: MTCameraOptions?
 
     package func toJS() -> JSString {
-        let centerLngLat = center.toLngLat()
-
         let options = EaseToOptions(center: center, options: options)
         let optionsString: JSString = options.toJSON() ?? ""
 

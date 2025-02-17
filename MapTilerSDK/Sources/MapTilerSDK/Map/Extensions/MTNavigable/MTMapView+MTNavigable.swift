@@ -49,4 +49,9 @@ extension MTMapView: MTNavigable {
     public func jumpTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async {
         await MTBridge.shared.execute(JumpTo(center: center, options: options))
     }
+
+    /// Sets the padding in pixels around the viewport.
+    public func setPadding(_ options: MTPaddingOptions) async {
+        await MTBridge.shared.execute(SetPadding(paddingOptions: options))
+    }
 }

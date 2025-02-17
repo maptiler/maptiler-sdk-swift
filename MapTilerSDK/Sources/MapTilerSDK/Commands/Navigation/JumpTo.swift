@@ -10,8 +10,6 @@ package struct JumpTo: MTCommand {
     var options: MTCameraOptions?
 
     package func toJS() -> JSString {
-        let centerLngLat = center.toLngLat()
-
         let options = JumpToOptions(center: center, options: options)
         let optionsString: JSString = options.toJSON() ?? ""
 

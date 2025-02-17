@@ -10,8 +10,6 @@ package struct FlyTo: MTCommand {
     var options: MTFlyToOptions?
 
     package func toJS() -> JSString {
-        let centerLngLat = center.toLngLat()
-
         let options = FlyToOptions(center: center, options: options)
         let optionsString: JSString = options.toJSON() ?? ""
 

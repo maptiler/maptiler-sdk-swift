@@ -63,7 +63,7 @@ struct JumpView: View {
                    selection: $selected,
                    content: {
                 if selected == Constants.pickerPlaceholder {
-                    Text(Constants.pickerPlaceholder)
+                    Text(Constants.pickerPlaceholder).tag(Constants.pickerPlaceholder)
                 }
 
                 ForEach(jumpSelections, id: \.self) {

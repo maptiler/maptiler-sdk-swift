@@ -54,4 +54,116 @@ extension MTMapView: MTNavigable {
     public func setPadding(_ options: MTPaddingOptions) async {
         await MTBridge.shared.execute(SetPadding(paddingOptions: options))
     }
+
+    /// Sets the value of centerClampedToGround.
+    ///
+    /// If true, the elevation of the center point will automatically be set to the terrain elevation
+    /// (or zero if terrain is not enabled).
+    /// If false, the elevation of the center point will default to sea level and will not automatically update.
+    /// Needs to be set to false to keep the camera above ground when pitch > 90 degrees.
+    /// - Parameters:
+    ///   - isCenterClampedToGround: The boolean value indicating if center will be clamped to ground.
+    /// - Note: Defaults to true.
+    public func setIsCenterClampedToGround(_ isCenterClampedToGround: Bool) async {
+        await MTBridge.shared.execute(SetCenterClampedToGround(isCenterClampedToGround: isCenterClampedToGround))
+    }
+
+    /// Sets the elevation of the map's center point, in meters above sea level.
+    /// - Parameters:
+    ///   - elevation: The desired elevation.
+    /// - Note: Triggers the following events: moveStart and moveEnd.
+    public func setCenterElevation(_ elevation: Double) async {
+        await MTBridge.shared.execute(SetCenterElevation(elevation: elevation))
+    }
+
+    /// Sets or clears the map's maximum pitch.
+    ///
+    /// If the map's current pitch is higher than the new maximum, the map will pitch to the new maximum.
+    /// If null is provided, the function removes the current maximum pitch (sets it to 60).
+    /// - Parameters:
+    /// - maxPitch: The maximum pitch to set (0-85).
+    public func setMaxPitch(_ maxPitch: Double?) async {
+        await MTBridge.shared.execute(SetMaxPitch(maxPitch: maxPitch))
+    }
+
+    /// Sets or clears the map's maximum zoom.
+    ///
+    /// If the map's current zoom level is higher than the new maximum, the map will zoom to the new maximum.
+    /// If null or undefined is provided, the function removes the current maximum zoom (sets it to 22).
+    /// - Parameters:
+    /// - maxZoom: The maximum zoom level to set.
+    public func setMaxZoom(_ maxZoom: Double?) async {
+        await MTBridge.shared.execute(SetMaxZoom(maxZoom: maxZoom))
+    }
+
+    /// Sets or clears the map's minimum pitch.
+    ///
+    /// If the map's current pitch is lower than the new minimum, the map will pitch to the new minimum.
+    ///  If null is provided, the function removes the current minimum pitch (i.e. sets it to 0).
+    /// - Parameters:
+    /// - minPitch: The minimum pitch to set (0-85)
+    public func setMinPitch(_ minPitch: Double?) async {
+        await MTBridge.shared.execute(SetMinPitch(minPitch: minPitch))
+    }
+
+    /// Sets or clears the map's minimum zoom.
+    ///
+    /// If the map's current zoom level is lower than the new minimum, the map will zoom to the new minimum.
+    /// If null  is provided, the function removes the current minimum zoom (i.e. sets it to -2).
+    /// - Parameters:
+    /// - minZoom: The minimum zoom level to set (-2 - 24).
+    public func setMinZoom(_ minZoom: Double?) async {
+        await MTBridge.shared.execute(SetMinZoom(minZoom: minZoom))
+    }
+
+    /// Sets the map's pitch (tilt).
+    /// - Parameters:
+    /// - pitch: The pitch to set, measured in degrees away from the plane of the screen (0-60).
+    public func setPitch(_ pitch: Double) async {
+        await MTBridge.shared.execute(SetPitch(pitch: pitch))
+    }
+
+    /// Sets the map's roll angle.
+    /// - Parameters:
+    ///   - roll: The roll to set, measured in degrees about the camera boresight.
+    /// - Note: Triggers the following events: moveStart, moveEnd, rollStart, and rollEnd.
+    public func setRoll(_ roll: Double) async {
+        await MTBridge.shared.execute(SetRoll(roll: roll))
+    }
+
+    /// Sets the map's zoom level.
+    ///  - Parameters:
+    ///   - zoom: The zoom level to set (0-20).
+    public func setZoom(_ zoom: Double) async {
+        await MTBridge.shared.execute(SetZoom(zoom: zoom))
+    }
+
+    /// Set combination of center, bearing, pitch, roll and elevation.
+    public func setViewport(with cameraHelper: MTMapCameraHelper, zoomLevel: Double? = nil) {
+        Task {
+            if let centerCoordinate = cameraHelper.centerCoordinate {
+                await setCenter(centerCoordinate)
+            }
+
+            if let bearing = cameraHelper.bearing {
+                await setBearing(bearing)
+            }
+
+            if let pitch = cameraHelper.pitch {
+                await setPitch(pitch)
+            }
+
+            if let roll = cameraHelper.roll {
+                await setRoll(roll)
+            }
+
+            if let elevation = cameraHelper.elevation {
+                await setCenterElevation(elevation)
+            }
+
+            if let zoomLevel {
+                await setZoom(zoomLevel)
+            }
+        }
+    }
 }

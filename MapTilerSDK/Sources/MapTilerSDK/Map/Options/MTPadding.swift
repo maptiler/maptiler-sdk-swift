@@ -18,5 +18,7 @@ public struct MTPaddingOptions: @unchecked Sendable, Codable {
     ) {
         self.left = left
         self.top = top
+        self.right = right
+        self.bottom = bottom
     }
 }

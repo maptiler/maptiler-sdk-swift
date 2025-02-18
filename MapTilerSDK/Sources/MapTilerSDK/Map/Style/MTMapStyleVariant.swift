@@ -4,7 +4,9 @@
 //
 
 /// Variants of the reference styles.
-public enum MTMapStyleVariant: String, @unchecked Sendable {
+public enum MTMapStyleVariant: String, @unchecked Sendable, CaseIterable, Identifiable {
+    public var id: String { rawValue }
+
     case dark
     case light
     case pastel
@@ -14,4 +16,5 @@ public enum MTMapStyleVariant: String, @unchecked Sendable {
     case vintage
     case lite
     case lines
+    case background
 }

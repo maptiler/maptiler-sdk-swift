@@ -43,8 +43,16 @@ extension MTMapView: MTStylable {
     /// Features that cross 180 and -180 degrees longitude will be cut in two (with one portion on
     /// the right edge of the map and the other on the left edge of the map) at every zoom level.
     ///  - Parameters:
-    ///   - shouldRenderWorldCopies: Boolean indicating whether world copies should be rendered.
+    ///     - shouldRenderWorldCopies: Boolean indicating whether world copies should be rendered.
     public func setShouldRenderWorldCopies(_ shouldRenderWorldCopies: Bool) async {
         await MTBridge.shared.execute(SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies))
+    }
+
+    /// Updates the map's style object with a new value.
+    ///   - Parameters:
+    ///     - referenceStyle:  Desired reference map style.
+    ///     - styleVariant: Optional variant of the reference style.
+    public func setStyle(_ referenceStyle: MTMapReferenceStyle, styleVariant: MTMapStyleVariant?) async {
+        await MTBridge.shared.execute(SetStyle(referenceStyle: referenceStyle, styleVariant: styleVariant))
     }
 }

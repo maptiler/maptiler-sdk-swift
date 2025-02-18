@@ -40,7 +40,7 @@ struct JumpView: View {
         static let pickerWidth: CGFloat = 160.0
         static let defaultHeight: CGFloat = 10.0
         static let defaultCornerRadius: CGFloat = 8.0
-        static let jumpActionBackgroundColor = Color(red: 0/255, green: 161/255, blue: 194/255)
+        static let jumpActionBackgroundColor = Color(red: 255/255, green: 255/255, blue: 255/255)
     }
 
     private let jumpSelections = [
@@ -85,7 +85,7 @@ struct JumpView: View {
                     .frame(maxWidth: Constants.defaultWidth, maxHeight: Constants.defaultHeight)
                     .padding()
                     .background(Constants.jumpActionBackgroundColor)
-                    .foregroundColor(.white)
+                    .foregroundColor(.secondary)
                     .cornerRadius(Constants.defaultCornerRadius)
             }
         }

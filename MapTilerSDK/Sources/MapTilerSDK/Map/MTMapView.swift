@@ -68,6 +68,15 @@ open class MTMapView: UIView {
 
         if let webView = webViewExecutor.getWebView() {
             addSubview(webView)
+
+            webView.translatesAutoresizingMaskIntoConstraints = false
+
+            NSLayoutConstraint.activate([
+                webView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                webView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                webView.topAnchor.constraint(equalTo: topAnchor),
+                webView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
         }
 
         MTBridge.shared.setExecutor(webViewExecutor)

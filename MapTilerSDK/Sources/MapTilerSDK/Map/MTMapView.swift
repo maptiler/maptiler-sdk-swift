@@ -18,9 +18,6 @@ public protocol MTMapViewDelegate: AnyObject {
 /// Exposes methods and properties that enable changes to the map,
 /// and fires events that can be interacted with.
 open class MTMapView: UIView {
-    /// A camera representing the current viewpoint of the map, allowing navigation
-    private var camera: MTMapCamera = MTMapCamera.getCameraFromMapStyle()
-
     /// Current reference style of the map object.
     public var referenceStyle: MTMapReferenceStyle = .streets
 
@@ -81,8 +78,6 @@ open class MTMapView: UIView {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {
                 return
             }
-
-            camera = MTMapCamera.getCameraWith(options)
 
             await MTBridge.shared.execute(InitializeMap(
                 apiKey: apiKey,

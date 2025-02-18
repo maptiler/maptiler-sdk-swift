@@ -3,7 +3,7 @@
 //  MapTilerSDK
 //
 
-public enum MTLanguage: Codable {
+public enum MTLanguage: @unchecked Sendable, Codable {
     case special(MTSpecialLanguage)
     case country(MTCountryLanguage)
 

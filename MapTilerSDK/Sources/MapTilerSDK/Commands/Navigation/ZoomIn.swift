@@ -5,6 +5,6 @@
 
 package struct ZoomIn: MTCommand {
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).zoomIn();"
+        return "\(MTBridge.mapObject).zoomIn();"
     }
 }

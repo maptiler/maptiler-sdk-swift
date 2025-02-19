@@ -9,6 +9,6 @@ package struct SetMaxZoom: MTCommand {
     var maxZoom: Double?
 
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).setMaxZoom(\(maxZoom ?? defaultZoom));"
+        return "\(MTBridge.mapObject).setMaxZoom(\(maxZoom ?? defaultZoom));"
     }
 }

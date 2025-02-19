@@ -8,11 +8,19 @@
 public struct MTDoubleTapZoomInGesture: MTGesture {
     public var type: MTGestureType = .doubleTapZoomIn
 
+    private var bridge: MTBridge!
+
+    private init() {}
+
+    package init(bridge: MTBridge) {
+        self.bridge = bridge
+    }
+
     public func disable() async {
-        await MTBridge.shared.execute(DoubleTapZoomDisable())
+        await bridge.execute(DoubleTapZoomDisable())
     }
 
     public func enable() async {
-        await MTBridge.shared.execute(DoubleTapZoomEnable())
+        await bridge.execute(DoubleTapZoomEnable())
     }
 }

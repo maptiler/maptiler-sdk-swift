@@ -5,6 +5,6 @@
 
 package struct DragPanEnable: MTCommand {
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).dragPan.enable();"
+        return "\(MTBridge.mapObject).dragPan.enable();"
     }
 }

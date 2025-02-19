@@ -7,6 +7,6 @@ package struct SetCenterElevation: MTCommand {
     var elevation: Double
 
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).setCenterElevation(\(elevation));"
+        return "\(MTBridge.mapObject).setCenterElevation(\(elevation));"
     }
 }

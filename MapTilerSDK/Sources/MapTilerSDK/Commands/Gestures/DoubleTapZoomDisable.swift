@@ -5,6 +5,6 @@
 
 package struct DoubleTapZoomDisable: MTCommand {
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).doubleClickZoom.disable();"
+        return "\(MTBridge.mapObject).doubleClickZoom.disable();"
     }
 }

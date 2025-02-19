@@ -5,6 +5,6 @@
 
 package struct TwoFingersDragPitchDisable: MTCommand {
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).touchPitch.disable();"
+        return "\(MTBridge.mapObject).touchPitch.disable();"
     }
 }

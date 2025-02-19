@@ -13,6 +13,6 @@ package struct SetGlyphs: MTCommand {
         let absoluteURLString = url.absoluteString
         let parameters: JSString = options != nil ? "\(absoluteURLString),\(options.toJSON() ?? "")" : absoluteURLString
 
-        return "\(MTBridge.shared.mapObject).setGlyphs(\(parameters));"
+        return "\(MTBridge.mapObject).setGlyphs(\(parameters));"
     }
 }

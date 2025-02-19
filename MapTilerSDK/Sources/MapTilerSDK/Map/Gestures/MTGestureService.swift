@@ -8,18 +8,24 @@
 public class MTGestureService {
     public private(set) var enabledGestures: [MTGestureType: MTGesture] = [:]
 
-    init() {
-        enabledGestures[.doubleTapZoomIn] = MTGestureFactory.makeGesture(with: .doubleTapZoomIn)
-        enabledGestures[.dragPan] = MTGestureFactory.makeGesture(with: .dragPan)
-        enabledGestures[.twoFingersDragPitch] = MTGestureFactory.makeGesture(with: .twoFingersDragPitch)
-        enabledGestures[.pinchRotateAndZoom] = MTGestureFactory.makeGesture(with: .pinchRotateAndZoom)
+    private var bridge: MTBridge!
+
+    private init() {}
+
+    package init(bridge: MTBridge) {
+        self.bridge = bridge
+
+        enabledGestures[.doubleTapZoomIn] = MTGestureFactory.makeGesture(with: .doubleTapZoomIn, bridge: bridge)
+        enabledGestures[.dragPan] = MTGestureFactory.makeGesture(with: .dragPan, bridge: bridge)
+        enabledGestures[.twoFingersDragPitch] = MTGestureFactory.makeGesture(with: .twoFingersDragPitch, bridge: bridge)
+        enabledGestures[.pinchRotateAndZoom] = MTGestureFactory.makeGesture(with: .pinchRotateAndZoom, bridge: bridge)
     }
 
     /// Registers the gesture with the provided type.
     /// - Parameters:
     ///   - type: type of gesture to enable.
     public func enableGesture(with type: MTGestureType) async {
-        enabledGestures[type] = MTGestureFactory.makeGesture(with: type)
+        enabledGestures[type] = MTGestureFactory.makeGesture(with: type, bridge: bridge)
 
         await enabledGestures[type]!.enable()
     }

@@ -13,7 +13,7 @@ package struct EaseTo: MTCommand {
         let options = EaseToOptions(center: center, options: options)
         let optionsString: JSString = options.toJSON() ?? ""
 
-        return "\(MTBridge.shared.mapObject).easeTo(\(optionsString));"
+        return "\(MTBridge.mapObject).easeTo(\(optionsString));"
     }
 }
 

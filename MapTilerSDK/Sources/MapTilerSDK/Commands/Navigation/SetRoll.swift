@@ -7,6 +7,6 @@ package struct SetRoll: MTCommand {
     var roll: Double
 
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).setRoll(\(roll));"
+        return "\(MTBridge.mapObject).setRoll(\(roll));"
     }
 }

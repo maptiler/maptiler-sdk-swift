@@ -6,8 +6,6 @@
 import UIKit
 
 protocol MapControlViewDelegate: AnyObject {
-    func mapControlViewDidTapZoomIn(_ mapControlView: MapControlView)
-    func mapControlViewDidTapZoomOut(_ mapControlView: MapControlView)
     func mapControlViewDidTapFlyTo(_ mapControlView: MapControlView)
     func mapControlViewDidTapEaseTo(_ mapControlView: MapControlView)
     func mapControlView(_ mapControlView: MapControlView, didSelectBearing bearing: Double)
@@ -22,11 +20,8 @@ class MapControlView: BaseView {
         static let accentColor = UIColor(red: 0, green: 161/255, blue: 194/255, alpha: 1)
     }
 
-    @IBOutlet weak var zoomInButton: UIButton!
-    @IBOutlet weak var zoomOutButton: UIButton!
     @IBOutlet weak var flyToButton: UIButton!
     @IBOutlet weak var easeToButton: UIButton!
-    @IBOutlet weak var zoomView: UIView!
     @IBOutlet weak var bearingTextField: UITextField!
 
     private var bearingPickerView: UIPickerView!
@@ -39,7 +34,6 @@ class MapControlView: BaseView {
         super.commonInit()
 
         configPickerView()
-        configZoomView()
         configNavigationButtons()
     }
 
@@ -51,21 +45,12 @@ class MapControlView: BaseView {
         bearingTextField.inputView = bearingPickerView
     }
 
-    private func configZoomView() {
-        zoomView.layer.cornerRadius = Constants.defaultCornerRadius
-    }
-
     private func configNavigationButtons() {
         flyToButton.layer.cornerRadius = Constants.defaultCornerRadius
         easeToButton.layer.cornerRadius = Constants.defaultCornerRadius
-    }
 
-    @IBAction func zoomInButtonTouchUpInside(_ sender: UIButton) {
-        delegate?.mapControlViewDidTapZoomIn(self)
-    }
-
-    @IBAction func zoomOutButtonTouchUpInside(_ sender: UIButton) {
-        delegate?.mapControlViewDidTapZoomOut(self)
+        flyToButton.addShadow()
+        easeToButton.addShadow()
     }
 
     @IBAction func flyToButtonTouchUpInside(_ sender: UIButton) {

@@ -10,6 +10,8 @@ import MapTilerSDK
 class MapStyleViewController: UIViewController {
     @IBOutlet weak var mapStyleViewContainer: UIView!
 
+    private var mapView: MapStyleView?
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -17,8 +19,8 @@ class MapStyleViewController: UIViewController {
     }
 
     private func navigateToMapStyleView() {
-        let view = MapStyleView()
-        let hostingController = UIHostingController(rootView: view)
+        mapView = MapStyleView()
+        let hostingController = UIHostingController(rootView: mapView)
 
         addChild(hostingController)
 

@@ -28,6 +28,12 @@ class MainViewController: UIViewController {
         }
     }
 
+    @IBOutlet weak var mapZoomControlView: MapZoomControlView! {
+        didSet {
+            mapZoomControlView.delegate = self
+        }
+    }
+
     @IBOutlet weak var jumpContainerView: UIView!
 
     private var dataModel = JumpDataModel()
@@ -69,18 +75,6 @@ class MainViewController: UIViewController {
 }
 
 extension MainViewController: MapControlViewDelegate {
-    func mapControlViewDidTapZoomIn(_ mapControlView: MapControlView) {
-        Task {
-            await mapView.zoomIn()
-        }
-    }
-    
-    func mapControlViewDidTapZoomOut(_ mapControlView: MapControlView) {
-        Task {
-            await mapView.zoomOut()
-        }
-    }
-
     func mapControlViewDidTapFlyTo(_ mapControlView: MapControlView) {
         Task {
             let unterageriCoordinates: CLLocationCoordinate2D = Constants.unterageriCoordinates
@@ -101,6 +95,20 @@ extension MainViewController: MapControlViewDelegate {
     func mapControlView(_ mapControlView: MapControlView, didSelectBearing bearing: Double) {
         Task {
             await mapView.setBearing(bearing)
+        }
+    }
+}
+
+extension MainViewController: MapZoomControlViewDelegate {
+    func mapZoomControlViewDidTapZoomIn(_ mapZoomControlView: MapZoomControlView) {
+        Task {
+            await mapView.zoomIn()
+        }
+    }
+
+    func mapZoomControlViewDidTapZoomOut(_ mapZoomControlView: MapZoomControlView) {
+        Task {
+            await mapView.zoomOut()
         }
     }
 }

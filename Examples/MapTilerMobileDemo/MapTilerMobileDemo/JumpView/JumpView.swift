@@ -45,7 +45,7 @@ struct JumpView: View {
 
     private let jumpSelections = [
             "Amsterdam",
-            "Lima",
+            "Quito",
             "Miami",
             "Tokyo",
             "Prague",

@@ -21,7 +21,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2lc-Tz-nWX">
-                    <rect key="frame" x="217" y="34" width="159" height="28"/>
+                    <rect key="frame" x="209" y="34" width="161" height="28"/>
                     <color key="backgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                     <color key="tintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                     <state key="normal" title="Button"/>
@@ -35,7 +35,7 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vsn-IW-FB2">
-                    <rect key="frame" x="16" y="34" width="161" height="28"/>
+                    <rect key="frame" x="16" y="34" width="163" height="28"/>
                     <color key="backgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                     <color key="tintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                     <state key="normal" title="Button"/>
@@ -61,12 +61,12 @@
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="SR6-fp-aG6" secondAttribute="trailing" constant="24" id="Lo1-R6-oyT"/>
                 <constraint firstItem="Vsn-IW-FB2" firstAttribute="leading" secondItem="Coz-jU-X8N" secondAttribute="leading" constant="16" id="Q4F-yC-ik1"/>
-                <constraint firstAttribute="trailing" secondItem="2lc-Tz-nWX" secondAttribute="trailing" constant="24" id="XOI-aV-2TQ"/>
+                <constraint firstAttribute="trailing" secondItem="2lc-Tz-nWX" secondAttribute="trailing" constant="30" id="XOI-aV-2TQ"/>
                 <constraint firstAttribute="bottom" secondItem="2lc-Tz-nWX" secondAttribute="bottom" constant="20" symbolic="YES" id="amz-tV-dzl"/>
                 <constraint firstItem="Vsn-IW-FB2" firstAttribute="top" secondItem="SR6-fp-aG6" secondAttribute="bottom" constant="10" id="fQd-8g-alY"/>
                 <constraint firstAttribute="bottom" secondItem="Vsn-IW-FB2" secondAttribute="bottom" constant="20" symbolic="YES" id="h1q-2p-mBV"/>
                 <constraint firstItem="2lc-Tz-nWX" firstAttribute="width" secondItem="Vsn-IW-FB2" secondAttribute="width" multiplier="0.987578" id="ig3-cl-8dq"/>
-                <constraint firstItem="2lc-Tz-nWX" firstAttribute="leading" secondItem="Vsn-IW-FB2" secondAttribute="trailing" constant="40" id="ybO-Li-WCV"/>
+                <constraint firstItem="2lc-Tz-nWX" firstAttribute="leading" secondItem="Vsn-IW-FB2" secondAttribute="trailing" constant="30" id="ybO-Li-WCV"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="193.89312977099235" y="-253.52112676056339"/>

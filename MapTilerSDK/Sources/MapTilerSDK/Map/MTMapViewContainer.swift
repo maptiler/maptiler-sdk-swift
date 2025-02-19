@@ -12,7 +12,7 @@ public struct MTMapViewContainer: UIViewRepresentable {
 
     public init() {
         self.referenceStyle = .streets
-        self.styleVariant = .dark
+        self.styleVariant = .light
     }
 
     public func makeUIView(context: Context) -> some UIView {

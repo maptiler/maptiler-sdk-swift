@@ -11,10 +11,12 @@ struct MapStyleView: View {
         static let referenceStylePickerTitle = "Reference Style:"
         static let styleVariantPickerTitle = "Style Variant:"
         static let emptyString = ""
+        static let defaultOpacity: CGFloat = 0.7
+        static let minHeight: CGFloat = 300
     }
 
     @State private var referenceStyle: MTMapReferenceStyle = .streets
-    @State private var styleVariant: MTMapStyleVariant? = .dark
+    @State private var styleVariant: MTMapStyleVariant? = .light
 
     private var selectedStyleVariants: [MTMapStyleVariant] {
         return referenceStyle.getVariants()
@@ -29,17 +31,20 @@ struct MapStyleView: View {
                     .frame(maxWidth: .infinity, maxHeight: geometry.size.height * 0.7)
                     .ignoresSafeArea()
 
-                HStack {
+                HStack(alignment: .top) {
                     VStack {
                         Text(Constants.referenceStylePickerTitle)
-                            .font(.headline)
+                            .font(.title2)
+                            .foregroundStyle(.white)
                             .padding(.top)
+
                         Picker(Constants.emptyString, selection: $referenceStyle) {
                             ForEach(MTMapReferenceStyle.allCases) { style in
                                 Text(style.rawValue.capitalized)
-                                    .accentColor(.black)
-                                    .foregroundStyle(.black)
-                                    .tint(.black)
+                                    .accentColor(.white)
+                                    .foregroundStyle(.white)
+                                    .tint(.white)
+                                    .opacity(Constants.defaultOpacity)
                                     .tag(style)
                             }
                         }
@@ -50,24 +55,31 @@ struct MapStyleView: View {
                                 styleVariant = variant
                             }
                         }
+                        .frame(maxHeight: .infinity, alignment: .top)
                     }
+
                     VStack {
                         Text(Constants.styleVariantPickerTitle)
-                            .font(.headline)
+                            .font(.title2)
+                            .foregroundStyle(.white)
                             .padding(.top)
+
                         Picker(Constants.emptyString, selection: $styleVariant) {
                             ForEach(selectedStyleVariants) { style in
                                 Text(style.rawValue.capitalized)
-                                    .accentColor(.black)
-                                    .foregroundStyle(.black)
-                                    .tint(.black)
+                                    .accentColor(.white)
+                                    .foregroundStyle(.white)
+                                    .tint(.white)
+                                    .opacity(Constants.defaultOpacity)
                                     .tag(style)
                             }
                         }
                         .pickerStyle(.wheel)
                         .tint(.white)
+                        .frame(maxHeight: .infinity, alignment: .top)
                     }
                 }
+                .frame(minHeight: Constants.minHeight)
             }
         }
     }

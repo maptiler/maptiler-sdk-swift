@@ -49,29 +49,29 @@ public enum MTMapReferenceStyle: String, @unchecked Sendable, CaseIterable, Iden
     public func getVariants() -> [MTMapStyleVariant] {
         switch self {
         case .streets:
-            return [.dark, .light, .pastel, .night]
+            return [.light, .dark, .pastel, .night]
         case .satellite:
             return []
         case .hybrid:
             return []
         case .outdoor:
-            return [.dark, .light]
+            return [.light, .dark]
         case .winter:
-            return [.dark, .light]
+            return [.light, .dark]
         case .dataviz:
-            return [.dark, .light]
+            return [.light, .dark]
         case .basic:
-            return [.dark, .light, .pastel]
+            return [.light, .dark, .pastel]
         case .bright:
-            return [.dark, .light, .pastel]
+            return [.light, .dark, .pastel]
         case .topo:
             return [.shiny, .pastel, .topographique]
         case .voyager:
-            return [.dark, .light, .vintage]
+            return [.light, .dark, .vintage]
         case .toner:
             return [.background, .lite, .lines]
         case .backdrop:
-            return [.dark, .light]
+            return [.light, .dark]
         case .openStreetMap:
             return []
         }

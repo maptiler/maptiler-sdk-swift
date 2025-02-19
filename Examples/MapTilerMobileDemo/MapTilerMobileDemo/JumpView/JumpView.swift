@@ -85,7 +85,7 @@ struct JumpView: View {
                     .frame(maxWidth: Constants.defaultWidth, maxHeight: Constants.defaultHeight)
                     .padding()
                     .background(Constants.jumpActionBackgroundColor)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
                     .cornerRadius(Constants.defaultCornerRadius)
             }
         }

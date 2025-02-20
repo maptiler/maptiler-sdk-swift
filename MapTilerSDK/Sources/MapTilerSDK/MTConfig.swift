@@ -14,6 +14,9 @@ public actor MTConfig {
     private var unit: MTUnit = .metric
     private var primaryLanguage: MTLanguage = .special(.auto)
 
+    /// SDK log level.
+    public private(set) var logLevel: MTLogLevel = .none
+
     /// Boolean indicating whether caching is enabled.
     public private(set) var isCachingEnabled: Bool = true
 
@@ -22,6 +25,14 @@ public actor MTConfig {
 
     /// Boolean indicating whether telemetry is enabled.
     public private(set) var isTelemetryEnabled: Bool = true
+
+    /// Sets the SDK log level.
+    /// - Parameters:
+    ///   - level:  The desired SDK log level.
+    ///  - Note: Default: .none
+    public func setLogLevel(_ level: MTLogLevel) {
+        self.logLevel = level
+    }
 
     /// Sets the MapTiler API key.
     /// - Parameters:
@@ -33,6 +44,8 @@ public actor MTConfig {
     /// Returns the MapTiler API key.
     public func getAPIKey() -> String? {
         guard let apiKey else {
+            MTLogger.log("API key not set! Call setAPIKey on MTConfig first.", type: .warning)
+
             return nil
         }
 

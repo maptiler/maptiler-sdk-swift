@@ -100,6 +100,8 @@ open class MTMapView: UIView {
     package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {
+                MTLogger.log("Map Init Failed - API key not set! Call MTConfig.shared.setAPIKey first.", type: .error)
+
                 return
             }
 

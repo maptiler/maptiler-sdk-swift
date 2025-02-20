@@ -44,7 +44,19 @@ package final class WebViewExecutor: MTCommandExecutable {
             return
         }
 
-        webView.evaluateJavaScript(command.toJS())
+        webView.evaluateJavaScript(command.toJS()) { _, error in
+            // Log errors based on the log level.
+            // Most of the JS functions return the Map itself which is not required in the native code.
+            if let error = error as? WKError, error.code != .javaScriptResultTypeIsUnsupported {
+                Task {
+                    let commandMessage = "Bridging error occurred for \(command)."
+                    let errorMessage = await MTConfig.shared.logLevel == .debug(verbose: true)
+                    ? "\(commandMessage) - \(error.errorUserInfo.debugDescription)"
+                    : commandMessage
+                    MTLogger.log("\(errorMessage)", type: .error)
+                }
+            }
+        }
     }
 }
 

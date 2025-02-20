@@ -25,7 +25,7 @@ open class MTMapView: UIView {
     public var styleVariant: MTMapStyleVariant?
 
     /// Current options of the map object.
-    public var options: MTMapOptions = MTMapOptions()
+    public var options: MTMapOptions? = MTMapOptions()
 
     /// Service responsible for gestures handling
     public var gestureService: MTGestureService!
@@ -34,6 +34,8 @@ open class MTMapView: UIView {
     public weak var delegate: MTMapViewDelegate?
 
     package var bridge: MTBridge!
+
+    package var eventProcessor: EventProcessor!
 
     private var webViewExecutor: WebViewExecutor!
 
@@ -64,8 +66,19 @@ open class MTMapView: UIView {
         commonInit()
     }
 
+    convenience public init(options: MTMapOptions?) {
+        self.init()
+
+        self.options = options
+
+        commonInit()
+    }
+
     private func commonInit() {
-        webViewExecutor = WebViewExecutor(frame: frame)
+        eventProcessor = EventProcessor()
+        eventProcessor.delegate = self
+
+        webViewExecutor = WebViewExecutor(frame: frame, eventProcessor: eventProcessor)
         webViewExecutor.delegate = self
 
         if let webView = webViewExecutor.getWebView() {
@@ -73,7 +86,7 @@ open class MTMapView: UIView {
         }
 
         bridge = MTBridge(executor: webViewExecutor)
-        gestureService = MTGestureService(bridge: bridge)
+        gestureService = MTGestureService(bridge: bridge, eventProcessor: eventProcessor)
     }
 
     open override func layoutSubviews() {
@@ -99,5 +112,11 @@ open class MTMapView: UIView {
 
             delegate?.mapViewDidInitialize(self)
         }
+    }
+}
+
+extension MTMapView: EventProcessorDelegate {
+    package func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent) {
+        delegate?.mapView(self, didTriggerEvent: event)
     }
 }

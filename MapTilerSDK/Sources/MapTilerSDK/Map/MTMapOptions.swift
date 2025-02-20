@@ -184,6 +184,94 @@ public struct MTMapOptions: @unchecked Sendable {
 
     /// Boolean indicating whether terrain control is added directly to the map.
     public private(set) var terrainControlIsVisible: Bool? = false
+
+    public init(
+        language: MTLanguage? = nil,
+        center: CLLocationCoordinate2D? = nil,
+        projection: MTProjectionType? = nil,
+        zoom: Double? = nil,
+        maxZoom: Double? = nil,
+        minZoom: Double? = nil,
+        bearing: Double? = nil,
+        bearingSnap: Double? = nil,
+        pitch: Double? = nil,
+        maxPitch: Double? = nil,
+        minPitch: Double? = nil,
+        roll: Double? = nil,
+        rollIsEnabled: Bool? = nil,
+        elevation: Double? = nil,
+        terrainIsEnabled: Bool? = nil,
+        terrainExaggeration: Double? = nil,
+        cancelPendingTileRequestsWhileZooming: Bool? = nil,
+        isCenterClampedToGround: Bool? = nil,
+        shouldCollectResourceTiming: Bool? = nil,
+        crossSourceCollisionsAreEnabled: Bool? = nil,
+        fadeDuration: Double? = nil,
+        isInteractionEnabled: Bool? = nil,
+        logoPosition: MTMapCorner? = nil,
+        maptilerLogoIsVisible: Bool? = nil,
+        maxTileCacheSize: Double? = nil,
+        maxTileCacheZoomLevels: Double? = nil,
+        shouldPitchWithRotate: Bool? = nil,
+        shouldRefreshExpiredTiles: Bool? = nil,
+        shouldRenderWorldCopies: Bool? = nil,
+        shouldDragToPitch: Bool? = nil,
+        shouldPinchToRotateAndZoom: Bool? = nil,
+        doubleTapShouldZoom: Bool? = nil,
+        dragPanIsEnabled: Bool? = nil,
+        dragRotateIsEnabled: Bool? = nil,
+        shouldValidateStyle: Bool? = nil,
+        minimapIsVisible: Bool? = false,
+        attributionControlIsVisible: Bool? = nil,
+        geolocateControlIsVisible: Bool? = false,
+        navigationControlIsVisible: Bool? = false,
+        projectionControlIsVisible: Bool? = false,
+        scaleControlIsVisible: Bool? = false,
+        terrainControlIsVisible: Bool? = false
+    ) {
+        self.language = language
+        self.center = center
+        self.projection = projection
+        self.zoom = zoom
+        self.maxZoom = maxZoom
+        self.minZoom = minZoom
+        self.bearing = bearing
+        self.bearingSnap = bearingSnap
+        self.pitch = pitch
+        self.maxPitch = maxPitch
+        self.minPitch = minPitch
+        self.roll = roll
+        self.rollIsEnabled = rollIsEnabled
+        self.elevation = elevation
+        self.terrainIsEnabled = terrainIsEnabled
+        self.terrainExaggeration = terrainExaggeration
+        self.cancelPendingTileRequestsWhileZooming = cancelPendingTileRequestsWhileZooming
+        self.isCenterClampedToGround = isCenterClampedToGround
+        self.shouldCollectResourceTiming = shouldCollectResourceTiming
+        self.crossSourceCollisionsAreEnabled = crossSourceCollisionsAreEnabled
+        self.fadeDuration = fadeDuration
+        self.isInteractionEnabled = isInteractionEnabled
+        self.logoPosition = logoPosition
+        self.maptilerLogoIsVisible = maptilerLogoIsVisible
+        self.maxTileCacheSize = maxTileCacheSize
+        self.maxTileCacheZoomLevels = maxTileCacheZoomLevels
+        self.shouldPitchWithRotate = shouldPitchWithRotate
+        self.shouldRefreshExpiredTiles = shouldRefreshExpiredTiles
+        self.shouldRenderWorldCopies = shouldRenderWorldCopies
+        self.shouldDragToPitch = shouldDragToPitch
+        self.shouldPinchToRotateAndZoom = shouldPinchToRotateAndZoom
+        self.doubleTapShouldZoom = doubleTapShouldZoom
+        self.dragPanIsEnabled = dragPanIsEnabled
+        self.dragRotateIsEnabled = dragRotateIsEnabled
+        self.shouldValidateStyle = shouldValidateStyle
+        self.minimapIsVisible = minimapIsVisible
+        self.attributionControlIsVisible = attributionControlIsVisible
+        self.geolocateControlIsVisible = geolocateControlIsVisible
+        self.navigationControlIsVisible = navigationControlIsVisible
+        self.projectionControlIsVisible = projectionControlIsVisible
+        self.scaleControlIsVisible = scaleControlIsVisible
+        self.terrainControlIsVisible = terrainControlIsVisible
+    }
 }
 
 extension MTMapOptions: Codable {

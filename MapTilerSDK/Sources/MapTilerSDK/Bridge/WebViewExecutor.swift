@@ -8,7 +8,6 @@ import WebKit
 @MainActor
 protocol WebViewExecutorDelegate: AnyObject {
     func webViewExecutor(_ executor: WebViewExecutor, didFinishNavigation navigation: WKNavigation)
-    func webViewExecutor(_ executor: WebViewExecutor, didTriggerEvent event: MTEvent)
 }
 
 // Class responsible for JS execution in WKWebView
@@ -16,10 +15,14 @@ protocol WebViewExecutorDelegate: AnyObject {
 package final class WebViewExecutor: MTCommandExecutable {
     private var webView: WKWebView?
     private var webViewManager: WebViewManager!
+    private var eventProcessor: EventProcessor!
+
     weak var delegate: WebViewExecutorDelegate?
 
-    init(frame: CGRect) {
-        webViewManager = WebViewManager()
+    init(frame: CGRect, eventProcessor: EventProcessor) {
+        self.eventProcessor = eventProcessor
+
+        webViewManager = WebViewManager(eventProcessor: eventProcessor)
         webViewManager.delegate = self
 
         guard let webView = webViewManager.getAttachableWebView(frame: frame) else {
@@ -46,10 +49,6 @@ package final class WebViewExecutor: MTCommandExecutable {
 }
 
 extension WebViewExecutor: WebViewManagerDelegate {
-    func webViewManager(_ manager: WebViewManager, didTriggerEvent event: MTEvent) {
-        delegate?.webViewExecutor(self, didTriggerEvent: event)
-    }
-
     func webViewManager(_ manager: WebViewManager, didFinishNavigation navigation: WKNavigation) {
         delegate?.webViewExecutor(self, didFinishNavigation: navigation)
     }

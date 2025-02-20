@@ -9,16 +9,19 @@ import UIKit
 @MainActor
 protocol WebViewManagerDelegate: AnyObject {
     func webViewManager(_ manager: WebViewManager, didFinishNavigation navigation: WKNavigation)
-    func webViewManager(_ manager: WebViewManager, didTriggerEvent event: MTEvent)
 }
 
 // Class responsible for initializing webview for JS bridging
 @MainActor
 package final class WebViewManager: NSObject {
     private var webView: WKWebView?
+    package var eventProcessor: EventProcessor!
+
     weak var delegate: WebViewManagerDelegate?
 
-    package var eventProcessor: EventProcessor!
+    init(eventProcessor: EventProcessor) {
+        self.eventProcessor = eventProcessor
+    }
 
     func getAttachableWebView(frame: CGRect) -> WKWebView? {
         initWebView(frame: frame)
@@ -40,9 +43,6 @@ package final class WebViewManager: NSObject {
             webView = WKWebView(frame: frame, configuration: configuration)
             webView?.navigationDelegate = self
             webView?.load(request)
-
-            eventProcessor = EventProcessor()
-            eventProcessor.delegate = self
         }
     }
 
@@ -102,11 +102,5 @@ extension WebViewManager {
                 });
             };
             """
-    }
-}
-
-extension WebViewManager: EventProcessorDelegate {
-    package func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent) {
-        delegate?.webViewManager(self, didTriggerEvent: event)
     }
 }

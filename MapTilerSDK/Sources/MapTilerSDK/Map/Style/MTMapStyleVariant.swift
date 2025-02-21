@@ -7,6 +7,7 @@
 public enum MTMapStyleVariant: String, @unchecked Sendable, CaseIterable, Identifiable {
     public var id: String { rawValue }
 
+    case reference
     case dark
     case light
     case pastel

@@ -8,19 +8,17 @@ import MapTilerSDK
 
 struct MapStyleView: View {
     enum Constants {
-        static let referenceStylePickerTitle = "Reference Style:"
-        static let styleVariantPickerTitle = "Style Variant:"
         static let emptyString = ""
         static let defaultOpacity: CGFloat = 0.7
-        static let minHeight: CGFloat = 300
+        static let maxHeight: CGFloat = 100
         static let widthOffset: CGFloat = 0.85
-        static let heightOffset: CGFloat = 0.7
+        static let heightOffset: CGFloat = 0.9
     }
 
     @State private var referenceStyle: MTMapReferenceStyle = .streets
-    @State private var styleVariant: MTMapStyleVariant? = .light
+    @State private var styleVariant: MTMapStyleVariant? = .reference
 
-    private var selectedStyleVariants: [MTMapStyleVariant] {
+    private var selectedStyleVariants: [MTMapStyleVariant]? {
         return referenceStyle.getVariants()
     }
 
@@ -35,11 +33,6 @@ struct MapStyleView: View {
 
                 HStack(alignment: .top) {
                     VStack {
-                        Text(Constants.referenceStylePickerTitle)
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                            .padding(.top)
-
                         Picker(Constants.emptyString, selection: $referenceStyle) {
                             ForEach(MTMapReferenceStyle.allCases) { style in
                                 Text(style.rawValue.capitalized)
@@ -50,10 +43,12 @@ struct MapStyleView: View {
                                     .tag(style)
                             }
                         }
-                        .pickerStyle(.wheel)
+                        .pickerStyle(.menu)
                         .tint(.white)
                         .onChange(of: referenceStyle) { _ in
-                            if let variant = selectedStyleVariants.first {
+                            styleVariant = nil
+
+                            if let variant = selectedStyleVariants?.first {
                                 styleVariant = variant
                             }
                         }
@@ -61,27 +56,25 @@ struct MapStyleView: View {
                     }
 
                     VStack {
-                        Text(Constants.styleVariantPickerTitle)
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                            .padding(.top)
-
                         Picker(Constants.emptyString, selection: $styleVariant) {
-                            ForEach(selectedStyleVariants) { style in
-                                Text(style.rawValue.capitalized)
-                                    .accentColor(.white)
-                                    .foregroundStyle(.white)
-                                    .tint(.white)
-                                    .opacity(Constants.defaultOpacity)
-                                    .tag(style)
+                            if let selectedStyleVariants = selectedStyleVariants {
+                                ForEach(selectedStyleVariants) { style in
+                                    Text(style.rawValue.capitalized)
+                                        .accentColor(.white)
+                                        .foregroundStyle(.white)
+                                        .tint(.white)
+                                        .opacity(Constants.defaultOpacity)
+                                        .tag(style)
+                                }
                             }
                         }
-                        .pickerStyle(.wheel)
+                        .pickerStyle(.menu)
                         .tint(.white)
+                        .disabled(selectedStyleVariants?.isEmpty ?? false)
                         .frame(maxHeight: .infinity, alignment: .top)
                     }
                 }
-                .frame(maxWidth: geometry.size.width * Constants.widthOffset, minHeight: Constants.minHeight)
+                .frame(maxWidth: geometry.size.width * Constants.widthOffset, maxHeight: Constants.maxHeight)
                 .ignoresSafeArea()
             }
         }

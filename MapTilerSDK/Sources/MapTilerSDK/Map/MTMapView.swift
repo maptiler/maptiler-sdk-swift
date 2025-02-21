@@ -33,6 +33,8 @@ open class MTMapView: UIView {
     /// Delegate object responsible for event propagation
     public weak var delegate: MTMapViewDelegate?
 
+    public private(set) var isInitialized: Bool = false
+
     package var bridge: MTBridge!
 
     package var eventProcessor: EventProcessor!
@@ -112,6 +114,7 @@ open class MTMapView: UIView {
                 styleVariant: styleVariant)
             )
 
+            isInitialized = true
             delegate?.mapViewDidInitialize(self)
         }
     }

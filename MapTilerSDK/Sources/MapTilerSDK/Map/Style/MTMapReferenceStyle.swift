@@ -4,7 +4,9 @@
 //
 
 /// Defines purpose and guidelines on what information is displayed.
-public enum MTMapReferenceStyle: String, @unchecked Sendable {
+public enum MTMapReferenceStyle: String, @unchecked Sendable, CaseIterable, Identifiable {
+    public var id: String { rawValue }
+
     /// The classic default style, perfect for urban areas.
     case streets
 
@@ -43,4 +45,35 @@ public enum MTMapReferenceStyle: String, @unchecked Sendable {
 
     /// Reference style without any variants.
     case openStreetMap
+
+    public func getVariants() -> [MTMapStyleVariant] {
+        switch self {
+        case .streets:
+            return [.light, .dark, .pastel, .night]
+        case .satellite:
+            return []
+        case .hybrid:
+            return []
+        case .outdoor:
+            return [.light, .dark]
+        case .winter:
+            return [.light, .dark]
+        case .dataviz:
+            return [.light, .dark]
+        case .basic:
+            return [.light, .dark, .pastel]
+        case .bright:
+            return [.light, .dark, .pastel]
+        case .topo:
+            return [.shiny, .pastel, .topographique]
+        case .voyager:
+            return [.light, .dark, .vintage]
+        case .toner:
+            return [.background, .lite, .lines]
+        case .backdrop:
+            return [.light, .dark]
+        case .openStreetMap:
+            return []
+        }
+    }
 }

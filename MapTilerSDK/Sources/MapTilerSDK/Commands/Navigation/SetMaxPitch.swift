@@ -9,6 +9,6 @@ package struct SetMaxPitch: MTCommand {
     var maxPitch: Double?
 
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).setMaxPitch(\(maxPitch ?? defaultPitch));"
+        return "\(MTBridge.mapObject).setMaxPitch(\(maxPitch ?? defaultPitch));"
     }
 }

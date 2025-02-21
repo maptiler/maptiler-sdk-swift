@@ -7,6 +7,6 @@ package struct SetBearing: MTCommand {
     var bearing: Double
 
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).setBearing(\(bearing));"
+        return "\(MTBridge.mapObject).setBearing(\(bearing));"
     }
 }

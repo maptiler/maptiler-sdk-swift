@@ -4,16 +4,17 @@
 //
 
 package class MTGestureFactory {
-    package static func makeGesture(with type: MTGestureType) -> MTGesture {
+    @MainActor
+    package static func makeGesture(with type: MTGestureType, bridge: MTBridge) -> MTGesture {
         switch type {
         case .doubleTapZoomIn:
-            return MTDoubleTapZoomInGesture()
+            return MTDoubleTapZoomInGesture(bridge: bridge)
         case .dragPan:
-            return MTDragPanGesture()
+            return MTDragPanGesture(bridge: bridge)
         case .twoFingersDragPitch:
-            return MTTwoFingersDragPitchGesture()
+            return MTTwoFingersDragPitchGesture(bridge: bridge)
         case .pinchRotateAndZoom:
-            return MTPinchRotateAndZoomGesture()
+            return MTPinchRotateAndZoomGesture(bridge: bridge)
         }
     }
 }

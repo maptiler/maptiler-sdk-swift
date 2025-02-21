@@ -13,7 +13,7 @@ package struct JumpTo: MTCommand {
         let options = JumpToOptions(center: center, options: options)
         let optionsString: JSString = options.toJSON() ?? ""
 
-        return "\(MTBridge.shared.mapObject).jumpTo(\(optionsString));"
+        return "\(MTBridge.mapObject).jumpTo(\(optionsString));"
     }
 }
 

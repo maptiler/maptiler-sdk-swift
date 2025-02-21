@@ -9,6 +9,6 @@ package struct SetMinPitch: MTCommand {
     var minPitch: Double?
 
     package func toJS() -> JSString {
-        return "\(MTBridge.shared.mapObject).setMinPitch(\(minPitch ?? defaultPitch));"
+        return "\(MTBridge.mapObject).setMinPitch(\(minPitch ?? defaultPitch));"
     }
 }

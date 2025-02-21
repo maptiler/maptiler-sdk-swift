@@ -9,6 +9,6 @@ package struct SetCenter: MTCommand {
 
     package func toJS() -> JSString {
         let centerLngLat: LngLat = center.toLngLat()
-        return "\(MTBridge.shared.mapObject).setCenter([\(centerLngLat.lng), \(centerLngLat.lat)]);"
+        return "\(MTBridge.mapObject).setCenter([\(centerLngLat.lng), \(centerLngLat.lat)]);"
     }
 }

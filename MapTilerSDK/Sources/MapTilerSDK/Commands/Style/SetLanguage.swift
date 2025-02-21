@@ -19,6 +19,6 @@ package struct SetLanguage: MTCommand {
             )
         }
 
-        return "\(MTBridge.shared.mapObject).setLanguage(\(languageString));"
+        return "\(MTBridge.mapObject).setLanguage(\(languageString));"
     }
 }

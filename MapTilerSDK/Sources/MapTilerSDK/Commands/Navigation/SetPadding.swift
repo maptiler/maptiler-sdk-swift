@@ -9,6 +9,6 @@ package struct SetPadding: MTCommand {
     package func toJS() -> JSString {
         let paddingString: JSString = paddingOptions.toJSON() ?? ""
 
-        return "\(MTBridge.shared.mapObject).setPadding(\(paddingString));"
+        return "\(MTBridge.mapObject).setPadding(\(paddingString));"
     }
 }

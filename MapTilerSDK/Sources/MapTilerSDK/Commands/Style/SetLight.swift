@@ -11,6 +11,6 @@ package struct SetLight: MTCommand {
         let lightString: JSString = light.toJSON() ?? ""
         let parameters: JSString = options != nil ? "\(lightString),\(options.toJSON() ?? "")" : lightString
 
-        return "\(MTBridge.shared.mapObject).setLight(\(parameters));"
+        return "\(MTBridge.mapObject).setLight(\(parameters));"
     }
 }

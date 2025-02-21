@@ -8,11 +8,19 @@
 public struct MTDragPanGesture: MTGesture {
     public var type: MTGestureType = .dragPan
 
+    private var bridge: MTBridge!
+
+    private init() {}
+
+    package init(bridge: MTBridge) {
+        self.bridge = bridge
+    }
+
     public func disable() async {
-        await MTBridge.shared.execute(DragPanDisable())
+        await bridge.execute(DragPanDisable())
     }
 
     public func enable() async {
-        await MTBridge.shared.execute(DragPanEnable())
+        await bridge.execute(DragPanEnable())
     }
 }

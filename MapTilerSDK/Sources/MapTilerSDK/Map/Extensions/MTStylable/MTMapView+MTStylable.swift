@@ -11,7 +11,7 @@ extension MTMapView: MTStylable {
     ///   - url: URL of the Glyph
     ///   - options: Supporting type to add validation to another style related type.
     public func setGlyphs(url: URL, options: MTStyleSetterOptions?) async {
-        await MTBridge.shared.execute(SetGlyphs(url: url, options: options))
+        await bridge.execute(SetGlyphs(url: url, options: options))
     }
 
     /// Sets the map labels language.
@@ -21,7 +21,7 @@ extension MTMapView: MTStylable {
     /// - Parameters:
     ///   - language: The language to be applied.
     public func setLanguage(_ language: MTLanguage) async {
-        await MTBridge.shared.execute(SetLanguage(language: language))
+        await bridge.execute(SetLanguage(language: language))
     }
 
     /// Sets the any combination of light values.
@@ -29,7 +29,7 @@ extension MTMapView: MTStylable {
     ///   - light: Light properties to set.
     ///   - options: Supporting type to add validation to another style related type.
     public func setLight(_ light: MTLight, options: MTStyleSetterOptions?) async {
-        await MTBridge.shared.execute(SetLight(light: light, options: options))
+        await bridge.execute(SetLight(light: light, options: options))
     }
 
     /// Sets the state of shouldRenderWorldCopies.
@@ -43,8 +43,16 @@ extension MTMapView: MTStylable {
     /// Features that cross 180 and -180 degrees longitude will be cut in two (with one portion on
     /// the right edge of the map and the other on the left edge of the map) at every zoom level.
     ///  - Parameters:
-    ///   - shouldRenderWorldCopies: Boolean indicating whether world copies should be rendered.
+    ///     - shouldRenderWorldCopies: Boolean indicating whether world copies should be rendered.
     public func setShouldRenderWorldCopies(_ shouldRenderWorldCopies: Bool) async {
-        await MTBridge.shared.execute(SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies))
+        await bridge.execute(SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies))
+    }
+
+    /// Updates the map's style object with a new value.
+    ///   - Parameters:
+    ///     - referenceStyle:  Desired reference map style.
+    ///     - styleVariant: Optional variant of the reference style.
+    public func setStyle(_ referenceStyle: MTMapReferenceStyle, styleVariant: MTMapStyleVariant?) async {
+        await bridge.execute(SetStyle(referenceStyle: referenceStyle, styleVariant: styleVariant))
     }
 }

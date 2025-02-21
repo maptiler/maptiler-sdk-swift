@@ -13,7 +13,7 @@ package struct FlyTo: MTCommand {
         let options = FlyToOptions(center: center, options: options)
         let optionsString: JSString = options.toJSON() ?? ""
 
-        return "\(MTBridge.shared.mapObject).flyTo(\(optionsString));"
+        return "\(MTBridge.mapObject).flyTo(\(optionsString));"
     }
 }
 

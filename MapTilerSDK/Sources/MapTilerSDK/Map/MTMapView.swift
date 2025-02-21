@@ -28,10 +28,12 @@ open class MTMapView: UIView {
     public var options: MTMapOptions = MTMapOptions()
 
     /// Service responsible for gestures handling
-    public var gestureService: MTGestureService = MTGestureService()
+    public var gestureService: MTGestureService!
 
     /// Delegate object responsible for event propagation
     public weak var delegate: MTMapViewDelegate?
+
+    package var bridge: MTBridge!
 
     private var webViewExecutor: WebViewExecutor!
 
@@ -70,7 +72,16 @@ open class MTMapView: UIView {
             addSubview(webView)
         }
 
-        MTBridge.shared.setExecutor(webViewExecutor)
+        bridge = MTBridge(executor: webViewExecutor)
+        gestureService = MTGestureService(bridge: bridge)
+    }
+
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+
+        if let webView = webViewExecutor.getWebView() {
+            webView.frame = bounds
+        }
     }
 
     package func initializeMap() {
@@ -79,7 +90,7 @@ open class MTMapView: UIView {
                 return
             }
 
-            await MTBridge.shared.execute(InitializeMap(
+            await bridge.execute(InitializeMap(
                 apiKey: apiKey,
                 options: options,
                 referenceStyle: referenceStyle,

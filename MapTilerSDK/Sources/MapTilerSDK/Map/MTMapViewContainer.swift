@@ -35,6 +35,10 @@ public struct MTMapViewContainer: UIViewRepresentable {
     }
 
     private func updateMapView(_ mapView: MTMapView) {
+        if !mapView.isInitialized {
+            return
+        }
+
         Task {
             await mapView.setStyle(referenceStyle, styleVariant: styleVariant)
         }

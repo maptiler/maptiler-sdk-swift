@@ -33,6 +33,8 @@ open class MTMapView: UIView {
     /// Delegate object responsible for event propagation
     public weak var delegate: MTMapViewDelegate?
 
+    public private(set) var isInitialized: Bool = false
+
     package var bridge: MTBridge!
 
     package var eventProcessor: EventProcessor!
@@ -100,6 +102,8 @@ open class MTMapView: UIView {
     package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {
+                MTLogger.log("Map Init Failed - API key not set! Call MTConfig.shared.setAPIKey first.", type: .error)
+
                 return
             }
 
@@ -110,6 +114,7 @@ open class MTMapView: UIView {
                 styleVariant: styleVariant)
             )
 
+            isInitialized = true
             delegate?.mapViewDidInitialize(self)
         }
     }

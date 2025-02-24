@@ -8,7 +8,7 @@ import CoreLocation
 import Combine
 
 class JumpDataModel: ObservableObject {
-    @Published var jumpCoordinates: CLLocationCoordinate2D = CLLocationCoordinate2D()
+    @Published var jumpCoordinates: CLLocationCoordinate2D?
 
     func updateJumpCoordinates(jumpSelection: String) {
         Task {

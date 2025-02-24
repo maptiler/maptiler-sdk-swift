@@ -13,6 +13,8 @@ protocol WebViewExecutorDelegate: AnyObject {
 // Class responsible for JS execution in WKWebView
 @MainActor
 package final class WebViewExecutor: MTCommandExecutable {
+    private let exceptionKey: String = "WKJavaScriptExceptionMessage"
+
     private var webView: WKWebView?
     private var webViewManager: WebViewManager!
     private var eventProcessor: EventProcessor!
@@ -39,21 +41,43 @@ package final class WebViewExecutor: MTCommandExecutable {
     }
 
     @MainActor
-    package func execute(_ command: MTCommand) {
+    package func execute(_ command: MTCommand) async throws -> MTBridgeReturnType {
         guard let webView = webView else {
-            return
+            throw MTBridgeError.bridgeNotLoaded
         }
 
-        webView.evaluateJavaScript(command.toJS()) { _, error in
-            // Log errors based on the log level.
-            // Most of the JS functions return the Map itself which is not required in the native code.
-            if let error = error as? WKError, error.code != .javaScriptResultTypeIsUnsupported {
-                Task {
-                    let commandMessage = "Bridging error occurred for \(command)."
-                    let errorMessage = await MTConfig.shared.logLevel == .debug(verbose: true)
-                    ? "\(commandMessage) - \(error.errorUserInfo.debugDescription)"
-                    : commandMessage
-                    MTLogger.log("\(errorMessage)", type: .error)
+        let isVerbose = await MTConfig.shared.logLevel == .debug(verbose: true)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            webView.evaluateJavaScript(command.toJS()) { [weak self] result, error in
+                if let error = error {
+                    // Log errors based on the log level.
+                    // Most of the JS functions return the Map itself which is not supported in the native code.
+                    if let error = error as? WKError, error.code != .javaScriptResultTypeIsUnsupported {
+                        if isVerbose {
+                            let commandMessage = "Bridging error occurred for \(command)"
+                            MTLogger.log("\(commandMessage): \(error.errorUserInfo.debugDescription)", type: .error)
+                        }
+
+                        if let exception = error.errorUserInfo[self?.exceptionKey ?? ""] as? String {
+                            continuation.resume(throwing: MTBridgeError.exception(exception))
+                        } else {
+                            continuation.resume(throwing: MTBridgeError.unknown("\(error)"))
+                        }
+                    } else {
+                        if isVerbose {
+                            continuation.resume(throwing: MTBridgeError.unsupportedReturnType("\(command) completed with unsupported return type."))
+                        } else {
+                            continuation.resume(returning: .unsupportedType)
+                        }
+                    }
+                } else {
+                    do {
+                        let parsedResult = try MTBridgeReturnType(from: result)
+                        continuation.resume(returning: parsedResult)
+                    } catch {
+                        continuation.resume(throwing: MTBridgeError.invalidResultType(result.debugDescription))
+                    }
                 }
             }
         }

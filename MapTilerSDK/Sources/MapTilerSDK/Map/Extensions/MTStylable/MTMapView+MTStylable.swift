@@ -11,7 +11,7 @@ extension MTMapView: MTStylable {
     ///   - url: URL of the Glyph
     ///   - options: Supporting type to add validation to another style related type.
     public func setGlyphs(url: URL, options: MTStyleSetterOptions?) async {
-        await bridge.execute(SetGlyphs(url: url, options: options))
+        await runCommand(SetGlyphs(url: url, options: options))
     }
 
     /// Sets the map labels language.
@@ -21,7 +21,7 @@ extension MTMapView: MTStylable {
     /// - Parameters:
     ///   - language: The language to be applied.
     public func setLanguage(_ language: MTLanguage) async {
-        await bridge.execute(SetLanguage(language: language))
+        await runCommand(SetLanguage(language: language))
     }
 
     /// Sets the any combination of light values.
@@ -29,7 +29,7 @@ extension MTMapView: MTStylable {
     ///   - light: Light properties to set.
     ///   - options: Supporting type to add validation to another style related type.
     public func setLight(_ light: MTLight, options: MTStyleSetterOptions?) async {
-        await bridge.execute(SetLight(light: light, options: options))
+        await runCommand(SetLight(light: light, options: options))
     }
 
     /// Sets the state of shouldRenderWorldCopies.
@@ -45,7 +45,7 @@ extension MTMapView: MTStylable {
     ///  - Parameters:
     ///     - shouldRenderWorldCopies: Boolean indicating whether world copies should be rendered.
     public func setShouldRenderWorldCopies(_ shouldRenderWorldCopies: Bool) async {
-        await bridge.execute(SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies))
+        await runCommand(SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies))
     }
 
     /// Updates the map's style object with a new value.
@@ -53,6 +53,6 @@ extension MTMapView: MTStylable {
     ///     - referenceStyle:  Desired reference map style.
     ///     - styleVariant: Optional variant of the reference style.
     public func setStyle(_ referenceStyle: MTMapReferenceStyle, styleVariant: MTMapStyleVariant?) async {
-        await bridge.execute(SetStyle(referenceStyle: referenceStyle, styleVariant: styleVariant))
+        await runCommand(SetStyle(referenceStyle: referenceStyle, styleVariant: styleVariant))
     }
 }

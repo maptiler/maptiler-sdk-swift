@@ -17,10 +17,18 @@ public struct MTPinchRotateAndZoomGesture: MTGesture {
     }
 
     public func disable() async {
-        await bridge.execute(PinchRotateAndZoomDisable())
+        do {
+            try await bridge.execute(PinchRotateAndZoomDisable())
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 
     public func enable() async {
-        await bridge.execute(PinchRotateAndZoomEnable())
+        do {
+            try await bridge.execute(PinchRotateAndZoomEnable())
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 }

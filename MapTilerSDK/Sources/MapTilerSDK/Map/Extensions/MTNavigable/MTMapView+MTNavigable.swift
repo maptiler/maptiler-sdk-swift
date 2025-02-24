@@ -15,14 +15,14 @@ extension MTMapView: MTNavigable {
     /// - Parameters:
     ///   - bearing: The desired bearing.
     public func setBearing(_ bearing: Double) async {
-        await bridge.execute(SetBearing(bearing: bearing))
+        await runCommand(SetBearing(bearing: bearing))
     }
 
     /// Sets the map's geographical centerpoint.
     /// - Parameters:
     ///   - center: The desired center coordinate.
     public func setCenter(_ center: CLLocationCoordinate2D) async {
-        await bridge.execute(SetCenter(center: center))
+        await runCommand(SetCenter(center: center))
     }
 
     /// Changes any combination of center, zoom, bearing, and pitch.
@@ -33,7 +33,7 @@ extension MTMapView: MTNavigable {
     /// if the user has the reduced motion accesibility feature enabled,
     /// unless options includes essential: true.
     public func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?) async {
-        await bridge.execute(FlyTo(center: center, options: options))
+        await runCommand(FlyTo(center: center, options: options))
     }
 
     /// Changes any combination of center, zoom, bearing, pitch, and padding.
@@ -42,17 +42,17 @@ extension MTMapView: MTNavigable {
     /// - Note: The transition will happen instantly if the user has enabled the reduced motion accesibility feature,
     /// unless options includes essential: true.
     public func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async {
-        await bridge.execute(EaseTo(center: center, options: options))
+        await runCommand(EaseTo(center: center, options: options))
     }
 
     /// Changes any combination of center, zoom, bearing, and pitch, without an animated transition.
     public func jumpTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async {
-        await bridge.execute(JumpTo(center: center, options: options))
+        await runCommand(JumpTo(center: center, options: options))
     }
 
     /// Sets the padding in pixels around the viewport.
     public func setPadding(_ options: MTPaddingOptions) async {
-        await bridge.execute(SetPadding(paddingOptions: options))
+        await runCommand(SetPadding(paddingOptions: options))
     }
 
     /// Sets the value of centerClampedToGround.
@@ -65,7 +65,7 @@ extension MTMapView: MTNavigable {
     ///   - isCenterClampedToGround: The boolean value indicating if center will be clamped to ground.
     /// - Note: Defaults to true.
     public func setIsCenterClampedToGround(_ isCenterClampedToGround: Bool) async {
-        await bridge.execute(SetCenterClampedToGround(isCenterClampedToGround: isCenterClampedToGround))
+        await runCommand(SetCenterClampedToGround(isCenterClampedToGround: isCenterClampedToGround))
     }
 
     /// Sets the elevation of the map's center point, in meters above sea level.
@@ -73,7 +73,7 @@ extension MTMapView: MTNavigable {
     ///   - elevation: The desired elevation.
     /// - Note: Triggers the following events: moveStart and moveEnd.
     public func setCenterElevation(_ elevation: Double) async {
-        await bridge.execute(SetCenterElevation(elevation: elevation))
+        await runCommand(SetCenterElevation(elevation: elevation))
     }
 
     /// Sets or clears the map's maximum pitch.
@@ -82,8 +82,8 @@ extension MTMapView: MTNavigable {
     /// If null is provided, the function removes the current maximum pitch (sets it to 60).
     /// - Parameters:
     /// - maxPitch: The maximum pitch to set (0-85).
-    public func setMaxPitch(_ maxPitch: Double?) async {
-        await bridge.execute(SetMaxPitch(maxPitch: maxPitch))
+    public func setMaxPitch(_ maxPitch: Double?) async throws {
+        try await bridge.execute(SetMaxPitch(maxPitch: maxPitch))
     }
 
     /// Sets or clears the map's maximum zoom.
@@ -92,8 +92,8 @@ extension MTMapView: MTNavigable {
     /// If null or undefined is provided, the function removes the current maximum zoom (sets it to 22).
     /// - Parameters:
     /// - maxZoom: The maximum zoom level to set.
-    public func setMaxZoom(_ maxZoom: Double?) async {
-        await bridge.execute(SetMaxZoom(maxZoom: maxZoom))
+    public func setMaxZoom(_ maxZoom: Double?) async throws {
+        try await bridge.execute(SetMaxZoom(maxZoom: maxZoom))
     }
 
     /// Sets or clears the map's minimum pitch.
@@ -102,8 +102,8 @@ extension MTMapView: MTNavigable {
     ///  If null is provided, the function removes the current minimum pitch (i.e. sets it to 0).
     /// - Parameters:
     /// - minPitch: The minimum pitch to set (0-85)
-    public func setMinPitch(_ minPitch: Double?) async {
-        await bridge.execute(SetMinPitch(minPitch: minPitch))
+    public func setMinPitch(_ minPitch: Double?) async throws {
+        try await bridge.execute(SetMinPitch(minPitch: minPitch))
     }
 
     /// Sets or clears the map's minimum zoom.
@@ -112,15 +112,15 @@ extension MTMapView: MTNavigable {
     /// If null  is provided, the function removes the current minimum zoom (i.e. sets it to -2).
     /// - Parameters:
     /// - minZoom: The minimum zoom level to set (-2 - 24).
-    public func setMinZoom(_ minZoom: Double?) async {
-        await bridge.execute(SetMinZoom(minZoom: minZoom))
+    public func setMinZoom(_ minZoom: Double?) async throws {
+        try await bridge.execute(SetMinZoom(minZoom: minZoom))
     }
 
     /// Sets the map's pitch (tilt).
     /// - Parameters:
     /// - pitch: The pitch to set, measured in degrees away from the plane of the screen (0-60).
     public func setPitch(_ pitch: Double) async {
-        await bridge.execute(SetPitch(pitch: pitch))
+        await runCommand(SetPitch(pitch: pitch))
     }
 
     /// Sets the map's roll angle.
@@ -128,14 +128,14 @@ extension MTMapView: MTNavigable {
     ///   - roll: The roll to set, measured in degrees about the camera boresight.
     /// - Note: Triggers the following events: moveStart, moveEnd, rollStart, and rollEnd.
     public func setRoll(_ roll: Double) async {
-        await bridge.execute(SetRoll(roll: roll))
+        await runCommand(SetRoll(roll: roll))
     }
 
     /// Sets the map's zoom level.
     ///  - Parameters:
     ///   - zoom: The zoom level to set (0-20).
     public func setZoom(_ zoom: Double) async {
-        await bridge.execute(SetZoom(zoom: zoom))
+        await runCommand(SetZoom(zoom: zoom))
     }
 
     /// Set combination of center, bearing, pitch, roll and elevation.

@@ -107,15 +107,19 @@ open class MTMapView: UIView {
                 return
             }
 
-            await bridge.execute(InitializeMap(
-                apiKey: apiKey,
-                options: options,
-                referenceStyle: referenceStyle,
-                styleVariant: styleVariant)
-            )
+            do {
+                try await bridge.execute(InitializeMap(
+                    apiKey: apiKey,
+                    options: options,
+                    referenceStyle: referenceStyle,
+                    styleVariant: styleVariant)
+                )
 
-            isInitialized = true
-            delegate?.mapViewDidInitialize(self)
+                isInitialized = true
+                delegate?.mapViewDidInitialize(self)
+            } catch {
+                MTLogger.log("\(error)", type: .criticalError)
+            }
         }
     }
 }
@@ -123,5 +127,15 @@ open class MTMapView: UIView {
 extension MTMapView: EventProcessorDelegate {
     package func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent) {
         delegate?.mapView(self, didTriggerEvent: event)
+    }
+}
+
+extension MTMapView {
+    package func runCommand(_ command: MTCommand) async {
+        do {
+            try await bridge.execute(command)
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 }

@@ -17,14 +17,26 @@ public struct MTDragPanGesture: MTGesture {
     }
 
     public func disable() async {
-        await bridge.execute(DragPanDisable())
+        do {
+            try await bridge.execute(DragPanDisable())
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 
     public func enable() async {
-        await bridge.execute(DragPanEnable(options: nil))
+        do {
+            try await bridge.execute(DragPanEnable(options: nil))
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 
     public func enable(with options: MTDragPanOptions) async {
-        await bridge.execute(DragPanEnable(options: options))
+        do {
+            try await bridge.execute(DragPanEnable(options: options))
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 }

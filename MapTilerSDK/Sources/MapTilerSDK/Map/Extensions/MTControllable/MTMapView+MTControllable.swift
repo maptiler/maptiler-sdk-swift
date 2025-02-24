@@ -12,7 +12,7 @@ extension MTMapView: MTControllable {
     public func addMapTilerLogoControl(position: MTMapCorner) async {
         if let url = URL(string: "https://api.maptiler.com/resources/logo.svg"),
             let linkURL = URL(string: "https://www.maptiler.com") {
-            await bridge.execute(AddLogoControl(url: url, linkURL: linkURL, position: position))
+            await runCommand(AddLogoControl(url: url, linkURL: linkURL, position: position))
         }
     }
 
@@ -22,6 +22,6 @@ extension MTMapView: MTControllable {
     ///    - linkURL: URL of logo link.
     ///   - position: The corner position of the logo.
     public func addLogoControl(logoURL: URL, linkURL: URL, position: MTMapCorner) async {
-        await bridge.execute(AddLogoControl(url: logoURL, linkURL: linkURL, position: position))
+        await runCommand(AddLogoControl(url: logoURL, linkURL: linkURL, position: position))
     }
 }

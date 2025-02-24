@@ -1,0 +1,24 @@
+//
+//  MTDragPanOptions.swift
+//  MapTilerSDK
+//
+
+public struct MTDragPanOptions: @unchecked Sendable, Codable {
+    /// Factor used to scale the drag velocity.
+    /// - Note: Default: 0
+    public var linearity: Double?
+
+    /// The maximum value of the drag velocity.
+    /// - Note: Default: 1400
+    public var maxSpeed: Double?
+
+    /// The rate at which the speed reduces after the pan ends.
+    /// - Note: Default: 2500
+    public var deceleration: Double?
+
+    public init(linearity: Double? = nil, maxSpeed: Double? = nil, deceleration: Double? = nil) {
+        self.linearity = linearity
+        self.maxSpeed = maxSpeed
+        self.deceleration = deceleration
+    }
+}

@@ -10,13 +10,16 @@ public struct MTMapViewContainer: UIViewRepresentable {
     private var referenceStyle: MTMapReferenceStyle = .streets
     private var styleVariant: MTMapStyleVariant?
 
-    public init() {
+    private var options: MTMapOptions?
+
+    public init(options: MTMapOptions?) {
         self.referenceStyle = .streets
         self.styleVariant = .light
+        self.options = options
     }
 
     public func makeUIView(context: Context) -> some UIView {
-        let mapView = MTMapView()
+        let mapView = MTMapView(options: options)
 
         updateMapView(mapView)
 

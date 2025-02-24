@@ -21,6 +21,10 @@ public struct MTDragPanGesture: MTGesture {
     }
 
     public func enable() async {
-        await bridge.execute(DragPanEnable())
+        await bridge.execute(DragPanEnable(options: nil))
+    }
+
+    public func enable(with options: MTDragPanOptions) async {
+        await bridge.execute(DragPanEnable(options: options))
     }
 }

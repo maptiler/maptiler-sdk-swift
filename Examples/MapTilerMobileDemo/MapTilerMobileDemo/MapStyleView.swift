@@ -13,6 +13,8 @@ struct MapStyleView: View {
         static let emptyString = ""
         static let defaultOpacity: CGFloat = 0.7
         static let minHeight: CGFloat = 300
+        static let widthOffset: CGFloat = 0.85
+        static let heightOffset: CGFloat = 0.7
     }
 
     @State private var referenceStyle: MTMapReferenceStyle = .streets
@@ -25,10 +27,10 @@ struct MapStyleView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack {
-                MTMapViewContainer()
+                MTMapViewContainer(options: MTMapOptions(attributionControlIsVisible: false))
                     .referenceStyle(referenceStyle)
                     .styleVariant(styleVariant)
-                    .frame(maxWidth: .infinity, maxHeight: geometry.size.height * 0.7)
+                    .frame(maxHeight: geometry.size.height * Constants.heightOffset)
                     .ignoresSafeArea()
 
                 HStack(alignment: .top) {
@@ -79,7 +81,8 @@ struct MapStyleView: View {
                         .frame(maxHeight: .infinity, alignment: .top)
                     }
                 }
-                .frame(minHeight: Constants.minHeight)
+                .frame(maxWidth: geometry.size.width * Constants.widthOffset, minHeight: Constants.minHeight)
+                .ignoresSafeArea()
             }
         }
     }

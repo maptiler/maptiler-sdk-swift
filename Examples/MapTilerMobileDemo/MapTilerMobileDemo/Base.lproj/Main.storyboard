@@ -121,20 +121,19 @@
         <scene sceneID="Nlb-BW-3eu">
             <objects>
                 <viewController id="ym7-yT-SK7" customClass="MapStyleViewController" customModule="MapTilerMobileDemo" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="SQw-Ix-FCz">
+                    <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="SQw-Ix-FCz">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xj5-Gt-uQa">
-                                <rect key="frame" x="0.0" y="-70" width="403" height="922"/>
+                            <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xj5-Gt-uQa">
+                                <rect key="frame" x="0.0" y="-62" width="403" height="914"/>
                                 <color key="backgroundColor" red="0.19607843137254902" green="0.20000000000000001" blue="0.3411764705882353" alpha="0.76320684523809523" colorSpace="calibratedRGB"/>
                             </view>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="fTu-lh-U0a"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="Xj5-Gt-uQa" secondAttribute="trailing" constant="-10" id="2UA-Xl-151"/>
-                            <constraint firstItem="Xj5-Gt-uQa" firstAttribute="top" secondItem="SQw-Ix-FCz" secondAttribute="top" constant="-70" id="PKP-OP-2gB"/>
+                            <constraint firstItem="Xj5-Gt-uQa" firstAttribute="top" secondItem="SQw-Ix-FCz" secondAttribute="top" constant="-62" id="PKP-OP-2gB"/>
                             <constraint firstAttribute="bottom" secondItem="Xj5-Gt-uQa" secondAttribute="bottom" id="ihE-hh-9g9"/>
                             <constraint firstItem="Xj5-Gt-uQa" firstAttribute="leading" secondItem="SQw-Ix-FCz" secondAttribute="leading" id="zxV-Y0-wQD"/>
                         </constraints>

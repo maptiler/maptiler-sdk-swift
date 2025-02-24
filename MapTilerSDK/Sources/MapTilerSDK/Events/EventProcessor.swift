@@ -13,12 +13,13 @@ package protocol EventProcessorDelegate: AnyObject {
 @MainActor
 package class EventProcessor {
     enum Constants {
-        static let doubleTapThreshold: Double = 0.4
         static let circularEventBufferSize: Int = 20
     }
 
     private var eventQueue: CircularEventBuffer = CircularEventBuffer(capacity: Constants.circularEventBufferSize)
     private var lastTouchTimestamp: TimeInterval = 0.0
+
+    private var doubleTapSensitivity: Double = 0.4
 
     weak var delegate: EventProcessorDelegate?
 
@@ -45,7 +46,7 @@ package class EventProcessor {
 
         let currentTimestamp = Date.now.timeIntervalSince1970
 
-        if currentTimestamp - lastTouchTimestamp < Constants.doubleTapThreshold {
+        if currentTimestamp - lastTouchTimestamp < doubleTapSensitivity {
             eventQueue.enqueue(.doubleTap)
         }
 
@@ -57,5 +58,9 @@ package class EventProcessor {
             delegate?.eventProcessor(self, didTriggerEvent: .doubleTap)
             eventQueue.clear()
         }
+    }
+
+    package func setDoubleTapSensitivity(_ sensitivity: Double) {
+        doubleTapSensitivity = sensitivity
     }
 }

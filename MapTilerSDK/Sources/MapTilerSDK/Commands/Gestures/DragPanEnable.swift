@@ -4,7 +4,11 @@
 //
 
 package struct DragPanEnable: MTCommand {
+    var options: MTDragPanOptions?
+
     package func toJS() -> JSString {
-        return "\(MTBridge.mapObject).dragPan.enable();"
+        let optionsString: JSString = options?.toJSON() ?? ""
+
+        return "\(MTBridge.mapObject).dragPan.enable(\(optionsString));"
     }
 }

@@ -119,6 +119,10 @@ extension MainViewController: MTMapViewDelegate {
         print(">>> MapTiler SDK Demo <<<")
         print("--- Map Initialized ---")
         print("-------------------------")
+
+        Task {
+            await mapView.addMapTilerLogoControl(position: .topLeft)
+        }
     }
 
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent) {

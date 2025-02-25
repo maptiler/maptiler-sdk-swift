@@ -54,6 +54,8 @@ function setUpMapEvents(map) {
         'sourcedata',
         'sourcedataabort',
         'sourcedataloading',
+        'styledata',
+        'styledataloading',
         'styleimagemissing',
         'terrain',
         'terrainAnimationStart',

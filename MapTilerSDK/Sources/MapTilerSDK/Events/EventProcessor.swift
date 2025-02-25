@@ -32,30 +32,34 @@ package class EventProcessor {
     }
 
     private func processEventIfNeeded(_ event: MTEvent) {
-        if event == .touchEnd {
+        if event == .touchDidEnd {
             processTap()
         }
 
-        if event == .idle {
+        if event == .isIdle {
             processIdleFollowingDoubleTap()
+        }
+
+        if event != .didDoubleTap {
+            delegate?.eventProcessor(self, didTriggerEvent: event)
         }
     }
 
     private func processTap() {
-        eventQueue.enqueue(.touchEnd)
+        eventQueue.enqueue(.touchDidEnd)
 
         let currentTimestamp = Date.now.timeIntervalSince1970
 
         if currentTimestamp - lastTouchTimestamp < doubleTapSensitivity {
-            eventQueue.enqueue(.doubleTap)
+            eventQueue.enqueue(.didDoubleTap)
         }
 
         lastTouchTimestamp = currentTimestamp
     }
 
     private func processIdleFollowingDoubleTap() {
-        if eventQueue.contains(.doubleTap) {
-            delegate?.eventProcessor(self, didTriggerEvent: .doubleTap)
+        if eventQueue.contains(.didDoubleTap) {
+            delegate?.eventProcessor(self, didTriggerEvent: .didDoubleTap)
             eventQueue.clear()
         }
     }

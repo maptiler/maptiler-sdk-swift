@@ -17,10 +17,18 @@ public struct MTDoubleTapZoomInGesture: MTGesture {
     }
 
     public func disable() async {
-        await bridge.execute(DoubleTapZoomDisable())
+        do {
+            try await bridge.execute(DoubleTapZoomDisable())
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 
     public func enable() async {
-        await bridge.execute(DoubleTapZoomEnable())
+        do {
+            try await bridge.execute(DoubleTapZoomEnable())
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 }

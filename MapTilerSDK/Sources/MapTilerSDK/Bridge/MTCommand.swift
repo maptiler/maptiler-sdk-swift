@@ -10,5 +10,5 @@ package protocol MTCommand: Sendable {
 }
 
 package protocol MTCommandExecutable {
-    func execute(_ command: MTCommand) async
+    func execute(_ command: MTCommand) async throws -> MTBridgeReturnType
 }

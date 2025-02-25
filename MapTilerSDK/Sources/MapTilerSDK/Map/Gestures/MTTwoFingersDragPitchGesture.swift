@@ -17,10 +17,18 @@ public struct MTTwoFingersDragPitchGesture: MTGesture {
     }
 
     public func disable() async {
-        await bridge.execute(TwoFingersDragPitchDisable())
+        do {
+            try await bridge.execute(TwoFingersDragPitchDisable())
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 
     public func enable() async {
-        await bridge.execute(TwoFingersDragPitchEnable())
+        do {
+            try await bridge.execute(TwoFingersDragPitchEnable())
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
     }
 }

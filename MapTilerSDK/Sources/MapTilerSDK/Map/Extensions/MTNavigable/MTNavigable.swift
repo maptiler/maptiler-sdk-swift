@@ -16,11 +16,11 @@ public protocol MTNavigable {
     func setPadding(_ options: MTPaddingOptions) async
     func setIsCenterClampedToGround(_ isCenterClampedToGround: Bool) async
     func setCenterElevation(_ elevation: Double) async
-    func setMaxPitch(_ maxPitch: Double?) async
-    func setMaxZoom(_ maxZoom: Double?) async
-    func setMinPitch(_ minPitch: Double?) async
-    func setMinZoom(_ minZoom: Double?) async
+    func setMaxPitch(_ maxPitch: Double?) async throws
+    func setMaxZoom(_ maxZoom: Double?) async throws
+    func setMinPitch(_ minPitch: Double?) async throws
+    func setMinZoom(_ minZoom: Double?) async throws
     func setPitch(_ pitch: Double) async
     func setRoll(_ roll: Double) async
-    func setZoom(_ zoom: Double) async
+    func getPitch() async -> Double
 }

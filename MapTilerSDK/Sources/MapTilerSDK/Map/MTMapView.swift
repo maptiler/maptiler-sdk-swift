@@ -102,26 +102,63 @@ open class MTMapView: UIView {
     package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {
-                MTLogger.log("Map Init Failed - API key not set! Call MTConfig.shared.setAPIKey first.", type: .error)
+                MTLogger.log(
+                    "Map Init Failed - API key not set! Call MTConfig.shared.setAPIKey first.",
+                    type: .criticalError
+                )
 
                 return
             }
 
-            await bridge.execute(InitializeMap(
-                apiKey: apiKey,
-                options: options,
-                referenceStyle: referenceStyle,
-                styleVariant: styleVariant)
-            )
+            do {
+                try await bridge.execute(InitializeMap(
+                    apiKey: apiKey,
+                    options: options,
+                    referenceStyle: referenceStyle,
+                    styleVariant: styleVariant)
+                )
 
-            isInitialized = true
-            delegate?.mapViewDidInitialize(self)
+                isInitialized = true
+                delegate?.mapViewDidInitialize(self)
+
+                MTLogger.log("\(MTLogger.infoMarker) - Map Initialized Successfully", type: .info)
+            } catch {
+                MTLogger.log("\(error)", type: .criticalError)
+            }
         }
     }
 }
 
 extension MTMapView: EventProcessorDelegate {
     package func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent) {
+        MTLogger.log("MTEvent triggered: \(event)", type: .event)
+
         delegate?.mapView(self, didTriggerEvent: event)
+    }
+}
+
+extension MTMapView {
+    package func runCommand(_ command: MTCommand) async {
+        do {
+            try await bridge.execute(command)
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+        }
+    }
+
+    package func runCommandWithDoubleReturnValue(_ command: MTCommand) async -> Double {
+        do {
+            let value = try await bridge.execute(command)
+
+            if case .double(let commandValue) = value {
+                return commandValue
+            } else {
+                MTLogger.log("\(command) returned invalid type.", type: .error)
+                return .nan
+            }
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+            return .nan
+        }
     }
 }

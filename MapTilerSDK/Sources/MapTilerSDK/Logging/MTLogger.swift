@@ -9,6 +9,8 @@ public protocol MTLoggable: Sendable {
 }
 
 public class MTLogger {
+    public static let infoMarker: String = "MTInfo"
+
     /// Add a log.
     public static func log(_ message: String, type: MTLogType) {
         Task {

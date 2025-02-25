@@ -7,6 +7,8 @@ import SwiftUI
 
 /// Declarative Map view for use in SwiftUI
 public struct MTMapViewContainer: UIViewRepresentable {
+    private let notInitializedMessage: String = "MapView not initialized yet!"
+
     private var referenceStyle: MTMapReferenceStyle = .streets
     private var styleVariant: MTMapStyleVariant?
 
@@ -28,6 +30,7 @@ public struct MTMapViewContainer: UIViewRepresentable {
 
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         guard let mapView = uiView as? MTMapView else {
+            MTLogger.log(notInitializedMessage, type: .warning)
             return
         }
 
@@ -36,6 +39,7 @@ public struct MTMapViewContainer: UIViewRepresentable {
 
     private func updateMapView(_ mapView: MTMapView) {
         if !mapView.isInitialized {
+            MTLogger.log(notInitializedMessage, type: .warning)
             return
         }
 

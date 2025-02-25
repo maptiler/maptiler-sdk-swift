@@ -43,7 +43,7 @@ package final class WebViewExecutor: MTCommandExecutable {
     @MainActor
     package func execute(_ command: MTCommand) async throws -> MTBridgeReturnType {
         guard let webView = webView else {
-            throw MTBridgeError.bridgeNotLoaded
+            throw MTError.bridgeNotLoaded
         }
 
         let isVerbose = await MTConfig.shared.logLevel == .debug(verbose: true)
@@ -59,14 +59,19 @@ package final class WebViewExecutor: MTCommandExecutable {
                             MTLogger.log("\(commandMessage): \(error.errorUserInfo.debugDescription)", type: .error)
                         }
 
-                        if let exception = error.errorUserInfo[self?.exceptionKey ?? ""] as? String {
-                            continuation.resume(throwing: MTBridgeError.exception(exception))
+                        if let reason = error.errorUserInfo[self?.exceptionKey ?? ""] as? String {
+                            let exception = MTException(code: error.code.rawValue, reason: reason)
+                            continuation.resume(throwing: MTError.exception(body: exception))
                         } else {
-                            continuation.resume(throwing: MTBridgeError.unknown("\(error)"))
+                            continuation.resume(throwing: MTError.unknown(description: "\(error)"))
                         }
                     } else {
                         if isVerbose {
-                            continuation.resume(throwing: MTBridgeError.unsupportedReturnType("\(command) completed with unsupported return type."))
+                            continuation.resume(
+                                throwing: MTError.unsupportedReturnType(
+                                    description: "\(command) completed with unsupported return type."
+                                )
+                            )
                         } else {
                             continuation.resume(returning: .unsupportedType)
                         }
@@ -76,7 +81,7 @@ package final class WebViewExecutor: MTCommandExecutable {
                         let parsedResult = try MTBridgeReturnType(from: result)
                         continuation.resume(returning: parsedResult)
                     } catch {
-                        continuation.resume(throwing: MTBridgeError.invalidResultType(result.debugDescription))
+                        continuation.resume(throwing: MTError.invalidResultType(description: result.debugDescription))
                     }
                 }
             }

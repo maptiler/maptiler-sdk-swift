@@ -3,7 +3,7 @@
 //  MapTilerSDK
 //
 
-public enum MTBridgeReturnType: Sendable {
+package enum MTBridgeReturnType: Sendable {
     case string(String)
     case double(Double)
     case bool(Bool)
@@ -20,7 +20,7 @@ public enum MTBridgeReturnType: Sendable {
         } else if value == nil {
             self = .null
         } else {
-            throw MTBridgeError.invalidResultType(value.debugDescription)
+            throw MTError.invalidResultType(description: value.debugDescription)
         }
     }
 }

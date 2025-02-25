@@ -16,6 +16,7 @@ package extension Encodable {
             }
         }
 
+        MTLogger.log("\(String(describing: self)) encoding failure.", type: .error)
         return nil
     }
 }

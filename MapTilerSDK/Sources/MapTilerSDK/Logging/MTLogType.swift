@@ -9,4 +9,5 @@ public enum MTLogType: Sendable {
     case warning
     case error
     case criticalError
+    case event
 }

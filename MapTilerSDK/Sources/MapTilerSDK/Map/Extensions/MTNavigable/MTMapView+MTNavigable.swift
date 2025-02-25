@@ -81,7 +81,8 @@ extension MTMapView: MTNavigable {
     /// If the map's current pitch is higher than the new maximum, the map will pitch to the new maximum.
     /// If null is provided, the function removes the current maximum pitch (sets it to 60).
     /// - Parameters:
-    /// - maxPitch: The maximum pitch to set (0-85).
+    ///   - maxPitch: The maximum pitch to set (0-85).
+    /// - Throws: A ``MTError`` if maxPitch is out of bounds.
     public func setMaxPitch(_ maxPitch: Double?) async throws {
         try await bridge.execute(SetMaxPitch(maxPitch: maxPitch))
     }
@@ -91,7 +92,8 @@ extension MTMapView: MTNavigable {
     /// If the map's current zoom level is higher than the new maximum, the map will zoom to the new maximum.
     /// If null or undefined is provided, the function removes the current maximum zoom (sets it to 22).
     /// - Parameters:
-    /// - maxZoom: The maximum zoom level to set.
+    ///   - maxZoom: The maximum zoom level to set.
+    /// - Throws: A ``MTError`` if maxZoom is out of bounds.
     public func setMaxZoom(_ maxZoom: Double?) async throws {
         try await bridge.execute(SetMaxZoom(maxZoom: maxZoom))
     }
@@ -101,7 +103,8 @@ extension MTMapView: MTNavigable {
     /// If the map's current pitch is lower than the new minimum, the map will pitch to the new minimum.
     ///  If null is provided, the function removes the current minimum pitch (i.e. sets it to 0).
     /// - Parameters:
-    /// - minPitch: The minimum pitch to set (0-85)
+    ///   - minPitch: The minimum pitch to set (0-85)
+    /// - Throws: A ``MTError`` if minPitch is out of bounds.
     public func setMinPitch(_ minPitch: Double?) async throws {
         try await bridge.execute(SetMinPitch(minPitch: minPitch))
     }
@@ -111,14 +114,15 @@ extension MTMapView: MTNavigable {
     /// If the map's current zoom level is lower than the new minimum, the map will zoom to the new minimum.
     /// If null  is provided, the function removes the current minimum zoom (i.e. sets it to -2).
     /// - Parameters:
-    /// - minZoom: The minimum zoom level to set (-2 - 24).
+    ///   - minZoom: The minimum zoom level to set (-2 - 24).
+    /// - Throws: A ``MTError`` if minZoom is out of bounds.
     public func setMinZoom(_ minZoom: Double?) async throws {
         try await bridge.execute(SetMinZoom(minZoom: minZoom))
     }
 
     /// Sets the map's pitch (tilt).
     /// - Parameters:
-    /// - pitch: The pitch to set, measured in degrees away from the plane of the screen (0-60).
+    ///   - pitch: The pitch to set, measured in degrees away from the plane of the screen (0-60).
     public func setPitch(_ pitch: Double) async {
         await runCommand(SetPitch(pitch: pitch))
     }

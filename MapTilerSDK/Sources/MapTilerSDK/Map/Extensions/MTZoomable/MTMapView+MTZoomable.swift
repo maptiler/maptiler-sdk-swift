@@ -15,4 +15,9 @@ extension MTMapView: MTZoomable {
     public func zoomOut() async {
         await runCommand(ZoomOut())
     }
+
+    /// Returns the map's current zoom level.
+    public func getZoom() async -> Double {
+        return await runCommandWithDoubleReturnValue(GetZoom())
+    }
 }

@@ -9,4 +9,5 @@ public protocol MTZoomable {
     func zoomIn() async
     func zoomOut() async
     func getZoom() async -> Double
+    func setZoom(_ zoom: Double) async
 }

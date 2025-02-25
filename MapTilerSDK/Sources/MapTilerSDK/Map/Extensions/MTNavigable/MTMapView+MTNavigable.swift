@@ -135,13 +135,6 @@ extension MTMapView: MTNavigable {
         await runCommand(SetRoll(roll: roll))
     }
 
-    /// Sets the map's zoom level.
-    ///  - Parameters:
-    ///   - zoom: The zoom level to set (0-20).
-    public func setZoom(_ zoom: Double) async {
-        await runCommand(SetZoom(zoom: zoom))
-    }
-
     /// Set combination of center, bearing, pitch, roll and elevation.
     public func setViewport(with cameraHelper: MTMapCameraHelper, zoomLevel: Double? = nil) {
         Task {
@@ -169,5 +162,12 @@ extension MTMapView: MTNavigable {
                 await setZoom(zoomLevel)
             }
         }
+    }
+
+    /// Returns the map's current pitch (tilt).
+    ///
+    /// The map's current pitch, measured in degrees away from the plane of the screen.
+    public func getPitch() async -> Double {
+        await runCommandWithDoubleReturnValue(GetPitch())
     }
 }

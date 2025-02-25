@@ -20,4 +20,11 @@ extension MTMapView: MTZoomable {
     public func getZoom() async -> Double {
         return await runCommandWithDoubleReturnValue(GetZoom())
     }
+
+    /// Sets the map's zoom level.
+    ///  - Parameters:
+    ///   - zoom: The zoom level to set (0-20).
+    public func setZoom(_ zoom: Double) async {
+        await runCommand(SetZoom(zoom: zoom))
+    }
 }

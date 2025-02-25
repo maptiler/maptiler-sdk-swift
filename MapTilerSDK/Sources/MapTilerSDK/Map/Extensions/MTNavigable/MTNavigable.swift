@@ -22,5 +22,5 @@ public protocol MTNavigable {
     func setMinZoom(_ minZoom: Double?) async throws
     func setPitch(_ pitch: Double) async
     func setRoll(_ roll: Double) async
-    func setZoom(_ zoom: Double) async
+    func getPitch() async -> Double
 }

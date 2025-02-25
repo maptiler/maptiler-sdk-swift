@@ -22,7 +22,7 @@ public enum MTError: Error {
     ///  - Parameter description: Debug description of the command that returned unsupported type.
     case unsupportedReturnType(description: String)
 
-    /// Method execution returned unsupported type.
+    /// Method execution resulted in an unknown error.
     ///
     ///  - Parameter description: Debug description of error.
     case unknown(description: String)
@@ -61,6 +61,7 @@ public enum MTError: Error {
     }
 }
 
+/// Represents body of the MTError exception.
 public struct MTException: Sendable {
     public var code: Int
     public var reason: String

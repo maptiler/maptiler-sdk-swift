@@ -65,7 +65,7 @@ package final class WebViewExecutor: MTCommandExecutable {
                         } else {
                             continuation.resume(throwing: MTError.unknown(description: "\(error)"))
                         }
-                    } else {
+                    } else { // Execution completed successfully, but with unsupported type. Log based on log level.
                         if isVerbose {
                             continuation.resume(
                                 throwing: MTError.unsupportedReturnType(
@@ -76,7 +76,7 @@ package final class WebViewExecutor: MTCommandExecutable {
                             continuation.resume(returning: .unsupportedType)
                         }
                     }
-                } else {
+                } else { // Pass result, handle if type is invalid.
                     do {
                         let parsedResult = try MTBridgeReturnType(from: result)
                         continuation.resume(returning: parsedResult)

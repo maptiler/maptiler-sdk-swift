@@ -14,6 +14,7 @@ package protocol EventProcessorDelegate: AnyObject {
 package class EventProcessor {
     enum Constants {
         static let circularEventBufferSize: Int = 20
+        static let uknownEventMessage: String = "Unknown event occurred."
     }
 
     private var eventQueue: CircularEventBuffer = CircularEventBuffer(capacity: Constants.circularEventBufferSize)
@@ -25,6 +26,8 @@ package class EventProcessor {
 
     func registerEvent(_ event: MTEvent?) {
         guard let event else {
+            MTLogger.log(Constants.uknownEventMessage, type: .warning)
+
             return
         }
 

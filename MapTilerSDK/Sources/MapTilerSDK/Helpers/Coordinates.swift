@@ -5,12 +5,10 @@
 
 import CoreLocation
 
-package typealias LngLat = (lng: Double, lat: Double)
-
 extension CLLocationCoordinate2D: @retroactive Equatable {
     // Bridging - Converts native CLLocationCoordinate2D latitude, longitude pair to LngLat pair based on GeoJSON specs
     package func toLngLat() -> LngLat {
-        return (lng: self.longitude, lat: self.latitude)
+        return LngLat(lng: self.longitude, lat: self.latitude)
     }
 
     package static func fromLngLat(lngLat: LngLat) -> CLLocationCoordinate2D {

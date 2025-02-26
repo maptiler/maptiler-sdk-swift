@@ -7,7 +7,7 @@ import Foundation
 
 @MainActor
 package protocol EventProcessorDelegate: AnyObject {
-    func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent)
+    func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent, with data: MTData?)
 }
 
 @MainActor
@@ -24,7 +24,7 @@ package class EventProcessor {
 
     weak var delegate: EventProcessorDelegate?
 
-    func registerEvent(_ event: MTEvent?) {
+    func registerEvent(_ event: MTEvent?, with data: MTData? = nil) {
         guard let event else {
             MTLogger.log(Constants.uknownEventMessage, type: .warning)
 
@@ -34,17 +34,17 @@ package class EventProcessor {
         processEventIfNeeded(event)
     }
 
-    private func processEventIfNeeded(_ event: MTEvent) {
+    private func processEventIfNeeded(_ event: MTEvent, with data: MTData? = nil) {
         if event == .touchDidEnd {
             processTap()
         }
 
         if event == .isIdle {
-            processIdleFollowingDoubleTap()
+            processIdleFollowingDoubleTap(with: data)
         }
 
         if event != .didDoubleTap {
-            delegate?.eventProcessor(self, didTriggerEvent: event)
+            delegate?.eventProcessor(self, didTriggerEvent: event, with: data)
         }
     }
 
@@ -60,9 +60,9 @@ package class EventProcessor {
         lastTouchTimestamp = currentTimestamp
     }
 
-    private func processIdleFollowingDoubleTap() {
+    private func processIdleFollowingDoubleTap(with data: MTData? = nil) {
         if eventQueue.contains(.didDoubleTap) {
-            delegate?.eventProcessor(self, didTriggerEvent: .didDoubleTap)
+            delegate?.eventProcessor(self, didTriggerEvent: .didDoubleTap, with: data)
             eventQueue.clear()
         }
     }

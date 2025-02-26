@@ -35,9 +35,14 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
 
     private var options: MTMapOptions?
 
-    private var coordinator: MTCoordinator? = nil
+    private var coordinator: MTCoordinator?
 
-    public init(options: MTMapOptions?, coordinator: MTCoordinator?, referenceStyle: MTMapReferenceStyle, styleVariant: MTMapStyleVariant?) {
+    public init(
+        options: MTMapOptions?,
+        coordinator: MTCoordinator?,
+        referenceStyle: MTMapReferenceStyle,
+        styleVariant: MTMapStyleVariant?
+    ) {
         self.referenceStyle = referenceStyle
         self.styleVariant = styleVariant
         self.options = options
@@ -92,19 +97,19 @@ extension MTMapViewContainer {
         return view
     }
 
-    public func didTriggerEvent(_ closure: @escaping (_ event: MTEvent) -> Void) -> Self  {
+    public func didTriggerEvent(_ closure: @escaping (_ event: MTEvent, _ data: MTData?) -> Void) -> Self {
         coordinator?.didTriggerEvent = closure
         return self
     }
 
-    public func didInitialize(_ closure: @escaping () -> Void) -> Self  {
+    public func didInitialize(_ closure: @escaping () -> Void) -> Self {
         coordinator?.didInitialize = closure
         return self
     }
 }
 
 package class MTCoordinator: MTMapViewDelegate {
-    var didTriggerEvent: ((MTEvent) -> Void)?
+    var didTriggerEvent: ((MTEvent, MTData?) -> Void)?
     var didInitialize: (() -> Void)?
 
     public func mapViewDidInitialize(_ mapView: MTMapView) {
@@ -113,9 +118,9 @@ package class MTCoordinator: MTMapViewDelegate {
         }
     }
 
-    public func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent) {
+    public func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
         DispatchQueue.main.async { [weak self] in
-            self?.didTriggerEvent?(event)
+            self?.didTriggerEvent?(event, data)
         }
     }
 }

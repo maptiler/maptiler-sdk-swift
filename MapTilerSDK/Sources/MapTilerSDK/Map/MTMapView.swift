@@ -10,7 +10,7 @@ import WebKit
 @MainActor
 public protocol MTMapViewDelegate: AnyObject {
     func mapViewDidInitialize(_ mapView: MTMapView)
-    func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent)
+    func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?)
 }
 
 /// Object representing the map on the screen.
@@ -130,10 +130,10 @@ open class MTMapView: UIView {
 }
 
 extension MTMapView: EventProcessorDelegate {
-    package func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent) {
+    package func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent, with data: MTData?) {
         MTLogger.log("MTEvent triggered: \(event)", type: .event)
 
-        delegate?.mapView(self, didTriggerEvent: event)
+        delegate?.mapView(self, didTriggerEvent: event, with: data)
     }
 }
 

@@ -17,26 +17,12 @@ function setUpMapEvents(map) {
         'boxzoomcancel',
         'boxzoomend',
         'boxzoomstart',
-        'click',
         'contextmenu',
         'cooperativegestureprevented',
-        'data',
-        'dataabort',
-        'dataloading',
         'dblclick',
-        'drag',
-        'dragend',
-        'dragstart',
         'idle',
         'load',
         'loadWithTerrain',
-        'mousedown',
-        'mouseenter',
-        'mouseleave',
-        'mousemove',
-        'mouseout',
-        'mouseover',
-        'mouseup',
         'move',
         'moveend',
         'movestart',
@@ -48,34 +34,103 @@ function setUpMapEvents(map) {
         'remove',
         'render',
         'resize',
-        'rotate',
-        'rotateend',
-        'rotatestart',
-        'sourcedata',
-        'sourcedataabort',
-        'sourcedataloading',
-        'styledata',
-        'styledataloading',
-        'styleimagemissing',
         'terrain',
         'terrainAnimationStart',
-        'terrainAnimationStop',
-        'touchcancel',
-        'touchend',
-        'touchmove',
-        'touchstart',
-        'webglcontextlost',
-        'webglcontextrestored',
-        'wheel',
-        'zoom',
-        'zoomend',
-        'zoomstart'
+        'terrainAnimationStop'
     ];
 
     events.forEach(event => {
         map.on(event, function() {
             window.webkit.messageHandlers.mapHandler.postMessage({
                 event: event
+            });
+        });
+    });
+
+    // MapTapEvent
+    map.on('click', function(e) {
+        var data = {
+            lngLat: e.lngLat,
+            point: e.point
+        };
+
+        window.webkit.messageHandlers.mapHandler.postMessage({
+            event: 'click',
+            data: data
+        });
+    });
+
+    // MapImageEvent
+    map.on('styleimagemissing', function(e) {
+        var data = {
+            id: e.id,
+        };
+
+        window.webkit.messageHandlers.mapHandler.postMessage({
+            event: 'click',
+            data: data
+        });
+    });
+
+    // MapDataEvents
+    const mapDataEvents = [
+        'data',
+        'dataabort',
+        'dataloading',
+        'sourcedata',
+        'sourcedataabort',
+        'sourcedataloading',
+        'styledata',
+        'styledataloading',
+        'rotate',
+        'rotateend',
+        'rotatestart'
+    ];
+
+    mapDataEvents.forEach(event => {
+        map.on(event, function(e) {
+            var data = {
+                dataType: e.dataType,
+                isSourceLoaded: e.isSourceLoaded,
+                source: e.source,
+                sourceDataType: e.sourceDataType,
+                tile: e.tile,
+                coord: e.coord
+            };
+
+            window.webkit.messageHandlers.mapHandler.postMessage({
+                event: event,
+                data: data
+            });
+        });
+    });
+
+    // MapTouchEvents
+    const mapTouchEvents = [
+        'touchcancel',
+        'touchend',
+        'touchmove',
+        'touchstart',
+        'drag',
+        'dragend',
+        'dragstart',
+        'zoom',
+        'zoomend',
+        'zoomstart'
+    ];
+
+    mapTouchEvents.forEach(event => {
+        map.on(event, function(e) {
+            var data = {
+                lngLat: e.lngLat,
+                lngLats: e.lngLats,
+                point: e.point,
+                points: e.points
+            };
+
+            window.webkit.messageHandlers.mapHandler.postMessage({
+                event: event,
+                data: data
             });
         });
     });

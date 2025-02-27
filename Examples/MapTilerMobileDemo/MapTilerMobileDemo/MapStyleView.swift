@@ -25,6 +25,12 @@ struct MapStyleView: View {
             MTMapViewContainer(options: MTMapOptions(attributionControlIsVisible: false))
                 .referenceStyle(referenceStyle)
                 .styleVariant(styleVariant)
+                .didInitialize {
+                    print("-------------------------")
+                    print(">>> MapTiler SDK Demo <<<")
+                    print("--- Map Initialized ---")
+                    print("-------------------------")
+                }
 
             HStack(alignment: .top) {
                 Picker(Constants.emptyString, selection: $referenceStyle) {

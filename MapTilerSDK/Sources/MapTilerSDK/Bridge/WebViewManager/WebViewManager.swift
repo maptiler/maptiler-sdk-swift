@@ -83,6 +83,7 @@ extension WebViewManager {
         enum Map {
             static let handler = "mapHandler"
             static let event = "event"
+            static let data = "data"
         }
 
         enum JSResources {

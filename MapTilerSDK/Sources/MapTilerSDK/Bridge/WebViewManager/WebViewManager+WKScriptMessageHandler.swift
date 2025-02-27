@@ -28,7 +28,19 @@ extension WebViewManager: WKScriptMessageHandler {
 
     private func handleEvent(with message: WKScriptMessage) {
         if let messageBody = message.body as? [String: Any], let event = messageBody[Constants.Map.event] as? String {
-            eventProcessor.registerEvent(MTEvent(rawValue: event))
+            if let data = messageBody[Constants.Map.data] as? [String: Any] {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: data)
+                    let decoder = JSONDecoder()
+                    let eventData = try decoder.decode(MTData.self, from: jsonData)
+
+                    eventProcessor.registerEvent(MTEvent(rawValue: event), with: eventData)
+                } catch {
+                    MTLogger.log("Data parsing error for event: \(event): \(error)", type: .error)
+                }
+            } else {
+                eventProcessor.registerEvent(MTEvent(rawValue: event))
+            }
         }
     }
 }

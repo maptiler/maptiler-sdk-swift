@@ -35,7 +35,8 @@ class MainViewController: UIViewController {
     }
 
     @IBOutlet weak var jumpContainerView: UIView!
-
+    @IBOutlet weak var loadingActivityIndicator: UIActivityIndicatorView!
+    
     private var dataModel = JumpDataModel()
     private var cancellables = Set<AnyCancellable>()
 
@@ -43,6 +44,8 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
 
         setUpJumpView()
+
+        setUpLoadingActivityIndicator()
     }
 
     private func setUpJumpView() {
@@ -56,6 +59,11 @@ class MainViewController: UIViewController {
         jumpHostingController.didMove(toParent: self)
 
         observeJumpCoordinates()
+    }
+
+    private func setUpLoadingActivityIndicator() {
+        loadingActivityIndicator.startAnimating()
+        loadingActivityIndicator.hidesWhenStopped = true
     }
 
     private func observeJumpCoordinates() {
@@ -125,9 +133,9 @@ extension MainViewController: MTMapViewDelegate {
         }
     }
 
-    func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent) {
-        print(">>> Event Propagation Demo <<<")
-        print("Event Triggered: \(event.rawValue)")
-        print("------------------------------")
+    func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
+        if event == .didLoad, mapView.isInitialized {
+            loadingActivityIndicator.stopAnimating()
+        }
     }
 }

@@ -48,11 +48,19 @@ extension MTMapView: MTStylable {
         await runCommand(SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies))
     }
 
-    /// Updates the map's style object with a new value.
-    ///   - Parameters:
-    ///     - referenceStyle:  Desired reference map style.
-    ///     - styleVariant: Optional variant of the reference style.
-    public func setStyle(_ referenceStyle: MTMapReferenceStyle, styleVariant: MTMapStyleVariant?) async {
-        await runCommand(SetStyle(referenceStyle: referenceStyle, styleVariant: styleVariant))
+    package func getId(for referenceStyle: MTMapReferenceStyle) async -> String {
+        return await runCommandWithStringReturnValue(GetIdForReferenceStyle(referenceStyle: referenceStyle))
+    }
+
+    package func getId(for styleVariant: MTMapStyleVariant) async -> String {
+        return await runCommandWithStringReturnValue(GetIdForStyleVariant(styleVariant: styleVariant))
+    }
+
+    package func getName(for referenceStyle: MTMapReferenceStyle) async -> String {
+        return await runCommandWithStringReturnValue(GetNameForReferenceStyle(referenceStyle: referenceStyle))
+    }
+
+    package func getName(for styleVariant: MTMapStyleVariant) async -> String {
+        return await runCommandWithStringReturnValue(GetNameForStyleVariant(styleVariant: styleVariant))
     }
 }

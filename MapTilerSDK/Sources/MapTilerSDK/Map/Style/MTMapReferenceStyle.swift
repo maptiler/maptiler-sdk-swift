@@ -49,31 +49,31 @@ public enum MTMapReferenceStyle: String, @unchecked Sendable, CaseIterable, Iden
     public func getVariants() -> [MTMapStyleVariant]? {
         switch self {
         case .streets:
-            return [.reference, .light, .dark, .pastel, .night]
+            return [.defaultVariant, .light, .dark, .pastel, .night]
         case .satellite:
-            return []
+            return [.defaultVariant]
         case .hybrid:
-            return []
+            return [.defaultVariant]
         case .outdoor:
-            return [.reference, .light, .dark]
+            return [.defaultVariant, .light, .dark]
         case .winter:
-            return [.reference, .light, .dark]
+            return [.defaultVariant, .light, .dark]
         case .dataviz:
-            return [.reference, .light, .dark]
+            return [.defaultVariant, .light, .dark]
         case .basic:
-            return [.reference, .light, .dark, .pastel]
+            return [.defaultVariant, .light, .dark, .pastel]
         case .bright:
-            return [.reference, .light, .dark, .pastel]
+            return [.defaultVariant, .light, .dark, .pastel]
         case .topo:
-            return [.reference, .shiny, .pastel, .topographique]
+            return [.defaultVariant, .shiny, .pastel, .topographique]
         case .voyager:
-            return [.reference, .light, .dark, .vintage]
+            return [.defaultVariant, .light, .dark, .vintage]
         case .toner:
-            return [.reference, .background, .lite, .lines]
+            return [.defaultVariant, .background, .lite, .lines]
         case .backdrop:
-            return [.reference, .light, .dark]
+            return [.defaultVariant, .light, .dark]
         case .openStreetMap:
-            return []
+            return [.defaultVariant]
         }
     }
 }

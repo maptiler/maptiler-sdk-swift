@@ -12,7 +12,7 @@ public enum MTLanguage: @unchecked Sendable, Codable {
 
         switch self {
         case .special(let language):
-            try container.encode("maptilersdk.Language.\(language.rawValue.uppercased())")
+            try container.encode("\(MTBridge.sdkObject).Language.\(language.rawValue.uppercased())")
         case .country(let country):
             try container.encode(country.rawValue)
         }

@@ -51,6 +51,7 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> some UIView {
         let mapView = MTMapView(options: options)
+        mapView.setProxy(referenceStyle: referenceStyle, styleVariant: styleVariant)
 
         mapView.delegate = coordinator
 
@@ -79,7 +80,7 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
         }
 
         Task {
-            await mapView.setStyle(referenceStyle, styleVariant: styleVariant)
+            await mapView.style?.setStyle(referenceStyle, styleVariant: styleVariant)
         }
     }
 }

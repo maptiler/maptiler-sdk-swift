@@ -12,7 +12,7 @@ package struct AddLogoControl: MTCommand {
 
     package func toJS() -> JSString {
         let addLogoCommand = """
-            const logo = new maptilersdk.MaptilerLogoControl({
+            const logo = new \(MTBridge.sdkObject).MaptilerLogoControl({
                 logoURL: "\(url)",
                 linkURL: "\(linkURL)"
             });

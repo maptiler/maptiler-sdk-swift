@@ -25,6 +25,6 @@ package struct InitializeMap: MTCommand {
             )
         }
 
-        return "initializeMap('\(apiKey)', maptilersdk.MapStyle.\(style), \(optionsString));"
+        return "initializeMap('\(apiKey)', \(MTBridge.sdkObject).\(MTBridge.styleObject).\(style), \(optionsString));"
     }
 }

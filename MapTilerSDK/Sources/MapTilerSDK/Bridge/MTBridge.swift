@@ -11,6 +11,8 @@ package final class MTBridge: @unchecked Sendable {
     var executor: MTCommandExecutable?
 
     static let mapObject: JSString = "map"
+    static let sdkObject: JSString = "maptilersdk"
+    static let styleObject: JSString = "MapStyle"
 
     init(executor: MTCommandExecutable) {
         self.executor = executor

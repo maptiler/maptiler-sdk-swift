@@ -18,11 +18,11 @@ public protocol MTMapViewDelegate: AnyObject {
 /// Exposes methods and properties that enable changes to the map,
 /// and fires events that can be interacted with.
 open class MTMapView: UIView {
-    /// Current reference style of the map object.
-    public var referenceStyle: MTMapReferenceStyle = .streets
+    /// Proxy style object of the map.
+    public private(set) var style: MTStyle?
 
-    /// Current style variant of the map object.
-    public var styleVariant: MTMapStyleVariant?
+    private var referenceStyleProxy: MTMapReferenceStyle = .streets
+    private var styleVariantProxy: MTMapStyleVariant?
 
     /// Current options of the map object.
     public var options: MTMapOptions? = MTMapOptions()
@@ -62,8 +62,9 @@ open class MTMapView: UIView {
         self.init(frame: frame)
 
         self.options = options
-        self.referenceStyle = referenceStyle
-        self.styleVariant = styleVariant
+
+        self.referenceStyleProxy = referenceStyle
+        self.styleVariantProxy = styleVariant
 
         commonInit()
     }
@@ -114,8 +115,8 @@ open class MTMapView: UIView {
                 try await bridge.execute(InitializeMap(
                     apiKey: apiKey,
                     options: options,
-                    referenceStyle: referenceStyle,
-                    styleVariant: styleVariant)
+                    referenceStyle: referenceStyleProxy,
+                    styleVariant: styleVariantProxy)
                 )
 
                 isInitialized = true
@@ -127,6 +128,11 @@ open class MTMapView: UIView {
             }
         }
     }
+
+    package func setProxy(referenceStyle: MTMapReferenceStyle, styleVariant: MTMapStyleVariant?) {
+        self.referenceStyleProxy = referenceStyle
+        self.styleVariantProxy = styleVariant
+    }
 }
 
 extension MTMapView: EventProcessorDelegate {
@@ -134,6 +140,10 @@ extension MTMapView: EventProcessorDelegate {
         MTLogger.log("MTEvent triggered: \(event)", type: .event)
 
         delegate?.mapView(self, didTriggerEvent: event, with: data)
+
+        if event == .didLoad {
+            style = MTStyle(for: self, with: referenceStyleProxy, and: styleVariantProxy)
+        }
     }
 }
 
@@ -159,6 +169,22 @@ extension MTMapView {
         } catch {
             MTLogger.log("\(error)", type: .error)
             return .nan
+        }
+    }
+
+    package func runCommandWithStringReturnValue(_ command: MTCommand) async -> String {
+        do {
+            let value = try await bridge.execute(command)
+
+            if case .string(let commandValue) = value {
+                return commandValue
+            } else {
+                MTLogger.log("\(command) returned invalid type.", type: .error)
+                return ""
+            }
+        } catch {
+            MTLogger.log("\(error)", type: .error)
+            return ""
         }
     }
 }

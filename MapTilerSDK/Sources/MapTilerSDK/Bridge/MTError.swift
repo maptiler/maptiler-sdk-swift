@@ -34,11 +34,11 @@ public enum MTError: Error {
         switch self {
         case .exception(body: let body):
             return body.code
-        case .invalidResultType(description: let description):
+        case .invalidResultType:
             return 90
-        case .unsupportedReturnType(description: let description):
+        case .unsupportedReturnType:
             return 91
-        case .unknown(description: let description):
+        case .unknown:
             return 92
         case .bridgeNotLoaded:
             return 93

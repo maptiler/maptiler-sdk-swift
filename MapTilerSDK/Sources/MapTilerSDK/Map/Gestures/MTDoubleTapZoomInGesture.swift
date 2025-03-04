@@ -18,7 +18,7 @@ public struct MTDoubleTapZoomInGesture: MTGesture {
 
     public func disable() async {
         do {
-            try await bridge.execute(DoubleTapZoomDisable())
+            try await _ = bridge.execute(DoubleTapZoomDisable())
         } catch {
             MTLogger.log("\(error)", type: .error)
         }
@@ -26,7 +26,7 @@ public struct MTDoubleTapZoomInGesture: MTGesture {
 
     public func enable() async {
         do {
-            try await bridge.execute(DoubleTapZoomEnable())
+            try await _ = bridge.execute(DoubleTapZoomEnable())
         } catch {
             MTLogger.log("\(error)", type: .error)
         }

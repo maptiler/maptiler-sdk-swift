@@ -18,7 +18,7 @@ public struct MTDragPanGesture: MTGesture {
 
     public func disable() async {
         do {
-            try await bridge.execute(DragPanDisable())
+            try await _ = bridge.execute(DragPanDisable())
         } catch {
             MTLogger.log("\(error)", type: .error)
         }
@@ -26,7 +26,7 @@ public struct MTDragPanGesture: MTGesture {
 
     public func enable() async {
         do {
-            try await bridge.execute(DragPanEnable(options: nil))
+            try await _ = bridge.execute(DragPanEnable(options: nil))
         } catch {
             MTLogger.log("\(error)", type: .error)
         }
@@ -34,7 +34,7 @@ public struct MTDragPanGesture: MTGesture {
 
     public func enable(with options: MTDragPanOptions) async {
         do {
-            try await bridge.execute(DragPanEnable(options: options))
+            try await _ = bridge.execute(DragPanEnable(options: options))
         } catch {
             MTLogger.log("\(error)", type: .error)
         }

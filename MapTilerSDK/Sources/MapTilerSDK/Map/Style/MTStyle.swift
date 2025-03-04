@@ -18,7 +18,11 @@ public class MTStyle {
 
     private var mapView: MTMapView!
 
-    package init(for mapView: MTMapView, with referenceStyle: MTMapReferenceStyle, and styleVariant: MTMapStyleVariant?) {
+    package init(
+        for mapView: MTMapView,
+        with referenceStyle: MTMapReferenceStyle,
+        and styleVariant: MTMapStyleVariant?
+    ) {
         self.mapView = mapView
 
         Task {

@@ -13,8 +13,8 @@ struct MapStyleView: View {
         static let minHeight: CGFloat = 40
     }
 
-    @State private var referenceStyle: MTMapReferenceStyle = .streets
-    @State private var styleVariant: MTMapStyleVariant? = .reference
+    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
 
     private var selectedStyleVariants: [MTMapStyleVariant]? {
         return referenceStyle.getVariants()

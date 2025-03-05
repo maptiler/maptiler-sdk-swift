@@ -112,7 +112,7 @@ open class MTMapView: UIView {
             }
 
             do {
-                try await bridge.execute(InitializeMap(
+                try await _ = bridge.execute(InitializeMap(
                     apiKey: apiKey,
                     options: options,
                     referenceStyle: referenceStyleProxy,
@@ -150,7 +150,7 @@ extension MTMapView: EventProcessorDelegate {
 extension MTMapView {
     package func runCommand(_ command: MTCommand) async {
         do {
-            try await bridge.execute(command)
+            try await _ = bridge.execute(command)
         } catch {
             MTLogger.log("\(error)", type: .error)
         }

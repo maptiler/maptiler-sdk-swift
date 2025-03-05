@@ -84,7 +84,7 @@ extension MTMapView: MTNavigable {
     ///   - maxPitch: The maximum pitch to set (0-85).
     /// - Throws: A ``MTError`` if maxPitch is out of bounds.
     public func setMaxPitch(_ maxPitch: Double?) async throws {
-        try await bridge.execute(SetMaxPitch(maxPitch: maxPitch))
+        try await _ = bridge.execute(SetMaxPitch(maxPitch: maxPitch))
     }
 
     /// Sets or clears the map's maximum zoom.
@@ -95,7 +95,7 @@ extension MTMapView: MTNavigable {
     ///   - maxZoom: The maximum zoom level to set.
     /// - Throws: A ``MTError`` if maxZoom is out of bounds.
     public func setMaxZoom(_ maxZoom: Double?) async throws {
-        try await bridge.execute(SetMaxZoom(maxZoom: maxZoom))
+        try await _ = bridge.execute(SetMaxZoom(maxZoom: maxZoom))
     }
 
     /// Sets or clears the map's minimum pitch.
@@ -106,7 +106,7 @@ extension MTMapView: MTNavigable {
     ///   - minPitch: The minimum pitch to set (0-85)
     /// - Throws: A ``MTError`` if minPitch is out of bounds.
     public func setMinPitch(_ minPitch: Double?) async throws {
-        try await bridge.execute(SetMinPitch(minPitch: minPitch))
+        try await _ = bridge.execute(SetMinPitch(minPitch: minPitch))
     }
 
     /// Sets or clears the map's minimum zoom.
@@ -117,7 +117,7 @@ extension MTMapView: MTNavigable {
     ///   - minZoom: The minimum zoom level to set (-2 - 24).
     /// - Throws: A ``MTError`` if minZoom is out of bounds.
     public func setMinZoom(_ minZoom: Double?) async throws {
-        try await bridge.execute(SetMinZoom(minZoom: minZoom))
+        try await _ = bridge.execute(SetMinZoom(minZoom: minZoom))
     }
 
     /// Sets the map's pitch (tilt).

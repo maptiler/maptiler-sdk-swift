@@ -28,7 +28,8 @@ public class MTVectorTileSource: MTTileSource, @unchecked Sendable {
 
     /// Scheme used for tiles.
     ///
-    /// Influences the y direction of the tile coordinates. The global-mercator (aka Spherical Mercator) profile is assumed.
+    /// Influences the y direction of the tile coordinates. The global-mercator (aka Spherical Mercator)
+    /// profile is assumed.
     public var scheme: MTTileScheme = .xyz
 
     /// An array of one or more tile source URLs.
@@ -42,12 +43,14 @@ public class MTVectorTileSource: MTTileSource, @unchecked Sendable {
 
     public private(set) var type: MTSourceType = .vector
 
-    public init (identifier: String, url: URL) {
+    /// Initializes the source with unique id and url to TileJSON resource.
+    public init(identifier: String, url: URL) {
         self.identifier = identifier
         self.url = url
     }
 
-    public init (identifier: String, tiles: [URL]) {
+    /// Initializes the source with unique id and one or more tile source urls.
+    public init(identifier: String, tiles: [URL]) {
         self.identifier = identifier
         self.tiles = tiles
     }

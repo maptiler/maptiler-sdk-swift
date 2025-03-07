@@ -2,6 +2,7 @@
 //  SetUrlToSource.swift
 //  MapTilerSDK
 //
+
 import Foundation
 package struct SetUrlToSource: MTCommand {
     var url: URL

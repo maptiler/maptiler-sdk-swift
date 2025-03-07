@@ -64,11 +64,11 @@ extension MTMapView: MTStylable {
         return await runCommandWithStringReturnValue(GetNameForStyleVariant(styleVariant: styleVariant))
     }
 
-    /// Adds a source to the map.
-    ///
-    ///  - Parameters:
-    ///     - source: Source to be added.
-    public func addSource(_ source: MTSource) async {
+    package func addSource(_ source: MTSource) async {
         return await runCommand(AddSource(source: source))
+    }
+
+    package func removeSource(_ source: MTSource) async {
+        return await runCommand(RemoveSource(source: source))
     }
 }

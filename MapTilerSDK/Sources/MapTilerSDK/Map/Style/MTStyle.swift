@@ -17,6 +17,7 @@ public class MTStyle {
     public private(set) var styleVariant: MTMapStyleVariant?
 
     private var mapView: MTMapView!
+    private var sources: [String: MTWeakSource] = [:]
 
     package init(
         for mapView: MTMapView,
@@ -108,4 +109,53 @@ public class MTStyle {
     public func getName(for styleVariant: MTMapStyleVariant) async -> String {
         return await mapView.getName(for: styleVariant)
     }
+}
+
+extension MTStyle {
+    /// Adds a source to the map.
+    ///
+    /// - Parameters:
+    ///     - source: Source to be added.
+    /// - Throws: A ``MTStyleError.sourceAlreadyExists`` if source with the same
+    /// id is already added to the map.
+    public func addSource(_ source: MTSource) async throws {
+        guard sources[source.identifier] == nil else {
+            throw MTStyleError.sourceAlreadyExists
+        }
+
+        return await mapView.addSource(source)
+    }
+
+    /// Removes a source from the map.
+    ///
+    /// - Parameters:
+    ///     - source: Source to be removed.
+    /// - Throws: A ``MTStyleError.sourceNotFound`` if source does not exist on the map.
+    public func removeSource(_ source: MTSource) async throws {
+        guard sources[source.identifier] != nil else {
+            throw MTStyleError.sourceNotFound
+        }
+
+        return await mapView.removeSource(source)
+    }
+
+    /// Returns a boolean indicating whether a source is already added to the map.
+    func sourceExists(_ source: MTSource) -> Bool {
+        return sources[source.identifier] != nil
+    }
+}
+
+/// Represents the xceptions raised by the MTStyle object.
+public enum MTStyleError: Error {
+    /// Source with the same id already added to the map.
+    case sourceAlreadyExists
+
+    /// Source does not exist in the map.
+    case sourceNotFound
+
+    /// Layer with the same id already added to the map.
+    case layerAlreadyExists
+
+    /// Layer does not exist in the map.
+    case layerNotFound
 }

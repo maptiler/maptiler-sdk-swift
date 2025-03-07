@@ -9,5 +9,5 @@ import Foundation
 public protocol MTSource: Sendable {
     var identifier: String { get set }
     var url: URL? { get set }
-    var type: MTSourceType { get set }
+    var type: MTSourceType { get }
 }

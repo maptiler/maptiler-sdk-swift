@@ -9,14 +9,14 @@ package struct AddSource: MTCommand {
     var source: MTSource
 
     package func toJS() -> JSString {
-        if let source = source as? MTTileSource {
-            return handleMTTileSource(source)
+        if let source = source as? MTVectorTileSource {
+            return handleMTVectorTileSource(source)
         }
 
         return emptyReturnValue
     }
 
-    private func handleMTTileSource(_ source: MTTileSource) -> JSString {
+    private func handleMTVectorTileSource(_ source: MTVectorTileSource) -> JSString {
         var data: JSString = ""
         if let dataUrl = source.url {
             data = "data: '\(dataUrl.absoluteString)'"
@@ -34,11 +34,11 @@ package struct AddSource: MTCommand {
             type: '\(source.type)',
             minzoom: \(source.minZoom),
             maxzoom: \(source.maxZoom),
+            bounds: \(source.bounds),
+            scheme: \(source.scheme.rawValue),
             \(data),
             \(attributionString)
         });
         """
-
-        return emptyReturnValue
     }
 }

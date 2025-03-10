@@ -48,6 +48,10 @@ extension MTMapView: MTStylable {
         await runCommand(SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies))
     }
 
+    public func addMarker(_ marker: MTMarker) async {
+        await runCommand(AddMarker(marker: marker))
+    }
+
     package func getId(for referenceStyle: MTMapReferenceStyle) async -> String {
         return await runCommandWithStringReturnValue(GetIdForReferenceStyle(referenceStyle: referenceStyle))
     }
@@ -78,5 +82,9 @@ extension MTMapView: MTStylable {
 
     package func removeLayer(_ layer: MTLayer) async {
         return await runCommand(RemoveLayer(layer: layer))
+    }
+
+    package func setCoordinatesTo(_ marker: MTMarker) async {
+        return await runCommand(SetCoordinatesToMarker(marker: marker))
     }
 }

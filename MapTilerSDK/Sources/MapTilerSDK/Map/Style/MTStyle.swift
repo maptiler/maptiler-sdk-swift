@@ -18,6 +18,7 @@ public class MTStyle {
 
     private var mapView: MTMapView!
     private var sources: [String: MTWeakSource] = [:]
+    private var layers: [String: MTWeakLayer] = [:]
 
     package init(
         for mapView: MTMapView,
@@ -123,6 +124,8 @@ extension MTStyle {
             throw MTStyleError.sourceAlreadyExists
         }
 
+        sources[source.identifier] = MTWeakSource(source: source)
+
         return await mapView.addSource(source)
     }
 
@@ -136,6 +139,8 @@ extension MTStyle {
             throw MTStyleError.sourceNotFound
         }
 
+        sources.removeValue(forKey: source.identifier)
+
         return await mapView.removeSource(source)
     }
 
@@ -145,7 +150,45 @@ extension MTStyle {
     }
 }
 
-/// Represents the xceptions raised by the MTStyle object.
+extension MTStyle {
+    /// Adds a layer to the map.
+    ///
+    /// - Parameters:
+    ///     - layer: Layer to be added.
+    /// - Throws: A ``MTStyleError.layerAlreadyExists`` if layer with the same
+    /// id is already added to the map.
+    public func addLayer(_ layer: MTLayer) async throws {
+        guard layers[layer.identifier] == nil else {
+            throw MTStyleError.layerAlreadyExists
+        }
+
+        layers[layer.identifier] = MTWeakLayer(layer: layer)
+
+        return await mapView.addLayer(layer)
+    }
+
+    /// Removes a layer from the map.
+    ///
+    /// - Parameters:
+    ///     - layer: Layer to be removed.
+    /// - Throws: A ``MTStyleError.layerNotFound`` if layer does not exist on the map.
+    public func removeLayer(_ layer: MTLayer) async throws {
+        guard layers[layer.identifier] != nil else {
+            throw MTStyleError.layerNotFound
+        }
+
+        layers.removeValue(forKey: layer.identifier)
+
+        return await mapView.removeLayer(layer)
+    }
+
+    /// Returns a boolean indicating whether a layer is already added to the map.
+    func layerExists(_ layer: MTLayer) -> Bool {
+        return layers[layer.identifier] != nil
+    }
+}
+
+/// Represents the exceptions raised by the MTStyle object.
 public enum MTStyleError: Error {
     /// Source with the same id already added to the map.
     case sourceAlreadyExists

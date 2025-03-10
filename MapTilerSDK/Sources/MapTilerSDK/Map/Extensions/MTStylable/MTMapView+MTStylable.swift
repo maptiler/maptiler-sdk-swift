@@ -71,4 +71,12 @@ extension MTMapView: MTStylable {
     package func removeSource(_ source: MTSource) async {
         return await runCommand(RemoveSource(source: source))
     }
+
+    package func addLayer(_ layer: MTLayer) async {
+        return await runCommand(AddLayer(layer: layer))
+    }
+
+    package func removeLayer(_ layer: MTLayer) async {
+        return await runCommand(RemoveLayer(layer: layer))
+    }
 }

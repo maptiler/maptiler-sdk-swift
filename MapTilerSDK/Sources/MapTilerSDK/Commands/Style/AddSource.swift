@@ -21,7 +21,7 @@ package struct AddSource: MTCommand {
         if let dataUrl = source.url {
             data = "url: '\(dataUrl.absoluteString)'"
         } else if let tiles = source.tiles {
-            data = "tiles: '\(tiles)'"
+            data = "tiles: \(tiles.map { $0.absoluteString.removingPercentEncoding ?? "" })"
         }
 
         var attributionString: JSString = ""

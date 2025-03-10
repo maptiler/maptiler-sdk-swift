@@ -19,7 +19,7 @@ package struct AddSource: MTCommand {
     private func handleMTVectorTileSource(_ source: MTVectorTileSource) -> JSString {
         var data: JSString = ""
         if let dataUrl = source.url {
-            data = "data: '\(dataUrl.absoluteString)'"
+            data = "url: '\(dataUrl.absoluteString)'"
         } else if let tiles = source.tiles {
             data = "tiles: '\(tiles)'"
         }
@@ -31,11 +31,11 @@ package struct AddSource: MTCommand {
 
         return """
         \(MTBridge.mapObject).addSource('\(source.identifier)', {
-            type: '\(source.type)',
+            type: '\(source.type.rawValue)',
             minzoom: \(source.minZoom),
             maxzoom: \(source.maxZoom),
             bounds: \(source.bounds),
-            scheme: \(source.scheme.rawValue),
+            scheme: '\(source.scheme.rawValue)',
             \(data),
             \(attributionString)
         });

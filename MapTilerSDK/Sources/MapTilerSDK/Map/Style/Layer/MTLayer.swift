@@ -4,10 +4,11 @@
 //
 
 /// Protocol requirements for all types of Layers.
-public protocol MTLayer: Sendable {
+public protocol MTLayer: Sendable, AnyObject {
     var identifier: String { get set }
-    var type: MTLayerType { get set }
-    var source: MTSource { get set }
-    var maxZoom: Double { get set }
-    var minZoom: Double { get set }
+    var type: MTLayerType { get }
+    var sourceIdentifier: String { get set }
+    var maxZoom: Double? { get set }
+    var minZoom: Double? { get set }
+    var sourceLayer: String? { get set }
 }

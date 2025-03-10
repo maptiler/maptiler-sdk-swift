@@ -3,7 +3,7 @@
 //  MapTilerSDK
 //
 
-public class MTWeakSource {
+package class MTWeakSource {
     weak var source: (any MTSource)?
 
     init(source: MTSource? = nil) {

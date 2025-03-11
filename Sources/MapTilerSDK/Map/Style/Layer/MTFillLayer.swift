@@ -107,6 +107,32 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         maxZoom = try container.decode(Double.self, forKey: .maxZoom)
         minZoom = try container.decode(Double.self, forKey: .minZoom)
         sourceLayer = try container.decodeIfPresent(String.self, forKey: .sourceLayer)
+
+        // PAINT
+
+        let paintContainer = try container.nestedContainer(keyedBy: PaintCodingKeys.self, forKey: .paint)
+
+        shouldBeAntialised = try paintContainer.decodeIfPresent(Bool.self, forKey: .shouldBeAntialised) ?? false
+        opacity = try paintContainer.decode(Double.self, forKey: .opacity)
+        translate = try paintContainer.decode([Double].self, forKey: .translate)
+
+        let colorHex = try paintContainer.decode(String.self, forKey: .color)
+        color = UIColor(hex: colorHex) ?? .black
+
+        let outlineColorHex = try paintContainer.decode(String.self, forKey: .outlineColor)
+        outlineColor = UIColor(hex: outlineColorHex) ?? color
+
+        let anchorString = try paintContainer.decode(String.self, forKey: .translateAnchor)
+        translateAnchor = MTFillTranslateAnchor(rawValue: anchorString)
+
+        // LAYOUT
+
+        let layoutContainer = try container.nestedContainer(keyedBy: LayoutCodingKeys.self, forKey: .layout)
+
+        sortKey = try layoutContainer.decode(Double.self, forKey: .sortKey)
+
+        let visibilityString = try layoutContainer.decode(String.self, forKey: .visibility)
+        visibility = MTLayerVisibility(rawValue: visibilityString)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -119,6 +145,8 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         try container.encodeIfPresent(minZoom, forKey: .minZoom)
         try container.encodeIfPresent(sourceLayer, forKey: .sourceLayer)
 
+        // PAINT
+
         var paintContainer = container.nestedContainer(keyedBy: PaintCodingKeys.self, forKey: .paint)
 
         try paintContainer.encodeIfPresent(shouldBeAntialised, forKey: .shouldBeAntialised)
@@ -130,6 +158,8 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
             translateAnchor?.rawValue ?? MTFillTranslateAnchor.map.rawValue,
             forKey: .translateAnchor
         )
+
+        // LAYOUT
 
         var layoutContainer = container.nestedContainer(keyedBy: LayoutCodingKeys.self, forKey: .layout)
 
@@ -163,5 +193,22 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
     package enum LayoutCodingKeys: String, CodingKey {
         case sortKey = "fill-sort-key"
         case visibility
+    }
+}
+
+extension MTFillLayer: Equatable {
+    public static func == (lhs: MTFillLayer, rhs: MTFillLayer) -> Bool {
+        let isIdEqual = lhs.identifier == rhs.identifier
+        let isSourceIdentifierEqual = lhs.sourceIdentifier == rhs.sourceIdentifier
+        let isMaxZoomlEqual = lhs.maxZoom == rhs.maxZoom
+        let isMinZoomlEqual = lhs.minZoom == rhs.minZoom
+        let sourceLayerEqual = lhs.sourceLayer == rhs.sourceLayer
+
+        return isIdEqual &&
+            isSourceIdentifierEqual &&
+            isMaxZoomlEqual &&
+            isMaxZoomlEqual &&
+            isMinZoomlEqual &&
+            sourceLayerEqual
     }
 }

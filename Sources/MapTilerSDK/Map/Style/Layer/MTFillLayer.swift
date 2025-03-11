@@ -71,7 +71,8 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
     /// Enum controlling whether this layer is displayed.
     public var visibility: MTLayerVisibility? = .visible
 
-    /// Initializes the source with unique identifier, source identifier, max and min zoom levels and source layer, which is required for vector tile sources.
+    /// Initializes the source with unique identifier, source identifier, max and min zoom levels and source layer,
+    /// which is required for vector tile sources.
     public init(
         identifier: String,
         sourceIdentifier: String,
@@ -125,12 +126,18 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         try paintContainer.encodeIfPresent(opacity, forKey: .opacity)
         try paintContainer.encodeIfPresent(outlineColor?.toHex() ?? UIColor.black.toHex(), forKey: .outlineColor)
         try paintContainer.encodeIfPresent(translate, forKey: .translate)
-        try paintContainer.encodeIfPresent(translateAnchor?.rawValue ?? MTFillTranslateAnchor.map.rawValue, forKey: .translateAnchor)
+        try paintContainer.encodeIfPresent(
+            translateAnchor?.rawValue ?? MTFillTranslateAnchor.map.rawValue,
+            forKey: .translateAnchor
+        )
 
         var layoutContainer = container.nestedContainer(keyedBy: LayoutCodingKeys.self, forKey: .layout)
 
         try layoutContainer.encodeIfPresent(sortKey, forKey: .sortKey)
-        try layoutContainer.encodeIfPresent(visibility?.rawValue ?? MTLayerVisibility.visible.rawValue, forKey: .visibility)
+        try layoutContainer.encodeIfPresent(
+            visibility?.rawValue ?? MTLayerVisibility.visible.rawValue,
+            forKey: .visibility
+        )
     }
 
     package enum CodingKeys: String, CodingKey {

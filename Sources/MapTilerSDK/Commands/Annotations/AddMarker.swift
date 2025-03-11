@@ -16,7 +16,7 @@ package struct AddMarker: MTCommand {
                 color: '\(marker.color?.toHex() ?? UIColor.blue.toHex())',
                 draggable: \(marker.draggable ?? false)
             });
-            
+
             \(marker.identifier)
             .setLngLat([\(coordinates.lng), \(coordinates.lat)])
             .addTo(\(MTBridge.mapObject));

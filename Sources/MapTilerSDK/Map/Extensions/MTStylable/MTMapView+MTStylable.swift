@@ -48,8 +48,18 @@ extension MTMapView: MTStylable {
         await runCommand(SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies))
     }
 
+    /// Adds a marker to the map.
+    /// - Parameters:
+    ///    - marker: Marker to be added to the map.
     public func addMarker(_ marker: MTMarker) async {
         await runCommand(AddMarker(marker: marker))
+    }
+
+    // Removes a marker from the map.
+    /// - Parameters:
+    ///    - marker: Marker to be removed from the map.
+    public func removeMarker(_ marker: MTMarker) async {
+        await runCommand(RemoveMarker(marker: marker))
     }
 
     package func getId(for referenceStyle: MTMapReferenceStyle) async -> String {
@@ -69,22 +79,22 @@ extension MTMapView: MTStylable {
     }
 
     package func addSource(_ source: MTSource) async {
-        return await runCommand(AddSource(source: source))
+        await runCommand(AddSource(source: source))
     }
 
     package func removeSource(_ source: MTSource) async {
-        return await runCommand(RemoveSource(source: source))
+        await runCommand(RemoveSource(source: source))
     }
 
     package func addLayer(_ layer: MTLayer) async {
-        return await runCommand(AddLayer(layer: layer))
+        await runCommand(AddLayer(layer: layer))
     }
 
     package func removeLayer(_ layer: MTLayer) async {
-        return await runCommand(RemoveLayer(layer: layer))
+        await runCommand(RemoveLayer(layer: layer))
     }
 
     package func setCoordinatesTo(_ marker: MTMarker) async {
-        return await runCommand(SetCoordinatesToMarker(marker: marker))
+        await runCommand(SetCoordinatesToMarker(marker: marker))
     }
 }

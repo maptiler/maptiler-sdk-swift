@@ -13,4 +13,5 @@ public protocol MTStylable {
     func setLight(_ light: MTLight, options: MTStyleSetterOptions?) async
     func setShouldRenderWorldCopies(_ shouldRenderWorldCopies: Bool) async
     func addMarker(_ marker: MTMarker) async
+    func removeMarker(_ marker: MTMarker) async
 }

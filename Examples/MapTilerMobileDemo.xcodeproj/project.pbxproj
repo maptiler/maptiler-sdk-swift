@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		17ED4EAB2D50BF72009F3E89 /* MapTilerSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 17ED4EAA2D50BF72009F3E89 /* MapTilerSDK */; };
+		17DE4A852D7EF1B500EF2187 /* MapTilerSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 17DE4A842D7EF1B500EF2187 /* MapTilerSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				17ED4EAB2D50BF72009F3E89 /* MapTilerSDK in Frameworks */,
+				17DE4A852D7EF1B500EF2187 /* MapTilerSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +83,7 @@
 			);
 			name = MapTilerMobileDemo;
 			packageProductDependencies = (
-				17ED4EAA2D50BF72009F3E89 /* MapTilerSDK */,
+				17DE4A842D7EF1B500EF2187 /* MapTilerSDK */,
 			);
 			productName = MapTilerMobileDemo;
 			productReference = 17ED4E912D50BE5C009F3E89 /* MapTilerMobileDemo.app */;
@@ -114,7 +114,7 @@
 			mainGroup = 17ED4E882D50BE5C009F3E89;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				17ED4EA92D50BF72009F3E89 /* XCLocalSwiftPackageReference "../../MapTilerSDK" */,
+				17DE4A832D7EF1B500EF2187 /* XCLocalSwiftPackageReference "../../maptiler-sdk-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 17ED4E922D50BE5C009F3E89 /* Products */;
@@ -346,14 +346,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		17ED4EA92D50BF72009F3E89 /* XCLocalSwiftPackageReference "../../MapTilerSDK" */ = {
+		17DE4A832D7EF1B500EF2187 /* XCLocalSwiftPackageReference "../../maptiler-sdk-swift" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../MapTilerSDK;
+			relativePath = "../../maptiler-sdk-swift";
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		17ED4EAA2D50BF72009F3E89 /* MapTilerSDK */ = {
+		17DE4A842D7EF1B500EF2187 /* MapTilerSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MapTilerSDK;
 		};

@@ -17,7 +17,7 @@ public protocol MTMapViewDelegate: AnyObject {
 ///
 /// Exposes methods and properties that enable changes to the map,
 /// and fires events that can be interacted with.
-open class MTMapView: UIView, Sendable {
+open class MTMapView: UIView {
     /// Proxy style object of the map.
     public private(set) var style: MTStyle?
 

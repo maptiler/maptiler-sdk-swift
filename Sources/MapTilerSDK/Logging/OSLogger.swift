@@ -34,7 +34,7 @@ package class OSLogger: MTLoggable, @unchecked Sendable {
                 logger.critical("\(message)")
             }
         case .event:
-            if verbose {
+            if verbose && logLevel != .none {
                 logger.info("\(message)")
             }
         }

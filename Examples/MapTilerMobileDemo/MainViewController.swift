@@ -35,6 +35,7 @@ class MainViewController: UIViewController {
     }
 
     @IBOutlet weak var jumpContainerView: UIView!
+    @IBOutlet weak var benchmarkButton: UIButton!
     @IBOutlet weak var loadingActivityIndicator: UIActivityIndicatorView!
     
     private var dataModel = JumpDataModel()
@@ -47,7 +48,7 @@ class MainViewController: UIViewController {
 
         setUpLoadingActivityIndicator()
     }
-
+    
     private func setUpJumpView() {
         let jumpHostingController = UIHostingController(rootView: JumpView(dataModel: dataModel))
         addChild(jumpHostingController)
@@ -131,6 +132,13 @@ extension MainViewController: MTMapViewDelegate {
         Task {
             await mapView.addMapTilerLogoControl(position: .topLeft)
         }
+
+        // *** Uncomment for benchmark ***
+//        Task {
+//            benchmarkButton.isHidden = false
+//            await MTConfig.shared.setLogLevel(.none)
+//        }
+        // *** ***
     }
 
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {

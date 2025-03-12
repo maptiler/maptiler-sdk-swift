@@ -145,7 +145,7 @@ extension MTStyle {
     }
 
     /// Returns a boolean indicating whether a source is already added to the map.
-    func sourceExists(_ source: MTSource) -> Bool {
+    public func sourceExists(_ source: MTSource) -> Bool {
         return sources[source.identifier] != nil
     }
 }
@@ -183,7 +183,7 @@ extension MTStyle {
     }
 
     /// Returns a boolean indicating whether a layer is already added to the map.
-    func layerExists(_ layer: MTLayer) -> Bool {
+    public func layerExists(_ layer: MTLayer) -> Bool {
         return layers[layer.identifier] != nil
     }
 }

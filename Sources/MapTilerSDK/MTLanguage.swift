@@ -52,7 +52,7 @@ public enum MTSpecialLanguage: String, Codable {
 }
 
 /// Languages available for MTMapView object.
-public enum MTCountryLanguage: String, Codable {
+public enum MTCountryLanguage: String, Codable, CaseIterable {
     /// Albanian language.
     case albanian = "sq"
 

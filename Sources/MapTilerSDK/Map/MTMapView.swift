@@ -17,7 +17,7 @@ public protocol MTMapViewDelegate: AnyObject {
 ///
 /// Exposes methods and properties that enable changes to the map,
 /// and fires events that can be interacted with.
-open class MTMapView: UIView {
+open class MTMapView: UIView, Sendable {
     /// Proxy style object of the map.
     public private(set) var style: MTStyle?
 
@@ -34,6 +34,8 @@ open class MTMapView: UIView {
     public weak var delegate: MTMapViewDelegate?
 
     public private(set) var isInitialized: Bool = false
+
+    public var didInitialize: (() -> Void)?
 
     package var bridge: MTBridge!
 
@@ -121,6 +123,7 @@ open class MTMapView: UIView {
 
                 isInitialized = true
                 delegate?.mapViewDidInitialize(self)
+                didInitialize?()
 
                 MTLogger.log("\(MTLogger.infoMarker) - Map Initialized Successfully", type: .info)
             } catch {

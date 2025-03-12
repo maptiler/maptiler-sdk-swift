@@ -8,7 +8,7 @@ import Foundation
 package extension Encodable {
     func toJSON() -> String? {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .withoutEscapingSlashes
+        encoder.outputFormatting = .sortedKeys
 
         if let jsonData = try? encoder.encode(self) {
             if let jsonString = String(data: jsonData, encoding: .utf8) {

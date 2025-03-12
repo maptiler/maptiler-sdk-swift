@@ -185,6 +185,11 @@ public struct MTMapOptions: @unchecked Sendable {
     /// Boolean indicating whether terrain control is added directly to the map.
     public private(set) var terrainControlIsVisible: Bool? = false
 
+    public init(center: CLLocationCoordinate2D? = nil, zoom: Double? = nil) {
+        self.center = center
+        self.zoom = zoom
+    }
+
     public init(
         language: MTLanguage? = nil,
         center: CLLocationCoordinate2D? = nil,

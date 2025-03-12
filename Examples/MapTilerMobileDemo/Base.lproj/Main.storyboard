@@ -83,6 +83,18 @@
                                     <constraint firstAttribute="height" constant="60" id="2s7-f3-ASs"/>
                                 </constraints>
                             </view>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vcA-jg-OMy">
+                                <rect key="frame" x="104.66666666666669" y="408.66666666666669" width="184" height="35"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="184" id="J4F-6c-zse"/>
+                                    <constraint firstAttribute="height" constant="35" id="xCo-kw-znO"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="BENCHMARK"/>
+                                <connections>
+                                    <segue destination="NEb-f2-Vj2" kind="show" id="00A-Y2-r74"/>
+                                </connections>
+                            </button>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="ope-7I-6c4">
                                 <rect key="frame" x="178" y="408" width="37" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -91,6 +103,8 @@
                         <viewLayoutGuide key="safeArea" id="jAF-J6-Clo"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="vcA-jg-OMy" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="5dS-Dc-mgq"/>
+                            <constraint firstItem="vcA-jg-OMy" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="BYc-GL-rtk"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="bottom" secondItem="Vtk-8K-li4" secondAttribute="bottom" id="Cle-zq-5Br"/>
                             <constraint firstItem="1gL-KZ-0Hm" firstAttribute="top" secondItem="JMD-r8-val" secondAttribute="bottom" constant="10" id="JVh-zJ-aTA"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="bottom" secondItem="bPo-zQ-sJh" secondAttribute="bottom" id="T9s-c6-ave"/>
@@ -111,6 +125,7 @@
                         <imageReference key="selectedImage" image="map" catalog="system" symbolScale="large"/>
                     </tabBarItem>
                     <connections>
+                        <outlet property="benchmarkButton" destination="vcA-jg-OMy" id="IjZ-nh-RZ0"/>
                         <outlet property="jumpContainerView" destination="JMD-r8-val" id="zW0-Rd-P2l"/>
                         <outlet property="loadingActivityIndicator" destination="ope-7I-6c4" id="rYf-gi-imh"/>
                         <outlet property="mapControlView" destination="bPo-zQ-sJh" id="t9H-nD-HJn"/>
@@ -121,6 +136,16 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-550.38167938931292" y="-251.40845070422537"/>
+        </scene>
+        <!--BenchmarkVC-->
+        <scene sceneID="JBh-He-4QF">
+            <objects>
+                <viewControllerPlaceholder storyboardName="BenchmarkVC" referencedIdentifier="BenchmarkVC" id="NEb-f2-Vj2" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="Pdv-aZ-4tX"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="phG-ag-9yb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="51" y="-329"/>
         </scene>
         <!--SwiftUI-->
         <scene sceneID="Nlb-BW-3eu">

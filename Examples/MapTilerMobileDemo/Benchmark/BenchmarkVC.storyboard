@@ -18,23 +18,34 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iXP-fz-Kbv">
-                                <rect key="frame" x="166" y="100" width="61.333333333333343" height="35"/>
+                                <rect key="frame" x="120.66666666666669" y="79" width="152" height="35"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Start"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Start Benchmark"/>
                                 <connections>
                                     <action selector="startButtonTouchUpInside:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="Jln-Um-7qc"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8CX-zz-wTj">
+                                <rect key="frame" x="121.66666666666669" y="129" width="150" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Start Stress Test"/>
+                                <connections>
+                                    <action selector="stressTestButtonTouchUpInside:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="P8k-ln-iHX"/>
                                 </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="iXP-fz-Kbv" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="41" id="fVV-UL-eB2"/>
+                            <constraint firstItem="8CX-zz-wTj" firstAttribute="top" secondItem="iXP-fz-Kbv" secondAttribute="bottom" constant="15" id="RmS-01-gck"/>
+                            <constraint firstItem="iXP-fz-Kbv" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="20" id="fVV-UL-eB2"/>
+                            <constraint firstItem="8CX-zz-wTj" firstAttribute="centerX" secondItem="iXP-fz-Kbv" secondAttribute="centerX" id="jKm-BC-EZ5"/>
                             <constraint firstItem="iXP-fz-Kbv" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="pJH-36-9kb"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="startButton" destination="iXP-fz-Kbv" id="5fr-2Z-egV"/>
+                        <outlet property="startStressTestButton" destination="8CX-zz-wTj" id="kYp-wP-cE6"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

@@ -84,12 +84,13 @@
                                 </constraints>
                             </view>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vcA-jg-OMy">
-                                <rect key="frame" x="132.66666666666666" y="408.66666666666669" width="127.66666666666666" height="35"/>
+                                <rect key="frame" x="108" y="408.66666666666669" width="177" height="35"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="xCo-kw-znO"/>
                                 </constraints>
+                                <color key="tintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="BENCHMARK"/>
+                                <buttonConfiguration key="configuration" style="filled" title="OPEN BENCHMARK"/>
                                 <connections>
                                     <segue destination="NEb-f2-Vj2" kind="show" id="00A-Y2-r74"/>
                                 </connections>

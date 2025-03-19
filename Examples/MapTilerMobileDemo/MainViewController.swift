@@ -45,10 +45,22 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
 
         setUpJumpView()
-
         setUpLoadingActivityIndicator()
+        setUpLongPress()
     }
-    
+
+    private func setUpLongPress() {
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        longPressRecognizer.minimumPressDuration = 0.5
+        longPressRecognizer.delaysTouchesBegan = true
+
+        self.jumpContainerView.addGestureRecognizer(longPressRecognizer)
+    }
+
+    @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        benchmarkButton.isHidden = false
+    }
+
     private func setUpJumpView() {
         let jumpHostingController = UIHostingController(rootView: JumpView(dataModel: dataModel))
         addChild(jumpHostingController)
@@ -133,7 +145,7 @@ extension MainViewController: MTMapViewDelegate {
             await mapView.addMapTilerLogoControl(position: .topLeft)
         }
 
-        // *** Uncomment for benchmark ***
+        // *** Uncomment for benchmark or use long press on jump view ***
 //        Task {
 //            benchmarkButton.isHidden = false
 //            await MTConfig.shared.setLogLevel(.none)

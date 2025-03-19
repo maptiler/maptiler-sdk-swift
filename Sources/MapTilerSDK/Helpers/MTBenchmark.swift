@@ -14,7 +14,7 @@ import UIKit
 public final class MTBenchmark: MTMapViewDelegate {
     let zoom = 6.0
     let centerCoordinate = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
-    let apiKey = "YOUR_API_KEY_HERE"
+    var apiKey = "YOUR_API_KEY_HERE"
 
     // https://api.maptiler.com/tiles/uk-openzoomstack/{z}/{x}/{y}.pbf?key=\(apiKey)
     let openStackTiles: [(String, UIColor)] = [
@@ -162,6 +162,8 @@ public final class MTBenchmark: MTMapViewDelegate {
 
     public var mapView: MTMapView!
 
+    public var didUpdateStressTest: ((String) -> Void)?
+
     var initTime: CFAbsoluteTime!
 
     private let logger = Logger(
@@ -173,20 +175,30 @@ public final class MTBenchmark: MTMapViewDelegate {
         await setUp(in: frame)
     }
 
+    public func setAPIKey(apiKey: String) {
+        self.apiKey = apiKey
+    }
+
     public func start() async {
         await benchmarkSwift()
         await benchmarkJS()
     }
 
-    public func startStressTest() async {
-        let iterations = 100
-
+    public func startStressTest(iterations: Int, markersAreOn: Bool) async {
         let totalStartTime = CFAbsoluteTimeGetCurrent()
-        await stressMarkers(iterations: iterations)
-        await stressSourcesAndLayers(iterations: iterations)
+
         await stressNavigation(iterations: iterations)
+
+        if markersAreOn {
+            await stressMarkers(iterations: iterations)
+        }
+        
+        await stressSourcesAndLayers(iterations: iterations)
+
         let totalElapsedTime = CFAbsoluteTimeGetCurrent() - totalStartTime
+
         logger.log(level: .error, "TOTAL Benchmark t: \(totalElapsedTime)")
+        didUpdateStressTest?(">>> TOTAL Benchmark elapsed: \(totalElapsedTime)")
     }
 
     private func setUp(in frame: CGRect) async {
@@ -288,6 +300,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
         logger.log(level: .error, "total t: \(totalElapsedTime) - \("Zoom")")
         logger.log(level: .error, "avg t: \(elapsedTimesSum / Double(elapsedTimes.count)) - \("Zoom")")
+        didUpdateStressTest?(">>> ZOOM Benchmark elapsed: \(totalElapsedTime)")
     }
 
     private func stressJumpTo(iterations: Int) async {
@@ -314,6 +327,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
         logger.log(level: .error, "total t: \(totalElapsedTime) - \("JumpTo")")
         logger.log(level: .error, "avg t: \(elapsedTimesSum / Double(elapsedTimes.count)) - \("JumpTo")")
+        didUpdateStressTest?(">>> JUMPTO Benchmark elapsed: \(totalElapsedTime)")
     }
 
     private func stressFlyTo(iterations: Int) async {
@@ -340,6 +354,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
         logger.log(level: .error, "total t: \(totalElapsedTime) - \("FlyTo")")
         logger.log(level: .error, "avg t: \(elapsedTimesSum / Double(elapsedTimes.count)) - \("FlyTo")")
+        didUpdateStressTest?(">>> FLYTO Benchmark elapsed: \(totalElapsedTime)")
     }
 
     private func stressMarkers(iterations: Int) async {
@@ -397,6 +412,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
         logger.log(level: .error, "total t: \(totalElapsedTime) - \("AddMarker")")
         logger.log(level: .error, "avg t: \(elapsedTimesSum / Double(elapsedTimes.count)) - \("AddMarker")")
+        didUpdateStressTest?(">>> MARKERS RND DIST Benchmark elapsed: \(totalElapsedTime)")
     }
 
     private func stressSourcesAndLayers(iterations: Int) async {
@@ -533,6 +549,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
         logger.log(level: .error, "total t: \(totalElapsedTime) - \("SourcesAndLayers")")
         logger.log(level: .error, "avg t: \(elapsedTimesSum / Double(elapsedTimes.count)) - \("SourcesAndLayers")")
+        didUpdateStressTest?(">>> SOURCES AND LAYERS Benchmark elapsed: \(totalElapsedTime)")
     }
 }
 

@@ -74,6 +74,15 @@
                                     <constraint firstAttribute="width" constant="84" id="tNd-wy-KeI"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="g21-yJ-aeI" customClass="MapProjectionControlView" customModule="MapTilerMobileDemo" customModuleProvider="target">
+                                <rect key="frame" x="304" y="239" width="84" height="110"/>
+                                <viewLayoutGuide key="safeArea" id="fol-Ec-iJ8"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="84" id="UrC-WF-L9n"/>
+                                    <constraint firstAttribute="height" constant="110" id="eQw-OU-skw"/>
+                                </constraints>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JMD-r8-val" userLabel="JumpContainerView">
                                 <rect key="frame" x="0.0" y="59" width="393" height="60"/>
                                 <viewLayoutGuide key="safeArea" id="rvd-sS-rjL"/>
@@ -107,12 +116,14 @@
                             <constraint firstItem="vcA-jg-OMy" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="BYc-GL-rtk"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="bottom" secondItem="Vtk-8K-li4" secondAttribute="bottom" id="Cle-zq-5Br"/>
                             <constraint firstItem="1gL-KZ-0Hm" firstAttribute="top" secondItem="JMD-r8-val" secondAttribute="bottom" constant="10" id="JVh-zJ-aTA"/>
+                            <constraint firstItem="g21-yJ-aeI" firstAttribute="top" secondItem="1gL-KZ-0Hm" secondAttribute="bottom" id="PRT-el-Cc6"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="bottom" secondItem="bPo-zQ-sJh" secondAttribute="bottom" id="T9s-c6-ave"/>
                             <constraint firstAttribute="trailing" secondItem="1gL-KZ-0Hm" secondAttribute="trailing" constant="5" id="WbW-pu-0po"/>
                             <constraint firstItem="Vtk-8K-li4" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailing" id="dNQ-Nk-Rrt"/>
                             <constraint firstItem="Vtk-8K-li4" firstAttribute="top" secondItem="JMD-r8-val" secondAttribute="bottom" id="f8r-2t-JXl"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="trailing" secondItem="bPo-zQ-sJh" secondAttribute="trailing" constant="10" id="iyb-nd-v04"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="top" secondItem="JMD-r8-val" secondAttribute="top" id="mAb-fx-qRK"/>
+                            <constraint firstItem="g21-yJ-aeI" firstAttribute="trailing" secondItem="1gL-KZ-0Hm" secondAttribute="trailing" id="mIh-uT-gtY"/>
                             <constraint firstItem="bPo-zQ-sJh" firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="nRp-gd-gZr"/>
                             <constraint firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="xxb-4C-0bd"/>
                             <constraint firstItem="JMD-r8-val" firstAttribute="trailing" secondItem="Vtk-8K-li4" secondAttribute="trailing" id="zHu-Sz-v8C"/>
@@ -129,6 +140,7 @@
                         <outlet property="jumpContainerView" destination="JMD-r8-val" id="zW0-Rd-P2l"/>
                         <outlet property="loadingActivityIndicator" destination="ope-7I-6c4" id="rYf-gi-imh"/>
                         <outlet property="mapControlView" destination="bPo-zQ-sJh" id="t9H-nD-HJn"/>
+                        <outlet property="mapProjectionControlView" destination="g21-yJ-aeI" id="OnE-kI-O11"/>
                         <outlet property="mapView" destination="uRD-JF-5ak" id="u5s-Un-4aZ"/>
                         <outlet property="mapZoomControlView" destination="1gL-KZ-0Hm" id="mzx-jZ-hcU"/>
                     </connections>

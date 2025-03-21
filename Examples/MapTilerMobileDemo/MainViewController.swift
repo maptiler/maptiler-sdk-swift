@@ -34,12 +34,21 @@ class MainViewController: UIViewController {
         }
     }
 
+    @IBOutlet weak var mapProjectionControlView: MapProjectionControlView! {
+        didSet {
+            mapProjectionControlView.delegate = self
+        }
+    }
+
     @IBOutlet weak var jumpContainerView: UIView!
     @IBOutlet weak var benchmarkButton: UIButton!
     @IBOutlet weak var loadingActivityIndicator: UIActivityIndicatorView!
     
     private var dataModel = JumpDataModel()
     private var cancellables = Set<AnyCancellable>()
+
+    private var globeEnabled = false
+    private var terrainEnabled = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -130,6 +139,32 @@ extension MainViewController: MapZoomControlViewDelegate {
     func mapZoomControlViewDidTapZoomOut(_ mapZoomControlView: MapZoomControlView) {
         Task {
             await mapView.zoomOut()
+        }
+    }
+}
+
+extension MainViewController: MapProjectionControlViewDelegate {
+    func mapZoomControlViewDidTapEnableGlobe(_ mapZoomControlView: MapProjectionControlView) {
+        Task {
+            if globeEnabled {
+                await mapView.enableMercatorProjection()
+            } else {
+                await mapView.enableGlobeProjection()
+            }
+
+            globeEnabled = !globeEnabled
+        }
+    }
+    
+    func mapZoomControlViewDidTapEnableTerrain(_ mapZoomControlView: MapProjectionControlView) {
+        Task {
+            if terrainEnabled {
+                await mapView.disableTerrain()
+            } else {
+                await mapView.enableTerrain()
+            }
+
+            terrainEnabled = !terrainEnabled
         }
     }
 }

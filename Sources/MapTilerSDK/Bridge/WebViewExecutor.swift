@@ -67,14 +67,10 @@ package final class WebViewExecutor: MTCommandExecutable {
                         }
                     } else { // Execution completed successfully, but with unsupported type. Log based on log level.
                         if isVerbose {
-                            continuation.resume(
-                                throwing: MTError.unsupportedReturnType(
-                                    description: "\(command) completed with unsupported return type."
-                                )
-                            )
-                        } else {
-                            continuation.resume(returning: .unsupportedType)
+                            MTLogger.log("\(command) completed with unsupported return type.", type: .warning)
                         }
+
+                        continuation.resume(returning: .unsupportedType)
                     }
                 } else { // Pass result, handle if type is invalid.
                     do {

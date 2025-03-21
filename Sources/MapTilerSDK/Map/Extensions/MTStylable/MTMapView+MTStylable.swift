@@ -62,6 +62,41 @@ extension MTMapView: MTStylable {
         await runCommand(RemoveMarker(marker: marker))
     }
 
+    /// Enables the globe projection visualization.
+    public func enableGlobeProjection() async {
+        await runCommand(EnableGlobeProjection())
+    }
+
+    /// Enables the mercator projection visualization.
+    public func enableMercatorProjection() async {
+        await runCommand(EnableMercatorProjection())
+    }
+
+    /// Enables the 3D terrain visualization.
+    /// - Parameters:
+    ///    - exaggerationFactor: Factor for volume boosting.
+    /// - Note: Default is 1.
+    public func enableTerrain(exaggerationFactor: Double = 1.0) async {
+        await runCommand(EnableTerrain(exaggerationFactor: exaggerationFactor))
+    }
+
+    /// Disables  the 3D terrain visualization.
+    public func disableTerrain() async {
+        await runCommand(DisableTerrain())
+    }
+
+    /// Sets the map's vertical field of view, in degrees.
+    ///
+    /// The internal camera has a default vertical field of view of a wide ~36.86 degrees. In globe mode,
+    /// such a large FOV reduces the amount of the Earth that can be seen at once and exaggerates
+    /// the central part, comparably to a fisheye lens. In many cases, a narrower FOV is preferable.
+    ///  - Parameters:
+    ///    - degrees: The vertical field of view to set, in degrees (0-180).
+    ///  - Note: Default is 36.87.
+    public func setVerticalFieldOfView(degrees: Double = 36.87) async {
+        await runCommand(SetVerticalFieldOfView(degrees: degrees))
+    }
+
     package func getId(for referenceStyle: MTMapReferenceStyle) async -> String {
         return await runCommandWithStringReturnValue(GetIdForReferenceStyle(referenceStyle: referenceStyle))
     }

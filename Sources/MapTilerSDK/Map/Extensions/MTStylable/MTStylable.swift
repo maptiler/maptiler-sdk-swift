@@ -14,4 +14,9 @@ public protocol MTStylable {
     func setShouldRenderWorldCopies(_ shouldRenderWorldCopies: Bool) async
     func addMarker(_ marker: MTMarker) async
     func removeMarker(_ marker: MTMarker) async
+    func enableGlobeProjection() async
+    func enableMercatorProjection() async
+    func enableTerrain(exaggerationFactor: Double) async
+    func disableTerrain() async
+    func setVerticalFieldOfView(degrees: Double) async
 }

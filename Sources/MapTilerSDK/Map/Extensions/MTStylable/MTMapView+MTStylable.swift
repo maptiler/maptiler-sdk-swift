@@ -55,11 +55,30 @@ extension MTMapView: MTStylable {
         await runCommand(AddMarker(marker: marker))
     }
 
-    // Removes a marker from the map.
+    /// Adds multiple markers to the map.
+    ///
+    /// Batch adding is preferred way of adding multiple markers to the map.
+    /// - Parameters:
+    ///    - markers: Markers to be added to the map.
+    ///    - withSingleIcon: Optional single image to use for all markers.
+    public func addMarkers(_ markers: [MTMarker], withSingleIcon: UIImage?) async {
+        await runCommand(AddMarkers(markers: markers, withSingleIcon: withSingleIcon))
+    }
+
+    /// Removes a marker from the map.
     /// - Parameters:
     ///    - marker: Marker to be removed from the map.
     public func removeMarker(_ marker: MTMarker) async {
         await runCommand(RemoveMarker(marker: marker))
+    }
+
+    /// Removes multiple markers from the map.
+    ///
+    /// Batch removing is preferred way of removing multiple markers from the map.
+    /// - Parameters:
+    ///    - markers: Markers to be removed from the map.
+    public func removeMarkers(_ markers: [MTMarker]) async {
+        await runCommand(RemoveMarkers(markers: markers))
     }
 
     /// Enables the globe projection visualization.

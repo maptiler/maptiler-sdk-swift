@@ -20,6 +20,9 @@ public class MTMarker: MTAnnotation, @unchecked Sendable {
     /// Boolean indicating whether marker is draggable.
     public var draggable: Bool?
 
+    /// Custom icon to use for marker.
+    public var icon: UIImage?
+
     /// Initializes the marker with the specified position.
     /// - Parameters:
     ///    - coordinates: Position of the marker.

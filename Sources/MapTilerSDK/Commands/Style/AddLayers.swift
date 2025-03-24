@@ -1,21 +1,27 @@
 //
-//  AddLayer.swift
+//  AddLayers.swift
 //  MapTilerSDK
 //
 
-package struct AddLayer: MTCommand {
+package struct AddLayers: MTCommand {
     let emptyReturnValue = ""
 
-    var layer: MTLayer
+    var layers: [MTLayer]
 
     package func toJS() -> JSString {
-        if let layer = layer as? MTFillLayer {
-            return handleMTFillLayer(layer)
-        } else if let layer = layer as? MTSymbolLayer {
-            return handleMTSymbolLayer(layer)
+        var jsString = ""
+
+        for layer in layers {
+            jsString.append("\n")
+
+            if let layer = layer as? MTFillLayer {
+                jsString.append(handleMTFillLayer(layer))
+            } else if let layer = layer as? MTSymbolLayer {
+                jsString.append(handleMTSymbolLayer(layer))
+            }
         }
 
-        return emptyReturnValue
+        return jsString
     }
 
     private func handleMTFillLayer(_ layer: MTFillLayer) -> JSString {

@@ -231,8 +231,16 @@ extension MTMapView: MTStylable {
         runCommand(AddLayer(layer: layer), completion: completionHandler)
     }
 
+    package func addLayers(_ layers: [MTLayer], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(AddLayers(layers: layers), completion: completionHandler)
+    }
+
     package func removeLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(RemoveLayer(layer: layer), completion: completionHandler)
+    }
+
+    package func removeLayers(_ layers: [MTLayer], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(RemoveLayers(layers: layers), completion: completionHandler)
     }
 
     package func setCoordinatesTo(_ marker: MTMarker, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {

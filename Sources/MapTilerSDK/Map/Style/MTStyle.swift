@@ -17,8 +17,8 @@ public class MTStyle {
     public private(set) var styleVariant: MTMapStyleVariant?
 
     private var mapView: MTMapView!
-    private var sources: [String: MTWeakSource] = [:]
-    private var layers: [String: MTWeakLayer] = [:]
+    private var mapSources: [String: MTWeakSource] = [:]
+    private var mapLayers: [String: MTWeakLayer] = [:]
 
     package init(
         for mapView: MTMapView,
@@ -165,7 +165,7 @@ extension MTStyle {
     ///     - source: Source to be added.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addSource(_ source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        sources[source.identifier] = MTWeakSource(source: source)
+        mapSources[source.identifier] = MTWeakSource(source: source)
 
         mapView.addSource(source, completionHandler: completionHandler)
     }
@@ -176,14 +176,14 @@ extension MTStyle {
     ///     - source: Source to be removed.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func removeSource(_ source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        sources.removeValue(forKey: source.identifier)
+        mapSources.removeValue(forKey: source.identifier)
 
         mapView.removeSource(source, completionHandler: completionHandler)
     }
 
     /// Returns a boolean indicating whether a source is already added to the map.
     public func sourceExists(_ source: MTSource) -> Bool {
-        return sources[source.identifier] != nil
+        return mapSources[source.identifier] != nil
     }
 }
 
@@ -194,9 +194,22 @@ extension MTStyle {
     ///     - layer: Layer to be added.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        layers[layer.identifier] = MTWeakLayer(layer: layer)
+        mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
 
         mapView.addLayer(layer, completionHandler: completionHandler)
+    }
+
+    /// Adds multiple layers to the map.
+    ///
+    /// - Parameters:
+    ///     - layers: Layers to be added.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addLayers(_ layers: [MTLayer], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        for layer in layers {
+            mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
+        }
+
+        mapView.addLayers(layers, completionHandler: completionHandler)
     }
 
     /// Removes a layer from the map.
@@ -205,14 +218,27 @@ extension MTStyle {
     ///     - layer: Layer to be removed.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func removeLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        layers.removeValue(forKey: layer.identifier)
+        mapLayers.removeValue(forKey: layer.identifier)
 
         mapView.removeLayer(layer, completionHandler: completionHandler)
     }
 
+    /// Remove multiple layers from the map.
+    ///
+    /// - Parameters:
+    ///     - layers: Layers to be removed.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeLayers(_ layers: [MTLayer], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        for layer in layers {
+            mapLayers.removeValue(forKey: layer.identifier)
+        }
+
+        mapView.removeLayers(layers, completionHandler: completionHandler)
+    }
+
     /// Returns a boolean indicating whether a layer is already added to the map.
     public func layerExists(_ layer: MTLayer) -> Bool {
-        return layers[layer.identifier] != nil
+        return mapLayers[layer.identifier] != nil
     }
 }
 
@@ -357,7 +383,7 @@ extension MTStyle {
     /// - Throws: A ``MTStyleError.sourceAlreadyExists`` if source with the same
     /// id is already added to the map.
     public func addSource(_ source: MTSource) async throws {
-        guard sources[source.identifier] == nil else {
+        guard mapSources[source.identifier] == nil else {
             throw MTStyleError.sourceAlreadyExists
         }
 
@@ -379,7 +405,7 @@ extension MTStyle {
     ///     - source: Source to be removed.
     /// - Throws: A ``MTStyleError.sourceNotFound`` if source does not exist on the map.
     public func removeSource(_ source: MTSource) async throws {
-        guard sources[source.identifier] != nil else {
+        guard mapSources[source.identifier] != nil else {
             throw MTStyleError.sourceNotFound
         }
 
@@ -402,12 +428,29 @@ extension MTStyle {
     /// - Throws: A ``MTStyleError.layerAlreadyExists`` if layer with the same
     /// id is already added to the map.
     public func addLayer(_ layer: MTLayer) async throws {
-        guard layers[layer.identifier] == nil else {
+        guard mapLayers[layer.identifier] == nil else {
             throw MTStyleError.layerAlreadyExists
         }
 
         try await withCheckedThrowingContinuation { continuation in
             addLayer(layer) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Adds multiple layers to the map.
+    ///
+    /// - Parameters:
+    ///     - layers: Layers to be added.
+    public func addLayers(_ layers: [MTLayer]) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            addLayers(layers) { result in
                 switch result {
                 case .success(let success):
                     continuation.resume()
@@ -424,12 +467,29 @@ extension MTStyle {
     ///     - layer: Layer to be removed.
     /// - Throws: A ``MTStyleError.layerNotFound`` if layer does not exist on the map.
     public func removeLayer(_ layer: MTLayer) async throws {
-        guard layers[layer.identifier] != nil else {
+        guard mapLayers[layer.identifier] != nil else {
             throw MTStyleError.layerNotFound
         }
 
         try await withCheckedThrowingContinuation { continuation in
             removeLayer(layer) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Removes multiple layers from the map.
+    ///
+    /// - Parameters:
+    ///     - layers: Layers to be removed.
+    public func removeLayers(_ layers: [MTLayer]) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            removeLayers(layers) { result in
                 switch result {
                 case .success(let success):
                     continuation.resume()

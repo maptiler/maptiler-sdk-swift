@@ -14,45 +14,84 @@ extension MTMapView: MTNavigable {
     /// for example, a bearing of 90° orients the map so that east is up.
     /// - Parameters:
     ///   - bearing: The desired bearing.
-    public func setBearing(_ bearing: Double) async {
-        await runCommand(SetBearing(bearing: bearing))
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setBearing(_ bearing: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetBearing(bearing: bearing), completion: completionHandler)
     }
 
     /// Sets the map's geographical centerpoint.
     /// - Parameters:
     ///   - center: The desired center coordinate.
-    public func setCenter(_ center: CLLocationCoordinate2D) async {
-        await runCommand(SetCenter(center: center))
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setCenter(
+        _ center: CLLocationCoordinate2D,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetCenter(center: center), completion: completionHandler)
     }
 
     /// Changes any combination of center, zoom, bearing, and pitch.
     ///
     /// The animation seamlessly incorporates zooming and panning to help the user maintain her bearings
     /// even after traversing a great distance.
+    /// - Parameters:
+    ///   - center: The desired center coordinate.
+    ///   - options: Custom options to use.
+    ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The animation will be skipped, and this will behave equivalently to jumpTo
     /// if the user has the reduced motion accesibility feature enabled,
     /// unless options includes essential: true.
-    public func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?) async {
-        await runCommand(FlyTo(center: center, options: options))
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func flyTo(
+        _ center: CLLocationCoordinate2D,
+        options: MTFlyToOptions?,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(FlyTo(center: center, options: options), completion: completionHandler)
     }
 
     /// Changes any combination of center, zoom, bearing, pitch, and padding.
     ///
     /// The map will retain its current values for any details not specified in options.
+    /// - Parameters:
+    ///   - center: The desired center coordinate.
+    ///   - options: Custom options to use.
+    ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The transition will happen instantly if the user has enabled the reduced motion accesibility feature,
     /// unless options includes essential: true.
-    public func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async {
-        await runCommand(EaseTo(center: center, options: options))
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func easeTo(
+        _ center: CLLocationCoordinate2D,
+        options: MTCameraOptions?,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(EaseTo(center: center, options: options), completion: completionHandler)
     }
 
     /// Changes any combination of center, zoom, bearing, and pitch, without an animated transition.
-    public func jumpTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async {
-        await runCommand(JumpTo(center: center, options: options))
+    ///
+    /// - Parameters:
+    ///   - center: The desired center coordinate.
+    ///   - options: Custom options to use.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func jumpTo(
+        _ center: CLLocationCoordinate2D,
+        options: MTCameraOptions?,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(JumpTo(center: center, options: options), completion: completionHandler)
     }
 
     /// Sets the padding in pixels around the viewport.
-    public func setPadding(_ options: MTPaddingOptions) async {
-        await runCommand(SetPadding(paddingOptions: options))
+    /// - Parameters:
+    ///   - options: Custom options to use.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setPadding(_ options: MTPaddingOptions, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetPadding(paddingOptions: options), completion: completionHandler)
     }
 
     /// Sets the value of centerClampedToGround.
@@ -63,17 +102,27 @@ extension MTMapView: MTNavigable {
     /// Needs to be set to false to keep the camera above ground when pitch > 90 degrees.
     /// - Parameters:
     ///   - isCenterClampedToGround: The boolean value indicating if center will be clamped to ground.
+    ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: Defaults to true.
-    public func setIsCenterClampedToGround(_ isCenterClampedToGround: Bool) async {
-        await runCommand(SetCenterClampedToGround(isCenterClampedToGround: isCenterClampedToGround))
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setIsCenterClampedToGround(
+        _ isCenterClampedToGround: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            SetCenterClampedToGround(isCenterClampedToGround: isCenterClampedToGround),
+            completion: completionHandler
+        )
     }
 
     /// Sets the elevation of the map's center point, in meters above sea level.
     /// - Parameters:
     ///   - elevation: The desired elevation.
+    ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: Triggers the following events: moveStart and moveEnd.
-    public func setCenterElevation(_ elevation: Double) async {
-        await runCommand(SetCenterElevation(elevation: elevation))
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setCenterElevation(_ elevation: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetCenterElevation(elevation: elevation), completion: completionHandler)
     }
 
     /// Sets or clears the map's maximum pitch.
@@ -82,9 +131,10 @@ extension MTMapView: MTNavigable {
     /// If null is provided, the function removes the current maximum pitch (sets it to 60).
     /// - Parameters:
     ///   - maxPitch: The maximum pitch to set (0-85).
-    /// - Throws: A ``MTError`` if maxPitch is out of bounds.
-    public func setMaxPitch(_ maxPitch: Double?) async throws {
-        try await _ = bridge.execute(SetMaxPitch(maxPitch: maxPitch))
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setMaxPitch(_ maxPitch: Double?, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetMaxPitch(maxPitch: maxPitch), completion: completionHandler)
     }
 
     /// Sets or clears the map's maximum zoom.
@@ -93,9 +143,10 @@ extension MTMapView: MTNavigable {
     /// If null or undefined is provided, the function removes the current maximum zoom (sets it to 22).
     /// - Parameters:
     ///   - maxZoom: The maximum zoom level to set.
-    /// - Throws: A ``MTError`` if maxZoom is out of bounds.
-    public func setMaxZoom(_ maxZoom: Double?) async throws {
-        try await _ = bridge.execute(SetMaxZoom(maxZoom: maxZoom))
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setMaxZoom(_ maxZoom: Double?, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetMaxZoom(maxZoom: maxZoom), completion: completionHandler)
     }
 
     /// Sets or clears the map's minimum pitch.
@@ -104,9 +155,10 @@ extension MTMapView: MTNavigable {
     ///  If null is provided, the function removes the current minimum pitch (i.e. sets it to 0).
     /// - Parameters:
     ///   - minPitch: The minimum pitch to set (0-85)
-    /// - Throws: A ``MTError`` if minPitch is out of bounds.
-    public func setMinPitch(_ minPitch: Double?) async throws {
-        try await _ = bridge.execute(SetMinPitch(minPitch: minPitch))
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setMinPitch(_ minPitch: Double?, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetMinPitch(minPitch: minPitch), completion: completionHandler)
     }
 
     /// Sets or clears the map's minimum zoom.
@@ -115,27 +167,35 @@ extension MTMapView: MTNavigable {
     /// If null  is provided, the function removes the current minimum zoom (i.e. sets it to -2).
     /// - Parameters:
     ///   - minZoom: The minimum zoom level to set (-2 - 24).
-    /// - Throws: A ``MTError`` if minZoom is out of bounds.
-    public func setMinZoom(_ minZoom: Double?) async throws {
-        try await _ = bridge.execute(SetMinZoom(minZoom: minZoom))
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setMinZoom(_ minZoom: Double?, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetMinZoom(minZoom: minZoom), completion: completionHandler)
     }
 
     /// Sets the map's pitch (tilt).
     /// - Parameters:
     ///   - pitch: The pitch to set, measured in degrees away from the plane of the screen (0-60).
-    public func setPitch(_ pitch: Double) async {
-        await runCommand(SetPitch(pitch: pitch))
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setPitch(_ pitch: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetPitch(pitch: pitch), completion: completionHandler)
     }
 
     /// Sets the map's roll angle.
     /// - Parameters:
     ///   - roll: The roll to set, measured in degrees about the camera boresight.
+    ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: Triggers the following events: moveStart, moveEnd, rollStart, and rollEnd.
-    public func setRoll(_ roll: Double) async {
-        await runCommand(SetRoll(roll: roll))
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setRoll(_ roll: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetRoll(roll: roll), completion: completionHandler)
     }
 
     /// Set combination of center, bearing, pitch, roll and elevation.
+    /// - Parameters:
+    ///   - cameraHelper: Helper to use for setting the viewport.
+    ///   - zoomLevel: Desired zoom level to set.
     public func setViewport(with cameraHelper: MTMapCameraHelper, zoomLevel: Double? = nil) {
         Task {
             if let centerCoordinate = cameraHelper.centerCoordinate {
@@ -167,7 +227,232 @@ extension MTMapView: MTNavigable {
     /// Returns the map's current pitch (tilt).
     ///
     /// The map's current pitch, measured in degrees away from the plane of the screen.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getPitch(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetPitch(), completion: completionHandler)
+    }
+}
+
+// Concurrency
+extension MTMapView {
+    /// Sets the bearing of the map.
+    ///
+    /// The bearing is the compass direction that is "up";
+    /// for example, a bearing of 90° orients the map so that east is up.
+    /// - Parameters:
+    ///   - bearing: The desired bearing.
+    public func setBearing(_ bearing: Double) async {
+        await withCheckedContinuation { continuation in
+            setBearing(bearing) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the map's geographical centerpoint.
+    /// - Parameters:
+    ///   - center: The desired center coordinate.
+    public func setCenter(_ center: CLLocationCoordinate2D) async {
+        await withCheckedContinuation { continuation in
+            setCenter(center) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Changes any combination of center, zoom, bearing, and pitch.
+    ///
+    /// The animation seamlessly incorporates zooming and panning to help the user maintain her bearings
+    /// even after traversing a great distance.
+    /// - Note: The animation will be skipped, and this will behave equivalently to jumpTo
+    /// if the user has the reduced motion accesibility feature enabled,
+    /// unless options includes essential: true.
+    public func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?) async {
+        await withCheckedContinuation { continuation in
+            flyTo(center, options: options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Changes any combination of center, zoom, bearing, pitch, and padding.
+    ///
+    /// The map will retain its current values for any details not specified in options.
+    /// - Note: The transition will happen instantly if the user has enabled the reduced motion accesibility feature,
+    /// unless options includes essential: true.
+    public func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async {
+        await withCheckedContinuation { continuation in
+            easeTo(center, options: options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Changes any combination of center, zoom, bearing, and pitch, without an animated transition.
+    public func jumpTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async {
+        await withCheckedContinuation { continuation in
+            jumpTo(center, options: options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the padding in pixels around the viewport.
+    public func setPadding(_ options: MTPaddingOptions) async {
+        await withCheckedContinuation { continuation in
+            setPadding(options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the value of centerClampedToGround.
+    ///
+    /// If true, the elevation of the center point will automatically be set to the terrain elevation
+    /// (or zero if terrain is not enabled).
+    /// If false, the elevation of the center point will default to sea level and will not automatically update.
+    /// Needs to be set to false to keep the camera above ground when pitch > 90 degrees.
+    /// - Parameters:
+    ///   - isCenterClampedToGround: The boolean value indicating if center will be clamped to ground.
+    /// - Note: Defaults to true.
+    public func setIsCenterClampedToGround(_ isCenterClampedToGround: Bool) async {
+        await withCheckedContinuation { continuation in
+            setIsCenterClampedToGround(isCenterClampedToGround) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the elevation of the map's center point, in meters above sea level.
+    /// - Parameters:
+    ///   - elevation: The desired elevation.
+    /// - Note: Triggers the following events: moveStart and moveEnd.
+    public func setCenterElevation(_ elevation: Double) async {
+        await withCheckedContinuation { continuation in
+            setCenterElevation(elevation) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets or clears the map's maximum pitch.
+    ///
+    /// If the map's current pitch is higher than the new maximum, the map will pitch to the new maximum.
+    /// If null is provided, the function removes the current maximum pitch (sets it to 60).
+    /// - Parameters:
+    ///   - maxPitch: The maximum pitch to set (0-85).
+    /// - Throws: A ``MTError`` if maxPitch is out of bounds.
+    public func setMaxPitch(_ maxPitch: Double?) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            setMaxPitch(maxPitch) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Sets or clears the map's maximum zoom.
+    ///
+    /// If the map's current zoom level is higher than the new maximum, the map will zoom to the new maximum.
+    /// If null or undefined is provided, the function removes the current maximum zoom (sets it to 22).
+    /// - Parameters:
+    ///   - maxZoom: The maximum zoom level to set.
+    /// - Throws: A ``MTError`` if maxZoom is out of bounds.
+    public func setMaxZoom(_ maxZoom: Double?) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            setMaxZoom(maxZoom) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Sets or clears the map's minimum pitch.
+    ///
+    /// If the map's current pitch is lower than the new minimum, the map will pitch to the new minimum.
+    ///  If null is provided, the function removes the current minimum pitch (i.e. sets it to 0).
+    /// - Parameters:
+    ///   - minPitch: The minimum pitch to set (0-85)
+    /// - Throws: A ``MTError`` if minPitch is out of bounds.
+    public func setMinPitch(_ minPitch: Double?) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            setMinPitch(minPitch) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Sets or clears the map's minimum zoom.
+    ///
+    /// If the map's current zoom level is lower than the new minimum, the map will zoom to the new minimum.
+    /// If null  is provided, the function removes the current minimum zoom (i.e. sets it to -2).
+    /// - Parameters:
+    ///   - minZoom: The minimum zoom level to set (-2 - 24).
+    /// - Throws: A ``MTError`` if minZoom is out of bounds.
+    public func setMinZoom(_ minZoom: Double?) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            setMinZoom(minZoom) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Sets the map's pitch (tilt).
+    /// - Parameters:
+    ///   - pitch: The pitch to set, measured in degrees away from the plane of the screen (0-60).
+    public func setPitch(_ pitch: Double) async {
+        await withCheckedContinuation { continuation in
+            setPitch(pitch) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the map's roll angle.
+    /// - Parameters:
+    ///   - roll: The roll to set, measured in degrees about the camera boresight.
+    /// - Note: Triggers the following events: moveStart, moveEnd, rollStart, and rollEnd.
+    public func setRoll(_ roll: Double) async {
+        await withCheckedContinuation { continuation in
+            setRoll(roll) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Returns the map's current pitch (tilt).
+    ///
+    /// The map's current pitch, measured in degrees away from the plane of the screen.
     public func getPitch() async -> Double {
-        await runCommandWithDoubleReturnValue(GetPitch())
+        await withCheckedContinuation { continuation in
+            getPitch { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: .nan)
+                }
+            }
+        }
     }
 }

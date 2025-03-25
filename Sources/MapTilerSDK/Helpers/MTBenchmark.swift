@@ -402,6 +402,7 @@ public final class MTBenchmark: MTMapViewDelegate {
             let lng = Double.random(in: -180...180)
 
             let marker = MTMarker(coordinates: CLLocationCoordinate2D(latitude: lat, longitude: lng))
+
             await mapView.runCommand(AddMarker(marker: marker))
             let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
             elapsedTimes.append(elapsedTime)

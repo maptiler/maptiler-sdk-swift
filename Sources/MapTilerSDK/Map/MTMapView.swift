@@ -151,43 +151,70 @@ extension MTMapView: EventProcessorDelegate {
 }
 
 extension MTMapView {
-    package func runCommand(_ command: MTCommand) async {
-        do {
-            try await _ = bridge.execute(command)
-        } catch {
-            MTLogger.log("\(error)", type: .error)
+    package func runCommand(_ command: MTCommand, completion: ((Result<Void, MTError>) -> Void)? = nil) {
+        Task {
+            do {
+                try await bridge.execute(command)
+                completion?(.success(()))
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
         }
     }
 
-    package func runCommandWithDoubleReturnValue(_ command: MTCommand) async -> Double {
-        do {
-            let value = try await bridge.execute(command)
+    package func runCommandWithDoubleReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<Double, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
 
-            if case .double(let commandValue) = value {
-                return commandValue
-            } else {
-                MTLogger.log("\(command) returned invalid type.", type: .error)
-                return .nan
+                if case .double(let commandValue) = value {
+                    completion?(.success(commandValue))
+                } else {
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(.failure(MTError.unsupportedReturnType(description: "Expected double, got NaN.")))
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
             }
-        } catch {
-            MTLogger.log("\(error)", type: .error)
-            return .nan
         }
     }
 
-    package func runCommandWithStringReturnValue(_ command: MTCommand) async -> String {
-        do {
-            let value = try await bridge.execute(command)
+    package func runCommandWithStringReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<String, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
 
-            if case .string(let commandValue) = value {
-                return commandValue
-            } else {
-                MTLogger.log("\(command) returned invalid type.", type: .error)
-                return ""
+                if case .string(let commandValue) = value {
+                    completion?(.success(commandValue))
+                } else {
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(.failure(MTError.unsupportedReturnType(description: "Expected double, got NaN.")))
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
             }
-        } catch {
-            MTLogger.log("\(error)", type: .error)
-            return ""
         }
     }
 }

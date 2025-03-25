@@ -17,8 +17,8 @@ public class MTStyle {
     public private(set) var styleVariant: MTMapStyleVariant?
 
     private var mapView: MTMapView!
-    private var sources: [String: MTWeakSource] = [:]
-    private var layers: [String: MTWeakLayer] = [:]
+    private var mapSources: [String: MTWeakSource] = [:]
+    private var mapLayers: [String: MTWeakLayer] = [:]
 
     package init(
         for mapView: MTMapView,
@@ -36,11 +36,23 @@ public class MTStyle {
     ///   - Parameters:
     ///     - referenceStyle:  Desired reference map style.
     ///     - styleVariant: Optional variant of the reference style.
-    public func setStyle(_ referenceStyle: MTMapReferenceStyle, styleVariant: MTMapStyleVariant?) async {
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setStyle(
+        _ referenceStyle: MTMapReferenceStyle,
+        styleVariant: MTMapStyleVariant?,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
         self.referenceStyle = referenceStyle
         self.styleVariant = styleVariant
 
-        await mapView.runCommand(SetStyle(referenceStyle: referenceStyle, styleVariant: styleVariant))
+        mapView.runCommand(
+            SetStyle(
+                referenceStyle: referenceStyle,
+                styleVariant: styleVariant
+            ),
+            completion: completionHandler
+        )
     }
 
     /// Returns variants for the current reference style if they exist.
@@ -56,59 +68,93 @@ public class MTStyle {
     }
 
     /// Returns ID of the current reference style.
-    public func getIdForCurrentReferenceStyle() async -> String {
-        return await mapView.getId(for: referenceStyle)
+    ///   - Parameters:
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getIdForCurrentReferenceStyle(completionHandler: ((Result<String, MTError>) -> Void)? = nil) {
+        mapView.getId(for: referenceStyle, completionHandler: completionHandler)
     }
 
     /// Returns ID for the provided reference style.
     /// - Parameters:
     ///     - referenceStyle:  Reference style for which to get id.
-    public func getId(for referenceStyle: MTMapReferenceStyle) async -> String {
-        return await mapView.getId(for: referenceStyle)
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getId(
+        for referenceStyle: MTMapReferenceStyle,
+        completionHandler: ((Result<String, MTError>) -> Void)? = nil
+    ) {
+        mapView.getId(for: referenceStyle, completionHandler: completionHandler)
     }
 
     /// Returns ID of the current style variant, if it exists.
-    public func getIdForCurrentStyleVariant() async -> String? {
+    ///   - Parameters:
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getIdForCurrentStyleVariant(completionHandler: ((Result<String, MTError>) -> Void)? = nil) {
         guard let styleVariant else {
-            return nil
+            completionHandler?(.failure(MTError.bridgeNotLoaded))
+            return
         }
 
-        return await mapView.getId(for: styleVariant)
+        mapView.getId(for: styleVariant, completionHandler: completionHandler)
     }
 
     /// Returns id for the provided style variant.
     /// - Parameters:
     ///     - styleVariant:  Style variant for which to get id.
-    public func getId(for styleVariant: MTMapStyleVariant) async -> String {
-        return await mapView.getId(for: styleVariant)
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getId(
+        for styleVariant: MTMapStyleVariant,
+        completionHandler: ((Result<String, MTError>) -> Void)? = nil
+    ) {
+        mapView.getId(for: styleVariant, completionHandler: completionHandler)
     }
 
     /// Returns name of the current reference style.
-    public func getNameForCurrentReferenceStyle() async -> String {
-        return await mapView.getName(for: referenceStyle)
+    ///   - Parameters:
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getNameForCurrentReferenceStyle(completionHandler: ((Result<String, MTError>) -> Void)? = nil) {
+        mapView.getName(for: referenceStyle, completionHandler: completionHandler)
     }
 
     /// Returns name of the provided reference style.
     /// - Parameters:
     ///     - referenceStyle:  Reference style for which to get name.
-    public func getName(for referenceStyle: MTMapReferenceStyle) async -> String {
-        return await mapView.getName(for: referenceStyle)
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getName(
+        for referenceStyle: MTMapReferenceStyle,
+        completionHandler: ((Result<String, MTError>) -> Void)? = nil
+    ) {
+        mapView.getName(for: referenceStyle, completionHandler: completionHandler)
     }
 
     /// Returns name of the current style variant, if it exists.
-    public func getNameForCurrentStyleVariant() async -> String? {
+    ///   - Parameters:
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getNameForCurrentStyleVariant(completionHandler: ((Result<String, MTError>) -> Void)? = nil) {
         guard let styleVariant else {
-            return nil
+            completionHandler?(.failure(MTError.bridgeNotLoaded))
+            return
         }
 
-        return await mapView.getName(for: styleVariant)
+        mapView.getName(for: styleVariant, completionHandler: completionHandler)
     }
 
     /// Returns name for the provided style variant.
     /// - Parameters:
     ///     - styleVariant:  Style variant for which to get name.
-    public func getName(for styleVariant: MTMapStyleVariant) async -> String {
-        return await mapView.getName(for: styleVariant)
+    ///     - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getName(
+        for styleVariant: MTMapStyleVariant,
+        completionHandler: ((Result<String, MTError>) -> Void)? = nil
+    ) {
+        mapView.getName(for: styleVariant, completionHandler: completionHandler)
     }
 }
 
@@ -117,36 +163,27 @@ extension MTStyle {
     ///
     /// - Parameters:
     ///     - source: Source to be added.
-    /// - Throws: A ``MTStyleError.sourceAlreadyExists`` if source with the same
-    /// id is already added to the map.
-    public func addSource(_ source: MTSource) async throws {
-        guard sources[source.identifier] == nil else {
-            throw MTStyleError.sourceAlreadyExists
-        }
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addSource(_ source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        mapSources[source.identifier] = MTWeakSource(source: source)
 
-        sources[source.identifier] = MTWeakSource(source: source)
-
-        return await mapView.addSource(source)
+        mapView.addSource(source, completionHandler: completionHandler)
     }
 
     /// Removes a source from the map.
     ///
     /// - Parameters:
     ///     - source: Source to be removed.
-    /// - Throws: A ``MTStyleError.sourceNotFound`` if source does not exist on the map.
-    public func removeSource(_ source: MTSource) async throws {
-        guard sources[source.identifier] != nil else {
-            throw MTStyleError.sourceNotFound
-        }
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeSource(_ source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        mapSources.removeValue(forKey: source.identifier)
 
-        sources.removeValue(forKey: source.identifier)
-
-        return await mapView.removeSource(source)
+        mapView.removeSource(source, completionHandler: completionHandler)
     }
 
     /// Returns a boolean indicating whether a source is already added to the map.
     public func sourceExists(_ source: MTSource) -> Bool {
-        return sources[source.identifier] != nil
+        return mapSources[source.identifier] != nil
     }
 }
 
@@ -155,16 +192,273 @@ extension MTStyle {
     ///
     /// - Parameters:
     ///     - layer: Layer to be added.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
+
+        mapView.addLayer(layer, completionHandler: completionHandler)
+    }
+
+    /// Adds multiple layers to the map.
+    ///
+    /// - Parameters:
+    ///     - layers: Layers to be added.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addLayers(_ layers: [MTLayer], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        for layer in layers {
+            mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
+        }
+
+        mapView.addLayers(layers, completionHandler: completionHandler)
+    }
+
+    /// Removes a layer from the map.
+    ///
+    /// - Parameters:
+    ///     - layer: Layer to be removed.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        mapLayers.removeValue(forKey: layer.identifier)
+
+        mapView.removeLayer(layer, completionHandler: completionHandler)
+    }
+
+    /// Remove multiple layers from the map.
+    ///
+    /// - Parameters:
+    ///     - layers: Layers to be removed.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeLayers(_ layers: [MTLayer], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        for layer in layers {
+            mapLayers.removeValue(forKey: layer.identifier)
+        }
+
+        mapView.removeLayers(layers, completionHandler: completionHandler)
+    }
+
+    /// Returns a boolean indicating whether a layer is already added to the map.
+    public func layerExists(_ layer: MTLayer) -> Bool {
+        return mapLayers[layer.identifier] != nil
+    }
+}
+
+// Concurrency
+extension MTStyle {
+    /// Updates the map's style object with a new value.
+    ///   - Parameters:
+    ///     - referenceStyle:  Desired reference map style.
+    ///     - styleVariant: Optional variant of the reference style.
+    public func setStyle(_ referenceStyle: MTMapReferenceStyle, styleVariant: MTMapStyleVariant?) async {
+        await withCheckedContinuation { continuation in
+            setStyle(referenceStyle, styleVariant: styleVariant) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Returns ID of the current reference style.
+    public func getIdForCurrentReferenceStyle() async -> String {
+        await withCheckedContinuation { continuation in
+            getIdForCurrentReferenceStyle { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+
+    /// Returns ID for the provided reference style.
+    /// - Parameters:
+    ///     - referenceStyle:  Reference style for which to get id.
+    public func getId(for referenceStyle: MTMapReferenceStyle) async -> String {
+        await withCheckedContinuation { continuation in
+            getId(for: referenceStyle) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+
+    /// Returns ID of the current style variant, if it exists.
+    public func getIdForCurrentStyleVariant() async -> String? {
+        await withCheckedContinuation { continuation in
+            getIdForCurrentStyleVariant { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+
+    /// Returns id for the provided style variant.
+    /// - Parameters:
+    ///     - styleVariant:  Style variant for which to get id.
+    public func getId(for styleVariant: MTMapStyleVariant) async -> String {
+        await withCheckedContinuation { continuation in
+            getId(for: styleVariant) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+
+    /// Returns name of the current reference style.
+    public func getNameForCurrentReferenceStyle() async -> String {
+        await withCheckedContinuation { continuation in
+            getNameForCurrentReferenceStyle { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+
+    /// Returns name of the provided reference style.
+    /// - Parameters:
+    ///     - referenceStyle:  Reference style for which to get name.
+    public func getName(for referenceStyle: MTMapReferenceStyle) async -> String {
+        await withCheckedContinuation { continuation in
+            getName(for: referenceStyle) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+
+    /// Returns name of the current style variant, if it exists.
+    public func getNameForCurrentStyleVariant() async -> String? {
+        await withCheckedContinuation { continuation in
+            getNameForCurrentStyleVariant { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+
+    /// Returns name for the provided style variant.
+    /// - Parameters:
+    ///     - styleVariant:  Style variant for which to get name.
+    public func getName(for styleVariant: MTMapStyleVariant) async -> String {
+        await withCheckedContinuation { continuation in
+            getName(for: styleVariant) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+
+    /// Adds a source to the map.
+    ///
+    /// - Parameters:
+    ///     - source: Source to be added.
+    /// - Throws: A ``MTStyleError.sourceAlreadyExists`` if source with the same
+    /// id is already added to the map.
+    public func addSource(_ source: MTSource) async throws {
+        guard mapSources[source.identifier] == nil else {
+            throw MTStyleError.sourceAlreadyExists
+        }
+
+        try await withCheckedThrowingContinuation { continuation in
+            addSource(source) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Removes a source from the map.
+    ///
+    /// - Parameters:
+    ///     - source: Source to be removed.
+    /// - Throws: A ``MTStyleError.sourceNotFound`` if source does not exist on the map.
+    public func removeSource(_ source: MTSource) async throws {
+        guard mapSources[source.identifier] != nil else {
+            throw MTStyleError.sourceNotFound
+        }
+
+        try await withCheckedThrowingContinuation { continuation in
+            removeSource(source) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Adds a layer to the map.
+    ///
+    /// - Parameters:
+    ///     - layer: Layer to be added.
     /// - Throws: A ``MTStyleError.layerAlreadyExists`` if layer with the same
     /// id is already added to the map.
     public func addLayer(_ layer: MTLayer) async throws {
-        guard layers[layer.identifier] == nil else {
+        guard mapLayers[layer.identifier] == nil else {
             throw MTStyleError.layerAlreadyExists
         }
 
-        layers[layer.identifier] = MTWeakLayer(layer: layer)
+        try await withCheckedThrowingContinuation { continuation in
+            addLayer(layer) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
 
-        return await mapView.addLayer(layer)
+    /// Adds multiple layers to the map.
+    ///
+    /// - Parameters:
+    ///     - layers: Layers to be added.
+    public func addLayers(_ layers: [MTLayer]) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            addLayers(layers) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
     /// Removes a layer from the map.
@@ -173,18 +467,37 @@ extension MTStyle {
     ///     - layer: Layer to be removed.
     /// - Throws: A ``MTStyleError.layerNotFound`` if layer does not exist on the map.
     public func removeLayer(_ layer: MTLayer) async throws {
-        guard layers[layer.identifier] != nil else {
+        guard mapLayers[layer.identifier] != nil else {
             throw MTStyleError.layerNotFound
         }
 
-        layers.removeValue(forKey: layer.identifier)
-
-        return await mapView.removeLayer(layer)
+        try await withCheckedThrowingContinuation { continuation in
+            removeLayer(layer) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
-    /// Returns a boolean indicating whether a layer is already added to the map.
-    public func layerExists(_ layer: MTLayer) -> Bool {
-        return layers[layer.identifier] != nil
+    /// Removes multiple layers from the map.
+    ///
+    /// - Parameters:
+    ///     - layers: Layers to be removed.
+    public func removeLayers(_ layers: [MTLayer]) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            removeLayers(layers) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 }
 

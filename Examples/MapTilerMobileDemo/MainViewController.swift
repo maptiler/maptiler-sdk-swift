@@ -193,4 +193,8 @@ extension MainViewController: MTMapViewDelegate {
             loadingActivityIndicator.stopAnimating()
         }
     }
+
+    func mapView(_ mapView: MTMapView, didUpdateLocation location: CLLocation) {
+        print("Device Coordinates: \(location.coordinate.latitude) - \(location.coordinate.longitude)")
+    }
 }

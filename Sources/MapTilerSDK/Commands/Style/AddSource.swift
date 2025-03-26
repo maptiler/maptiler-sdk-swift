@@ -11,6 +11,8 @@ package struct AddSource: MTCommand {
     package func toJS() -> JSString {
         if let source = source as? MTVectorTileSource {
             return handleMTVectorTileSource(source)
+        } else if let source = source as? MTGeoJSONSource {
+            return handleGeoJSONSource(source)
         }
 
         return emptyReturnValue
@@ -40,5 +42,15 @@ package struct AddSource: MTCommand {
             \(attributionString)
         });
         """
+    }
+
+    private func handleGeoJSONSource(_ source: MTGeoJSONSource) -> JSString {
+        guard let sourceString: JSString = source.toJSON() else {
+            return emptyReturnValue
+        }
+
+        return """
+        \(MTBridge.mapObject).addSource('\(source.identifier)', \(sourceString));
+"""
     }
 }

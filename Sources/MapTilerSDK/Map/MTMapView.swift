@@ -5,12 +5,20 @@
 
 import UIKit
 import WebKit
+import CoreLocation
 
 /// Delegate responsible for map event propagation
 @MainActor
 public protocol MTMapViewDelegate: AnyObject {
     func mapViewDidInitialize(_ mapView: MTMapView)
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?)
+    func mapView(_ mapView: MTMapView, didUpdateLocation location: CLLocation)
+}
+
+extension MTMapViewDelegate {
+    public func mapView(_ mapView: MTMapView, didUpdateLocation location: CLLocation) {
+        MTLogger.log("MTLocationManager didUpdateLocation", type: .info)
+    }
 }
 
 /// Object representing the map on the screen.
@@ -20,6 +28,12 @@ public protocol MTMapViewDelegate: AnyObject {
 open class MTMapView: UIView {
     /// Proxy style object of the map.
     public private(set) var style: MTStyle?
+
+    public private(set) var locationManager: MTLocationManager? {
+        didSet {
+            locationManager?.delegate = self
+        }
+    }
 
     private var referenceStyleProxy: MTMapReferenceStyle = .streets
     private var styleVariantProxy: MTMapStyleVariant?
@@ -77,6 +91,18 @@ open class MTMapView: UIView {
         self.options = options
 
         commonInit()
+    }
+
+    /// Initializes location tracking manager.
+    ///
+    /// In order to track user location you have to initalize the MLLocationManager,
+    /// add neccessary Privacy Location messages to info.plist, subscribe to MTLocationManagerDelegate
+    /// and start location updates and/or request location once via locationManager property on MTMapView.
+    /// - Parameters:
+    ///    - manager: Optional external CLLocationManager to use.
+    ///    - accuracy: Optional desired accuracy to use.
+    public func initLocationTracking(using manager: CLLocationManager? = nil, accuracy: CLLocationAccuracy? = nil) {
+        locationManager = MTLocationManager(using: manager, accuracy: accuracy)
     }
 
     private func commonInit() {
@@ -216,5 +242,15 @@ extension MTMapView {
                 }
             }
         }
+    }
+}
+
+extension MTMapView: MTLocationManagerDelegate {
+    public func didUpdateLocation(_ location: CLLocation) {
+        delegate?.mapView(self, didUpdateLocation: location)
+    }
+
+    public func didFailWithError(_ error: Error) {
+        MTLogger.log("MTLocationManager didFailWithError \(error)", type: .error)
     }
 }

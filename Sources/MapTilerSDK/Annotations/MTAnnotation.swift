@@ -5,6 +5,7 @@
 
 import CoreLocation
 
+/// Protocol requirements for all annotation objects.
 public protocol MTAnnotation: Sendable {
     var identifier: String { get }
     var coordinates: CLLocationCoordinate2D { get }

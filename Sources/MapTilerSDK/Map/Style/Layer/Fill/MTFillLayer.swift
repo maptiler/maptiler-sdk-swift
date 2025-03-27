@@ -5,12 +5,13 @@
 
 import UIKit
 
+/// The fill style layer that renders one or more filled (and optionally stroked) polygons on a map. 
 public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
     /// Unique layer identifier.
     public var identifier: String
 
     /// Type of the layer.
-    public private(set) var type: MTLayerType
+    public private(set) var type: MTLayerType = .fill
 
     /// Identifier of the source to be used for this layer.
     public var sourceIdentifier: String

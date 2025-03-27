@@ -5,12 +5,13 @@
 
 import UIKit
 
+/// The symbol style that layer renders icon and text labels at points or along lines on a map. 
 public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
     /// Unique layer identifier.
     public var identifier: String
 
     /// Type of the layer.
-    public private(set) var type: MTLayerType
+    public private(set) var type: MTLayerType = .symbol
 
     /// Identifier of the source to be used for this layer.
     public var sourceIdentifier: String
@@ -41,7 +42,7 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
 
     private var iconName: String?
 
-    /// Initializes the source with unique identifier, source identifier, max and min zoom levels and source layer,
+    /// Initializes the layer with unique identifier, source identifier, max and min zoom levels and source layer,
     /// which is required for vector tile sources.
     public init(
         identifier: String,
@@ -60,7 +61,7 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         self.iconName = "icon\(identifier).src"
     }
 
-    /// Initializes the source with the unique identifier and a source identifier.
+    /// Initializes the layer with the unique identifier and a source identifier.
     public init(
         identifier: String,
         sourceIdentifier: String

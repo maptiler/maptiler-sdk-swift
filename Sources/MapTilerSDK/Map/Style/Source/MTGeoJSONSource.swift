@@ -52,6 +52,9 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
     /// - Note: Defaults to 0.375
     public var tolerance: Double? = 0.375
 
+    /// Specifices whether to calculate line distance metrics
+    public var lineMetrics: Bool? = false
+
     /// Initializes the source with unique id and url to TileJSON resource.
     public init(identifier: String, url: URL) {
         self.identifier = identifier
@@ -71,6 +74,7 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
         clusterRadius = try container.decode(Double.self, forKey: .clusterRadius)
         maxZoom = try container.decode(Double.self, forKey: .maxZoom)
         tolerance = try container.decode(Double.self, forKey: .tolerance)
+        lineMetrics = try container.decode(Bool.self, forKey: .lineMetrics)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -85,6 +89,7 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
         try container.encodeIfPresent(clusterRadius, forKey: .clusterRadius)
         try container.encodeIfPresent(maxZoom, forKey: .maxZoom)
         try container.encodeIfPresent(tolerance, forKey: .tolerance)
+        try container.encodeIfPresent(lineMetrics, forKey: .lineMetrics)
     }
 
     package enum CodingKeys: String, CodingKey {
@@ -98,5 +103,6 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
         case clusterRadius
         case maxZoom = "maxzoom"
         case tolerance
+        case lineMetrics
     }
 }

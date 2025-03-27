@@ -31,7 +31,7 @@ package class EventProcessor {
             return
         }
 
-        processEventIfNeeded(event)
+        processEventIfNeeded(event, with: data)
     }
 
     private func processEventIfNeeded(_ event: MTEvent, with data: MTData? = nil) {

@@ -34,9 +34,32 @@ public class MTMarker: MTAnnotation, @unchecked Sendable {
     /// Sets coordinates for the marker.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setCoordinates(
+        _ coordinates: CLLocationCoordinate2D,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.coordinates = coordinates
+
+        mapView.setCoordinatesTo(self, completionHandler: completionHandler)
+    }
+}
+
+// Concurrency
+extension MTMarker {
+    /// Sets coordinates for the marker.
+    /// - Parameters:
+    ///    - coordinates: Position of the marker.
+    @MainActor
     public func setCoordinates(_ coordinates: CLLocationCoordinate2D, in mapView: MTMapView) async {
         self.coordinates = coordinates
 
-        await mapView.setCoordinatesTo(self)
+        await withCheckedContinuation { continuation in
+            setCoordinates(coordinates, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
     }
 }

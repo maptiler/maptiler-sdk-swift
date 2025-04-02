@@ -75,4 +75,65 @@ public class MTVectorTileSource: MTTileSource, @unchecked Sendable {
         self.attribution = attribution
         self.type = .vector
     }
+
+    /// Sets the url of the source.
+    ///
+    /// Used for updating the source data.
+    /// - Parameters:
+    ///    - url: url to Vector Tile resource.
+    ///    - mapView: MTMapView which holds the source.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    public func setURL(url: URL, in mapView: MTMapView, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        mapView.setURL(url: url, to: self, completionHandler: completionHandler)
+    }
+
+    /// Sets the tiles of the source.
+    ///
+    /// Used for updating the source data.
+    /// - Parameters:
+    ///    - data: list of urls with tile resources.
+    ///    - mapView: MTMapView which holds the source.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    public func setTiles(
+        tiles: [URL],
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.setTiles(tiles: tiles, to: self, completionHandler: completionHandler)
+    }
+}
+
+// Concurrency
+extension MTVectorTileSource {
+    /// Sets the url of the source.
+    ///
+    /// Used for updating the source data.
+    /// - Parameters:
+    ///    - url: url to Vector Tile resource.
+    ///    - mapView: MTMapView which holds the source.
+    @MainActor
+    public func setURL(url: URL, in mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            setURL(url: url, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the tiles of the source.
+    ///
+    /// Used for updating the source data.
+    /// - Parameters:
+    ///    - data: list of urls with tile resources.
+    ///    - mapView: MTMapView which holds the source.
+    @MainActor
+    public func setTiles(tiles: [URL], in mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            setTiles(tiles: tiles, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
 }

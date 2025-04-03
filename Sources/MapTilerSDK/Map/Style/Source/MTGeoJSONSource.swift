@@ -105,4 +105,34 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
         case tolerance
         case lineMetrics
     }
+
+    /// Sets the data of the source.
+    ///
+    /// Used for updating the source data.
+    /// - Parameters:
+    ///    - data: url to GeoJSON resource.
+    ///    - mapView: MTMapView which holds the source.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    public func setData(data: URL, in mapView: MTMapView, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        mapView.setData(data: data, to: self, completionHandler: completionHandler)
+    }
+}
+
+// Concurrency
+extension MTGeoJSONSource {
+    /// Sets the data of the source.
+    ///
+    /// Used for updating the source data.
+    /// - Parameters:
+    ///    - data: url to GeoJSON resource.
+    ///    - mapView: MTMapView which holds the source.
+    @MainActor
+    public func setData(data: URL, in mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            setData(data: data, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
 }

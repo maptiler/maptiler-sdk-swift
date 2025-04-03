@@ -246,6 +246,22 @@ extension MTMapView: MTStylable {
     package func setCoordinatesTo(_ marker: MTMarker, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetCoordinatesToMarker(marker: marker), completion: completionHandler)
     }
+
+    package func setURL(url: URL, to source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetUrlToSource(url: url, source: source), completion: completionHandler)
+    }
+
+    package func setData(data: URL, to source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetDataToSource(data: data, source: source), completion: completionHandler)
+    }
+
+    package func setTiles(
+        tiles: [URL],
+        to source: MTSource,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetTilesToSource(tiles: tiles, source: source), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -407,6 +423,30 @@ extension MTMapView {
     public func setVerticalFieldOfView(degrees: Double = 36.87) async {
         await withCheckedContinuation { continuation in
             setVerticalFieldOfView(degrees: degrees) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    package func setURL(url: URL, to source: MTSource) async {
+        await withCheckedContinuation { continuation in
+            setURL(url: url, to: source) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    package func setData(data: URL, to source: MTSource) async {
+        await withCheckedContinuation { continuation in
+            setData(data: data, to: source) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    package func setTiles(tiles: [URL], to source: MTSource) async {
+        await withCheckedContinuation { continuation in
+            setTiles(tiles: tiles, to: source) { _ in
                 continuation.resume()
             }
         }

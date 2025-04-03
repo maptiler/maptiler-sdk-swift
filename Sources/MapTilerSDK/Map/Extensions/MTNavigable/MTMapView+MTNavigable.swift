@@ -39,6 +39,7 @@ extension MTMapView: MTNavigable {
     /// - Parameters:
     ///   - center: The desired center coordinate.
     ///   - options: Custom options to use.
+    ///   - animationOptions: Optional animation options to use.
     ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The animation will be skipped, and this will behave equivalently to jumpTo
     /// if the user has the reduced motion accesibility feature enabled,
@@ -47,9 +48,10 @@ extension MTMapView: MTNavigable {
     public func flyTo(
         _ center: CLLocationCoordinate2D,
         options: MTFlyToOptions?,
+        animationOptions: MTAnimationOptions?,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        runCommand(FlyTo(center: center, options: options), completion: completionHandler)
+        runCommand(FlyTo(center: center, options: options, animationOptions: animationOptions), completion: completionHandler)
     }
 
     /// Changes any combination of center, zoom, bearing, pitch, and padding.
@@ -58,6 +60,7 @@ extension MTMapView: MTNavigable {
     /// - Parameters:
     ///   - center: The desired center coordinate.
     ///   - options: Custom options to use.
+    ///   - animationOptions: Optional animation options to use.
     ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The transition will happen instantly if the user has enabled the reduced motion accesibility feature,
     /// unless options includes essential: true.
@@ -65,9 +68,10 @@ extension MTMapView: MTNavigable {
     public func easeTo(
         _ center: CLLocationCoordinate2D,
         options: MTCameraOptions?,
+        animationOptions: MTAnimationOptions?,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        runCommand(EaseTo(center: center, options: options), completion: completionHandler)
+        runCommand(EaseTo(center: center, options: options, animationOptions: animationOptions), completion: completionHandler)
     }
 
     /// Changes any combination of center, zoom, bearing, and pitch, without an animated transition.
@@ -233,6 +237,24 @@ extension MTMapView: MTNavigable {
     public func getPitch(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
         runCommandWithDoubleReturnValue(GetPitch(), completion: completionHandler)
     }
+
+    /// Pans the map by the specified offset.
+    /// - Parameters:
+    ///   - offset: The x and y coordinates by which to pan the map.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func panBy(_ offset: MTPoint, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(PanBy(offset: offset), completion: completionHandler)
+    }
+
+    /// Pans the map to the specified location with an animated transition.
+    /// - Parameters:
+    ///   - coordinates: The location to pan the map to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func panTo(_ coordinates: CLLocationCoordinate2D, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(PanTo(coordinates: coordinates), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -266,12 +288,17 @@ extension MTMapView {
     ///
     /// The animation seamlessly incorporates zooming and panning to help the user maintain her bearings
     /// even after traversing a great distance.
+    /// - Parameters:
+    ///   - center: The desired center coordinate.
+    ///   - options: Custom options to use.
+    ///   - animationOptions: Optional animation options to use.
+    ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The animation will be skipped, and this will behave equivalently to jumpTo
     /// if the user has the reduced motion accesibility feature enabled,
     /// unless options includes essential: true.
-    public func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?) async {
+    public func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?, animationOptions: MTAnimationOptions?) async {
         await withCheckedContinuation { continuation in
-            flyTo(center, options: options) { _ in
+            flyTo(center, options: options, animationOptions: animationOptions) { _ in
                 continuation.resume()
             }
         }
@@ -280,11 +307,16 @@ extension MTMapView {
     /// Changes any combination of center, zoom, bearing, pitch, and padding.
     ///
     /// The map will retain its current values for any details not specified in options.
+    /// - Parameters:
+    ///   - center: The desired center coordinate.
+    ///   - options: Custom options to use.
+    ///   - animationOptions: Optional animation options to use.
+    ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The transition will happen instantly if the user has enabled the reduced motion accesibility feature,
     /// unless options includes essential: true.
-    public func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async {
+    public func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?, animationOptions: MTAnimationOptions?) async {
         await withCheckedContinuation { continuation in
-            easeTo(center, options: options) { _ in
+            easeTo(center, options: options, animationOptions: animationOptions) { _ in
                 continuation.resume()
             }
         }
@@ -452,6 +484,28 @@ extension MTMapView {
                 case .failure(let error):
                     continuation.resume(returning: .nan)
                 }
+            }
+        }
+    }
+
+    /// Pans the map by the specified offset.
+    /// - Parameters:
+    ///   - offset: The x and y coordinates by which to pan the map.
+    public func panBy(_ offset: MTPoint) async {
+        await withCheckedContinuation { continuation in
+            panBy(offset) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Pans the map to the specified location with an animated transition.
+    /// - Parameters:
+    ///   - coordinates: The location to pan the map to.
+    public func panTo(_ coordinates: CLLocationCoordinate2D) async {
+        await withCheckedContinuation { continuation in
+            panTo(coordinates) { _ in
+                continuation.resume()
             }
         }
     }

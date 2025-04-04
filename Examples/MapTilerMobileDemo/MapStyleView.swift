@@ -5,16 +5,22 @@
 
 import SwiftUI
 import MapTilerSDK
+import CoreLocation
 
 struct MapStyleView: View {
     enum Constants {
         static let emptyString = ""
         static let defaultOpacity: CGFloat = 0.7
         static let minHeight: CGFloat = 40
+
+        static let unterageriCoordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+        static let brnoCoordinates = CLLocationCoordinate2D(latitude: 49.212596, longitude: 16.626576)
     }
 
     @State private var referenceStyle: MTMapReferenceStyle = .basic
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
+
+    @State private var map = MTMapView(options: MTMapOptions())
 
     private var selectedStyleVariants: [MTMapStyleVariant]? {
         return referenceStyle.getVariants()
@@ -22,7 +28,10 @@ struct MapStyleView: View {
 
     var body: some View {
         VStack {
-            MTMapViewContainer(options: MTMapOptions(attributionControlIsVisible: false))
+            MTMapViewContainer(map: map) {
+                MTMarker(coordinates: Constants.brnoCoordinates, color: .magenta, draggable: true)
+                MTMarker(coordinates: Constants.unterageriCoordinates, icon: UIImage(named: "maptiler-marker"))
+            }
                 .referenceStyle(referenceStyle)
                 .styleVariant(styleVariant)
                 .didInitialize {

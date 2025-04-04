@@ -109,7 +109,7 @@ extension MainViewController: MapControlViewDelegate {
         Task {
             let unterageriCoordinates: CLLocationCoordinate2D = Constants.unterageriCoordinates
 
-            await mapView.flyTo(unterageriCoordinates, options: nil)
+            await mapView.flyTo(unterageriCoordinates, options: nil, animationOptions: nil)
         }
     }
 
@@ -118,7 +118,7 @@ extension MainViewController: MapControlViewDelegate {
             let brnoCoordinates: CLLocationCoordinate2D = Constants.brnoCoordinates
             let options = MTCameraOptions(zoom: Constants.defaultZoomLevel)
 
-            await mapView.easeTo(brnoCoordinates, options: options)
+            await mapView.easeTo(brnoCoordinates, options: options, animationOptions: nil)
         }
     }
 

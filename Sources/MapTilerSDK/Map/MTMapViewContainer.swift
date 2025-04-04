@@ -7,19 +7,24 @@ import SwiftUI
 
 /// Declarative Map view for use in SwiftUI
 public struct MTMapViewContainer: View {
+    let content: [MTMapViewContent]
+
     @State private var coordinator: MTCoordinator? = MTCoordinator()
-    private var options: MTMapOptions?
 
     private var referenceStyle: MTMapReferenceStyle = .streets
     private var styleVariant: MTMapStyleVariant?
 
-    public init(options: MTMapOptions?) {
-        self.options = options
+    public var map: MTMapView
+
+    public init(map: MTMapView, @MTMapContentBuilder content: () -> [MTMapViewContent]) {
+        self.map = map
+        self.content = content()
     }
 
     public var body: some View {
         MTMapViewRepresentable(
-            options: options,
+            map: map,
+            content: content,
             coordinator: coordinator,
             referenceStyle: referenceStyle,
             styleVariant: styleVariant
@@ -28,34 +33,41 @@ public struct MTMapViewContainer: View {
 }
 
 package struct MTMapViewRepresentable: UIViewRepresentable {
+    let content: [MTMapViewContent]
+
     private let notInitializedMessage: String = "MapView not initialized yet!"
 
     private var referenceStyle: MTMapReferenceStyle = .streets
     private var styleVariant: MTMapStyleVariant?
 
-    private var options: MTMapOptions?
-
     private var coordinator: MTCoordinator?
 
+    var mapView: MTMapView
+
     public init(
-        options: MTMapOptions?,
+        map: MTMapView,
+        content: [MTMapViewContent],
         coordinator: MTCoordinator?,
         referenceStyle: MTMapReferenceStyle,
         styleVariant: MTMapStyleVariant?
     ) {
+        self.mapView = map
+        self.content = content
         self.referenceStyle = referenceStyle
         self.styleVariant = styleVariant
-        self.options = options
         self.coordinator = coordinator
     }
 
     public func makeUIView(context: Context) -> some UIView {
-        let mapView = MTMapView(options: options)
         mapView.setProxy(referenceStyle: referenceStyle, styleVariant: styleVariant)
 
         mapView.delegate = coordinator
 
         updateMapView(mapView)
+
+        mapView.didInitialize = {
+            content.forEach { $0.addToMap(mapView) }
+        }
 
         return mapView
     }

@@ -10,9 +10,11 @@ import CoreLocation
 public protocol MTNavigable {
     func setBearing(_ bearing: Double) async
     func setCenter(_ center: CLLocationCoordinate2D) async
-    func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?) async
-    func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async
+    func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?, animationOptions: MTAnimationOptions?) async
+    func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?, animationOptions: MTAnimationOptions?) async
     func jumpTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async
+    func panBy(_ offset: MTPoint) async
+    func panTo(_ coordinates: CLLocationCoordinate2D) async
     func setPadding(_ options: MTPaddingOptions) async
     func setIsCenterClampedToGround(_ isCenterClampedToGround: Bool) async
     func setCenterElevation(_ elevation: Double) async

@@ -51,7 +51,10 @@ extension MTMapView: MTNavigable {
         animationOptions: MTAnimationOptions?,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        runCommand(FlyTo(center: center, options: options, animationOptions: animationOptions), completion: completionHandler)
+        runCommand(
+            FlyTo(center: center, options: options, animationOptions: animationOptions),
+            completion: completionHandler
+        )
     }
 
     /// Changes any combination of center, zoom, bearing, pitch, and padding.
@@ -71,7 +74,14 @@ extension MTMapView: MTNavigable {
         animationOptions: MTAnimationOptions?,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        runCommand(EaseTo(center: center, options: options, animationOptions: animationOptions), completion: completionHandler)
+        runCommand(
+            EaseTo(
+                center: center,
+                options: options,
+                animationOptions: animationOptions
+            ),
+            completion: completionHandler
+        )
     }
 
     /// Changes any combination of center, zoom, bearing, and pitch, without an animated transition.
@@ -252,7 +262,10 @@ extension MTMapView: MTNavigable {
     ///   - coordinates: The location to pan the map to.
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
-    public func panTo(_ coordinates: CLLocationCoordinate2D, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+    public func panTo(
+        _ coordinates: CLLocationCoordinate2D,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
         runCommand(PanTo(coordinates: coordinates), completion: completionHandler)
     }
 }
@@ -296,7 +309,11 @@ extension MTMapView {
     /// - Note: The animation will be skipped, and this will behave equivalently to jumpTo
     /// if the user has the reduced motion accesibility feature enabled,
     /// unless options includes essential: true.
-    public func flyTo(_ center: CLLocationCoordinate2D, options: MTFlyToOptions?, animationOptions: MTAnimationOptions?) async {
+    public func flyTo(
+        _ center: CLLocationCoordinate2D,
+        options: MTFlyToOptions?,
+        animationOptions: MTAnimationOptions?
+    ) async {
         await withCheckedContinuation { continuation in
             flyTo(center, options: options, animationOptions: animationOptions) { _ in
                 continuation.resume()
@@ -314,7 +331,11 @@ extension MTMapView {
     ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The transition will happen instantly if the user has enabled the reduced motion accesibility feature,
     /// unless options includes essential: true.
-    public func easeTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?, animationOptions: MTAnimationOptions?) async {
+    public func easeTo(
+        _ center: CLLocationCoordinate2D,
+        options: MTCameraOptions?,
+        animationOptions: MTAnimationOptions?
+    ) async {
         await withCheckedContinuation { continuation in
             easeTo(center, options: options, animationOptions: animationOptions) { _ in
                 continuation.resume()

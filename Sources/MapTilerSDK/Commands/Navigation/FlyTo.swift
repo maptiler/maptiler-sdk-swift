@@ -39,6 +39,7 @@ package struct FlyToOptions: Codable {
         self.animationOptions = try MTAnimationOptions(from: decoder)
     }
 
+    // swiftlint:disable cyclomatic_complexity
     package func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -88,6 +89,7 @@ package struct FlyToOptions: Codable {
             try container.encode(easing.toJS(), forKey: .easing)
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     package enum CodingKeys: String, CodingKey {
         case center

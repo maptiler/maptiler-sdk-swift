@@ -137,3 +137,26 @@ extension MTVectorTileSource {
         }
     }
 }
+
+// DSL
+extension MTVectorTileSource {
+    /// Adds source to map DSL style.
+    ///
+    /// Prefer mapView.style.addSource instead.
+    public func addToMap(_ mapView: MTMapView) {
+        Task {
+            let source = MTVectorTileSource(
+                identifier: self.identifier,
+                bounds: self.bounds,
+                maxZoom: self.maxZoom,
+                minZoom: self.minZoom,
+                scheme: self.scheme,
+                tiles: self.tiles,
+                url: self.url,
+                attribution: self.attribution
+            )
+
+            try await mapView.style?.addSource(source)
+        }
+    }
+}

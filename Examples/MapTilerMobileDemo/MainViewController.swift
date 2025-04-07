@@ -189,7 +189,7 @@ extension MainViewController: MTMapViewDelegate {
     }
 
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
-        if event == .didLoad, mapView.isInitialized {
+        if event == .didLoad {
             loadingActivityIndicator.stopAnimating()
         }
     }

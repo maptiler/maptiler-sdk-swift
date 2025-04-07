@@ -110,6 +110,52 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
         self.sourceLayer = sourceLayer
     }
 
+    public init(
+        identifier: String,
+        sourceIdentifier: String,
+        maxZoom: Double? = nil,
+        minZoom: Double? = nil,
+        sourceLayer: String? = nil,
+        blur: Double? = 0.0,
+        cap: MTLineCap? = .butt,
+        color: UIColor? = .black,
+        dashArray: [Double]? = nil,
+        gapWidth: Double? = 0.0,
+        gradient: UIColor? = nil,
+        join: MTLineJoin? = .miter,
+        miterLimit: Double? = 2.0,
+        offset: Double? = 0.0,
+        opacity: Double? = 1.0,
+        roundLimit: Double? = 1.05,
+        sortKey: Double? = nil,
+        translate: [Double]? = [0.0, 0.0],
+        translateAnchor: MTLineTranslateAnchor? = .map,
+        width: Double? = 1.0,
+        visibility: MTLayerVisibility? = .visible
+    ) {
+        self.identifier = identifier
+        self.sourceIdentifier = sourceIdentifier
+        self.maxZoom = maxZoom
+        self.minZoom = minZoom
+        self.sourceLayer = sourceLayer
+        self.blur = blur
+        self.cap = cap
+        self.color = color
+        self.dashArray = dashArray
+        self.gapWidth = gapWidth
+        self.gradient = gradient
+        self.join = join
+        self.miterLimit = miterLimit
+        self.offset = offset
+        self.opacity = opacity
+        self.roundLimit = roundLimit
+        self.sortKey = sortKey
+        self.translate = translate
+        self.translateAnchor = translateAnchor
+        self.width = width
+        self.visibility = visibility
+    }
+
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -247,5 +293,41 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
         case roundLimit = "line-round-limit"
         case sortKey = "line-sort-key"
         case visibility
+    }
+}
+
+// DSL
+extension MTLineLayer {
+    /// Adds layer to map DSL style.
+    ///
+    /// Prefer mapView.style.addLayer instead.
+    public func addToMap(_ mapView: MTMapView) {
+        Task {
+            let layer = MTLineLayer(
+                identifier: self.identifier,
+                sourceIdentifier: self.sourceIdentifier,
+                maxZoom: self.maxZoom,
+                minZoom: self.minZoom,
+                sourceLayer: self.sourceLayer,
+                blur: self.blur,
+                cap: self.cap,
+                color: self.color,
+                dashArray: self.dashArray,
+                gapWidth: self.gapWidth,
+                gradient: self.gradient,
+                join: self.join,
+                miterLimit: self.miterLimit,
+                offset: self.offset,
+                opacity: self.opacity,
+                roundLimit: self.roundLimit,
+                sortKey: self.sortKey,
+                translate: self.translate,
+                translateAnchor: self.translateAnchor,
+                width: self.width,
+                visibility: self.visibility
+            )
+
+            try await mapView.style?.addLayer(layer)
+        }
     }
 }

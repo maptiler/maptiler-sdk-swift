@@ -99,6 +99,36 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         self.sourceIdentifier = sourceIdentifier
     }
 
+    public init(
+        identifier: String,
+        sourceIdentifier: String,
+        maxZoom: Double? = nil,
+        minZoom: Double? = nil,
+        sourceLayer: String? = nil,
+        shouldBeAntialised: Bool? = true,
+        color: UIColor? = .black,
+        opacity: Double? = 1.0,
+        outlineColor: UIColor? = nil,
+        translate: [Double]? = nil,
+        translateAnchor: MTFillTranslateAnchor? = .map,
+        sortKey: Double? = nil,
+        visibility: MTLayerVisibility? = .visible
+    ) {
+        self.identifier = identifier
+        self.sourceIdentifier = sourceIdentifier
+        self.maxZoom = maxZoom
+        self.minZoom = minZoom
+        self.sourceLayer = sourceLayer
+        self.shouldBeAntialised = shouldBeAntialised
+        self.color = color
+        self.opacity = opacity
+        self.outlineColor = outlineColor
+        self.translate = translate
+        self.translateAnchor = translateAnchor
+        self.sortKey = sortKey
+        self.visibility = visibility
+    }
+
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -211,5 +241,40 @@ extension MTFillLayer: Equatable {
             isMaxZoomlEqual &&
             isMinZoomlEqual &&
             sourceLayerEqual
+    }
+}
+
+// DSL
+extension MTFillLayer {
+    /// Adds layer to map DSL style.
+    /// 
+    /// Prefer mapView.style.addLayer instead.
+    public func addToMap(_ mapView: MTMapView) {
+        Task {
+            let layer = MTFillLayer(
+                identifier: self.identifier,
+                sourceIdentifier: self.sourceIdentifier,
+                maxZoom: self.maxZoom,
+                minZoom: self.minZoom,
+                sourceLayer: self.sourceLayer,
+                shouldBeAntialised: self.shouldBeAntialised,
+                color: self.color,
+                opacity: self.opacity,
+                outlineColor: self.outlineColor,
+                translate: self.translate,
+                translateAnchor: self.translateAnchor,
+                sortKey: self.sortKey,
+                visibility: self.visibility
+            )
+
+            try await mapView.style?.addLayer(layer)
+        }
+    }
+
+    @discardableResult
+    public func color(_ value: UIColor) -> Self {
+        self.color = value
+
+        return self
     }
 }

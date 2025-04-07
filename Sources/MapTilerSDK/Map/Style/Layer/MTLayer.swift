@@ -4,7 +4,7 @@
 //
 
 /// Protocol requirements for all types of Layers.
-public protocol MTLayer: Sendable, AnyObject {
+public protocol MTLayer: Sendable, MTMapViewContent, AnyObject {
     var identifier: String { get set }
     var type: MTLayerType { get }
     var sourceIdentifier: String { get set }

@@ -162,31 +162,3 @@ extension MTSymbolLayer: Equatable {
             sourceLayerEqual
     }
 }
-
-// DSL
-extension MTSymbolLayer {
-    /// Adds layer to map DSL style.
-    ///
-    /// Prefer mapView.style.addLayer instead.
-    public func addToMap(_ mapView: MTMapView) {
-        Task {
-            let layer = MTSymbolLayer(
-                identifier: self.identifier,
-                sourceIdentifier: self.sourceIdentifier,
-                maxZoom: self.minZoom,
-                minZoom: self.maxZoom,
-                sourceLayer: self.sourceLayer,
-                icon: self.icon,
-                visibility: self.visibility
-            )
-
-            try await mapView.style?.addLayer(layer)
-        }
-    }
-
-    public func icon(_ value: UIImage) -> Self {
-        self.icon = value
-
-        return self
-    }
-}

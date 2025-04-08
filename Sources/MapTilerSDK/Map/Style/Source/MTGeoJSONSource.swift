@@ -171,7 +171,7 @@ extension MTGeoJSONSource {
             let source = MTGeoJSONSource(
                 identifier: self.identifier,
                 url: self.url,
-                attribution:self.attribution,
+                attribution: self.attribution,
                 buffer: self.buffer,
                 isCluster: self.isCluster,
                 clusterMaxZoom: self.clusterMaxZoom,

@@ -243,38 +243,3 @@ extension MTFillLayer: Equatable {
             sourceLayerEqual
     }
 }
-
-// DSL
-extension MTFillLayer {
-    /// Adds layer to map DSL style.
-    /// 
-    /// Prefer mapView.style.addLayer instead.
-    public func addToMap(_ mapView: MTMapView) {
-        Task {
-            let layer = MTFillLayer(
-                identifier: self.identifier,
-                sourceIdentifier: self.sourceIdentifier,
-                maxZoom: self.maxZoom,
-                minZoom: self.minZoom,
-                sourceLayer: self.sourceLayer,
-                shouldBeAntialised: self.shouldBeAntialised,
-                color: self.color,
-                opacity: self.opacity,
-                outlineColor: self.outlineColor,
-                translate: self.translate,
-                translateAnchor: self.translateAnchor,
-                sortKey: self.sortKey,
-                visibility: self.visibility
-            )
-
-            try await mapView.style?.addLayer(layer)
-        }
-    }
-
-    @discardableResult
-    public func color(_ value: UIColor) -> Self {
-        self.color = value
-
-        return self
-    }
-}

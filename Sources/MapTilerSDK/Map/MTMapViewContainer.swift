@@ -73,10 +73,8 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
                     }
                 }
 
-                for item in content {
-                    if !(item is MTSource) {
-                        item.addToMap(mapView)
-                    }
+                for item in content where !(item is MTSource) {
+                    item.addToMap(mapView)
                 }
             }
         }

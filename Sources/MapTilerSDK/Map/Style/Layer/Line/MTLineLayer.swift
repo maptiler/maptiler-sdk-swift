@@ -34,7 +34,7 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
     /// including GeoJSON sources.
     public var sourceLayer: String?
 
-    // Blue of the line.
+    // Blur of the line.
     public var blur: Double? = 0.0
 
     /// The display of line endings.
@@ -293,41 +293,5 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
         case roundLimit = "line-round-limit"
         case sortKey = "line-sort-key"
         case visibility
-    }
-}
-
-// DSL
-extension MTLineLayer {
-    /// Adds layer to map DSL style.
-    ///
-    /// Prefer mapView.style.addLayer instead.
-    public func addToMap(_ mapView: MTMapView) {
-        Task {
-            let layer = MTLineLayer(
-                identifier: self.identifier,
-                sourceIdentifier: self.sourceIdentifier,
-                maxZoom: self.maxZoom,
-                minZoom: self.minZoom,
-                sourceLayer: self.sourceLayer,
-                blur: self.blur,
-                cap: self.cap,
-                color: self.color,
-                dashArray: self.dashArray,
-                gapWidth: self.gapWidth,
-                gradient: self.gradient,
-                join: self.join,
-                miterLimit: self.miterLimit,
-                offset: self.offset,
-                opacity: self.opacity,
-                roundLimit: self.roundLimit,
-                sortKey: self.sortKey,
-                translate: self.translate,
-                translateAnchor: self.translateAnchor,
-                width: self.width,
-                visibility: self.visibility
-            )
-
-            try await mapView.style?.addLayer(layer)
-        }
     }
 }

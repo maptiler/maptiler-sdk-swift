@@ -39,7 +39,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="icN-St-MUz" userLabel="ZoomOut">
-                            <rect key="frame" x="19" y="64" width="46" height="30"/>
+                            <rect key="frame" x="19" y="59" width="46" height="30"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="46" id="4Y4-dR-5IU"/>
                                 <constraint firstAttribute="height" constant="30" id="lum-dT-gaP"/>
@@ -57,7 +57,7 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstItem="icN-St-MUz" firstAttribute="top" secondItem="79k-4f-Lmf" secondAttribute="bottom" constant="20" id="EZ2-ZQ-Q2N"/>
+                        <constraint firstItem="icN-St-MUz" firstAttribute="top" secondItem="79k-4f-Lmf" secondAttribute="bottom" constant="15" id="EZ2-ZQ-Q2N"/>
                         <constraint firstItem="icN-St-MUz" firstAttribute="centerX" secondItem="Ifn-xc-LH1" secondAttribute="centerX" id="KGb-nE-mU3"/>
                         <constraint firstItem="79k-4f-Lmf" firstAttribute="centerX" secondItem="Ifn-xc-LH1" secondAttribute="centerX" id="KpM-fC-WI9"/>
                         <constraint firstItem="79k-4f-Lmf" firstAttribute="top" secondItem="Ifn-xc-LH1" secondAttribute="top" constant="14" id="npg-Nr-xAB"/>

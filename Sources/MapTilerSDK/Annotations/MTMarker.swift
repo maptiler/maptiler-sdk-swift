@@ -64,18 +64,6 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
 
         mapView.setCoordinatesTo(self, completionHandler: completionHandler)
     }
-
-    public func addToMap(_ mapView: MTMapView) {
-        Task {
-            let marker = MTMarker(
-                coordinates: self.coordinates,
-                color: self.color,
-                icon: self.icon,
-                draggable: self.draggable
-            )
-            await mapView.addMarker(marker)
-        }
-    }
 }
 
 // Concurrency
@@ -91,6 +79,24 @@ extension MTMarker {
             setCoordinates(coordinates, in: mapView) { _ in
                 continuation.resume()
             }
+        }
+    }
+}
+
+// DSL
+extension MTMarker {
+    /// Adds marker to map DSL style.
+    ///
+    /// Prefer mapView.addMarker instead.
+    public func addToMap(_ mapView: MTMapView) {
+        Task {
+            let marker = MTMarker(
+                coordinates: self.coordinates,
+                color: self.color,
+                icon: self.icon,
+                draggable: self.draggable
+            )
+            await mapView.addMarker(marker)
         }
     }
 }

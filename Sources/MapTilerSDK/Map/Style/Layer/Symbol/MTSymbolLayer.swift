@@ -73,6 +73,24 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         self.iconName = "icon\(identifier)"
     }
 
+    public init(
+        identifier: String,
+        sourceIdentifier: String,
+        maxZoom: Double? = nil,
+        minZoom: Double? = nil,
+        sourceLayer: String? = nil,
+        icon: UIImage? = nil,
+        visibility: MTLayerVisibility? = .visible
+    ) {
+        self.identifier = identifier
+        self.sourceIdentifier = sourceIdentifier
+        self.maxZoom = maxZoom
+        self.minZoom = minZoom
+        self.sourceLayer = sourceLayer
+        self.icon = icon
+        self.visibility = visibility
+    }
+
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 

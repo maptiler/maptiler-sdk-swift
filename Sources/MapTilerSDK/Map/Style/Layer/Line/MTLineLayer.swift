@@ -34,7 +34,7 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
     /// including GeoJSON sources.
     public var sourceLayer: String?
 
-    // Blue of the line.
+    // Blur of the line.
     public var blur: Double? = 0.0
 
     /// The display of line endings.
@@ -108,6 +108,52 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
         self.maxZoom = maxZoom
         self.minZoom = minZoom
         self.sourceLayer = sourceLayer
+    }
+
+    public init(
+        identifier: String,
+        sourceIdentifier: String,
+        maxZoom: Double? = nil,
+        minZoom: Double? = nil,
+        sourceLayer: String? = nil,
+        blur: Double? = 0.0,
+        cap: MTLineCap? = .butt,
+        color: UIColor? = .black,
+        dashArray: [Double]? = nil,
+        gapWidth: Double? = 0.0,
+        gradient: UIColor? = nil,
+        join: MTLineJoin? = .miter,
+        miterLimit: Double? = 2.0,
+        offset: Double? = 0.0,
+        opacity: Double? = 1.0,
+        roundLimit: Double? = 1.05,
+        sortKey: Double? = nil,
+        translate: [Double]? = [0.0, 0.0],
+        translateAnchor: MTLineTranslateAnchor? = .map,
+        width: Double? = 1.0,
+        visibility: MTLayerVisibility? = .visible
+    ) {
+        self.identifier = identifier
+        self.sourceIdentifier = sourceIdentifier
+        self.maxZoom = maxZoom
+        self.minZoom = minZoom
+        self.sourceLayer = sourceLayer
+        self.blur = blur
+        self.cap = cap
+        self.color = color
+        self.dashArray = dashArray
+        self.gapWidth = gapWidth
+        self.gradient = gradient
+        self.join = join
+        self.miterLimit = miterLimit
+        self.offset = offset
+        self.opacity = opacity
+        self.roundLimit = roundLimit
+        self.sortKey = sortKey
+        self.translate = translate
+        self.translateAnchor = translateAnchor
+        self.width = width
+        self.visibility = visibility
     }
 
     public required init(from decoder: any Decoder) throws {

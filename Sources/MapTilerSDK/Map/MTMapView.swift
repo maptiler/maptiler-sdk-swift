@@ -147,10 +147,6 @@ open class MTMapView: UIView {
                     styleVariant: styleVariantProxy)
                 )
 
-                isInitialized = true
-                delegate?.mapViewDidInitialize(self)
-                didInitialize?()
-
                 MTLogger.log("\(MTLogger.infoMarker) - Map Initialized Successfully", type: .info)
             } catch {
                 MTLogger.log("\(error)", type: .criticalError)
@@ -172,6 +168,10 @@ extension MTMapView: EventProcessorDelegate {
 
         if event == .didLoad {
             style = MTStyle(for: self, with: referenceStyleProxy, and: styleVariantProxy)
+
+            isInitialized = true
+            delegate?.mapViewDidInitialize(self)
+            didInitialize?()
         }
     }
 }

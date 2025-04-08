@@ -61,6 +61,30 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
         self.url = url
     }
 
+    public init(
+        identifier: String,
+        url: URL? = nil,
+        attribution: String? = nil,
+        buffer: Int? = 128,
+        isCluster: Bool = false,
+        clusterMaxZoom: Double? = nil,
+        clusterRadius: Double? = 50,
+        maxZoom: Double? = 18,
+        tolerance: Double? = 0.375,
+        lineMetrics: Bool? = false
+    ) {
+        self.identifier = identifier
+        self.url = url
+        self.attribution = attribution
+        self.buffer = buffer
+        self.isCluster = isCluster
+        self.clusterMaxZoom = clusterMaxZoom
+        self.clusterRadius = clusterRadius
+        self.maxZoom = maxZoom
+        self.tolerance = tolerance
+        self.lineMetrics = lineMetrics
+    }
+
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -133,6 +157,31 @@ extension MTGeoJSONSource {
             setData(data: data, in: mapView) { _ in
                 continuation.resume()
             }
+        }
+    }
+}
+
+// DSL
+extension MTGeoJSONSource {
+    /// Adds source to map DSL style.
+    ///
+    /// Prefer mapView.style.addSource instead.
+    public func addToMap(_ mapView: MTMapView) {
+        Task {
+            let source = MTGeoJSONSource(
+                identifier: self.identifier,
+                url: self.url,
+                attribution: self.attribution,
+                buffer: self.buffer,
+                isCluster: self.isCluster,
+                clusterMaxZoom: self.clusterMaxZoom,
+                clusterRadius: self.clusterRadius,
+                maxZoom: self.maxZoom,
+                tolerance: self.tolerance,
+                lineMetrics: self.lineMetrics
+            )
+
+            try await mapView.style?.addSource(source)
         }
     }
 }

@@ -99,6 +99,36 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         self.sourceIdentifier = sourceIdentifier
     }
 
+    public init(
+        identifier: String,
+        sourceIdentifier: String,
+        maxZoom: Double? = nil,
+        minZoom: Double? = nil,
+        sourceLayer: String? = nil,
+        shouldBeAntialised: Bool? = true,
+        color: UIColor? = .black,
+        opacity: Double? = 1.0,
+        outlineColor: UIColor? = nil,
+        translate: [Double]? = nil,
+        translateAnchor: MTFillTranslateAnchor? = .map,
+        sortKey: Double? = nil,
+        visibility: MTLayerVisibility? = .visible
+    ) {
+        self.identifier = identifier
+        self.sourceIdentifier = sourceIdentifier
+        self.maxZoom = maxZoom
+        self.minZoom = minZoom
+        self.sourceLayer = sourceLayer
+        self.shouldBeAntialised = shouldBeAntialised
+        self.color = color
+        self.opacity = opacity
+        self.outlineColor = outlineColor
+        self.translate = translate
+        self.translateAnchor = translateAnchor
+        self.sortKey = sortKey
+        self.visibility = visibility
+    }
+
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 

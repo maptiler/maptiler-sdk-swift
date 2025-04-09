@@ -15,8 +15,8 @@ extension MTSymbolLayer {
             let layer = MTSymbolLayer(
                 identifier: self.identifier,
                 sourceIdentifier: self.sourceIdentifier,
-                maxZoom: self.minZoom,
-                minZoom: self.maxZoom,
+                maxZoom: self.maxZoom,
+                minZoom: self.minZoom,
                 sourceLayer: self.sourceLayer,
                 icon: self.icon,
                 visibility: self.visibility

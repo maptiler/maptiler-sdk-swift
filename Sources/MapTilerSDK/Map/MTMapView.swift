@@ -168,10 +168,14 @@ extension MTMapView: EventProcessorDelegate {
 
         if event == .didLoad {
             style = MTStyle(for: self, with: referenceStyleProxy, and: styleVariantProxy)
-
+        } else if event == .isReady {
             isInitialized = true
             delegate?.mapViewDidInitialize(self)
             didInitialize?()
+        }
+
+        if event == .isIdle, let style {
+            style.processLayersQueueIfNeeded()
         }
     }
 }
@@ -232,6 +236,33 @@ extension MTMapView {
                 } else {
                     MTLogger.log("\(command) returned invalid type.", type: .error)
                     completion?(.failure(MTError.unsupportedReturnType(description: "Expected double, got NaN.")))
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
+    package func runCommandWithBoolReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
+
+                if case .bool(let commandValue) = value {
+                    completion?(.success(commandValue))
+                } else if case .double(let commandValue) = value {
+                    completion?(.success(commandValue != 0))
+                } else {
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(.failure(MTError.unsupportedReturnType(description: "Expected bool, got unknown.")))
                 }
             } catch {
                 MTLogger.log("\(error)", type: .error)

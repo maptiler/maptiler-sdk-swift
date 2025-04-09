@@ -177,6 +177,36 @@ extension MTMapView: MTStylable {
         )
     }
 
+    /// Returns boolean value indicating whether the source with provided id is loaded.
+    ///  - Parameters:
+    ///    - id: The id of the source.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isSourceLoaded(
+        id: String,
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(
+            IsSourceLoaded(
+                sourceId: id
+            ),
+            completion: completionHandler
+        )
+    }
+
+    /// Returns boolean value indicating whether the map is fully loaded.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isMapLoaded(
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(
+            IsMapLoaded(),
+            completion: completionHandler
+        )
+    }
+
     package func getId(
         for referenceStyle: MTMapReferenceStyle,
         completionHandler: ((Result<String, MTError>) -> Void)? = nil
@@ -424,6 +454,36 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             setVerticalFieldOfView(degrees: degrees) { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns boolean value indicating whether the source with provided id is loaded.
+    ///  - Parameters:
+    ///    - id: The id of the source.
+    public func isSourceLoaded(id: String) async -> Bool {
+        await withCheckedContinuation { continuation in
+            isSourceLoaded(id: id) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Returns boolean value indicating whether the map is fully loaded.
+    public func isMapLoaded() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isMapLoaded { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: false)
+                }
             }
         }
     }

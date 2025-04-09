@@ -236,7 +236,8 @@ extension MainViewController: MTMapViewDelegate {
         }
 
         loadingActivityIndicator.stopAnimating()
-//        addSources()
+
+        addSources()
 
         // *** Uncomment for benchmark or use long press on jump view ***
 //        Task {
@@ -260,33 +261,23 @@ extension MainViewController: MTMapViewDelegate {
 
 extension MainViewController: LayerViewDelegate {
     func layerView(_ layerView: LayerView, didUpdateLayerState state: Bool, layer: LayerType) {
-        addSources()
         switch layer {
         case .contours:
-            Task {
-                if state {
-                    try await mapView.style?.addLayer(contoursLayer)
-                } else {
-                    try await mapView.style?.removeLayer(contoursLayer)
-                }
-            }
+            updateLayer(contoursLayer, for: state)
         case .aeroway:
-            Task {
-                if state {
-                    try await mapView.style?.addLayer(aerowayLayer)
-                } else {
-                    try await mapView.style?.removeLayer(aerowayLayer)
-                }
-            }
+            updateLayer(aerowayLayer, for: state)
         case .place:
-            Task {
-                if state {
-                    try await mapView.style?.addLayer(placeLayer)
-                } else {
-                    try await mapView.style?.removeLayer(placeLayer)
-                }
+            updateLayer(placeLayer, for: state)
+        }
+    }
+
+    private func updateLayer(_ layer: MTLayer, for state: Bool) {
+        Task {
+            if state {
+                try await mapView.style?.addLayer(layer)
+            } else {
+                try await mapView.style?.removeLayer(layer)
             }
         }
-
     }
 }

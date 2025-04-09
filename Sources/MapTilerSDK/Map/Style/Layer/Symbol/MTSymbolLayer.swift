@@ -40,7 +40,9 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
     /// Enum controlling whether this layer is displayed.
     public var visibility: MTLayerVisibility? = .visible
 
-    private var iconName: String?
+    package var iconName: String? {
+        return "icon\(identifier)"
+    }
 
     /// Initializes the layer with unique identifier, source identifier, max and min zoom levels and source layer,
     /// which is required for vector tile sources.
@@ -52,13 +54,10 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         sourceLayer: String? = nil
     ) {
         self.identifier = identifier
-        self.type = .symbol
         self.sourceIdentifier = sourceIdentifier
         self.maxZoom = maxZoom
         self.minZoom = minZoom
         self.sourceLayer = sourceLayer
-
-        self.iconName = "icon\(identifier).src"
     }
 
     /// Initializes the layer with the unique identifier and a source identifier.
@@ -67,10 +66,7 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         sourceIdentifier: String
     ) {
         self.identifier = identifier
-        self.type = .symbol
         self.sourceIdentifier = sourceIdentifier
-
-        self.iconName = "icon\(identifier)"
     }
 
     public init(

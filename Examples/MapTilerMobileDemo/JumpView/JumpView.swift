@@ -59,6 +59,8 @@ struct JumpView: View {
 
     var body: some View {
         HStack(spacing: Constants.defaultSpacing) {
+            Spacer()
+
             Picker(Constants.jumpActionTitle,
                    selection: $selected,
                    content: {
@@ -88,6 +90,7 @@ struct JumpView: View {
                     .foregroundColor(.gray)
                     .cornerRadius(Constants.defaultCornerRadius)
             }
+            .padding()
         }
         .background(.clear)
         .padding()

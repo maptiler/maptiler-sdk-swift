@@ -3,6 +3,13 @@
 //  MapTilerSDK
 //
 
+import Foundation
+
+struct StyleTask {
+    let name: String
+    let execute: () -> Void
+}
+
 /// The proxy object for the current map style.
 ///
 /// Set of convenience methods for style, sources and layers manipulation.
@@ -20,6 +27,8 @@ public class MTStyle {
     private var mapSources: [String: MTWeakSource] = [:]
     private var mapLayers: [String: MTWeakLayer] = [:]
 
+    var queue: [StyleTask] = []
+
     package init(
         for mapView: MTMapView,
         with referenceStyle: MTMapReferenceStyle,
@@ -30,6 +39,11 @@ public class MTStyle {
         Task {
             await setStyle(referenceStyle, styleVariant: styleVariant)
         }
+    }
+
+    package func processLayersQueueIfNeeded() {
+        queue.forEach { $0.execute() }
+        queue.removeAll()
     }
 
     /// Updates the map's style object with a new value.
@@ -196,13 +210,38 @@ extension MTStyle {
     public func addLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
 
-        mapView.addLayer(layer, completionHandler: completionHandler)
+        if let parentSource = mapSources[layer.sourceIdentifier] {
+            mapView.isSourceLoaded(id: layer.sourceIdentifier) { [weak self] result in
+                guard let self else {
+                    completionHandler?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
+
+                switch result {
+                case .success(let isLoaded):
+                    if isLoaded {
+                        mapView.addLayer(layer, completionHandler: completionHandler)
+                    } else {
+                        let layerTask = StyleTask(name: layer.identifier) { [weak self] in
+                            self?.mapView.addLayer(layer, completionHandler: completionHandler)
+                        }
+
+                        queue.append(layerTask)
+                    }
+                case .failure(let error):
+                    completionHandler?(.failure(error))
+                }
+            }
+        } else {
+            completionHandler?(.failure(MTError.missingParent))
+        }
     }
 
     /// Adds multiple layers to the map.
     ///
     /// - Parameters:
     ///     - layers: Layers to be added.
+    /// - Note: All parent sources must be loaded prior to calling this method.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addLayers(_ layers: [MTLayer], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         for layer in layers {
@@ -448,6 +487,7 @@ extension MTStyle {
     ///
     /// - Parameters:
     ///     - layers: Layers to be added.
+    /// - Note: All parent sources must be loaded prior to calling this method.
     public func addLayers(_ layers: [MTLayer]) async throws {
         try await withCheckedThrowingContinuation { continuation in
             addLayers(layers) { result in

@@ -30,6 +30,9 @@ public enum MTError: Error {
     /// Method execution halted. Bridge and/or Map are not loaded.
     case bridgeNotLoaded
 
+    /// Method execution failed due to missing parent entity.
+    case missingParent
+
     public var code: Int {
         switch self {
         case .exception(body: let body):
@@ -42,6 +45,8 @@ public enum MTError: Error {
             return 92
         case .bridgeNotLoaded:
             return 93
+        case .missingParent:
+            return 95
         }
     }
 
@@ -57,6 +62,8 @@ public enum MTError: Error {
             return description
         case .bridgeNotLoaded:
             return "Bridge and/or Map are not loaded."
+        case .missingParent:
+            return "Missing parent entity."
         }
     }
 }

@@ -64,13 +64,11 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
         mapView.delegate = coordinator
 
         mapView.didInitialize = {
-            Task {
-                await mapView.style?.setStyle(referenceStyle, styleVariant: styleVariant)
+            mapView.style?.setStyle(referenceStyle, styleVariant: styleVariant) { _ in
+                let sources = content.filter { $0 is MTSource }
 
-                for item in content {
-                    if let item = item as? MTSource {
-                        try await mapView.style?.addSource(item)
-                    }
+                for item in sources {
+                    item.addToMap(mapView)
                 }
 
                 for item in content where !(item is MTSource) {

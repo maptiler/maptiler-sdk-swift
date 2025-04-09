@@ -22,4 +22,5 @@ public protocol MTStylable {
     func enableTerrain(exaggerationFactor: Double) async
     func disableTerrain() async
     func setVerticalFieldOfView(degrees: Double) async
+    func isSourceLoaded(id: String) async -> Bool
 }

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LayerView" customModule="MapTilerMobileDemo" customModuleProvider="target">
+            <connections>
+                <outlet property="aerowaySwitch" destination="FwZ-RF-U88" id="GCH-Wc-eAh"/>
+                <outlet property="contentView" destination="Ltl-kb-PcK" id="VzX-dc-CCx"/>
+                <outlet property="contoursSwitch" destination="k0x-Mb-Cjn" id="eTR-8G-KEo"/>
+                <outlet property="placeSwitch" destination="Mrt-4a-ONA" id="zwd-sb-X9C"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Ltl-kb-PcK">
+            <rect key="frame" x="0.0" y="0.0" width="210" height="400"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Contours" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dSL-Fq-TTF">
+                    <rect key="frame" x="15" y="55.333333333333336" width="80" height="22.333333333333336"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="80" id="R2z-VY-Upp"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="19"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Layers" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cgl-eV-AV6">
+                    <rect key="frame" x="15" y="14.999999999999998" width="67" height="25.333333333333329"/>
+                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="21"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="k0x-Mb-Cjn">
+                    <rect key="frame" x="115" y="51" width="51" height="31"/>
+                    <color key="onTintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <connections>
+                        <action selector="contoursSwitchValueChanged:" destination="-1" eventType="valueChanged" id="7XJ-KL-OXA"/>
+                    </connections>
+                </switch>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Aeroway" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YvM-6r-A5q">
+                    <rect key="frame" x="15" y="102.66666666666667" width="80" height="22.333333333333329"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="80" id="YZg-Ls-02Z"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="19"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="FwZ-RF-U88">
+                    <rect key="frame" x="115" y="98.333333333333329" width="51" height="30.999999999999986"/>
+                    <color key="onTintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <connections>
+                        <action selector="aerowaySwitchValueChanged:" destination="-1" eventType="valueChanged" id="4Bn-P1-ETe"/>
+                    </connections>
+                </switch>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Place" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jWm-af-Kh8">
+                    <rect key="frame" x="15" y="150" width="80" height="22.333333333333343"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="80" id="zGe-Nf-fQS"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="19"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Mrt-4a-ONA">
+                    <rect key="frame" x="115" y="145.66666666666666" width="51" height="31"/>
+                    <color key="onTintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <connections>
+                        <action selector="placeSwitchValueChanged:" destination="-1" eventType="valueChanged" id="kte-VO-hcG"/>
+                    </connections>
+                </switch>
+            </subviews>
+            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.72714710884353739" colorSpace="custom" customColorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstItem="k0x-Mb-Cjn" firstAttribute="leading" secondItem="dSL-Fq-TTF" secondAttribute="trailing" constant="20" id="2en-3F-YoT"/>
+                <constraint firstItem="FwZ-RF-U88" firstAttribute="centerY" secondItem="YvM-6r-A5q" secondAttribute="centerY" id="4JE-B0-GGw"/>
+                <constraint firstItem="YvM-6r-A5q" firstAttribute="leading" secondItem="dSL-Fq-TTF" secondAttribute="leading" id="9VM-mA-CJX"/>
+                <constraint firstItem="FwZ-RF-U88" firstAttribute="leading" secondItem="YvM-6r-A5q" secondAttribute="trailing" constant="20" id="FYX-LH-GuC"/>
+                <constraint firstItem="dSL-Fq-TTF" firstAttribute="leading" secondItem="Cgl-eV-AV6" secondAttribute="leading" id="OAA-Sl-Fj9"/>
+                <constraint firstItem="jWm-af-Kh8" firstAttribute="top" secondItem="YvM-6r-A5q" secondAttribute="bottom" constant="25" id="OMd-RE-DWz"/>
+                <constraint firstItem="jWm-af-Kh8" firstAttribute="leading" secondItem="YvM-6r-A5q" secondAttribute="leading" id="Xm0-Cv-1dE"/>
+                <constraint firstItem="Cgl-eV-AV6" firstAttribute="leading" secondItem="Ltl-kb-PcK" secondAttribute="leading" constant="15" id="g6t-zS-ea4"/>
+                <constraint firstItem="Cgl-eV-AV6" firstAttribute="top" secondItem="Ltl-kb-PcK" secondAttribute="top" constant="15" id="gf5-t2-P2c"/>
+                <constraint firstItem="Mrt-4a-ONA" firstAttribute="leading" secondItem="jWm-af-Kh8" secondAttribute="trailing" constant="20" id="hWa-5E-pTo"/>
+                <constraint firstItem="YvM-6r-A5q" firstAttribute="top" secondItem="dSL-Fq-TTF" secondAttribute="bottom" constant="25" id="k54-S3-IHP"/>
+                <constraint firstItem="k0x-Mb-Cjn" firstAttribute="centerY" secondItem="dSL-Fq-TTF" secondAttribute="centerY" id="kLc-2S-N9q"/>
+                <constraint firstItem="Mrt-4a-ONA" firstAttribute="centerY" secondItem="jWm-af-Kh8" secondAttribute="centerY" id="v72-iT-JJO"/>
+                <constraint firstItem="dSL-Fq-TTF" firstAttribute="top" secondItem="Cgl-eV-AV6" secondAttribute="bottom" constant="15" id="yQs-DC-5UI"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="193.89312977099235" y="-253.52112676056339"/>
+        </view>
+    </objects>
+</document>

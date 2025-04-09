@@ -43,12 +43,25 @@ class MainViewController: UIViewController {
     @IBOutlet weak var jumpContainerView: UIView!
     @IBOutlet weak var benchmarkButton: UIButton!
     @IBOutlet weak var loadingActivityIndicator: UIActivityIndicatorView!
-    
+    @IBOutlet weak var layerViewLeadingConstraint: NSLayoutConstraint!
+
+    @IBOutlet weak var layerView: LayerView! {
+        didSet {
+            layerView.delegate = self
+        }
+    }
+
     private var dataModel = JumpDataModel()
     private var cancellables = Set<AnyCancellable>()
 
     private var globeEnabled = false
     private var terrainEnabled = false
+
+    private var layerViewIsVisible = false
+
+    var contoursLayer: MTLineLayer!
+    var aerowayLayer: MTFillLayer!
+    var placeLayer: MTSymbolLayer!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,6 +69,23 @@ class MainViewController: UIViewController {
         setUpJumpView()
         setUpLoadingActivityIndicator()
         setUpLongPress()
+
+        setUpLayers()
+    }
+
+    private func setUpLayers() {
+        contoursLayer = MTLineLayer(identifier: "contourslayer", sourceIdentifier: "contourssource")
+        contoursLayer.color = .brown
+        contoursLayer.width = 1
+        contoursLayer.sourceLayer = "contour_ft"
+
+        aerowayLayer = MTFillLayer(identifier: "aerowaylayer", sourceIdentifier: "openmapsource")
+        aerowayLayer.color = .lightGray
+        aerowayLayer.sourceLayer = "aeroway"
+
+        placeLayer = MTSymbolLayer(identifier: "placelayer", sourceIdentifier: "openmapsource")
+        placeLayer.icon = UIImage(named: "maptiler-marker")
+        placeLayer.sourceLayer = "place"
     }
 
     private func setUpLongPress() {
@@ -100,6 +130,31 @@ class MainViewController: UIViewController {
     private func jumpTo(_ coordinates: CLLocationCoordinate2D) {
         Task {
             await mapView.jumpTo(coordinates, options: nil)
+        }
+    }
+
+    private func addSources() {
+        if let contoursURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=F88dOilbnFebWsh4o9oP") {
+            Task {
+                let contoursSource = MTVectorTileSource(identifier: "contourssource", tiles: [contoursURL])
+                try await mapView.style?.addSource(contoursSource)
+            }
+        }
+
+        if let openMapURL = URL(string: "https://api.maptiler.com/tiles/v3-openmaptiles/{z}/{x}/{y}.pbf?key=F88dOilbnFebWsh4o9oP") {
+            Task {
+                let aerowaySource = MTVectorTileSource(identifier: "openmapsource", tiles: [openMapURL])
+                try await mapView.style?.addSource(aerowaySource)
+            }
+        }
+    }
+
+    @IBAction func layersButtonTouchUpInside(_ sender: UIButton) {
+        layerViewLeadingConstraint.constant = layerViewIsVisible ? -layerView.frame.width : 0
+        layerViewIsVisible = !layerViewIsVisible
+
+        UIView.animate(withDuration: 0.8) { [weak self] in
+            self?.view.layoutIfNeeded()
         }
     }
 }
@@ -180,6 +235,10 @@ extension MainViewController: MTMapViewDelegate {
             await mapView.addMapTilerLogoControl(position: .topLeft)
         }
 
+        loadingActivityIndicator.stopAnimating()
+
+        addSources()
+
         // *** Uncomment for benchmark or use long press on jump view ***
 //        Task {
 //            benchmarkButton.isHidden = false
@@ -190,11 +249,35 @@ extension MainViewController: MTMapViewDelegate {
 
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
         if event == .didLoad {
-            loadingActivityIndicator.stopAnimating()
+//            loadingActivityIndicator.stopAnimating()
+//            addSources()
         }
     }
 
     func mapView(_ mapView: MTMapView, didUpdateLocation location: CLLocation) {
         print("Device Coordinates: \(location.coordinate.latitude) - \(location.coordinate.longitude)")
+    }
+}
+
+extension MainViewController: LayerViewDelegate {
+    func layerView(_ layerView: LayerView, didUpdateLayerState state: Bool, layer: LayerType) {
+        switch layer {
+        case .contours:
+            updateLayer(contoursLayer, for: state)
+        case .aeroway:
+            updateLayer(aerowayLayer, for: state)
+        case .place:
+            updateLayer(placeLayer, for: state)
+        }
+    }
+
+    private func updateLayer(_ layer: MTLayer, for state: Bool) {
+        Task {
+            if state {
+                try await mapView.style?.addLayer(layer)
+            } else {
+                try await mapView.style?.removeLayer(layer)
+            }
+        }
     }
 }

@@ -8,11 +8,20 @@ package struct SetStyle: MTCommand {
     var styleVariant: MTMapStyleVariant?
 
     package func toJS() -> JSString {
-        let referenceStyle = referenceStyle.rawValue.uppercased()
-        let style = (
-            styleVariant != nil && styleVariant != .defaultVariant
-        ) ? "\(referenceStyle).\(styleVariant!.rawValue.uppercased())" : referenceStyle
+        let referenceStyleName = referenceStyle.getName()
 
-        return "\(MTBridge.mapObject).setStyle(\(MTBridge.sdkObject).\(MTBridge.styleObject).\(style));"
+        var styleString = ""
+
+        if referenceStyle.isCustom() {
+            styleString = "'\(referenceStyleName)'"
+        } else {
+            let style = (
+                styleVariant != nil && styleVariant != .defaultVariant
+            ) ? "\(referenceStyleName).\(styleVariant!.rawValue.uppercased())" : referenceStyleName
+
+            styleString = "\(MTBridge.sdkObject).\(MTBridge.styleObject).\(style)"
+        }
+
+        return "\(MTBridge.mapObject).setStyle(\(styleString));"
     }
 }

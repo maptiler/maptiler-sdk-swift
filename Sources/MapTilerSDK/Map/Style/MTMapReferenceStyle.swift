@@ -3,9 +3,11 @@
 //  MapTilerSDK
 //
 
+import Foundation
+
 /// Defines purpose and guidelines on what information is displayed.
-public enum MTMapReferenceStyle: String, @unchecked Sendable, CaseIterable, Identifiable {
-    public var id: String { rawValue }
+public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
+    public var id: String { getName() }
 
     /// The classic default style, perfect for urban areas.
     case streets
@@ -46,6 +48,12 @@ public enum MTMapReferenceStyle: String, @unchecked Sendable, CaseIterable, Iden
     /// Reference style without any variants.
     case openStreetMap
 
+    /// Custom style from the URL.
+    ///
+    /// Custom style does not have variants.
+    case custom(URL)
+
+    /// Returns all child variants.
     public func getVariants() -> [MTMapStyleVariant]? {
         switch self {
         case .streets:
@@ -74,6 +82,57 @@ public enum MTMapReferenceStyle: String, @unchecked Sendable, CaseIterable, Iden
             return [.defaultVariant, .light, .dark]
         case .openStreetMap:
             return [.defaultVariant]
+        case .custom:
+            return [.defaultVariant]
         }
+    }
+
+    /// Returns boolean indicating whether style is custom or pre-made.
+    public func isCustom() -> Bool {
+        switch self {
+        case .custom:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Returns reference style name..
+    public func getName() -> String {
+        switch self {
+        case .streets:
+            return "STREETS"
+        case .satellite:
+            return "SATELLITE"
+        case .hybrid:
+            return "HYBRID"
+        case .outdoor:
+            return "OUTDOOR"
+        case .winter:
+            return "WINTER"
+        case .dataviz:
+            return "DATAVIZ"
+        case .basic:
+            return "BASIC"
+        case .bright:
+            return "BRIGHT"
+        case .topo:
+            return "TOPO"
+        case .voyager:
+            return "VOYAGER"
+        case .toner:
+            return "TONER"
+        case .backdrop:
+            return "BACKDROP"
+        case .openStreetMap:
+            return "OPENSTREETMAP"
+        case .custom (let url):
+            return url.absoluteString
+        }
+    }
+
+    /// Returns all pre-made styles.
+    public static func all() -> [MTMapReferenceStyle] {
+        return [.streets, .satellite, .hybrid, .outdoor, .winter, .dataviz, .basic, .bright, .topo, .voyager, .toner, .backdrop, .openStreetMap]
     }
 }

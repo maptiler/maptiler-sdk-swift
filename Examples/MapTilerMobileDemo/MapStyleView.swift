@@ -43,8 +43,8 @@ struct MapStyleView: View {
 
             HStack(alignment: .top) {
                 Picker(Constants.emptyString, selection: $referenceStyle) {
-                    ForEach(MTMapReferenceStyle.allCases) { style in
-                        Text(style.rawValue.capitalized)
+                    ForEach(MTMapReferenceStyle.all()) { style in
+                        Text(style.getName())
                             .accentColor(.white)
                             .foregroundStyle(.white)
                             .tint(.white)

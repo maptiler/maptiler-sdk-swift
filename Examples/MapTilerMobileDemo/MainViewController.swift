@@ -248,9 +248,10 @@ extension MainViewController: MTMapViewDelegate {
     }
 
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
-        if event == .didLoad {
-//            loadingActivityIndicator.stopAnimating()
-//            addSources()
+        if event == .isReady {
+            Task {
+                await mapView.style?.setStyle(.streets, styleVariant: nil)
+            }
         }
     }
 

@@ -118,6 +118,24 @@ extension MTMapView: MTStylable {
         runCommand(RemoveMarkers(markers: markers), completion: completionHandler)
     }
 
+    /// Adds a text popup to the map.
+    /// - Parameters:
+    ///    - popup: Popup to be added to the map.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addTextPopup(_ popup: MTTextPopup, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(AddTextPopup(popup: popup), completion: completionHandler)
+    }
+
+    /// Removes a text popup from the map.
+    /// - Parameters:
+    ///    - popup: Popup to be removed from the map.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeTextPopup(_ popup: MTTextPopup, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(RemoveTextPopup(popup: popup), completion: completionHandler)
+    }
+
     /// Enables the globe projection visualization.
     /// - Parameters:
     ///    - completionHandler: A handler block to execute when function finishes.
@@ -277,6 +295,10 @@ extension MTMapView: MTStylable {
         runCommand(SetCoordinatesToMarker(marker: marker), completion: completionHandler)
     }
 
+    package func setCoordinatesTo(_ popup: MTTextPopup, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetCoordinatesToTextPopup(popup: popup), completion: completionHandler)
+    }
+
     package func setURL(url: URL, to source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetUrlToSource(url: url, source: source), completion: completionHandler)
     }
@@ -398,6 +420,28 @@ extension MTMapView {
     public func removeMarkers(_ markers: [MTMarker]) async {
         await withCheckedContinuation { continuation in
             removeMarkers(markers) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds a text popup to the map.
+    /// - Parameters:
+    ///    - popup: Popup to be added to the map.
+    public func addTextPopup(_ popup: MTTextPopup) async {
+        await withCheckedContinuation { continuation in
+            addTextPopup(popup) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Removes a text popup from the map.
+    /// - Parameters:
+    ///    - marker: Popup to be removed from the map.
+    public func removeTextPopup(_ popup: MTTextPopup) async {
+        await withCheckedContinuation { continuation in
+            removeTextPopup(popup) { _ in
                 continuation.resume()
             }
         }

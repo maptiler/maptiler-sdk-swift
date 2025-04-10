@@ -23,12 +23,25 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Custom icon to use for marker.
     public var icon: UIImage?
 
+    /// Optional attached popup.
+    public private(set) var popup: MTTextPopup?
+
     /// Initializes the marker with the specified position.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
     public init(coordinates: CLLocationCoordinate2D) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
+    }
+
+    /// Initializes the marker with the specified position and text popup.
+    /// - Parameters:
+    ///    - coordinates: Position of the marker.
+    ///    - popup: Popup to attach to the marker.
+    public init(coordinates: CLLocationCoordinate2D, popup: MTTextPopup?) {
+        self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        self.coordinates = coordinates
+        self.popup = popup
     }
 
     // Initializes the marker with the specified position, color/icon and behaviour.
@@ -53,6 +66,7 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Sets coordinates for the marker.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
+    ///    - completionHandler: A handler block to execute when function finishes.
     @MainActor
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setCoordinates(
@@ -96,7 +110,18 @@ extension MTMarker {
                 icon: self.icon,
                 draggable: self.draggable
             )
+
+            marker.popup = self.popup
+
             await mapView.addMarker(marker)
         }
+    }
+
+    /// Modifier. Sets the ``popup``.
+    @discardableResult
+    public func popup(_ value: MTTextPopup) -> Self {
+        self.popup = value
+
+        return self
     }
 }

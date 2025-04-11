@@ -126,13 +126,27 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return "BACKDROP"
         case .openStreetMap:
             return "OPENSTREETMAP"
-        case .custom (let url):
+        case .custom(let url):
             return url.absoluteString
         }
     }
 
     /// Returns all pre-made styles.
     public static func all() -> [MTMapReferenceStyle] {
-        return [.streets, .satellite, .hybrid, .outdoor, .winter, .dataviz, .basic, .bright, .topo, .voyager, .toner, .backdrop, .openStreetMap]
+        return [
+            .streets,
+            .satellite,
+            .hybrid,
+            .outdoor,
+            .winter,
+            .dataviz,
+            .basic,
+            .bright,
+            .topo,
+            .voyager,
+            .toner,
+            .backdrop,
+            .openStreetMap
+        ]
     }
 }

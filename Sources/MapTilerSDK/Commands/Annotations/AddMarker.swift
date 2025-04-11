@@ -13,6 +13,18 @@ package struct AddMarker: MTCommand {
 
         var iconInit = ""
         var iconData = ""
+        var popupAttachment = ""
+
+        if let popup = marker.popup {
+            popupAttachment = """
+                const \(popup.identifier) = new maptilersdk.Popup({ offset: \(popup.offset ?? 0) });
+
+                \(popup.identifier)
+                .setText('\(popup.text)')
+                """
+        }
+
+        var popupString = marker.popup != nil ? "\(marker.identifier).setPopup(\(marker.popup!.identifier))" : ""
 
         if let icon = marker.icon, let encodedImageString = icon.getEncodedString() {
             iconInit = """
@@ -24,6 +36,8 @@ package struct AddMarker: MTCommand {
         }
 
         return """
+            \(popupAttachment)
+
             \(iconInit)
 
             const \(marker.identifier) = new maptilersdk.Marker({
@@ -31,6 +45,8 @@ package struct AddMarker: MTCommand {
                 draggable: \(marker.draggable ?? false),
                 \(iconData)
             });
+
+            \(popupString)
 
             \(marker.identifier)
             .setLngLat([\(coordinates.lng), \(coordinates.lat)])

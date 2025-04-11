@@ -30,7 +30,10 @@ struct MapStyleView: View {
         VStack {
             MTMapViewContainer(map: map) {
                 MTMarker(coordinates: Constants.brnoCoordinates, color: .magenta, draggable: true)
+
+                let maptilerPopup = MTTextPopup(coordinates: Constants.unterageriCoordinates, text: "MapTiler")
                 MTMarker(coordinates: Constants.unterageriCoordinates, icon: UIImage(named: "maptiler-marker"))
+                    .popup(maptilerPopup)
             }
                 .referenceStyle(referenceStyle)
                 .styleVariant(styleVariant)

@@ -17,7 +17,9 @@ package struct InitializeMap: MTCommand {
         if referenceStyle.isCustom() {
             styleString = "'\(referenceStyleName)'"
         } else {
-            let style = (styleVariant != nil) ? "\(referenceStyleName).\(styleVariant!.rawValue.uppercased())" : referenceStyleName
+            let style = (
+                styleVariant != nil
+            ) ? "\(referenceStyleName).\(styleVariant!.rawValue.uppercased())" : referenceStyleName
 
             styleString = "\(MTBridge.sdkObject).\(MTBridge.styleObject).\(style)"
         }

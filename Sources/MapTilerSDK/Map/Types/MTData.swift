@@ -24,7 +24,7 @@ public struct MTData: Codable {
 
         if container.contains(.coordinate) {
             let coordinateData = try container.decode(LngLat.self, forKey: .coordinate)
-            coordinate = CLLocationCoordinate2D(latitude: coordinateData.lng, longitude: coordinateData.lat)
+            coordinate = CLLocationCoordinate2D(latitude: coordinateData.lat, longitude: coordinateData.lng)
         }
 
         if container.contains(.point) {

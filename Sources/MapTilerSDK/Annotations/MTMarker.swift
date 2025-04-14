@@ -26,6 +26,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Optional attached popup.
     public private(set) var popup: MTTextPopup?
 
+    /// Optional attached custom annotation.
+    weak public private(set) var annotationView: MTCustomAnnotationView?
+
     /// Initializes the marker with the specified position.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
@@ -78,6 +81,21 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
 
         mapView.setCoordinatesTo(self, completionHandler: completionHandler)
     }
+
+    /// Sets marker as map's delegate.
+    /// - Parameters:
+    ///    - mapView: Map view for which to subscribe to.
+    @MainActor
+    public func setDelegate(to mapView: MTMapView) {
+        mapView.addContentDelegate(self)
+    }
+
+    /// Attaches custom annotation view to the marker.
+    ///
+    /// - Note: Does not add the custom view to the map. Use customAnnotationView.addTo.
+    public func attachAnnotationView(_ view: MTCustomAnnotationView) {
+        self.annotationView = view
+    }
 }
 
 // Concurrency
@@ -101,7 +119,7 @@ extension MTMarker {
 extension MTMarker {
     /// Adds marker to map DSL style.
     ///
-    /// Prefer mapView.addMarker instead.
+    /// Prefer marker.AddTo instead.
     public func addToMap(_ mapView: MTMapView) {
         Task {
             let marker = MTMarker(
@@ -123,5 +141,16 @@ extension MTMarker {
         self.popup = value
 
         return self
+    }
+}
+
+extension MTMarker: MTMapViewContentDelegate {
+    package func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
+        if event == .isDragging {
+            if let data = data, let coordinates = data.coordinate {
+                self.coordinates = coordinates
+                annotationView?.setCoordinates(self.coordinates, in: mapView)
+            }
+        }
     }
 }

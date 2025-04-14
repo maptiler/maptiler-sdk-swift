@@ -7,12 +7,27 @@ import UIKit
 import WebKit
 import CoreLocation
 
+package class MTWeakContentDelegate {
+    var id: String
+    weak var delegate: (any MTMapViewContentDelegate)?
+
+    init(delegate: MTMapViewContentDelegate? = nil) {
+        self.id = UUID().uuidString
+        self.delegate = delegate
+    }
+}
+
 /// Delegate responsible for map event propagation
 @MainActor
 public protocol MTMapViewDelegate: AnyObject {
     func mapViewDidInitialize(_ mapView: MTMapView)
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?)
     func mapView(_ mapView: MTMapView, didUpdateLocation location: CLLocation)
+}
+
+@MainActor
+package protocol MTMapViewContentDelegate: AnyObject {
+    func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?)
 }
 
 extension MTMapViewDelegate {
@@ -46,6 +61,8 @@ open class MTMapView: UIView {
 
     /// Delegate object responsible for event propagation
     public weak var delegate: MTMapViewDelegate?
+
+    package var contentDelegates: [String: MTWeakContentDelegate] = [:]
 
     public private(set) var isInitialized: Bool = false
 
@@ -158,6 +175,11 @@ open class MTMapView: UIView {
         self.referenceStyleProxy = referenceStyle
         self.styleVariantProxy = styleVariant
     }
+
+    package func addContentDelegate(_ contentDelegate: MTMapViewContentDelegate) {
+        let delegate = MTWeakContentDelegate(delegate: contentDelegate)
+        contentDelegates[delegate.id] = delegate
+    }
 }
 
 extension MTMapView: EventProcessorDelegate {
@@ -165,6 +187,14 @@ extension MTMapView: EventProcessorDelegate {
         MTLogger.log("MTEvent triggered: \(event)", type: .event)
 
         delegate?.mapView(self, didTriggerEvent: event, with: data)
+
+        for contentDelegate in self.contentDelegates.values {
+            if let delegate = contentDelegate.delegate {
+                delegate.mapView(self, didTriggerEvent: event, with: data)
+            } else {
+                contentDelegates.removeValue(forKey: contentDelegate.id)
+            }
+        }
 
         if event == .didLoad {
             style = MTStyle(for: self, with: referenceStyleProxy, and: styleVariantProxy)
@@ -263,6 +293,44 @@ extension MTMapView {
                 } else {
                     MTLogger.log("\(command) returned invalid type.", type: .error)
                     completion?(.failure(MTError.unsupportedReturnType(description: "Expected bool, got unknown.")))
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
+    package func runCommandWithCoordinateReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<CLLocationCoordinate2D, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
+
+                if case .stringDoubleDict(let commandValue) = value {
+                    if let lat = commandValue["lat"], let lng = commandValue["lng"] {
+                        let coordinates = CLLocationCoordinate2D(latitude: lat, longitude: lng)
+                        completion?(.success(coordinates))
+                    } else {
+                        completion?(
+                            .failure(
+                                MTError.unsupportedReturnType(description: "Expected Coordinates, got invalid type.")
+                            )
+                        )
+                    }
+                } else {
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(
+                        .failure(
+                            MTError.unsupportedReturnType(description: "Expected Coordinates, got invalid type.")
+                        )
+                    )
                 }
             } catch {
                 MTLogger.log("\(error)", type: .error)

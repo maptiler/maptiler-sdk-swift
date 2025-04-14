@@ -268,6 +268,14 @@ extension MTMapView: MTNavigable {
     ) {
         runCommand(PanTo(coordinates: coordinates), completion: completionHandler)
     }
+
+    /// Returns the map's current center.
+    ///
+    /// The map's current geographical center.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getCenter(completionHandler: @escaping (Result<CLLocationCoordinate2D, MTError>) -> Void) {
+        runCommandWithCoordinateReturnValue(GetCenter(), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -527,6 +535,22 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             panTo(coordinates) { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns the map's current center.
+    ///
+    /// The map's current geographical center.
+    public func getCenter() async -> CLLocationCoordinate2D {
+        await withCheckedContinuation { continuation in
+            getCenter { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+                }
             }
         }
     }

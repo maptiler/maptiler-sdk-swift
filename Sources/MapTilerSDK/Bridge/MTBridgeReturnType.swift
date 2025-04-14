@@ -7,6 +7,7 @@ package enum MTBridgeReturnType: Sendable {
     case string(String)
     case double(Double)
     case bool(Bool)
+    case stringDoubleDict([String: Double])
     case unsupportedType
     case null
 
@@ -17,6 +18,8 @@ package enum MTBridgeReturnType: Sendable {
             self = .double(value)
         } else if let value = value as? Bool {
             self = .bool(value)
+        } else if let value = value as? [String: Double] {
+            self = .stringDoubleDict(value)
         } else if value == nil {
             self = .null
         } else {

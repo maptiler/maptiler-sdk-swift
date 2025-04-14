@@ -21,7 +21,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// The pixel distance from the popup's coordinates.
     public private(set) var offset: Double? = 0.0
 
-    // Initializes the popup with the specified position and text.
+    /// Initializes the popup with the specified position and text.
     /// - Parameters:
     ///    - coordinates: Position of the popup.
     ///    - text: Text content of the popup.

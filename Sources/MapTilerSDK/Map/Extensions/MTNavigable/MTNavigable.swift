@@ -29,4 +29,5 @@ public protocol MTNavigable {
     func setPitch(_ pitch: Double) async
     func setRoll(_ roll: Double) async
     func getPitch() async -> Double
+    func getCenter() async -> CLLocationCoordinate2D
 }

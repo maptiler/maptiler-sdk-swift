@@ -15,6 +15,23 @@ package struct AddMarker: MTCommand {
         var iconData = ""
         var popupAttachment = ""
 
+        let drag = """
+            function onDrag() {
+                var markerCoord = \(marker.identifier).getLngLat();
+                var data = {
+                    id: '\(marker.identifier)',
+                    lngLat: markerCoord
+                };
+
+                window.webkit.messageHandlers.mapHandler.postMessage({
+                    event: 'drag',
+                    data: data
+                });
+            };
+
+            \(marker.identifier).on('drag', onDrag);
+        """
+
         if let popup = marker.popup {
             popupAttachment = """
                 const \(popup.identifier) = new maptilersdk.Popup({ offset: \(popup.offset ?? 0) });
@@ -51,6 +68,8 @@ package struct AddMarker: MTCommand {
             \(marker.identifier)
             .setLngLat([\(coordinates.lng), \(coordinates.lat)])
             .addTo(\(MTBridge.mapObject));
+
+            \(drag)
             """
     }
 }

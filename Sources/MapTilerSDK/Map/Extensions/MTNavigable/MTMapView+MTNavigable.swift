@@ -276,6 +276,14 @@ extension MTMapView: MTNavigable {
     public func getCenter(completionHandler: @escaping (Result<CLLocationCoordinate2D, MTError>) -> Void) {
         runCommandWithCoordinateReturnValue(GetCenter(), completion: completionHandler)
     }
+
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    package func project(
+        coordinates: CLLocationCoordinate2D,
+        completionHandler: @escaping (Result<CLLocationCoordinate2D, MTError>) -> Void
+    ) {
+        runCommandWithCoordinateReturnValue(Project(coordinate: coordinates), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -550,6 +558,19 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure(let error):
                     continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+                }
+            }
+        }
+    }
+
+    package func project(coordinates: CLLocationCoordinate2D) async -> MTPoint {
+        await withCheckedContinuation { continuation in
+            project(coordinates: coordinates) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: MTPoint(x: result.latitude, y: result.longitude))
+                case .failure(let error):
+                    continuation.resume(returning: MTPoint(x: 0, y: 0))
                 }
             }
         }

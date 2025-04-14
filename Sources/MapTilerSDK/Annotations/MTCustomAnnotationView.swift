@@ -51,28 +51,11 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
     ) {
         self.coordinates = coordinates
 
-        let zoom = mapView.getZoom { result in
+        mapView.project(coordinates: coordinates) { result in
             switch result {
-            case .success(let zoom):
-                let center = mapView.getCenter { result in
-                    switch result {
-                    case .success(let center):
-                        let point = self.convertLatLonToPoint(
-                            lat: coordinates.latitude,
-                            lon: coordinates.longitude,
-                            mapCenterLat: center.latitude,
-                            mapCenterLon: center.longitude,
-                            zoomLevel: zoom,
-                            mapWidth: mapView.bounds.width,
-                            mapHeight: mapView.bounds.height
-                        )
-
-                        self.center = point
-                        completionHandler?(.success(()))
-                    case .failure(let error):
-                        completionHandler?(.failure(error))
-                    }
-                }
+            case .success(let point):
+                self.center = CGPoint(x: point.latitude, y: point.longitude)
+                completionHandler?(.success(()))
             case .failure(let error):
                 completionHandler?(.failure(error))
             }
@@ -133,6 +116,7 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
     }
 
     // swiftlint:disable all
+    @available(iOS, deprecated: 16.0, message: "Prefer project method.")
     private func convertLatLonToPoint(
         lat: Double,
         lon: Double,

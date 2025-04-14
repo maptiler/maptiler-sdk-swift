@@ -317,6 +317,9 @@ extension MTMapView {
                     if let lat = commandValue["lat"], let lng = commandValue["lng"] {
                         let coordinates = CLLocationCoordinate2D(latitude: lat, longitude: lng)
                         completion?(.success(coordinates))
+                    } else if let x = commandValue["x"], let y = commandValue["y"] {
+                        let coordinates = CLLocationCoordinate2D(latitude: x, longitude: y)
+                        completion?(.success(coordinates))
                     } else {
                         completion?(
                             .failure(

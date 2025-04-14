@@ -14,6 +14,9 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
     /// Position of the view on the map.
     public private(set) var coordinates: CLLocationCoordinate2D
 
+    /// Offset from the center.
+    public private(set) var offset: MTPoint = MTPoint(x: 0.0, y: 0.0)
+
     // Initializes the view with the specified position.
     /// - Parameters:
     ///    - coordinates: Position of the annotation.
@@ -27,15 +30,37 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
         super.init(frame: frame)
     }
 
+    // Initializes the view with the specified position and offset.
+    /// - Parameters:
+    ///    - coordinates: Position of the annotation.
+    public init(
+        frame: CGRect,
+        coordinates: CLLocationCoordinate2D,
+        offset: MTPoint
+    ) {
+        self.identifier = "annot\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        self.coordinates = coordinates
+        self.offset = offset
+
+        super.init(frame: frame)
+    }
+
     public override init(frame: CGRect) {
         self.identifier = "annot\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
-        self.coordinates = CLLocationCoordinate2D(latitude: 0, longitude: 0) // TO DO
+        self.coordinates = CLLocationCoordinate2D(latitude: 0, longitude: 0)
 
         super.init(frame: frame)
     }
 
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    /// Sets the offset of the annotation view in pixels.
+    /// - Parameters:
+    ///    - offset: Desired offset.
+    public func setOffset(_ offset: MTPoint) {
+        self.offset = offset
     }
 
     /// Sets coordinates for the view.
@@ -51,10 +76,10 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
     ) {
         self.coordinates = coordinates
 
-        mapView.project(coordinates: coordinates) { result in
+        mapView.project(coordinates: coordinates) { [weak self] result in
             switch result {
             case .success(let point):
-                self.center = CGPoint(x: point.latitude, y: point.longitude)
+                self?.center = CGPoint(x: point.latitude + (self?.offset.x ?? 0.0), y: point.longitude + (self?.offset.y ?? 0.0))
                 completionHandler?(.success(()))
             case .failure(let error):
                 completionHandler?(.failure(error))
@@ -73,7 +98,7 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
         mapView.project(coordinates: coordinates) { result in
             switch result {
             case .success(let point):
-                self.center = CGPoint(x: point.latitude, y: point.longitude)
+                self.center = CGPoint(x: point.latitude + self.offset.x, y: point.longitude + self.offset.y)
 
                 mapView.addSubview(self)
                 mapView.bringSubviewToFront(self)
@@ -101,7 +126,7 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
 
     // swiftlint:disable all
     @available(iOS, deprecated: 16.0, message: "Prefer project method.")
-    private func convertLatLonToPoint(
+    private func convertLatLonToCGPoint(
         lat: Double,
         lon: Double,
         mapCenterLat: Double,

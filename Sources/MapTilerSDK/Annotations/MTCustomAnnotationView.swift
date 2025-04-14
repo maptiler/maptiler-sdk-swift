@@ -70,31 +70,15 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
     public func addTo(_ mapView: MTMapView, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         mapView.addContentDelegate(self)
 
-        let zoom = mapView.getZoom { result in
+        mapView.project(coordinates: coordinates) { result in
             switch result {
-            case .success(let zoom):
-                let center = mapView.getCenter { result in
-                    switch result {
-                    case .success(let center):
-                        let point = self.convertLatLonToPoint(
-                            lat: self.coordinates.latitude,
-                            lon: self.coordinates.longitude,
-                            mapCenterLat: center.latitude,
-                            mapCenterLon: center.longitude,
-                            zoomLevel: zoom,
-                            mapWidth: mapView.bounds.width,
-                            mapHeight: mapView.bounds.height
-                        )
+            case .success(let point):
+                self.center = CGPoint(x: point.latitude, y: point.longitude)
 
-                        self.center = point
-                        mapView.addSubview(self)
-                        mapView.bringSubviewToFront(self)
+                mapView.addSubview(self)
+                mapView.bringSubviewToFront(self)
 
-                        completionHandler?(.success(()))
-                    case .failure(let error):
-                        completionHandler?(.failure(error))
-                    }
-                }
+                completionHandler?(.success(()))
             case .failure(let error):
                 completionHandler?(.failure(error))
             }

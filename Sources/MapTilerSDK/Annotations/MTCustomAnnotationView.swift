@@ -7,7 +7,7 @@ import UIKit
 import CoreLocation
 
 @MainActor
-public class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchecked Sendable {
+open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchecked Sendable {
     /// Unique id of the view.
     public private(set) var identifier: String
 
@@ -34,7 +34,7 @@ public class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unch
         super.init(frame: frame)
     }
 
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

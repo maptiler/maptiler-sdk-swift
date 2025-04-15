@@ -145,6 +145,13 @@ open class MTMapView: UIView {
         }
     }
 
+    /// Reloads the map view.
+    public func reload() {
+        if let webView = webViewExecutor.getWebView() {
+            webView.reload()
+        }
+    }
+
     package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {

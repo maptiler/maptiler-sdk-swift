@@ -18,4 +18,5 @@ public enum MTMapStyleVariant: String, @unchecked Sendable, CaseIterable, Identi
     case lite
     case lines
     case background
+    case vivid
 }

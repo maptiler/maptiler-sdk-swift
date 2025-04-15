@@ -79,7 +79,10 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
         mapView.project(coordinates: coordinates) { [weak self] result in
             switch result {
             case .success(let point):
-                self?.center = CGPoint(x: point.latitude + (self?.offset.x ?? 0.0), y: point.longitude + (self?.offset.y ?? 0.0))
+                self?.center = CGPoint(
+                    x: point.latitude + (self?.offset.x ?? 0.0),
+                    y: point.longitude + (self?.offset.y ?? 0.0)
+                )
                 completionHandler?(.success(()))
             case .failure(let error):
                 completionHandler?(.failure(error))

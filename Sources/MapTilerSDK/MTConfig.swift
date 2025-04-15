@@ -85,12 +85,14 @@ public actor MTConfig {
     }
 
     /// Sets the session logic.
+    ///
+    ///  Make sure to call before map init or use MTMapOptions to supply before map init.
     /// - Parameters:
     ///   - isEnabled:  Boolean indicating whether session logic is enabled.
     ///   - map:  Map view to apply to.
     /// - Note: Enabled by default
     /// - SeeAlso: ``https://docs.maptiler.com/guides/maps-apis/maps-platform/what-is-map-session-in-maptiler-cloud/``
-    public func setSessionLogic(_ isEnabled: Bool, for map: MTMapView) {
+    package func setSessionLogic(_ isEnabled: Bool, for map: MTMapView) {
         self.isSessionLogicEnabled = isEnabled
 
         Task {

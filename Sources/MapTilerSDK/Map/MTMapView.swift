@@ -163,12 +163,19 @@ open class MTMapView: UIView {
                 return
             }
 
+            if let options {
+                await MTConfig.shared.setSessionLogic(options.isSessionLogicEnabled, for: self)
+            }
+
+            let isSessionLogicEnabled = await MTConfig.shared.isSessionLogicEnabled
+
             do {
                 try await _ = bridge.execute(InitializeMap(
                     apiKey: apiKey,
                     options: options,
                     referenceStyle: referenceStyleProxy,
-                    styleVariant: styleVariantProxy)
+                    styleVariant: styleVariantProxy,
+                    shouldEnableSessionLogic: isSessionLogicEnabled)
                 )
 
                 MTLogger.log("\(MTLogger.infoMarker) - Map Initialized Successfully", type: .info)

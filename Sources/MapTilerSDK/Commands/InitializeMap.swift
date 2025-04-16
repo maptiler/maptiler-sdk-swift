@@ -8,6 +8,7 @@ package struct InitializeMap: MTCommand {
     var options: MTMapOptions?
     var referenceStyle: MTMapReferenceStyle
     var styleVariant: MTMapStyleVariant?
+    var shouldEnableSessionLogic: Bool
 
     package func toJS() -> JSString {
         let referenceStyleName = referenceStyle.getName()
@@ -36,6 +37,6 @@ package struct InitializeMap: MTCommand {
             )
         }
 
-        return "initializeMap('\(apiKey)', \(styleString), \(optionsString));"
+        return "initializeMap('\(apiKey)', \(styleString), \(optionsString), \(shouldEnableSessionLogic));"
     }
 }

@@ -199,7 +199,7 @@ extension MainViewController: MapZoomControlViewDelegate {
 }
 
 extension MainViewController: MapProjectionControlViewDelegate {
-    func mapZoomControlViewDidTapEnableGlobe(_ mapZoomControlView: MapProjectionControlView) {
+    func mapProjectionControlViewDidTapEnableGlobe(_ mapProjectionControlView: MapProjectionControlView) {
         Task {
             if globeEnabled {
                 await mapView.enableMercatorProjection()
@@ -211,7 +211,7 @@ extension MainViewController: MapProjectionControlViewDelegate {
         }
     }
     
-    func mapZoomControlViewDidTapEnableTerrain(_ mapZoomControlView: MapProjectionControlView) {
+    func mapProjectionControlViewDidTapEnableTerrain(_ mapProjectionControlView: MapProjectionControlView) {
         Task {
             if terrainEnabled {
                 await mapView.disableTerrain()

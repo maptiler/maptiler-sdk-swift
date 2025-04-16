@@ -6,8 +6,8 @@
 import UIKit
 
 protocol MapProjectionControlViewDelegate: AnyObject {
-    func mapZoomControlViewDidTapEnableGlobe(_ mapZoomControlView: MapProjectionControlView)
-    func mapZoomControlViewDidTapEnableTerrain(_ mapZoomControlView: MapProjectionControlView)
+    func mapProjectionControlViewDidTapEnableGlobe(_ mapProjectionControlView: MapProjectionControlView)
+    func mapProjectionControlViewDidTapEnableTerrain(_ mapProjectionControlView: MapProjectionControlView)
 }
 
 class MapProjectionControlView: BaseView {
@@ -24,10 +24,10 @@ class MapProjectionControlView: BaseView {
     }
 
     @IBAction func enableGlobeButtonTouchUpInside(_ sender: UIButton) {
-        delegate?.mapZoomControlViewDidTapEnableGlobe(self)
+        delegate?.mapProjectionControlViewDidTapEnableGlobe(self)
     }
 
     @IBAction func enableTerrainButtonTouchUpInside(_ sender: UIButton) {
-        delegate?.mapZoomControlViewDidTapEnableTerrain(self)
+        delegate?.mapProjectionControlViewDidTapEnableTerrain(self)
     }
 }

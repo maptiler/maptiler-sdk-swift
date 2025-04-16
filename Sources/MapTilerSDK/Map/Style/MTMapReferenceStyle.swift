@@ -15,9 +15,6 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
     /// High resolution satellite images.
     case satellite
 
-    /// High resolution satellite with labels, landmarks, roads and political borders.
-    case hybrid
-
     /// A solid hiking companion, with peaks, parks, isolines and more.
     case outdoor
 
@@ -35,9 +32,6 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
 
     /// Reference style for topographic study.
     case topo
-
-    /// Reference style for stylish yet minimalist maps.
-    case voyager
 
     /// Reference style for very high contrast stylish maps.
     case toner
@@ -60,8 +54,6 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return [.defaultVariant, .light, .dark, .pastel, .night]
         case .satellite:
             return [.defaultVariant]
-        case .hybrid:
-            return [.defaultVariant]
         case .outdoor:
             return [.defaultVariant, .light, .dark]
         case .winter:
@@ -74,8 +66,6 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return [.defaultVariant, .light, .dark, .pastel]
         case .topo:
             return [.defaultVariant, .shiny, .pastel, .topographique]
-        case .voyager:
-            return [.defaultVariant, .light, .dark, .vintage]
         case .toner:
             return [.defaultVariant, .background, .lite, .lines]
         case .backdrop:
@@ -104,8 +94,6 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return "STREETS"
         case .satellite:
             return "SATELLITE"
-        case .hybrid:
-            return "HYBRID"
         case .outdoor:
             return "OUTDOOR"
         case .winter:
@@ -118,8 +106,6 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return "BRIGHT"
         case .topo:
             return "TOPO"
-        case .voyager:
-            return "VOYAGER"
         case .toner:
             return "TONER"
         case .backdrop:
@@ -136,14 +122,12 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
         return [
             .streets,
             .satellite,
-            .hybrid,
             .outdoor,
             .winter,
             .dataviz,
             .basic,
             .bright,
             .topo,
-            .voyager,
             .toner,
             .backdrop,
             .openStreetMap

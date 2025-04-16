@@ -185,6 +185,13 @@ public struct MTMapOptions: @unchecked Sendable {
     /// Boolean indicating whether terrain control is added directly to the map.
     public private(set) var terrainControlIsVisible: Bool? = false
 
+    /// Boolean indicating whether session logic is enabled.
+    ///
+    /// This allows MapTiler to enable "session based billing".
+    ///  - Note: Defaults to true.
+    ///  - SeeAlso: ``https://docs.maptiler.com/guides/maps-apis/maps-platform/what-is-map-session-in-maptiler-cloud/``
+    public private(set) var isSessionLogicEnabled: Bool = true
+
     public init(center: CLLocationCoordinate2D? = nil, zoom: Double? = nil) {
         self.center = center
         self.zoom = zoom
@@ -232,7 +239,8 @@ public struct MTMapOptions: @unchecked Sendable {
         navigationControlIsVisible: Bool? = false,
         projectionControlIsVisible: Bool? = false,
         scaleControlIsVisible: Bool? = false,
-        terrainControlIsVisible: Bool? = false
+        terrainControlIsVisible: Bool? = false,
+        isSessionLogicEnabled: Bool = true
     ) {
         self.language = language
         self.center = center
@@ -276,6 +284,7 @@ public struct MTMapOptions: @unchecked Sendable {
         self.projectionControlIsVisible = projectionControlIsVisible
         self.scaleControlIsVisible = scaleControlIsVisible
         self.terrainControlIsVisible = terrainControlIsVisible
+        self.isSessionLogicEnabled = isSessionLogicEnabled
     }
 }
 

@@ -41,6 +41,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``maxZoom``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func maxZoom(_ value: Double) -> Self {
         self.maxZoom = value
@@ -49,6 +50,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``minZoom``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func minZoom(_ value: Double) -> Self {
         self.maxZoom = value
@@ -57,6 +59,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``sourceLayer``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func sourceLayer(_ value: String) -> Self {
         self.sourceLayer = value
@@ -65,6 +68,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``blur``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func blur(_ value: Double) -> Self {
         self.blur = value
@@ -73,6 +77,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``cap``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func cap(_ value: MTLineCap) -> Self {
         self.cap = value
@@ -81,6 +86,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``color``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func color(_ value: UIColor) -> Self {
         self.color = value
@@ -89,6 +95,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``dashArray``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func dashArray(_ value: [Double]) -> Self {
         self.dashArray = value
@@ -97,6 +104,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``gapWidth``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func gapWidth(_ value: Double) -> Self {
         self.gapWidth = value
@@ -105,6 +113,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``gradient``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func gradient(_ value: UIColor) -> Self {
         self.gradient = value
@@ -113,6 +122,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``join``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func join(_ value: MTLineJoin) -> Self {
         self.join = value
@@ -121,6 +131,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``miterLimit``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func miterLimit(_ value: Double) -> Self {
         self.miterLimit = value
@@ -129,6 +140,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``offset``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func offset(_ value: Double) -> Self {
         self.offset = value
@@ -137,6 +149,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``opacity``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func opacity(_ value: Double) -> Self {
         self.opacity = value
@@ -145,6 +158,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``roundLimit``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func roundLimit(_ value: Double) -> Self {
         self.roundLimit = value
@@ -153,6 +167,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``sortKey``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func sortKey(_ value: Double) -> Self {
         self.sortKey = value
@@ -161,6 +176,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``translate``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func translate(_ value: [Double]) -> Self {
         self.translate = value
@@ -169,6 +185,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``translateAnchor``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func translateAnchor(_ value: MTLineTranslateAnchor) -> Self {
         self.translateAnchor = value
@@ -177,6 +194,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``width``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func width(_ value: Double) -> Self {
         self.width = value
@@ -185,6 +203,7 @@ extension MTLineLayer {
     }
 
     /// Modifier. Sets the ``visibility``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func visibility(_ value: MTLayerVisibility) -> Self {
         self.visibility = value

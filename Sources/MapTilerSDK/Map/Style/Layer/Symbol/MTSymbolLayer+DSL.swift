@@ -27,6 +27,7 @@ extension MTSymbolLayer {
     }
 
     /// Modifier. Sets the ``maxZoom``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func maxZoom(_ value: Double) -> Self {
         self.maxZoom = value
@@ -35,6 +36,7 @@ extension MTSymbolLayer {
     }
 
     /// Modifier. Sets the ``minZoom``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func minZoom(_ value: Double) -> Self {
         self.maxZoom = value
@@ -43,6 +45,7 @@ extension MTSymbolLayer {
     }
 
     /// Modifier. Sets the ``sourceLayer``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func sourceLayer(_ value: String) -> Self {
         self.sourceLayer = value
@@ -51,6 +54,7 @@ extension MTSymbolLayer {
     }
 
     /// Modifier. Sets the ``icon``.
+    /// - Note: Not to be used outside of DSL.
     public func icon(_ value: UIImage) -> Self {
         self.icon = value
 
@@ -58,6 +62,7 @@ extension MTSymbolLayer {
     }
 
     /// Modifier. Sets the ``visibility``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func visibility(_ value: MTLayerVisibility) -> Self {
         self.visibility = value

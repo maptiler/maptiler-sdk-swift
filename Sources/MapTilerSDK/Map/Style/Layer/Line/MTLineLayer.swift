@@ -51,7 +51,7 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
 
     /// The gradient with which to color a line feature.
     ///
-    /// Can only be used with GeoJSON sources that specify "ineMetrics": true.
+    /// Can only be used with GeoJSON sources that specify "lineMetrics": true.
     public var gradient: UIColor?
 
     /// The display of lines when joining.

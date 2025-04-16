@@ -137,6 +137,7 @@ extension MTMarker {
     }
 
     /// Modifier. Sets the ``popup``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func popup(_ value: MTTextPopup) -> Self {
         self.popup = value

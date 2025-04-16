@@ -9,7 +9,7 @@ import UIKit
 extension MTLineLayer {
     /// Adds layer to map DSL style.
     ///
-    /// Prefer mapView.style.addLayer instead.
+    /// Prefer ``MTStyle/addLayer(_:)`` on MTMapView instead.
     public func addToMap(_ mapView: MTMapView) {
         Task {
             let layer = MTLineLayer(

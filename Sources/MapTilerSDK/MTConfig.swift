@@ -5,7 +5,7 @@
 
 /// Object representing the SDK global settings.
 ///
-/// Exposes properties and options such as API Key and Language preferences.
+/// Exposes properties and options such as API Key and caching preferences.
 public actor MTConfig {
     public static let shared = MTConfig()
     private init() {}

@@ -7,14 +7,28 @@ import CoreLocation
 
 /// Object sent together with MTEvent.
 public struct MTData: Codable {
+    /// Unique id.
     public var id: String?
+
+    /// Coordinate of the event tap.
     public var coordinate: CLLocationCoordinate2D?
+
+    /// Point of the event tap.
     public var point: MTPoint?
+
+    /// Type of the event.
     public var dataType: String?
+
+    /// Boolean indicating if source is fully  loaded.
     public var isSourceLoaded: Bool?
+
+    /// Source data.
     public var source: MTSourceData?
+
+    /// Type of the source data.
     public var sourceDataType: String?
 
+    /// Initialiaes the data from decoder.
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 

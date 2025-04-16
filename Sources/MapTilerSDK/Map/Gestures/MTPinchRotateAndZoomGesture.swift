@@ -6,6 +6,7 @@
 /// Handles zoom and rotate by pinching with two fingers.
 @MainActor
 public struct MTPinchRotateAndZoomGesture: MTGesture {
+    /// Type of the gesture.
     public var type: MTGestureType = .pinchRotateAndZoom
 
     private var bridge: MTBridge!
@@ -16,6 +17,7 @@ public struct MTPinchRotateAndZoomGesture: MTGesture {
         self.bridge = bridge
     }
 
+    /// Disables the gesture on the map.
     public func disable() async {
         do {
             try await _ = bridge.execute(PinchRotateAndZoomDisable())
@@ -24,6 +26,7 @@ public struct MTPinchRotateAndZoomGesture: MTGesture {
         }
     }
 
+    /// Enables the gesture on the map.
     public func enable() async {
         do {
             try await _ = bridge.execute(PinchRotateAndZoomEnable())

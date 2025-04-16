@@ -3,8 +3,12 @@
 //  MapTilerSDK
 //
 
+/// Language of the map labels.
 public enum MTLanguage: @unchecked Sendable, Codable {
+    /// Custom language options.
     case special(MTSpecialLanguage)
+
+    /// Country specific language.
     case country(MTCountryLanguage)
 
     public func encode(to encoder: Encoder) throws {
@@ -19,6 +23,7 @@ public enum MTLanguage: @unchecked Sendable, Codable {
     }
 }
 
+/// Custom language options.
 public enum MTSpecialLanguage: String, Codable {
     /// The default language of the device.
     case auto

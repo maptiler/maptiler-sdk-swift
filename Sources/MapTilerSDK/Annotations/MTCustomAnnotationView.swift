@@ -6,8 +6,9 @@
 import UIKit
 import CoreLocation
 
+/// Subclassable view for adding custom annotations to the map.
 @MainActor
-open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchecked Sendable {
+open class MTCustomAnnotationView: UIView, @preconcurrency MTMapViewContent, @preconcurrency MTAnnotation, @unchecked Sendable {
     /// Unique id of the view.
     public private(set) var identifier: String
 
@@ -19,6 +20,7 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
 
     // Initializes the view with the specified position.
     /// - Parameters:
+    ///    - frame: Frame of the annotation view.
     ///    - coordinates: Position of the annotation.
     public init(
         frame: CGRect,
@@ -32,7 +34,9 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
 
     // Initializes the view with the specified position and offset.
     /// - Parameters:
+    ///    - frame: Frame of the annotation view.
     ///    - coordinates: Position of the annotation.
+    ///    - offset: Offset from the center.
     public init(
         frame: CGRect,
         coordinates: CLLocationCoordinate2D,
@@ -45,6 +49,9 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
         super.init(frame: frame)
     }
 
+    /// Initializes the view with the frame and centered coordinates.
+    /// - Parameters:
+    ///    - frame: Frame of the annotation view.
     public override init(frame: CGRect) {
         self.identifier = "annot\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = CLLocationCoordinate2D(latitude: 0, longitude: 0)
@@ -52,6 +59,7 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
         super.init(frame: frame)
     }
 
+    /// Not implemented code init.
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -67,6 +75,7 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
     /// - Parameters:
     ///    - coordinates: Position of the view
     ///    - completionHandler: A handler block to execute when function finishes.
+    ///    - mapView: Map view to apply to.
     @MainActor
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setCoordinates(
@@ -93,6 +102,7 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchec
     /// Adds custom annotation view to the map.
     /// - Parameters:
     ///    - mapView: Map view to add annotation to.
+    ///    - completionHandler: A handler block to execute when function finishes.
     @MainActor
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addTo(_ mapView: MTMapView, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
@@ -193,7 +203,8 @@ extension MTCustomAnnotationView {
 extension MTCustomAnnotationView {
     /// Adds annotation view to map DSL style.
     ///
-    /// Prefer annotation.addTo instead.
+    /// Prefer ``addTo(_:)`` instead.
+    @MainActor
     public func addToMap(_ mapView: MTMapView) {
         Task {
             let annotation = MTCustomAnnotationView(frame: self.frame, coordinates: self.coordinates)

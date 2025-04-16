@@ -7,10 +7,21 @@
 ///
 /// Sources state which data the map should display.
 public enum MTSourceType: String, Codable {
+    /// Vector tile source.
     case vector
+
+    /// Raster tile source.
     case raster
+
+    /// Raster DEM source.
     case rasterDEM = "raster-dem"
+
+    /// GeoJSON source.
     case geojson
+
+    /// Image source.
     case image
+
+    /// Video source.
     case video
 }

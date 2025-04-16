@@ -5,12 +5,15 @@
 
 import Foundation
 
-// A vector tile source.
+/// A geojson source.
 public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
+    /// Unique id of the source.
     public var identifier: String
 
+    /// URL pointing to the geojson resource.
     public var url: URL?
 
+    /// Type of the source.
     public private(set) var type: MTSourceType = .geojson
 
     /// Attribution to be displayed when the map is shown to a user.
@@ -61,6 +64,7 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
         self.url = url
     }
 
+    /// Initializes the source with all the options.
     public init(
         identifier: String,
         url: URL? = nil,
@@ -85,6 +89,7 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
         self.lineMetrics = lineMetrics
     }
 
+    /// Initializes the source from the decoder.
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -138,6 +143,7 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
     ///    - mapView: MTMapView which holds the source.
     ///    - completionHandler: A handler block to execute when function finishes.
     @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setData(data: URL, in mapView: MTMapView, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         mapView.setData(data: data, to: self, completionHandler: completionHandler)
     }
@@ -165,7 +171,7 @@ extension MTGeoJSONSource {
 extension MTGeoJSONSource {
     /// Adds source to map DSL style.
     ///
-    /// Prefer mapView.style.addSource instead.
+    /// Prefer ``MTStyle/addSource(_:)`` on MTMapView instead.
     public func addToMap(_ mapView: MTMapView) {
         Task {
             let source = MTGeoJSONSource(

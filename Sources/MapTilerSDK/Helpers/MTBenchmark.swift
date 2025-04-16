@@ -11,6 +11,8 @@ import UIKit
 // Overview of performance.
 // Detailed benchmarking is performed by Benchmarking package.
 // swiftlint:disable all
+
+/// Basic benchmarking class.
 public final class MTBenchmark: MTMapViewDelegate {
     let zoom = 6.0
     let centerCoordinate = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)

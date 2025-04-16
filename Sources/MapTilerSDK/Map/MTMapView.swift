@@ -20,8 +20,13 @@ package class MTWeakContentDelegate {
 /// Delegate responsible for map event propagation
 @MainActor
 public protocol MTMapViewDelegate: AnyObject {
+    /// Triggers when map is fully initialized.
     func mapViewDidInitialize(_ mapView: MTMapView)
+
+    /// Triggers when event ocurrs.
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?)
+
+    /// Triggers when location is updated.
     func mapView(_ mapView: MTMapView, didUpdateLocation location: CLLocation)
 }
 
@@ -64,8 +69,10 @@ open class MTMapView: UIView {
 
     package var contentDelegates: [String: MTWeakContentDelegate] = [:]
 
+    /// Boolean indicating whether map is initialized,
     public private(set) var isInitialized: Bool = false
 
+    /// Triggers when map initializes for the first time.
     public var didInitialize: (() -> Void)?
 
     package var bridge: MTBridge!
@@ -74,18 +81,21 @@ open class MTMapView: UIView {
 
     private var webViewExecutor: WebViewExecutor!
 
+    /// Initializes the map with the frame.
     override public init(frame: CGRect) {
         super.init(frame: frame)
 
         commonInit()
     }
 
+    /// Initializes the map with the coder..
     required public init?(coder: NSCoder) {
         super.init(coder: coder)
 
         commonInit()
     }
 
+    /// Initializes the map with the frame, options and style.
     convenience public init(
         frame: CGRect,
         options: MTMapOptions,
@@ -102,6 +112,7 @@ open class MTMapView: UIView {
         commonInit()
     }
 
+    /// Initializes the map with the options.
     convenience public init(options: MTMapOptions?) {
         self.init()
 

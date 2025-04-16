@@ -72,7 +72,7 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
     /// Enum controlling whether this layer is displayed.
     public var visibility: MTLayerVisibility? = .visible
 
-    /// Initializes the source with unique identifier, source identifier, max and min zoom levels and source layer,
+    /// Initializes the layer with unique identifier, source identifier, max and min zoom levels and source layer,
     /// which is required for vector tile sources.
     public init(
         identifier: String,
@@ -89,7 +89,7 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         self.sourceLayer = sourceLayer
     }
 
-    /// Initializes the source with the unique identifier and a source identifier.
+    /// Initializes the layer with the unique identifier and a source identifier.
     public init(
         identifier: String,
         sourceIdentifier: String
@@ -99,6 +99,7 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         self.sourceIdentifier = sourceIdentifier
     }
 
+    /// Initializes the layer with all options.
     public init(
         identifier: String,
         sourceIdentifier: String,
@@ -129,6 +130,7 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         self.visibility = visibility
     }
 
+    /// Initializes the layer from the decoder.
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 

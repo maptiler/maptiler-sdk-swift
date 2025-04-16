@@ -7,13 +7,17 @@ import CoreLocation
 
 /// Enum representing MTLocationManager errors.
 public enum MTLocationError: Error {
+    /// Location permission denied.
     case permissionDenied
 }
 
-@MainActor
 /// Protocol requirements for location manager.
+@MainActor
 public protocol MTLocationManagerDelegate: AnyObject {
+    /// Trigger when location updates.
     func didUpdateLocation(_ location: CLLocation)
+
+    /// Triggers when location updates fail.
     func didFailWithError(_ error: Error)
 }
 
@@ -26,6 +30,7 @@ public class MTLocationManager: NSObject, @preconcurrency CLLocationManagerDeleg
 
     package weak var delegate: MTLocationManagerDelegate?
 
+    /// Initializes the location manager.
     public init(using manager: CLLocationManager? = nil, accuracy: CLLocationAccuracy? = nil) {
         super.init()
 

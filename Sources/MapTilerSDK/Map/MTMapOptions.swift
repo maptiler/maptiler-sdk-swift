@@ -192,11 +192,36 @@ public struct MTMapOptions: @unchecked Sendable {
     ///  - SeeAlso: ``https://docs.maptiler.com/guides/maps-apis/maps-platform/what-is-map-session-in-maptiler-cloud/``
     public private(set) var isSessionLogicEnabled: Bool = true
 
-    public init(center: CLLocationCoordinate2D? = nil, zoom: Double? = nil) {
+    /// Initializes the map options with center and zoom.
+    public init(center: CLLocationCoordinate2D?, zoom: Double?) {
         self.center = center
         self.zoom = zoom
     }
 
+    /// Initializes the map options with center, zoom and terrain.
+    public init(center: CLLocationCoordinate2D?, zoom: Double?, terrainIsEnabled: Bool?, terrainExaggeration: Double?) {
+        self.center = center
+        self.zoom = zoom
+        self.terrainIsEnabled = terrainIsEnabled
+        self.terrainExaggeration = terrainExaggeration
+    }
+
+    /// Initializes the map options with center, zoom and projection.
+    public init(center: CLLocationCoordinate2D?, zoom: Double?, projection: MTProjectionType?) {
+        self.center = center
+        self.zoom = zoom
+        self.projection = projection
+    }
+
+    /// Initializes the map options with center, zoom, bearing, and pitch.
+    public init(center: CLLocationCoordinate2D?, zoom: Double?, bearing: Double?, pitch: Double?) {
+        self.center = center
+        self.zoom = zoom
+        self.bearing = bearing
+        self.pitch = pitch
+    }
+
+    /// Initializes the map options.
     public init(
         language: MTLanguage? = nil,
         center: CLLocationCoordinate2D? = nil,

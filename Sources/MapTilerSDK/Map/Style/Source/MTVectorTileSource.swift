@@ -41,6 +41,7 @@ public class MTVectorTileSource: MTTileSource, @unchecked Sendable {
     /// Attribution to be displayed when the map is shown to a user.
     public var attribution: String?
 
+    /// Type of the layer.
     public private(set) var type: MTSourceType = .vector
 
     /// Initializes the source with unique id and url to TileJSON resource.
@@ -55,6 +56,7 @@ public class MTVectorTileSource: MTTileSource, @unchecked Sendable {
         self.tiles = tiles
     }
 
+    /// Initializes the source with all options.
     public init(
         identifier: String,
         bounds: [Double],
@@ -84,6 +86,7 @@ public class MTVectorTileSource: MTTileSource, @unchecked Sendable {
     ///    - mapView: MTMapView which holds the source.
     ///    - completionHandler: A handler block to execute when function finishes.
     @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setURL(url: URL, in mapView: MTMapView, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         mapView.setURL(url: url, to: self, completionHandler: completionHandler)
     }
@@ -92,7 +95,7 @@ public class MTVectorTileSource: MTTileSource, @unchecked Sendable {
     ///
     /// Used for updating the source data.
     /// - Parameters:
-    ///    - data: list of urls with tile resources.
+    ///    - tiles: list of urls with tile resources.
     ///    - mapView: MTMapView which holds the source.
     ///    - completionHandler: A handler block to execute when function finishes.
     @MainActor
@@ -126,7 +129,7 @@ extension MTVectorTileSource {
     ///
     /// Used for updating the source data.
     /// - Parameters:
-    ///    - data: list of urls with tile resources.
+    ///    - tiles: list of urls with tile resources.
     ///    - mapView: MTMapView which holds the source.
     @MainActor
     public func setTiles(tiles: [URL], in mapView: MTMapView) async {
@@ -142,7 +145,7 @@ extension MTVectorTileSource {
 extension MTVectorTileSource {
     /// Adds source to map DSL style.
     ///
-    /// Prefer mapView.style.addSource instead.
+    /// Prefer ``MTStyle/addSource(_:)`` on MTMapView instead.
     public func addToMap(_ mapView: MTMapView) {
         Task {
             let source = MTVectorTileSource(

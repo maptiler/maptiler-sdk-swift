@@ -5,8 +5,13 @@
 
 /// The style spec representation of the source if the event has a dataType of source .
 public struct MTSourceData: Codable {
+    /// Type of the source.
     var type: String?
+
+    /// Url of the source resource.
     var url: String?
+
+    /// Attribution string.
     var attribution: String?
 
     public init(from decoder: any Decoder) throws {

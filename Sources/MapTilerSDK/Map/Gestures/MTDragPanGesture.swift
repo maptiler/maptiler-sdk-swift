@@ -6,6 +6,7 @@
 /// Handles panning the map by dragging.
 @MainActor
 public struct MTDragPanGesture: MTGesture {
+    /// Type of the gesture.
     public var type: MTGestureType = .dragPan
 
     private var bridge: MTBridge!
@@ -16,6 +17,7 @@ public struct MTDragPanGesture: MTGesture {
         self.bridge = bridge
     }
 
+    /// Disables the gesture on the map.
     public func disable() async {
         do {
             try await _ = bridge.execute(DragPanDisable())
@@ -24,6 +26,7 @@ public struct MTDragPanGesture: MTGesture {
         }
     }
 
+    /// Enables the gesture on the map.
     public func enable() async {
         do {
             try await _ = bridge.execute(DragPanEnable(options: nil))
@@ -32,6 +35,9 @@ public struct MTDragPanGesture: MTGesture {
         }
     }
 
+    /// Enables the gesture on the map with options.
+    ///  - Parameters:
+    ///     - options: Drag and pan options.
     public func enable(with options: MTDragPanOptions) async {
         do {
             try await _ = bridge.execute(DragPanEnable(options: options))

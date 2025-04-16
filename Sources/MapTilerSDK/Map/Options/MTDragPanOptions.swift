@@ -3,6 +3,7 @@
 //  MapTilerSDK
 //
 
+/// Options for drag and pan gesstures.
 public struct MTDragPanOptions: @unchecked Sendable, Codable {
     /// Factor used to scale the drag velocity.
     /// - Note: Default: 0
@@ -16,6 +17,7 @@ public struct MTDragPanOptions: @unchecked Sendable, Codable {
     /// - Note: Default: 2500
     public var deceleration: Double?
 
+    /// Initializes the options with linearity, maxSpeed and deceleration.
     public init(linearity: Double? = nil, maxSpeed: Double? = nil, deceleration: Double? = nil) {
         self.linearity = linearity
         self.maxSpeed = maxSpeed

@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 /// Declarative Map view for use in SwiftUI
 public struct MTMapViewContainer: View {
@@ -127,11 +128,17 @@ extension MTMapViewContainer {
         coordinator?.didInitialize = closure
         return self
     }
+
+    public func didUpdateLocation(_ closure: @escaping (_ location: CLLocation) -> Void) -> Self {
+        coordinator?.didUpdateLocation = closure
+        return self
+    }
 }
 
 package class MTCoordinator: MTMapViewDelegate {
     var didTriggerEvent: ((MTEvent, MTData?) -> Void)?
     var didInitialize: (() -> Void)?
+    var didUpdateLocation: ((CLLocation) -> Void)?
 
     public func mapViewDidInitialize(_ mapView: MTMapView) {
         DispatchQueue.main.async { [weak self] in
@@ -142,6 +149,12 @@ package class MTCoordinator: MTMapViewDelegate {
     public func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
         DispatchQueue.main.async { [weak self] in
             self?.didTriggerEvent?(event, data)
+        }
+    }
+
+    public func mapView(_ mapView: MTMapView, didUpdateLocation location: CLLocation) {
+        DispatchQueue.main.async { [weak self] in
+            self?.didUpdateLocation?(location)
         }
     }
 }

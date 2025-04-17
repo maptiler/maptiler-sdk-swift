@@ -8,7 +8,7 @@ import CoreLocation
 
 /// Subclassable view for adding custom annotations to the map.
 @MainActor
-open class MTCustomAnnotationView: UIView, @preconcurrency MTMapViewContent, @preconcurrency MTAnnotation, @unchecked Sendable {
+open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchecked Sendable {
     /// Unique id of the view.
     public private(set) var identifier: String
 
@@ -200,7 +200,7 @@ extension MTCustomAnnotationView {
 }
 
 // DSL
-extension MTCustomAnnotationView {
+extension MTCustomAnnotationView: @preconcurrency MTMapViewContent {
     /// Adds annotation view to map DSL style.
     ///
     /// Prefer ``addTo(_:)`` instead.

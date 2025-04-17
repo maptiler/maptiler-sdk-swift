@@ -38,7 +38,6 @@ public protocol MTNavigable {
         animationOptions: MTAnimationOptions?
     ) async
 
-
     /// Changes any combination of center, zoom, bearing, and pitch, without an animated transition
     /// - Parameters:
     ///    - center: Geographical center of the map.

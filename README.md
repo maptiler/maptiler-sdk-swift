@@ -1,5 +1,12 @@
 
 # MapTiler SDK Swift
+<p align="center">
+<img src="Examples/maptiler-logo.png" alt="MapTiler" title="MapTiler"/>
+</p>
+<p align="center">
+<img src="https://img.shields.io/badge/Swift-5.9_5.10_6.0-Orange?style=flat-square" alt="SPM" title="SPM"/>
+<img src="https://img.shields.io/badge/SPM-supported-DE5C43.svg" alt="SPM" title="SPM"/>
+</p>
 
 The MapTiler SDK Swift is a native SDK written in Swift, designed to work with the well-established MapTiler Cloud service, which provides all the data required to fuel a complete mobile mapping experience: vector tiles, geojson, map interaction, custom styles and more.
 
@@ -9,11 +16,17 @@ The MapTiler SDK Swift is a native SDK written in Swift, designed to work with t
 - [x] VectorTile and GeoJSON sources
 - [x] Fill, Line and Symbol layers
 - [x] Custom Annotation Views
-- [x] UIKit and SwiftUI support
 - [x] Location tracking
 - [x] Globe and 3D Terrain
+- [x] UIKit and SwiftUI support
 
 ## Basic Usage
+
+Make sure to set your MapTiler Cloud API key first. (i.e. in AppDelegate):
+
+```
+MTConfig.shared.setAPIKey(YOUR_API_KEY)
+```
 
 ### UIKit
 
@@ -51,3 +64,8 @@ MapTiler Swift SDK is a Swift Package and be added as dependecy through **Swift 
 
 - File -> Add Package Dependencies
 - Add https://github.com/maptiler/maptiler-sdk-swift.git
+
+<p align="center">
+<img src="Examples/streets.png" alt="MapTiler" title="MapTiler"/>
+<img src="Examples/satellite.png" alt="MapTiler" title="MapTiler"/>
+</p>

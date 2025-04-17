@@ -5,15 +5,21 @@
 
 import UIKit
 
-// Sets whether extruded geometries are lit relative to the map or viewport.
+/// Sets whether extruded geometries are lit relative to the map or viewport.
 public enum MTLightAnchor: String, Codable {
+    /// The position of the light source is aligned to the rotation of the map.
     case map
+
+    /// The position of the light source is aligned to the rotation of the viewport.
     case viewport
 }
 
 /// A style’s light property provides a global light source for that style.
 public struct MTLight: @unchecked Sendable, Codable {
+    /// Optional anchor enum.
     var anchor: MTLightAnchor?
+
+    /// Optional color. Defaults to white.
     var color: MTColor?
 
     /// Intensity of lighting (on a scale from 0 to 1).

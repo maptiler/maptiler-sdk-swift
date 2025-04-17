@@ -7,6 +7,7 @@ import Foundation
 
 /// Defines purpose and guidelines on what information is displayed.
 public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
+    /// Unique id of the style.
     public var id: String { getName() }
 
     /// The classic default style, perfect for urban areas.

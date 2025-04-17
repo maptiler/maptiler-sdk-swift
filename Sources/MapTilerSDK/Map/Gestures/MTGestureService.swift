@@ -6,6 +6,7 @@
 /// Service responsible for gesture handling and state.
 @MainActor
 public class MTGestureService {
+    /// List of the enabled gestures on the map.
     public private(set) var enabledGestures: [MTGestureType: MTGesture] = [:]
 
     private var bridge: MTBridge!

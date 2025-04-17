@@ -69,6 +69,7 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         self.sourceIdentifier = sourceIdentifier
     }
 
+    // Initializes the layer with all the options.
     public init(
         identifier: String,
         sourceIdentifier: String,
@@ -87,6 +88,7 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         self.visibility = visibility
     }
 
+    // Initializes the layer with the decoder.
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 

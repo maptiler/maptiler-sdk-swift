@@ -20,6 +20,7 @@ public struct MTAnimationOptions: @unchecked Sendable, Codable {
     /// Rate of the change of the animation.
     public var easing: MTEasing?
 
+    /// Initializes the options.
     public init(
         duration: Double? = nil,
         offset: MTPoint? = nil,

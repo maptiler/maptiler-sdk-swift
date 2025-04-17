@@ -6,6 +6,7 @@
 /// Handles zooming in the map with double tap.
 @MainActor
 public struct MTDoubleTapZoomInGesture: MTGesture {
+    /// Type of the gesture.
     public var type: MTGestureType = .doubleTapZoomIn
 
     private var bridge: MTBridge!
@@ -16,6 +17,7 @@ public struct MTDoubleTapZoomInGesture: MTGesture {
         self.bridge = bridge
     }
 
+    /// Disables the gesture on the map.
     public func disable() async {
         do {
             try await _ = bridge.execute(DoubleTapZoomDisable())
@@ -24,6 +26,7 @@ public struct MTDoubleTapZoomInGesture: MTGesture {
         }
     }
 
+    // Enables the gesture on the map.
     public func enable() async {
         do {
             try await _ = bridge.execute(DoubleTapZoomEnable())

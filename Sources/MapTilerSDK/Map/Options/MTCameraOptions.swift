@@ -6,11 +6,19 @@ import CoreLocation
 
 /// Options for controlling the desired location, zoom, bearing, and pitch of the camera.
 public struct MTCameraOptions: @unchecked Sendable {
+    /// Geographical center of the map.
     public var center: CLLocationCoordinate2D?
+
+    /// Zoom level of the map.
     public var zoom: Double?
+
+    /// The bearing of the map, measured in degrees counter-clockwise from north.
     public var bearing: Double?
+
+    /// The pitch (tilt) of the map, measured in degrees away from the plane of the screen (0-85).
     public var pitch: Double?
 
+    /// Initializes options.
     public init(
         center: CLLocationCoordinate2D? = nil,
         zoom: Double? = nil,

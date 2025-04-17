@@ -33,6 +33,7 @@ public enum MTError: Error {
     /// Method execution failed due to missing parent entity.
     case missingParent
 
+    /// Numerical code of the exception.
     public var code: Int {
         switch self {
         case .exception(body: let body):
@@ -50,6 +51,7 @@ public enum MTError: Error {
         }
     }
 
+    /// Explanation of the exception.
     public var reason: String {
         switch self {
         case .exception(body: let body):
@@ -70,6 +72,8 @@ public enum MTError: Error {
 
 /// Represents body of the MTError exception.
 public struct MTException: Sendable {
+    /// Exception code.
     public var code: Int
+    /// Explanation of the exception.
     public var reason: String
 }

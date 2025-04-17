@@ -11,6 +11,7 @@ public struct MTStyleSetterOptions: @unchecked Sendable, Codable {
     /// if you have previously validated the values you will be passing to this function.
     public var shouldValidate: Bool = true
 
+    /// Initializes the setter options.
     public init(shouldValidate: Bool) {
         self.shouldValidate = shouldValidate
     }

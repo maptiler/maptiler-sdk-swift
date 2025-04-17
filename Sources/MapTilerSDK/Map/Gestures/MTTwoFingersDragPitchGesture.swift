@@ -6,6 +6,7 @@
 /// Handles changing the pitch by dragging with two fingers.
 @MainActor
 public struct MTTwoFingersDragPitchGesture: MTGesture {
+    /// Type of the gesture.
     public var type: MTGestureType = .twoFingersDragPitch
 
     private var bridge: MTBridge!
@@ -16,6 +17,7 @@ public struct MTTwoFingersDragPitchGesture: MTGesture {
         self.bridge = bridge
     }
 
+    /// Disables the gesture on the map.
     public func disable() async {
         do {
             try await _ = bridge.execute(TwoFingersDragPitchDisable())
@@ -24,6 +26,7 @@ public struct MTTwoFingersDragPitchGesture: MTGesture {
         }
     }
 
+    /// Enables the gesture on the map.
     public func enable() async {
         do {
             try await _ = bridge.execute(TwoFingersDragPitchEnable())

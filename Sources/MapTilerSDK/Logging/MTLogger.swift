@@ -5,10 +5,13 @@
 
 /// Protocol requirement for all Logger objects.
 public protocol MTLoggable: Sendable {
+    /// Logs the message with type.
     func log(_ message: String, type: MTLogType) async
 }
 
+/// Logger class used for SDK logs.
 public class MTLogger {
+    /// Log marker for information messages.
     public static let infoMarker: String = "MTInfo"
 
     /// Add a log.

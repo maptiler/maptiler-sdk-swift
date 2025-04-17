@@ -25,6 +25,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// - Parameters:
     ///    - coordinates: Position of the popup.
     ///    - text: Text content of the popup.
+    ///  - offset: The pixel distance from the popup's coordinates.
     public init(
         coordinates: CLLocationCoordinate2D,
         text: String,
@@ -39,6 +40,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Sets coordinates for the popup.
     /// - Parameters:
     ///    - coordinates: Position of the popup
+    ///    - mapView: Map view to apply to.
     ///    - completionHandler: A handler block to execute when function finishes.
     @MainActor
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
@@ -58,6 +60,7 @@ extension MTTextPopup {
     /// Sets coordinates for the popup.
     /// - Parameters:
     ///    - coordinates: Position of the popup.
+    ///    - mapView: Map view to apply to.
     @MainActor
     public func setCoordinates(_ coordinates: CLLocationCoordinate2D, in mapView: MTMapView) async {
         self.coordinates = coordinates
@@ -74,7 +77,7 @@ extension MTTextPopup {
 extension MTTextPopup {
     /// Adds popup to map DSL style.
     ///
-    /// Prefer mapView.addTextPopup instead.
+    /// Prefer ``MTMapView/addTextPopup(_:)`` instead.
     public func addToMap(_ mapView: MTMapView) {
         Task {
             let popup = MTTextPopup(

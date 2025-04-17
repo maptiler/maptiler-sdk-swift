@@ -47,7 +47,7 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.popup = popup
     }
 
-    // Initializes the marker with the specified position, color/icon and behaviour.
+    /// Initializes the marker with the specified position, color/icon and behaviour.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
     ///    - color: Color of the marker.
@@ -103,6 +103,7 @@ extension MTMarker {
     /// Sets coordinates for the marker.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
+    ///    - mapView: Map view to apply to.
     @MainActor
     public func setCoordinates(_ coordinates: CLLocationCoordinate2D, in mapView: MTMapView) async {
         self.coordinates = coordinates
@@ -119,7 +120,7 @@ extension MTMarker {
 extension MTMarker {
     /// Adds marker to map DSL style.
     ///
-    /// Prefer marker.AddTo instead.
+    /// Prefer ``MTMapView/addMarker(_:)`` instead.
     public func addToMap(_ mapView: MTMapView) {
         Task {
             let marker = MTMarker(
@@ -136,6 +137,7 @@ extension MTMarker {
     }
 
     /// Modifier. Sets the ``popup``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func popup(_ value: MTTextPopup) -> Self {
         self.popup = value

@@ -9,7 +9,7 @@ import UIKit
 extension MTFillLayer {
     /// Adds layer to map DSL style.
     ///
-    /// Prefer mapView.style.addLayer instead.
+    /// Prefer ``MTStyle/addLayer(_:)`` on MTMapView instead.
     public func addToMap(_ mapView: MTMapView) {
         Task {
             let layer = MTFillLayer(
@@ -33,6 +33,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``maxZoom``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func maxZoom(_ value: Double) -> Self {
         self.maxZoom = value
@@ -41,6 +42,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``minZoom``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func minZoom(_ value: Double) -> Self {
         self.maxZoom = value
@@ -49,6 +51,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``sourceLayer``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func sourceLayer(_ value: String) -> Self {
         self.sourceLayer = value
@@ -57,6 +60,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``shouldBeAntialised``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func shouldBeAntialised(_ value: Bool) -> Self {
         self.shouldBeAntialised = value
@@ -65,6 +69,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``color``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func color(_ value: UIColor) -> Self {
         self.color = value
@@ -73,6 +78,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``opacity``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func opacity(_ value: Double) -> Self {
         self.opacity = value
@@ -81,6 +87,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``outlineColor``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func outlineColor(_ value: UIColor) -> Self {
         self.outlineColor = value
@@ -89,6 +96,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``translate``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func translate(_ value: [Double]) -> Self {
         self.translate = value
@@ -97,6 +105,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``translateAnchor``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func translateAnchor(_ value: MTFillTranslateAnchor) -> Self {
         self.translateAnchor = value
@@ -105,6 +114,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``sortKey``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func sortKey(_ value: Double) -> Self {
         self.sortKey = value
@@ -113,6 +123,7 @@ extension MTFillLayer {
     }
 
     /// Modifier. Sets the ``visibility``.
+    /// - Note: Not to be used outside of DSL.
     @discardableResult
     public func visibility(_ value: MTLayerVisibility) -> Self {
         self.visibility = value

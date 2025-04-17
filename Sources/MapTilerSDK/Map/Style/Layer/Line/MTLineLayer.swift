@@ -34,7 +34,7 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
     /// including GeoJSON sources.
     public var sourceLayer: String?
 
-    // Blur of the line.
+    /// Blur of the line.
     public var blur: Double? = 0.0
 
     /// The display of line endings.
@@ -51,7 +51,7 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
 
     /// The gradient with which to color a line feature.
     ///
-    /// Can only be used with GeoJSON sources that specify "ineMetrics": true.
+    /// Can only be used with GeoJSON sources that specify "lineMetrics": true.
     public var gradient: UIColor?
 
     /// The display of lines when joining.
@@ -85,6 +85,7 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
     /// Values are [x, y] where negatives indicate left and up, respectively.
     public var translate: [Double]? = [0.0, 0.0]
 
+    /// Controls the frame of reference for translate.
     public var translateAnchor: MTLineTranslateAnchor? = .map
 
     /// Width of the line.
@@ -110,6 +111,7 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
         self.sourceLayer = sourceLayer
     }
 
+    /// Initializes the layer with all options.
     public init(
         identifier: String,
         sourceIdentifier: String,
@@ -156,6 +158,7 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
         self.visibility = visibility
     }
 
+    /// Initializes layer from the decoder.
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 

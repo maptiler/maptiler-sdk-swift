@@ -25,7 +25,7 @@ The MapTiler SDK Swift is a native SDK written in Swift, designed to work with t
 Make sure to set your MapTiler Cloud API key first. (i.e. in AppDelegate):
 
 ```
-MTConfig.shared.setAPIKey(YOUR_API_KEY)
+MTConfig.shared.setAPIKey("YOUR_API_KEY")
 ```
 
 ### UIKit
@@ -60,7 +60,7 @@ var body: some View {
 For detailed functionality overview refer to the API Reference documentation. 
 
 # Installation
-MapTiler Swift SDK is a Swift Package and be added as dependecy through **Swift Package Manager**.
+MapTiler Swift SDK is a Swift Package and can be added as dependecy through **Swift Package Manager**.
 
 - File -> Add Package Dependencies
 - Add https://github.com/maptiler/maptiler-sdk-swift.git

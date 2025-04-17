@@ -57,7 +57,7 @@ var body: some View {
 }
 ```
 
-For detailed functionality overview refer to the API Reference documentation. 
+For detailed functionality overview refer to the API Reference documentation or build local docs in Xcode: Product -> Build Documentation.
 
 # Installation
 MapTiler Swift SDK is a Swift Package and can be added as dependecy through **Swift Package Manager**.

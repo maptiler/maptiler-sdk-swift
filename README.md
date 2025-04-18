@@ -8,7 +8,7 @@
 <img src="https://img.shields.io/badge/SPM-supported-DE5C43.svg" alt="SPM" title="SPM"/>
 </p>
 
-The MapTiler SDK Swift is a native SDK written in Swift, designed to work with the well-established MapTiler Cloud service, which provides all the data required to fuel a complete mobile mapping experience: vector tiles, geojson, map interaction, custom styles and more.
+The MapTiler SDK Swift is a native SDK written in Swift, designed to work with the well-established MapTiler Cloud service, which provides all the data required to fuel a complete mobile mapping experience: vector tiles, geojson, map interaction, custom styles, data visualization and more.
 
 ## Features
 - [x] Map interaction
@@ -24,16 +24,16 @@ The MapTiler SDK Swift is a native SDK written in Swift, designed to work with t
 
 Make sure to set your MapTiler Cloud API key first. (i.e. in AppDelegate):
 
-```
+```swift
 MTConfig.shared.setAPIKey("YOUR_API_KEY")
 ```
 
 ### UIKit
 
-```
+```swift
 import MapTilerSDK
 
-let options = MTMapOptions(center: Constants.unterageriCoordinates, zoom: Constants.defaultZoomLevel, bearing: 1.0, pitch: 20.0)
+let options = MTMapOptions(center: Constants.unterageriCoordinates, zoom: 2.0, bearing: 1.0, pitch: 20.0)
 var mapView = MTMapView(frame: view.frame, options: options, referenceStyle: .streets)
 mapView.delegate = self
 
@@ -42,7 +42,7 @@ view.addSubview(mapView)
 
 ### SwiftUI
 
-```
+```swift
 import MapTilerSDK
 
 @State private var referenceStyle: MTMapReferenceStyle = .streets
@@ -59,8 +59,49 @@ var body: some View {
 
 For detailed functionality overview refer to the API Reference documentation or build local docs in Xcode: Product -> Build Documentation.
 
+## Sources and Layers
+
+Sources and layers can be added to the map view style object as soon as map is initialized.
+
+### UIKit
+
+```swift
+guard let style = mapView.style else {
+    return
+}
+
+if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY") {
+    let contoursDataSource = MTVectorTileSource(identifier: "contoursSource", tiles: [contoursTilesURL])
+    style.addSource(contoursDataSource)
+
+    let contoursLayer = MTLineLayer(identifier: "contoursLayer", sourceIdentifier: contoursDataSource.identifier, sourceLayer: "contour_ft")
+    contoursLayer.color = .brown
+    contoursLayer.width = 2.0
+
+    style.addLayer(contoursLayer)
+}
+```
+
+## Markers and Popups
+
+Markers and popups (Text, Custom Annotation) can be used for highlighting points of interest on the map.
+
+### UIKit
+```swift
+let coordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+
+let popup = MTTextPopup(coordinates: coordinates, text: "MapTiler", offset: 20.0)
+let marker = MTMarker(coordinates: coordinates, popup: popup)
+marker.draggable = true
+
+mapView.addMarker(marker)
+```
+
+For additional examples refer to the Examples directory.
+
+
 # Installation
-MapTiler Swift SDK is a Swift Package and can be added as dependecy through **Swift Package Manager**.
+MapTiler Swift SDK is a Swift Package and can be added as dependency through **Swift Package Manager**.
 
 - File -> Add Package Dependencies
 - Add https://github.com/maptiler/maptiler-sdk-swift.git

@@ -33,7 +33,8 @@ MTConfig.shared.setAPIKey("YOUR_API_KEY")
 ```swift
 import MapTilerSDK
 
-let options = MTMapOptions(center: Constants.unterageriCoordinates, zoom: 2.0, bearing: 1.0, pitch: 20.0)
+let coordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+let options = MTMapOptions(center: coordinates, zoom: 2.0, bearing: 1.0, pitch: 20.0)
 var mapView = MTMapView(frame: view.frame, options: options, referenceStyle: .streets)
 mapView.delegate = self
 
@@ -82,6 +83,23 @@ if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v
 }
 ```
 
+### SwiftUI
+
+```swift
+@State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
+
+var body: some View {
+    MTMapViewContainer(map: mapView) {
+        MTVectorTileSource(identifier: "countoursSource", tiles: [URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY")])
+
+        MTLineLayer(identifier: "contoursLayer", sourceIdentifier: "countoursSource", sourceLayer: "contour_ft")
+            .color(.brown)
+            .width(2.0)
+
+    }
+}
+```
+
 ## Markers and Popups
 
 Markers and popups (Text, Custom Annotation) can be used for highlighting points of interest on the map.
@@ -95,6 +113,49 @@ let marker = MTMarker(coordinates: coordinates, popup: popup)
 marker.draggable = true
 
 mapView.addMarker(marker)
+```
+
+### SwiftUI
+```swift
+@State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
+
+let coordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+
+var body: some View {
+    MTMapViewContainer(map: mapView) {
+        let popup = MTTextPopup(coordinates: coordinates, text: "MapTiler", offset: 20.0)
+
+        MTMarker(coordinates: coordinates, draggable: true, popup: popup)
+    }
+}
+```
+
+Alternatively add content on custom actions:
+
+```swift
+@State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
+
+let coordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+
+var body: some View {
+    MTMapViewContainer(map: mapView) {
+    }
+        .didInitialize {
+            let marker = MTMarker(coordinates: coordinates)
+
+            Task {
+                await mapView.addMarker(marker)
+            }
+        }
+
+    Button("Add Popup") {
+        Task {
+            let popup = MTTextPopup(coordinates: coordinates, text: "MapTiler", offset: 20.0)
+
+            await mapView.addTextPopup(popup)
+        }
+    }
+}
 ```
 
 For additional examples refer to the Examples directory.

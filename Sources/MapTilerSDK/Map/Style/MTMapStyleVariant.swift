@@ -37,4 +37,7 @@ public enum MTMapStyleVariant: String, @unchecked Sendable, CaseIterable, Identi
 
     /// Background variant
     case background
+
+    /// Vivid variant
+    case vivid
 }

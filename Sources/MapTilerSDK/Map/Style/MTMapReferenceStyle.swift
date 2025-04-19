@@ -43,6 +43,12 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
     /// Reference style without any variants.
     case openStreetMap
 
+    /// Watercolor map for creative use.
+    case aquarelle
+
+    /// Light terrain map for data overlays.
+    case landscape
+
     /// Custom style from the URL.
     ///
     /// Custom style does not have variants.
@@ -73,6 +79,10 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return [.defaultVariant, .light, .dark]
         case .openStreetMap:
             return [.defaultVariant]
+        case .aquarelle:
+            return [.defaultVariant, .dark, .vivid]
+        case .landscape:
+            return [.defaultVariant, .dark, .vivid]
         case .custom:
             return [.defaultVariant]
         }
@@ -113,6 +123,10 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return "BACKDROP"
         case .openStreetMap:
             return "OPENSTREETMAP"
+        case .aquarelle:
+            return "AQUARELLE"
+        case .landscape:
+            return "LANDSCAPE"
         case .custom(let url):
             return url.absoluteString
         }
@@ -131,6 +145,8 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             .topo,
             .toner,
             .backdrop,
+            .aquarelle,
+            .landscape,
             .openStreetMap
         ]
     }

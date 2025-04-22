@@ -13,6 +13,7 @@ struct MarkersAndPopupsMapView: View {
     }
 
     let unterageriCoordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+    let brnoCoordinates = CLLocationCoordinate2D(latitude: 49.212596, longitude: 16.626576)
 
     @State private var referenceStyle: MTMapReferenceStyle = .basic
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
@@ -27,5 +28,12 @@ struct MarkersAndPopupsMapView: View {
         }
             .referenceStyle(referenceStyle)
             .styleVariant(styleVariant)
+            .didInitialize {
+                let marker = MTMarker(coordinates: brnoCoordinates)
+
+                Task {
+                    await mapView.addMarker(marker)
+                }
+            }
     }
 }

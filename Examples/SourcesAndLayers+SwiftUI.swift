@@ -34,5 +34,14 @@ struct SourcesAndLayersMapView: View {
         }
             .referenceStyle(referenceStyle)
             .styleVariant(styleVariant)
+
+        Button("Add Layer") {
+            Task {
+                let layer = MTLineLayer(identifier: "contoursBaseLayer", sourceIdentifier: "contoursLayer")
+                layer.sourceLayer = "contour"
+
+                try await mapView.style?.addLayer(layer)
+            }
+        }
     }
 }

@@ -11,6 +11,13 @@ function setUpMapEvents(map) {
         });
     });
 
+    // BRIDGE - WebGL event propagation
+    map.on('webglcontextlost', function() {
+        window.webkit.messageHandlers.errorHandler.postMessage({
+            error: 'webglcontextlost'
+        });
+    });
+
     // BRIDGE - Map events propagation
 
     const events = [

@@ -14,8 +14,8 @@ import UIKit
 
 /// Basic benchmarking class.
 public final class MTBenchmark: MTMapViewDelegate {
-    let zoom = 6.0
-    let centerCoordinate = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+    let zoom = 1.0
+    let centerCoordinate = CLLocationCoordinate2D(latitude: 35.742443, longitude: -102.981521)
     var apiKey = "YOUR_API_KEY_HERE"
 
     // https://api.maptiler.com/tiles/uk-openzoomstack/{z}/{x}/{y}.pbf?key=\(apiKey)
@@ -196,6 +196,8 @@ public final class MTBenchmark: MTMapViewDelegate {
         }
         
         await stressSourcesAndLayers(iterations: iterations)
+
+        await stressRealTime()
 
         let totalElapsedTime = CFAbsoluteTimeGetCurrent() - totalStartTime
 
@@ -553,6 +555,36 @@ public final class MTBenchmark: MTMapViewDelegate {
         logger.log(level: .error, "total t: \(totalElapsedTime) - \("SourcesAndLayers")")
         logger.log(level: .error, "avg t: \(elapsedTimesSum / Double(elapsedTimes.count)) - \("SourcesAndLayers")")
         didUpdateStressTest?(">>> SOURCES AND LAYERS Benchmark elapsed: \(totalElapsedTime)")
+    }
+
+    private func stressRealTime() async {
+        Task {
+            let startTime = CFAbsoluteTimeGetCurrent()
+
+            let source = MTGeoJSONSource(identifier: "realtimesource", url: URL(string: "https://docs.maptiler.com/sdk-js/assets/earthquakes.geojson")!)
+            try? await mapView.style?.addSource(source)
+
+            let layer = MTSymbolLayer(identifier: "realtimelayer", sourceIdentifier: source.identifier)
+            layer.icon = UIImage.checkmark
+            try? await mapView.style?.addLayer(layer)
+
+            var layerCount = 0
+
+            repeat {
+                await source.setData(data: URL(string: layerCount % 2 == 0 ? "https://docs.maptiler.com/sdk-js/assets/earthquakes.geojson" : "https://docs.maptiler.com/sdk-js/assets/us_states.geojson")!, in: self.mapView)
+
+                if #available(iOS 16.0, *) {
+                    try? await Task.sleep(for: .seconds(1))
+                }
+
+                layerCount += 1
+            } while (layerCount < 31)
+
+
+            let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
+
+            didUpdateStressTest?(">>> RealTime Test elapsed: \(elapsedTime)")
+        }
     }
 }
 

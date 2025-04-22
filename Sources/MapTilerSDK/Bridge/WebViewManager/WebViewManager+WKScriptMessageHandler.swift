@@ -20,9 +20,18 @@ extension WebViewManager: WKScriptMessageHandler {
 
     private func handleError(with message: WKScriptMessage) {
         if let errorInfo = message.body as? [String: Any] {
-            _ = errorInfo[Constants.Error.message] as? String ?? Constants.Error.unknown
+            let message = errorInfo[Constants.Error.message] as? String ?? Constants.Error.unknown
+
+            handleContextFailure(message: message)
         } else if let error = message.body as? String {
-            _ = error
+            let message = error
+            handleContextFailure(message: message)
+        }
+    }
+
+    private func handleContextFailure(message: String) {
+        if message == "webglcontextlost" {
+            MTLogger.log("Context lost, consider calling reload on MTMapView", type: .criticalError)
         }
     }
 

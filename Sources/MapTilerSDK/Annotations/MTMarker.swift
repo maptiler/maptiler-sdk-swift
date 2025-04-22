@@ -66,6 +66,28 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.draggable = draggable
     }
 
+    /// Initializes the marker with the specified position, color/icon and popup.
+    /// - Parameters:
+    ///    - coordinates: Position of the marker.
+    ///    - color: Color of the marker.
+    ///    - icon: Icon for the marker.
+    ///    - draggable: Boolean indicating whether the  marker is draggable.
+    ///    - popup: Popup to attach to the marker.
+    public init(
+        coordinates: CLLocationCoordinate2D,
+        color: UIColor? = .blue,
+        icon: UIImage? = nil,
+        draggable: Bool? = false,
+        popup: MTTextPopup?
+    ) {
+        self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        self.coordinates = coordinates
+        self.color = color
+        self.icon = icon
+        self.draggable = draggable
+        self.popup = popup
+    }
+
     /// Sets coordinates for the marker.
     /// - Parameters:
     ///    - coordinates: Position of the marker.

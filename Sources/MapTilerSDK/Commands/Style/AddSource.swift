@@ -49,8 +49,25 @@ package struct AddSource: MTCommand {
             return emptyReturnValue
         }
 
-        return """
-        \(MTBridge.mapObject).addSource('\(source.identifier)', \(sourceString));
-"""
+        var jsSourceString = sourceString
+
+        if let url = source.url, url.isFileURL {
+            jsSourceString = replaceDataString(sourceString: sourceString)
+        } else if let jsonString = source.jsonString {
+            jsSourceString = replaceDataString(sourceString: sourceString)
+        }
+
+        return "\(MTBridge.mapObject).addSource('\(source.identifier)', \(jsSourceString));"
     }
+}
+
+fileprivate func replaceDataString(sourceString: String) -> String {
+    let patternToReplace = #"("data":\s*)"([^"]*)""#
+    let dataString = sourceString.replacingOccurrences(
+        of: patternToReplace,
+        with: #"$1$2"#,
+        options: .regularExpression
+    )
+
+    return dataString
 }

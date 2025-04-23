@@ -49,6 +49,9 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
     /// Light terrain map for data overlays.
     case landscape
 
+    /// Detailed map of the ocean seafloor and bathymetry.
+    case ocean
+
     /// Custom style from the URL.
     ///
     /// Custom style does not have variants.
@@ -83,6 +86,8 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return [.defaultVariant, .dark, .vivid]
         case .landscape:
             return [.defaultVariant, .dark, .vivid]
+        case .ocean:
+            return [.defaultVariant]
         case .custom:
             return [.defaultVariant]
         }
@@ -127,6 +132,8 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             return "AQUARELLE"
         case .landscape:
             return "LANDSCAPE"
+        case .ocean:
+            return "OCEAN"
         case .custom(let url):
             return url.absoluteString
         }
@@ -147,6 +154,7 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
             .backdrop,
             .aquarelle,
             .landscape,
+            .ocean,
             .openStreetMap
         ]
     }

@@ -67,12 +67,21 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
         mapView.didInitialize = {
             mapView.style?.setStyle(referenceStyle, styleVariant: styleVariant) { _ in
                 let sources = content.filter { $0 is MTSource }
+                let layers = content.filter { $0 is MTLayer }
 
                 for item in sources {
-                    item.addToMap(mapView)
+                    if let item = item as? MTSource {
+                        mapView.style?.addSource(item)
+                    }
                 }
 
-                for item in content where !(item is MTSource) {
+                for item in layers {
+                    if let item = item as? MTLayer {
+                        mapView.style?.addLayer(item)
+                    }
+                }
+
+                for item in content where !((item is MTSource) || (item is MTLayer)) {
                     item.addToMap(mapView)
                 }
             }

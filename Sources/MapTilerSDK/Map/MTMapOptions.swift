@@ -7,7 +7,7 @@ import Foundation
 import CoreLocation
 
 /// Parameters of the map object.
-public struct MTMapOptions: @unchecked Sendable {
+public struct MTMapOptions: Sendable {
     /// The language of the map.
     ///
     /// This applies only for the map instance, supersedes the primaryLanguage from config.

@@ -4,7 +4,7 @@
 //
 
 /// Language of the map labels.
-public enum MTLanguage: @unchecked Sendable, Codable {
+public enum MTLanguage: Sendable, Codable {
     /// Custom language options.
     case special(MTSpecialLanguage)
 
@@ -24,7 +24,7 @@ public enum MTLanguage: @unchecked Sendable, Codable {
 }
 
 /// Custom language options.
-public enum MTSpecialLanguage: String, Codable {
+public enum MTSpecialLanguage: String, Sendable, Codable {
     /// The default language of the device.
     case auto
 
@@ -57,7 +57,7 @@ public enum MTSpecialLanguage: String, Codable {
 }
 
 /// Languages available for MTMapView object.
-public enum MTCountryLanguage: String, Codable, CaseIterable {
+public enum MTCountryLanguage: String, Sendable, Codable, CaseIterable {
     /// Albanian language.
     case albanian = "sq"
 

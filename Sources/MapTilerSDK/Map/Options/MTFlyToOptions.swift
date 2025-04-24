@@ -6,7 +6,7 @@
 import Foundation
 
 /// Options describing the destination and animation of the flyTo transition.
-public struct MTFlyToOptions: @unchecked Sendable, Codable {
+public struct MTFlyToOptions: Sendable, Codable {
     /// The zooming "curve" that will occur along the flight path.
     public var curve: Double?
 

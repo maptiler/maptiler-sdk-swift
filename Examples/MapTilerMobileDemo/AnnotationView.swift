@@ -7,7 +7,7 @@ import UIKit
 import MapTilerSDK
 import CoreLocation
 
-class AnnotationView: MTCustomAnnotationView, @unchecked Sendable {
+class AnnotationView: MTCustomAnnotationView {
     @IBOutlet weak var contentView: UIView!
 
     override init(frame: CGRect) {

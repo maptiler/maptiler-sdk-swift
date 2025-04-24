@@ -4,7 +4,7 @@
 //
 
 /// Provides animation options for navigation functions.
-public struct MTAnimationOptions: @unchecked Sendable, Codable {
+public struct MTAnimationOptions: Sendable, Codable {
     /// The animation's duration, measured in milliseconds.
     public var duration: Double?
 

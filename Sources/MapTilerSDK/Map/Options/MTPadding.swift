@@ -4,7 +4,7 @@
 //
 
 /// Options for setting padding on calls to map methods.
-public struct MTPaddingOptions: @unchecked Sendable, Codable {
+public struct MTPaddingOptions: Sendable, Codable {
     /// Left padding.
     var left: Double?
 

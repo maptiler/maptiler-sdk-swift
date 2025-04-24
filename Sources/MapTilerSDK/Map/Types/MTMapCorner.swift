@@ -4,7 +4,7 @@
 //
 
 /// Represents corners of the map.
-public enum MTMapCorner: String, @unchecked Sendable, Codable {
+public enum MTMapCorner: String, Sendable, Codable {
     /// Top left corner of the map.
     case topLeft = "top-left"
 

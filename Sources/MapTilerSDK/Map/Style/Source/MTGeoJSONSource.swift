@@ -13,6 +13,11 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
     /// URL pointing to the geojson resource.
     public var url: URL?
 
+    /// GeoJSON String.
+    ///
+    /// GeoJSON string parses coordinates as Longitude, Latitude pairs, in that order.
+    public var jsonString: String?
+
     /// Type of the source.
     public private(set) var type: MTSourceType = .geojson
 
@@ -64,6 +69,14 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
         self.url = url
     }
 
+    /// Initializes the source with unique id and GeoJSON string.
+    ///
+    /// GeoJSON string parses coordinates as Longitude, Latitude pairs, in that order.
+    public init(identifier: String, jsonString: String) {
+        self.identifier = identifier
+        self.jsonString = jsonString
+    }
+
     /// Initializes the source with all the options.
     public init(
         identifier: String,
@@ -109,7 +122,16 @@ public class MTGeoJSONSource: MTSource, @unchecked Sendable, Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encodeIfPresent(url, forKey: .url)
+        if let url = url {
+            if url.isFileURL {
+                try container.encode("JSON.parse(atob('\(Data(contentsOf: url).base64EncodedString())'))", forKey: .url)
+            } else {
+                try container.encode(url, forKey: .url)
+            }
+        } else if let jsonString = jsonString {
+            try container.encode("JSON.parse(atob('\(Data(jsonString.utf8).base64EncodedString())'))", forKey: .url)
+        }
+
         try container.encode(type, forKey: .type)
         try container.encodeIfPresent(attribution, forKey: .attribution)
         try container.encode(buffer, forKey: .buffer)

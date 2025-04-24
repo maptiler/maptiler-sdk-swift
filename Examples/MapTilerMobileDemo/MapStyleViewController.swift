@@ -29,5 +29,14 @@ class MapStyleViewController: UIViewController {
         mapStyleViewContainer.addSubview(hostingController.view)
 
         hostingController.didMove(toParent: self)
+
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: mapStyleViewContainer.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: mapStyleViewContainer.trailingAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: mapStyleViewContainer.topAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: mapStyleViewContainer.bottomAnchor),
+        ])
     }
 }

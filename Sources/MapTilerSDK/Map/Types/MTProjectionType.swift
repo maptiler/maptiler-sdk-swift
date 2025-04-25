@@ -4,7 +4,7 @@
 //
 
 /// Type of projection the map uses.
-public enum MTProjectionType: String, Codable {
+public enum MTProjectionType: String, Sendable, Codable {
     /// Mercator projection.
     case mercator
 

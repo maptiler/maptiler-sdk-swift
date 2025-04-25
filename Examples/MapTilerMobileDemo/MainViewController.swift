@@ -237,8 +237,6 @@ extension MainViewController: MTMapViewDelegate {
 
         loadingActivityIndicator.stopAnimating()
 
-        addSources()
-
         // *** Uncomment for benchmark or use long press on jump view ***
 //        Task {
 //            benchmarkButton.isHidden = false
@@ -249,9 +247,7 @@ extension MainViewController: MTMapViewDelegate {
 
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
         if event == .isReady {
-            Task {
-                await mapView.style?.setStyle(.streets, styleVariant: nil)
-            }
+            addSources()
         }
     }
 

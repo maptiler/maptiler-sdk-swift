@@ -4,7 +4,7 @@
 //
 
 /// Options for drag and pan gesstures.
-public struct MTDragPanOptions: @unchecked Sendable, Codable {
+public struct MTDragPanOptions: Sendable, Codable {
     /// Factor used to scale the drag velocity.
     /// - Note: Default: 0
     public var linearity: Double?

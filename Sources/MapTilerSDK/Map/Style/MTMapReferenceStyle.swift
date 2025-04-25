@@ -6,7 +6,7 @@
 import Foundation
 
 /// Defines purpose and guidelines on what information is displayed.
-public enum MTMapReferenceStyle: Identifiable, Hashable, @unchecked Sendable {
+public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable {
     /// Unique id of the style.
     public var id: String { getName() }
 

@@ -5,7 +5,7 @@
 import CoreLocation
 
 /// Options for controlling the desired location, zoom, bearing, and pitch of the camera.
-public struct MTCameraOptions: @unchecked Sendable {
+public struct MTCameraOptions: Sendable {
     /// Geographical center of the map.
     public var center: CLLocationCoordinate2D?
 

@@ -8,7 +8,7 @@ import CoreLocation
 
 /// Subclassable view for adding custom annotations to the map.
 @MainActor
-open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation, @unchecked Sendable {
+open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation {
     /// Unique id of the view.
     public private(set) var identifier: String
 

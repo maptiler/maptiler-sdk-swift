@@ -92,7 +92,7 @@ public actor MTConfig {
     ///   - map:  Map view to apply to.
     /// - Note: Enabled by default
     /// - SeeAlso: ``https://docs.maptiler.com/guides/maps-apis/maps-platform/what-is-map-session-in-maptiler-cloud/``
-    package func setSessionLogic(_ isEnabled: Bool, for map: MTMapView) {
+    public func setSessionLogic(_ isEnabled: Bool, for map: MTMapView) {
         self.isSessionLogicEnabled = isEnabled
 
         Task {

@@ -29,6 +29,8 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Optional attached custom annotation.
     weak public private(set) var annotationView: MTCustomAnnotationView?
 
+    private var tapThreshold: Double = 30.0
+
     /// Initializes the marker with the specified position.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
@@ -174,6 +176,21 @@ extension MTMarker: MTMapViewContentDelegate {
             if let data = data, let coordinates = data.coordinate {
                 self.coordinates = coordinates
                 annotationView?.setCoordinates(self.coordinates, in: mapView)
+            }
+        } else if event == .didTap {
+            if let tapCoordinate = data?.coordinate {
+                Task {
+                    let tapPoint = await mapView.project(coordinates: tapCoordinate)
+                    let markerPoint = await mapView.project(coordinates: self.coordinates)
+
+                    let dx = tapPoint.x - markerPoint.x
+                    let dy = tapPoint.y - markerPoint.y
+                    let distance = sqrt(dx * dx + dy * dy)
+
+                    if distance < tapThreshold {
+                        await annotationView?.addTo(mapView)
+                    }
+                }
             }
         }
     }

@@ -10,8 +10,10 @@ package struct SetGlyphs: MTCommand {
     var options: MTStyleSetterOptions?
 
     package func toJS() -> JSString {
-        let absoluteURLString = url.absoluteString
-        let parameters: JSString = options != nil ? "\(absoluteURLString),\(options.toJSON() ?? "")" : absoluteURLString
+        let path = url.absoluteString
+        let absoluteURLString = path.removingPercentEncoding ?? path
+        let stringWithOptions = "'\(absoluteURLString)',\(options.toJSON() ?? "")"
+        let parameters: JSString = options != nil ? stringWithOptions : "'\(absoluteURLString)'"
 
         return "\(MTBridge.mapObject).setGlyphs(\(parameters));"
     }

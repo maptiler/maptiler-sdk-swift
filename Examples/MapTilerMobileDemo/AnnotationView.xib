@@ -32,13 +32,27 @@
                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GFR-fY-lm5">
+                    <rect key="frame" x="145" y="1" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="35" id="m2l-P4-reX"/>
+                    </constraints>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain" image="xmark.app.fill" catalog="system"/>
+                    <connections>
+                        <action selector="closeButtonTouchUpInside:" destination="-1" eventType="touchUpInside" id="oRk-oR-oct"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
             <constraints>
+                <constraint firstItem="GFR-fY-lm5" firstAttribute="top" secondItem="zg9-gt-zDn" secondAttribute="top" constant="1" id="7sY-dp-lw8"/>
                 <constraint firstItem="LTA-eO-YgF" firstAttribute="centerX" secondItem="zg9-gt-zDn" secondAttribute="centerX" id="BoV-sH-y66"/>
                 <constraint firstItem="vqe-L3-Sie" firstAttribute="top" secondItem="LTA-eO-YgF" secondAttribute="bottom" constant="-10" id="P89-y1-PM7"/>
                 <constraint firstItem="vqe-L3-Sie" firstAttribute="centerX" secondItem="LTA-eO-YgF" secondAttribute="centerX" id="Qfu-JC-njx"/>
                 <constraint firstAttribute="top" secondItem="LTA-eO-YgF" secondAttribute="top" id="RMn-QU-zYG"/>
+                <constraint firstAttribute="trailing" secondItem="GFR-fY-lm5" secondAttribute="trailing" id="YxD-iB-4cT"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="193.89312977099235" y="-253.52112676056339"/>
@@ -47,5 +61,6 @@
     </objects>
     <resources>
         <image name="maptiler-logo" width="812" height="212"/>
+        <image name="xmark.app.fill" catalog="system" width="128" height="114"/>
     </resources>
 </document>

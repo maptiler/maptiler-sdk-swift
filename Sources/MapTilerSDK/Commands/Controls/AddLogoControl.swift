@@ -6,17 +6,18 @@
 import Foundation
 
 package struct AddLogoControl: MTCommand {
+    var name: String
     var url: URL
     var linkURL: URL
     var position: MTMapCorner
 
     package func toJS() -> JSString {
         let addLogoCommand = """
-            const logo = new \(MTBridge.sdkObject).MaptilerLogoControl({
+            const \(name) = new \(MTBridge.sdkObject).MaptilerLogoControl({
                 logoURL: "\(url)",
                 linkURL: "\(linkURL)"
             });
-            \("\(MTBridge.mapObject).addControl(logo, '\(position.rawValue)');")
+            \("\(MTBridge.mapObject).addControl(\(name), '\(position.rawValue)');")
             """
 
         return addLogoCommand

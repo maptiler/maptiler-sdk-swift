@@ -277,8 +277,12 @@ extension MTMapView: MTNavigable {
         runCommandWithCoordinateReturnValue(GetCenter(), completion: completionHandler)
     }
 
+    /// Project coordinates to point on the container.
+    /// - Parameters:
+    ///   - coordinates: The location to project.
+    ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
-    package func project(
+    public func project(
         coordinates: CLLocationCoordinate2D,
         completionHandler: @escaping (Result<CLLocationCoordinate2D, MTError>) -> Void
     ) {
@@ -563,7 +567,10 @@ extension MTMapView {
         }
     }
 
-    package func project(coordinates: CLLocationCoordinate2D) async -> MTPoint {
+    /// Project coordinates to point on the container.
+    /// - Parameters:
+    ///   - coordinates: The location to project.
+    public func project(coordinates: CLLocationCoordinate2D) async -> MTPoint {
         await withCheckedContinuation { continuation in
             project(coordinates: coordinates) { result in
                 switch result {

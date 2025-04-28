@@ -18,5 +18,5 @@ public protocol MTControllable {
     ///     - logoURL: URL of the logo image resource.
     ///     - linkURL: URL of the anchor link.
     ///     - position: Map position to add the control to.
-    func addLogoControl(logoURL: URL, linkURL: URL, position: MTMapCorner) async
+    func addLogoControl(name: String, logoURL: URL, linkURL: URL, position: MTMapCorner) async
 }

@@ -16,20 +16,14 @@ class AnnotationView: MTCustomAnnotationView {
 
     weak var delegate: AnnotationViewDelegate?
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(size: CGSize, coordinates: CLLocationCoordinate2D) {
+        super.init(size: size, coordinates: coordinates)
 
         commonInit()
     }
 
-    override init(frame: CGRect, coordinates: CLLocationCoordinate2D) {
-        super.init(frame: frame, coordinates: coordinates)
-
-        commonInit()
-    }
-
-    override init(frame: CGRect, coordinates: CLLocationCoordinate2D, offset: MTPoint) {
-        super.init(frame: frame, coordinates: coordinates, offset: offset)
+    override init(size: CGSize, coordinates: CLLocationCoordinate2D, offset: MTPoint) {
+        super.init(size: size, coordinates: coordinates, offset: offset)
 
         commonInit()
     }

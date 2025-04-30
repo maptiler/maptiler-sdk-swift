@@ -18,45 +18,39 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation {
     /// Offset from the center.
     public private(set) var offset: MTPoint = MTPoint(x: 0.0, y: 0.0)
 
+    private var size: CGSize = .zero
+
     // Initializes the view with the specified position.
     /// - Parameters:
-    ///    - frame: Frame of the annotation view.
+    ///    - size: Size of the annotation view.
     ///    - coordinates: Position of the annotation.
     public init(
-        frame: CGRect,
+        size: CGSize,
         coordinates: CLLocationCoordinate2D
     ) {
         self.identifier = "annot\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
+        self.size = size
 
-        super.init(frame: frame)
+        super.init(frame: CGRect(origin: CGPoint.zero, size: size))
     }
 
     // Initializes the view with the specified position and offset.
     /// - Parameters:
-    ///    - frame: Frame of the annotation view.
+    ///    - size: Size of the annotation view.
     ///    - coordinates: Position of the annotation.
     ///    - offset: Offset from the center.
     public init(
-        frame: CGRect,
+        size: CGSize,
         coordinates: CLLocationCoordinate2D,
         offset: MTPoint
     ) {
         self.identifier = "annot\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
         self.offset = offset
+        self.size = size
 
-        super.init(frame: frame)
-    }
-
-    /// Initializes the view with the frame and centered coordinates.
-    /// - Parameters:
-    ///    - frame: Frame of the annotation view.
-    public override init(frame: CGRect) {
-        self.identifier = "annot\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
-        self.coordinates = CLLocationCoordinate2D(latitude: 0, longitude: 0)
-
-        super.init(frame: frame)
+        super.init(frame: CGRect(origin: CGPoint.zero, size: size))
     }
 
     /// Not implemented code init.
@@ -207,9 +201,7 @@ extension MTCustomAnnotationView: @preconcurrency MTMapViewContent {
     @MainActor
     public func addToMap(_ mapView: MTMapView) {
         Task {
-            let annotation = MTCustomAnnotationView(frame: self.frame, coordinates: self.coordinates)
-
-            await annotation.addTo(mapView)
+            await self.addTo(mapView)
         }
     }
 }

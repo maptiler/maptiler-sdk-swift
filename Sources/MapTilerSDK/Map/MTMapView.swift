@@ -1,4 +1,8 @@
 //
+// Copyright (c) 2025, MapTiler
+// All rights reserved.
+// SPDX-License-Identifier: BSD 3-Clause
+//
 //  MTMapView.swift
 //  MapTilerSDK
 //
@@ -145,7 +149,7 @@ open class MTMapView: UIView {
         }
 
         bridge = MTBridge(executor: webViewExecutor)
-        gestureService = MTGestureService(bridge: bridge, eventProcessor: eventProcessor)
+        gestureService = MTGestureService(bridge: bridge, eventProcessor: eventProcessor, mapView: self)
     }
 
     open override func layoutSubviews() {

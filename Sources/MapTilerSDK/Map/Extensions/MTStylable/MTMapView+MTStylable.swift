@@ -33,6 +33,7 @@ extension MTMapView: MTStylable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setLanguage(_ language: MTLanguage, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetLanguage(language: language), completion: completionHandler)
+        options?.setLanguage(language)
     }
 
     /// Sets the any combination of light values.
@@ -71,6 +72,8 @@ extension MTMapView: MTStylable {
             SetShouldRenderWorldCopies(shouldRenderWorldCopies: shouldRenderWorldCopies),
             completion: completionHandler
         )
+
+        options?.setShouldRenderWorldCopies(shouldRenderWorldCopies)
     }
 
     /// Adds a marker to the map.
@@ -142,6 +145,8 @@ extension MTMapView: MTStylable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func enableGlobeProjection(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(EnableGlobeProjection(), completion: completionHandler)
+
+        options?.setProjection(.globe)
     }
 
     /// Enables the mercator projection visualization.
@@ -150,6 +155,7 @@ extension MTMapView: MTStylable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func enableMercatorProjection(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(EnableMercatorProjection(), completion: completionHandler)
+        options?.setProjection(.mercator)
     }
 
     /// Enables the 3D terrain visualization.
@@ -163,6 +169,8 @@ extension MTMapView: MTStylable {
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(EnableTerrain(exaggerationFactor: exaggerationFactor), completion: completionHandler)
+        options?.setTerrainIsEnabled(true)
+        options?.setTerrainExaggeration(exaggerationFactor)
     }
 
     /// Disables  the 3D terrain visualization.
@@ -171,6 +179,7 @@ extension MTMapView: MTStylable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func disableTerrain(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(DisableTerrain(), completion: completionHandler)
+        options?.setTerrainIsEnabled(false)
     }
 
     /// Sets the map's vertical field of view, in degrees.

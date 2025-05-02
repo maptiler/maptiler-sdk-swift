@@ -21,6 +21,8 @@ extension MTMapView: MTControllable {
                 AddLogoControl(name: "MapTilerLogo", url: url, linkURL: linkURL, position: position),
                 completion: completionHandler
             )
+
+            options?.setLogoPosition(position)
         }
     }
 
@@ -43,6 +45,8 @@ extension MTMapView: MTControllable {
             AddLogoControl(name: name, url: logoURL, linkURL: linkURL, position: position),
             completion: completionHandler
         )
+
+        options?.setLogoPosition(position)
     }
 }
 

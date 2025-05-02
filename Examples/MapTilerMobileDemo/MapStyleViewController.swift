@@ -6,6 +6,7 @@
 import UIKit
 import SwiftUI
 import MapTilerSDK
+import CoreLocation
 
 class MapStyleViewController: UIViewController {
     @IBOutlet weak var mapStyleViewContainer: UIView!
@@ -38,5 +39,16 @@ class MapStyleViewController: UIViewController {
             hostingController.view.topAnchor.constraint(equalTo: mapStyleViewContainer.topAnchor),
             hostingController.view.bottomAnchor.constraint(equalTo: mapStyleViewContainer.bottomAnchor),
         ])
+    }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "PreviewSegue", let vc = segue.destination as? PreviewVC, let map = mapView {
+            vc.mapView = MTMapView(
+                frame: map.mapView.frame,
+                options: map.mapView.options ?? MTMapOptions(),
+                referenceStyle: map.mapView.style?.referenceStyle ?? .streets,
+                styleVariant: map.mapView.style?.styleVariant
+            )
+        }
     }
 }

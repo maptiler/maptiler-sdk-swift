@@ -316,8 +316,8 @@ public struct MTMapOptions: Sendable {
 extension MTMapOptions: Codable {
     package enum CodingKeys: String, CodingKey {
         case language
-        case projection
         case center
+        case projection
         case zoom
         case maxZoom
         case minZoom
@@ -357,5 +357,175 @@ extension MTMapOptions: Codable {
         case projectionControlIsVisible = "projectionControl"
         case scaleControlIsVisible = "scaleControl"
         case terrainControlIsVisible = "terrainControl"
+    }
+}
+
+extension MTMapOptions {
+    package mutating func setLanguage(_ language: MTLanguage) {
+        self.language = language
+    }
+
+    package mutating func setCenter(_ center: CLLocationCoordinate2D) {
+        self.center = center
+    }
+
+    package mutating func setProjection(_ projection: MTProjectionType) {
+        self.projection = projection
+    }
+
+    package mutating func setZoom(_ zoom: Double) {
+        self.zoom = zoom
+    }
+
+    package mutating func setMaxZoom(_ maxZoom: Double) {
+        self.maxZoom = maxZoom
+    }
+
+    package mutating func setMinZoom(_ minZoom: Double) {
+        self.minZoom = minZoom
+    }
+
+    package mutating func setBearing(_ bearing: Double) {
+        self.bearing = bearing
+    }
+
+    package mutating func setBearingSnap(_ bearingSnap: Double) {
+        self.bearingSnap = bearingSnap
+    }
+
+    package mutating func setPitch(_ pitch: Double) {
+        self.pitch = pitch
+    }
+
+    package mutating func setMaxPitch(_ maxPitch: Double) {
+        self.maxPitch = maxPitch
+    }
+
+    package mutating func setMinPitch(_ minPitch: Double) {
+        self.minPitch = minPitch
+    }
+
+    package mutating func setRoll(_ roll: Double) {
+        self.roll = roll
+    }
+
+    package mutating func setRollIsEnabled(_ rollIsEnabled: Bool) {
+        self.rollIsEnabled = rollIsEnabled
+    }
+
+    package mutating func setElevation(_ elevation: Double) {
+        self.elevation = elevation
+    }
+
+    package mutating func setTerrainIsEnabled(_ terrainIsEnabled: Bool) {
+        self.terrainIsEnabled = terrainIsEnabled
+    }
+
+    package mutating func setTerrainExaggeration(_ terrainExaggeration: Double) {
+        self.terrainExaggeration = terrainExaggeration
+    }
+
+    package mutating func setCancelPendingTileRequestsWhileZooming(_ cancelPendingTileRequestsWhileZooming: Bool) {
+        self.cancelPendingTileRequestsWhileZooming = cancelPendingTileRequestsWhileZooming
+    }
+
+    package mutating func setIsCenterClampedToGround(_ isCenterClampedToGround: Bool) {
+        self.isCenterClampedToGround = isCenterClampedToGround
+    }
+
+    package mutating func setShouldCollectResourceTiming(_ shouldCollectResourceTiming: Bool) {
+        self.shouldCollectResourceTiming = shouldCollectResourceTiming
+    }
+
+    package mutating func setCrossSourceCollisionsAreEnabled(_ crossSourceCollisionsAreEnabled: Bool) {
+        self.crossSourceCollisionsAreEnabled = crossSourceCollisionsAreEnabled
+    }
+
+    package mutating func setFadeDuration(_ fadeDuration: Double) {
+        self.fadeDuration = fadeDuration
+    }
+
+    package mutating func setIsInteractionEnabled(_ isInteractionEnabled: Bool) {
+        self.isInteractionEnabled = isInteractionEnabled
+    }
+
+    package mutating func setLogoPosition(_ logoPosition: MTMapCorner) {
+        self.logoPosition = logoPosition
+    }
+
+    package mutating func setMaptilerLogoIsVisible(_ maptilerLogoIsVisible: Bool) {
+        self.maptilerLogoIsVisible = maptilerLogoIsVisible
+    }
+
+    package mutating func setMaxTileCacheSize(_ maxTileCacheSize: Double) {
+        self.maxTileCacheSize = maxTileCacheSize
+    }
+
+    package mutating func setMaxTileCacheZoomLevels(_ maxTileCacheZoomLevels: Double) {
+        self.maxTileCacheZoomLevels = maxTileCacheZoomLevels
+    }
+
+    package mutating func setShouldPitchWithRotate(_ shouldPitchWithRotate: Bool) {
+        self.shouldPitchWithRotate = shouldPitchWithRotate
+    }
+
+    package mutating func setShouldRefreshExpiredTiles(_ shouldRefreshExpiredTiles: Bool) {
+        self.shouldRefreshExpiredTiles = shouldRefreshExpiredTiles
+    }
+
+    package mutating func setShouldRenderWorldCopies(_ shouldRenderWorldCopies: Bool) {
+        self.shouldRenderWorldCopies = shouldRenderWorldCopies
+    }
+
+    package mutating func setShouldDragToPitch(_ shouldDragToPitch: Bool) {
+        self.shouldDragToPitch = shouldDragToPitch
+    }
+
+    package mutating func setShouldPinchToRotateAndZoom(_ shouldPinchToRotateAndZoom: Bool) {
+        self.shouldPinchToRotateAndZoom = shouldPinchToRotateAndZoom
+    }
+
+    package mutating func setDoubleTapShouldZoom(_ doubleTapShouldZoom: Bool) {
+        self.doubleTapShouldZoom = doubleTapShouldZoom
+    }
+
+    package mutating func setDragPanIsEnabled(_ dragPanIsEnabled: Bool) {
+        self.dragPanIsEnabled = dragPanIsEnabled
+    }
+
+    package mutating func setDragRotateIsEnabled(_ dragRotateIsEnabled: Bool) {
+        self.dragRotateIsEnabled = dragRotateIsEnabled
+    }
+
+    package mutating func setShouldValidateStyle(_ shouldValidateStyle: Bool) {
+        self.shouldValidateStyle = shouldValidateStyle
+    }
+
+    package mutating func setMinimapIsVisible(_ minimapIsVisible: Bool) {
+        self.minimapIsVisible = minimapIsVisible
+    }
+
+    package mutating func setAttributionControlIsVisible(_ attributionControlIsVisible: Bool) {
+        self.attributionControlIsVisible = attributionControlIsVisible
+    }
+
+    package mutating func setGeolocateControlIsVisible(_ geolocateControlIsVisible: Bool) {
+        self.geolocateControlIsVisible = geolocateControlIsVisible
+    }
+
+    package mutating func setNavigationControlIsVisible(_ navigationControlIsVisible: Bool) {
+        self.navigationControlIsVisible = navigationControlIsVisible
+    }
+
+    package mutating func setProjectionControlIsVisible(_ projectionControlIsVisible: Bool) {
+        self.projectionControlIsVisible = projectionControlIsVisible
+    }
+
+    package mutating func setScaleControlIsVisible(_ scaleControlIsVisible: Bool) {
+        self.scaleControlIsVisible = scaleControlIsVisible
+    }
+
+    package mutating func setTerrainControlIsVisible(_ terrainControlIsVisible: Bool) {
+        self.terrainControlIsVisible = terrainControlIsVisible
     }
 }

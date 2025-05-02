@@ -20,7 +20,7 @@ struct MapStyleView: View {
     @State private var referenceStyle: MTMapReferenceStyle = .basic
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
 
-    @State private var map = MTMapView(options: MTMapOptions())
+    @State public var mapView = MTMapView(options: MTMapOptions())
 
     private var selectedStyleVariants: [MTMapStyleVariant]? {
         return referenceStyle.getVariants()
@@ -73,16 +73,8 @@ struct MapStyleView: View {
                     .frame(height: Constants.minHeight, alignment: .bottom)
                 }
 
-                MTMapViewContainer(map: map) {
-                    MTMarker(coordinates: Constants.brnoCoordinates, color: .magenta, draggable: true)
-
-                    let maptilerPopup = MTTextPopup(coordinates: Constants.unterageriCoordinates, text: "MapTiler")
-                    MTMarker(coordinates: Constants.unterageriCoordinates, icon: UIImage(named: "maptiler-marker"))
-                        .popup(maptilerPopup)
-
-                    MTGeoJSONSource(identifier: "earthquakesSource", url: sourceURL)
-                    MTSymbolLayer(identifier: "earthquakesLayer", sourceIdentifier: "earthquakesSource")
-                        .icon(.strokedCheckmark)
+                MTMapViewContainer(map: mapView) {
+                    MTMarker(coordinates: Constants.unterageriCoordinates, icon: UIImage(named: "maptiler-marker"), draggable: true)
                 }
                 .referenceStyle(referenceStyle)
                 .styleVariant(styleVariant)

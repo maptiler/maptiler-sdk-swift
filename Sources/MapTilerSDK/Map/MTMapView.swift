@@ -232,6 +232,65 @@ extension MTMapView: EventProcessorDelegate {
         if event == .isIdle, let style {
             style.processLayersQueueIfNeeded()
         }
+
+        handleOptionsChange(event: event)
+    }
+
+    private func handleOptionsChange(event: MTEvent) {
+        if event == .zoomDidEnd {
+            let zoom = getZoom { [weak self] result in
+                switch result {
+                case .success(let zoom):
+                    self?.options?.setZoom(zoom)
+                case .failure(let error):
+                    MTLogger.log("\(error)", type: .error)
+                }
+            }
+        } else if event == .dragDidEnd || event == .rotateDidEnd || event == .moveDidEnd {
+            let center = getCenter { [weak self] result in
+                switch result {
+                case .success(let center):
+                    if self?.options?.center != center {
+                        self?.options?.setCenter(center)
+                    }
+                case .failure(let error):
+                    MTLogger.log("\(error)", type: .error)
+                }
+            }
+
+            let pitch = getPitch { [weak self] result in
+                switch result {
+                case .success(let pitch):
+                    if self?.options?.pitch != pitch {
+                        self?.options?.setPitch(pitch)
+                    }
+                case .failure(let error):
+                    MTLogger.log("\(error)", type: .error)
+                }
+            }
+
+            let bearing = getBearing { [weak self] result in
+                switch result {
+                case .success(let bearing):
+                    if self?.options?.bearing != bearing {
+                        self?.options?.setBearing(bearing)
+                    }
+                case .failure(let error):
+                    MTLogger.log("\(error)", type: .error)
+                }
+            }
+
+            let roll = getRoll { [weak self] result in
+                switch result {
+                case .success(let roll):
+                    if self?.options?.roll != roll {
+                        self?.options?.setRoll(roll)
+                    }
+                case .failure(let error):
+                    MTLogger.log("\(error)", type: .error)
+                }
+            }
+        }
     }
 }
 

@@ -18,6 +18,7 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setBearing(_ bearing: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetBearing(bearing: bearing), completion: completionHandler)
+        options?.setBearing(bearing)
     }
 
     /// Sets the map's geographical centerpoint.
@@ -30,6 +31,7 @@ extension MTMapView: MTNavigable {
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(SetCenter(center: center), completion: completionHandler)
+        options?.setCenter(center)
     }
 
     /// Changes any combination of center, zoom, bearing, and pitch.
@@ -55,6 +57,8 @@ extension MTMapView: MTNavigable {
             FlyTo(center: center, options: options, animationOptions: animationOptions),
             completion: completionHandler
         )
+
+        self.options?.setCenter(center)
     }
 
     /// Changes any combination of center, zoom, bearing, pitch, and padding.
@@ -82,6 +86,24 @@ extension MTMapView: MTNavigable {
             ),
             completion: completionHandler
         )
+
+        self.options?.setCenter(center)
+
+        guard let options = options else {
+            return
+        }
+
+        if let bearing = options.bearing {
+            self.options?.setBearing(bearing)
+        }
+
+        if let pitch = options.pitch {
+            self.options?.setPitch(pitch)
+        }
+
+        if let zoom = options.zoom {
+            self.options?.setZoom(zoom)
+        }
     }
 
     /// Changes any combination of center, zoom, bearing, and pitch, without an animated transition.
@@ -97,6 +119,24 @@ extension MTMapView: MTNavigable {
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(JumpTo(center: center, options: options), completion: completionHandler)
+
+        self.options?.setCenter(center)
+
+        guard let options = options else {
+            return
+        }
+
+        if let bearing = options.bearing {
+            self.options?.setBearing(bearing)
+        }
+
+        if let pitch = options.pitch {
+            self.options?.setPitch(pitch)
+        }
+
+        if let zoom = options.zoom {
+            self.options?.setZoom(zoom)
+        }
     }
 
     /// Sets the padding in pixels around the viewport.
@@ -127,6 +167,8 @@ extension MTMapView: MTNavigable {
             SetCenterClampedToGround(isCenterClampedToGround: isCenterClampedToGround),
             completion: completionHandler
         )
+
+        options?.setIsCenterClampedToGround(isCenterClampedToGround)
     }
 
     /// Sets the elevation of the map's center point, in meters above sea level.
@@ -137,6 +179,7 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setCenterElevation(_ elevation: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetCenterElevation(elevation: elevation), completion: completionHandler)
+        options?.setElevation(elevation)
     }
 
     /// Sets or clears the map's maximum pitch.
@@ -149,6 +192,10 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setMaxPitch(_ maxPitch: Double?, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetMaxPitch(maxPitch: maxPitch), completion: completionHandler)
+
+        if let maxPitch = maxPitch {
+            options?.setMaxPitch(maxPitch)
+        }
     }
 
     /// Sets or clears the map's maximum zoom.
@@ -161,6 +208,10 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setMaxZoom(_ maxZoom: Double?, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetMaxZoom(maxZoom: maxZoom), completion: completionHandler)
+
+        if let maxZoom = maxZoom {
+            options?.setMaxZoom(maxZoom)
+        }
     }
 
     /// Sets or clears the map's minimum pitch.
@@ -173,6 +224,10 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setMinPitch(_ minPitch: Double?, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetMinPitch(minPitch: minPitch), completion: completionHandler)
+
+        if let minPitch = minPitch {
+            options?.setMinPitch(minPitch)
+        }
     }
 
     /// Sets or clears the map's minimum zoom.
@@ -185,6 +240,10 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setMinZoom(_ minZoom: Double?, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetMinZoom(minZoom: minZoom), completion: completionHandler)
+
+        if let minZoom = minZoom {
+            options?.setMinZoom(minZoom)
+        }
     }
 
     /// Sets the map's pitch (tilt).
@@ -194,6 +253,8 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setPitch(_ pitch: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetPitch(pitch: pitch), completion: completionHandler)
+
+        options?.setPitch(pitch)
     }
 
     /// Sets the map's roll angle.
@@ -204,6 +265,8 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setRoll(_ roll: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetRoll(roll: roll), completion: completionHandler)
+
+        options?.setRoll(roll)
     }
 
     /// Set combination of center, bearing, pitch, roll and elevation.
@@ -213,27 +276,27 @@ extension MTMapView: MTNavigable {
     public func setViewport(with cameraHelper: MTMapCameraHelper, zoomLevel: Double? = nil) {
         Task {
             if let centerCoordinate = cameraHelper.centerCoordinate {
-                await setCenter(centerCoordinate)
+                setCenter(centerCoordinate, completionHandler: nil)
             }
 
             if let bearing = cameraHelper.bearing {
-                await setBearing(bearing)
+                setBearing(bearing, completionHandler: nil)
             }
 
             if let pitch = cameraHelper.pitch {
-                await setPitch(pitch)
+                setPitch(pitch, completionHandler: nil)
             }
 
             if let roll = cameraHelper.roll {
-                await setRoll(roll)
+                setRoll(roll, completionHandler: nil)
             }
 
             if let elevation = cameraHelper.elevation {
-                await setCenterElevation(elevation)
+                setCenterElevation(elevation, completionHandler: nil)
             }
 
             if let zoomLevel {
-                await setZoom(zoomLevel)
+                setZoom(zoomLevel, completionHandler: nil)
             }
         }
     }
@@ -287,6 +350,22 @@ extension MTMapView: MTNavigable {
         completionHandler: @escaping (Result<CLLocationCoordinate2D, MTError>) -> Void
     ) {
         runCommandWithCoordinateReturnValue(Project(coordinate: coordinates), completion: completionHandler)
+    }
+
+    /// Returns the map's current bearing.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getBearing(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetBearing(), completion: completionHandler)
+    }
+
+    /// Returns the map's current roll.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getRoll(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetRoll(), completion: completionHandler)
     }
 }
 
@@ -578,6 +657,34 @@ extension MTMapView {
                     continuation.resume(returning: MTPoint(x: result.latitude, y: result.longitude))
                 case .failure(let error):
                     continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Returns the map's current bearing.
+    public func getBearing() async -> Double {
+        await withCheckedContinuation { continuation in
+            getBearing { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns the map's current roll.
+    public func getRoll() async -> Double {
+        await withCheckedContinuation { continuation in
+            getRoll { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(returning: .nan)
                 }
             }
         }

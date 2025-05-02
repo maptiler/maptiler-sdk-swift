@@ -108,4 +108,10 @@ public protocol MTNavigable {
 
     /// Returns the map's current center.
     func getCenter() async -> CLLocationCoordinate2D
+
+    /// Returns the map's current bearing.
+    func getBearing() async -> Double
+
+    /// Returns the map's current roll.
+    func getRoll() async -> Double
 }

@@ -1,8 +1,10 @@
 //
+// Copyright (c) 2025, MapTiler
+// All rights reserved.
+// SPDX-License-Identifier: BSD 3-Clause
+//
 //  MTMapView+MTNavigable.swift
 //  MapTilerSDK
-//
-//  Created by Sasa Prodribaba on 11. 2. 2025..
 //
 
 import CoreLocation

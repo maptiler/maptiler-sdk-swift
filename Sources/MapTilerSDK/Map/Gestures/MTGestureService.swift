@@ -1,4 +1,8 @@
 //
+// Copyright (c) 2025, MapTiler
+// All rights reserved.
+// SPDX-License-Identifier: BSD 3-Clause
+//
 //  MTGestureService.swift
 //  MapTilerSDK
 //
@@ -11,10 +15,11 @@ public class MTGestureService {
 
     private var bridge: MTBridge!
     private var eventProcessor: EventProcessor!
+    private unowned var mapView: MTMapView!
 
     private init() {}
 
-    package init(bridge: MTBridge, eventProcessor: EventProcessor) {
+    package init(bridge: MTBridge, eventProcessor: EventProcessor, mapView: MTMapView) {
         self.bridge = bridge
         self.eventProcessor = eventProcessor
 
@@ -43,6 +48,17 @@ public class MTGestureService {
                         completionHandler?(.failure(MTError.bridgeNotLoaded))
                     }
                 }
+            }
+
+            switch type {
+            case .doubleTapZoomIn:
+                mapView.options?.setDoubleTapShouldZoom(false)
+            case .dragPan:
+                mapView.options?.setDragPanIsEnabled(false)
+            case .twoFingersDragPitch:
+                mapView.options?.setShouldDragToPitch(false)
+            case .pinchRotateAndZoom:
+                mapView.options?.setShouldPinchToRotateAndZoom(false)
             }
         }
     }
@@ -79,6 +95,8 @@ public class MTGestureService {
                 }
             }
         }
+
+        mapView.options?.setDragPanIsEnabled(true)
     }
 
     /// Enables pinch to rotate and zoom gesture.
@@ -107,6 +125,8 @@ public class MTGestureService {
                 }
             }
         }
+
+        mapView.options?.setShouldPinchToRotateAndZoom(true)
     }
 
     /// Enables two fingers drag pitch gesture.
@@ -135,6 +155,8 @@ public class MTGestureService {
                 }
             }
         }
+
+        mapView.options?.setShouldDragToPitch(true)
     }
 
     /// Enables double tap zoom in gesture.
@@ -162,6 +184,8 @@ public class MTGestureService {
                 }
             }
         }
+
+        mapView.options?.setDoubleTapShouldZoom(true)
     }
 
     /// Sets the double tap sensitivity level (i.e. required time between taps).

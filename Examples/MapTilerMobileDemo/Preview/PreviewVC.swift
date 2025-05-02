@@ -36,7 +36,9 @@ extension PreviewVC: MTMapViewDelegate {
     }
     
     func mapViewDidInitialize(_ mapView: MapTilerSDK.MTMapView) {
-        let marker = MTMarker(coordinates: Constants.unterageriCoordinates, icon: UIImage(named: "maptiler-marker"), draggable: true)
-        mapView.addMarker(marker)
+        Task {
+            let marker = MTMarker(coordinates: Constants.unterageriCoordinates, icon: UIImage(named: "maptiler-marker"), draggable: true)
+            await mapView.addMarker(marker)
+        }
     }
 }

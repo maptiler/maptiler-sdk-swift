@@ -49,10 +49,10 @@ import MapTilerSDK
 @State private var referenceStyle: MTMapReferenceStyle = .streets
 @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
 
-@State private var mapView = MTMapView(options: MTMapOptions(zoom: 14.0))
+@State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
 
 var body: some View {
-    MTMapViewContainer(map: map) {}
+    MTMapViewContainer(map: mapView) {}
         .referenceStyle(referenceStyle)
         .styleVariant(styleVariant)
 }
@@ -160,6 +160,19 @@ var body: some View {
 
 For additional examples refer to the Examples directory.
 
+## Custom Annotations
+In addition to `MTMarker` and `MTTextPopup`, you can use `MTCustomAnnotationView` class to make your own annotations and add them to the map. You can subclass to create custom UI it or use it as is for simple designs.
+
+```swift
+let customSize = CGSize(width: 200.0, height: 80.0)
+let coordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+
+let myCustomView = MTCustomAnnotationView(size: customSize, coordinates: coordinates)
+myCustomView.backgroundColor = .blue
+
+myCustomView.addTo(mapView)
+```
+
 
 # Installation
 MapTiler Swift SDK is a Swift Package and can be added as dependency through **Swift Package Manager**.
@@ -171,3 +184,6 @@ MapTiler Swift SDK is a Swift Package and can be added as dependency through **S
 <img src="Examples/streets.png" alt="MapTiler" title="MapTiler"/>
 <img src="Examples/satellite.png" alt="MapTiler" title="MapTiler"/>
 </p>
+
+# License
+MapTiler SDK Swift is released under the BSD 3-Clause license. See LICENSE for details.

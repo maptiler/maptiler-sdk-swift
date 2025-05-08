@@ -22,6 +22,15 @@ class PreviewVC: UIViewController {
         mapView.frame = contentView.frame
         contentView.addSubview(mapView)
 
+        mapView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            mapView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            mapView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            mapView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            mapView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+        ])
+
         mapView.delegate = self
     }
 

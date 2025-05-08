@@ -73,6 +73,18 @@ class MainViewController: UIViewController {
         setUpLayers()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        AppDelegate.AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        AppDelegate.AppUtility.lockOrientation(.all)
+    }
+
     private func setUpLayers() {
         contoursLayer = MTLineLayer(identifier: "contourslayer", sourceIdentifier: "contourssource")
         contoursLayer.color = .brown

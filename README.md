@@ -41,6 +41,12 @@ mapView.delegate = self
 view.addSubview(mapView)
 ```
 
+If you are using auto layout, you can call the helper function for anchors pinning. This ensures correct orientation updates.
+
+```swift
+mapView.pinToSuperviewEdges()
+```
+
 ### SwiftUI
 
 ```swift

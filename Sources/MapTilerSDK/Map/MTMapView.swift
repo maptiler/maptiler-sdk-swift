@@ -444,3 +444,23 @@ extension MTMapView: MTLocationManagerDelegate {
         MTLogger.log("MTLocationManager didFailWithError \(error)", type: .error)
     }
 }
+
+public extension MTMapView {
+    /// Pins the map view to its superview edges using auto layout.
+    ///
+    /// - Note: Map view must be added to the superview before calling the function.
+    public func pinToSuperviewEdges() {
+        guard let superview else {
+            return
+        }
+
+        translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            topAnchor.constraint(equalTo: superview.topAnchor),
+            leadingAnchor.constraint(equalTo: superview.leadingAnchor),
+            bottomAnchor.constraint(equalTo: superview.bottomAnchor),
+            trailingAnchor.constraint(equalTo: superview.trailingAnchor)
+        ])
+    }
+}

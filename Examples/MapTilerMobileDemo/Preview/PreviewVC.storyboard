@@ -18,7 +18,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R0H-qt-KUf">
-                                <rect key="frame" x="0.0" y="-50" width="393" height="995"/>
+                                <rect key="frame" x="-80" y="-80" width="553" height="1025"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TFO-uY-rkv" userLabel="FullScreen">
@@ -41,10 +41,10 @@
                         <viewLayoutGuide key="safeArea" id="nzO-6F-368"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="R0H-qt-KUf" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" id="3fR-f7-R7K"/>
+                            <constraint firstItem="R0H-qt-KUf" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" constant="-80" id="3fR-f7-R7K"/>
                             <constraint firstAttribute="trailing" secondItem="TFO-uY-rkv" secondAttribute="trailing" constant="20" id="BOe-2k-0kY"/>
-                            <constraint firstAttribute="trailing" secondItem="R0H-qt-KUf" secondAttribute="trailing" id="Ms5-38-7mN"/>
-                            <constraint firstItem="R0H-qt-KUf" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" constant="-50" id="Oee-M3-CoO"/>
+                            <constraint firstAttribute="trailing" secondItem="R0H-qt-KUf" secondAttribute="trailing" constant="-80" id="Ms5-38-7mN"/>
+                            <constraint firstItem="R0H-qt-KUf" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" constant="-80" id="Oee-M3-CoO"/>
                             <constraint firstAttribute="bottom" secondItem="R0H-qt-KUf" secondAttribute="bottom" constant="-93" id="a7N-7R-eCh"/>
                             <constraint firstItem="nzO-6F-368" firstAttribute="bottom" secondItem="TFO-uY-rkv" secondAttribute="bottom" constant="25" id="sBj-bT-nFX"/>
                         </constraints>

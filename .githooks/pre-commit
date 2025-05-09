@@ -1,0 +1,52 @@
+#!/bin/sh
+
+echo "🔍 Running SwiftLint on staged files..."
+
+SWIFTLINT_PATH=$(command -v swiftlint || echo "/opt/homebrew/bin/swiftlint")
+
+if [ ! -x "$SWIFTLINT_PATH" ]; then
+    SWIFTLINT_PATH="/usr/local/bin/swiftlint"
+fi
+
+if [ ! -x "$SWIFTLINT_PATH" ]; then
+    echo "❌ SwiftLint not found! Make sure it is installed via Homebrew:"
+    echo ""
+    echo "   brew install swiftlint"
+    echo ""
+    exit 1
+fi
+
+echo "✅ Found SwiftLint at: $SWIFTLINT_PATH"
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.swift$')
+
+if [ -z "$staged_files" ]; then
+    echo "No Swift files staged for commit."
+    exit 0
+fi
+
+lint_failed=0
+
+while IFS= read -r file; do
+    if [ -f "$file" ]; then
+        "$SWIFTLINT_PATH" autocorrect "$file"
+        
+        git add "$file"
+
+        "$SWIFTLINT_PATH" lint "$file" --quiet
+        lint_status=$?
+
+        if [ $lint_status -ne 0 ]; then
+            echo "❌ SwiftLint found violations in $file. Fix them before committing."
+            lint_failed=1
+        fi
+    fi
+done <<< "$staged_files"
+
+if [ $lint_failed -ne 0 ]; then
+    echo "🚨 Commit blocked due to SwiftLint violations!"
+    exit 1
+fi
+
+echo "✅ SwiftLint passed!"
+exit 0

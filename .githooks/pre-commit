@@ -29,11 +29,7 @@ lint_failed=0
 
 while IFS= read -r file; do
     if [ -f "$file" ]; then
-        "$SWIFTLINT_PATH" autocorrect "$file"
-        
-        git add "$file"
-
-        "$SWIFTLINT_PATH" lint "$file" --quiet
+        "$SWIFTLINT_PATH" lint "$file" --strict --quiet
         lint_status=$?
 
         if [ $lint_status -ne 0 ]; then

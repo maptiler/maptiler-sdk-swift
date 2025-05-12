@@ -45,7 +45,7 @@ package struct AddMarker: MTCommand {
                 """
         }
 
-        var popupString = marker.popup != nil ? "\(marker.identifier).setPopup(\(marker.popup!.identifier))" : ""
+        let popupString = marker.popup != nil ? "\(marker.identifier).setPopup(\(marker.popup!.identifier))" : ""
 
         if let icon = marker.icon, let encodedImageString = icon.getEncodedString() {
             iconInit = """

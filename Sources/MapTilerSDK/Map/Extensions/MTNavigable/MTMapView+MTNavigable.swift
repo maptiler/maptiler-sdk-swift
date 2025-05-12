@@ -603,7 +603,7 @@ extension MTMapView {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: .nan)
                 }
             }
@@ -641,7 +641,7 @@ extension MTMapView {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
                 }
             }
@@ -657,7 +657,7 @@ extension MTMapView {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: MTPoint(x: result.latitude, y: result.longitude))
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: MTPoint(x: 0, y: 0))
                 }
             }
@@ -671,7 +671,7 @@ extension MTMapView {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: .nan)
                 }
             }
@@ -685,7 +685,7 @@ extension MTMapView {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: .nan)
                 }
             }

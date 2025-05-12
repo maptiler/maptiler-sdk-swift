@@ -14,6 +14,8 @@ jobs:
     steps:
     - name: Setup Swift
       uses: SwiftyLab/setup-swift@latest
+      with:
+        swift-version: "5.1.0"
     - uses: actions/checkout@v4
     - name: Run tests
       run: xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 

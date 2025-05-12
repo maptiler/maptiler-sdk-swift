@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - name: Checkout code
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
     - name: Set Up Swift
-    - uses: SwiftyLab/setup-swift@latest
+      uses: SwiftyLab/setup-swift@latest
     - name: Verify Swift Version
       run: swift --version
     - name: Run tests

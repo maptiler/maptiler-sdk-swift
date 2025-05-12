@@ -16,6 +16,8 @@ jobs:
       uses: actions/checkout@v4
     - name: Set Up Swift
       uses: SwiftyLab/setup-swift@latest
+      with:
+        swift-version: '6.0.0'
     - name: Verify Swift Version
       run: swift --version
     - name: Run tests

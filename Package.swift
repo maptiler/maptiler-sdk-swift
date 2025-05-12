@@ -6,7 +6,6 @@ import PackageDescription
 let package = Package(
     name: "MapTilerSDK",
     platforms: [
-        // Minimum Supported Version
         .iOS(.v15)
     ],
     products: [

@@ -1,0 +1,28 @@
+name: Swift Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set Up Swift
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '16.2'
+    - name: Verify Swift Version
+      run: swift --version
+    - name: Verify Xcode version
+      run: xcodebuild -version
+    - name: Verify Active Swift Toolchain version
+      run: xcrun swift -version
+    - name: Run tests
+      run: xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 

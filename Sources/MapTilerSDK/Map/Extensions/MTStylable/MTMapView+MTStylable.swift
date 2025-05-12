@@ -524,7 +524,7 @@ extension MTMapView {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: false)
                 }
             }
@@ -538,7 +538,7 @@ extension MTMapView {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: false)
                 }
             }

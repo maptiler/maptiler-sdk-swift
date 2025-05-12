@@ -23,13 +23,10 @@ package struct AddMarkers: MTCommand {
         } else {
             return handleMarkers(markers: markers)
         }
-
-        return ""
     }
 
     package func handleMarkersWithSingleIcon(markerIcon: UIImage, markers: [MTMarker]) -> String {
         var iconInit = ""
-        var iconData = ""
 
         if let encodedImageString = markerIcon.getEncodedString() {
             iconInit = """

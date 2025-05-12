@@ -226,9 +226,10 @@ public final class MTBenchmark: MTMapViewDelegate {
 
     private func benchmarkJSExecution(command: MTCommand) async {
         let startTime = CFAbsoluteTimeGetCurrent()
-        await mapView.runCommand(command)
-        let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
-        logger.log(level: .error, "t: \(elapsedTime) - \(command.toJS())")
+        mapView.runCommand(command) { [weak self] _ in
+            let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
+            self?.logger.log(level: .error, "t: \(elapsedTime) - \(command.toJS())")
+        }
     }
 
     public func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
@@ -244,7 +245,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
     private func benchmarkSwift() async {
         await benchmarkSwiftExecution(label: "Fibonacci 30") { [weak self] in
-            guard let self else {
+            guard self != nil else {
                 return
             }
 
@@ -256,7 +257,7 @@ public final class MTBenchmark: MTMapViewDelegate {
         }
 
         await benchmarkSwiftExecution(label: "Memory Allocation 100K") { [weak self] in
-            guard let self else {
+            guard self != nil else {
                 return
             }
 
@@ -298,9 +299,10 @@ public final class MTBenchmark: MTMapViewDelegate {
         let totalStartTime = CFAbsoluteTimeGetCurrent()
         for i in 0...iterations {
             let startTime = CFAbsoluteTimeGetCurrent()
-            await mapView.runCommand(i % 2 == 0 ? ZoomIn() : ZoomOut())
-            let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
-            elapsedTimes.append(elapsedTime)
+            mapView.runCommand(i % 2 == 0 ? ZoomIn() : ZoomOut()) { _ in
+                let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
+                elapsedTimes.append(elapsedTime)
+            }
         }
 
         let elapsedTimesSum = elapsedTimes.reduce(0, +)
@@ -318,7 +320,7 @@ public final class MTBenchmark: MTMapViewDelegate {
         for i in 0...iterations {
             let startTime = CFAbsoluteTimeGetCurrent()
             let isEven = i % 2 == 0
-            await mapView.runCommand(
+            mapView.runCommand(
                 JumpTo(
                     center: CLLocationCoordinate2D(
                         latitude: isEven ? 19.567 : 45.567,
@@ -345,7 +347,7 @@ public final class MTBenchmark: MTMapViewDelegate {
         for i in 0...iterations {
             let startTime = CFAbsoluteTimeGetCurrent()
             let isEven = i % 2 == 0
-            await mapView.runCommand(
+            mapView.runCommand(
                 FlyTo(
                     center: CLLocationCoordinate2D(
                         latitude: isEven ? 19.567 : 45.567,
@@ -387,9 +389,11 @@ public final class MTBenchmark: MTMapViewDelegate {
                     longitude: !isEven ? 19.567 + moduleThree : 45.567 - moduleThree
                 )
             )
-            await mapView.runCommand(AddMarker(marker: marker))
-            let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
-            elapsedTimes.append(elapsedTime)
+
+            mapView.runCommand(AddMarker(marker: marker)) { _ in
+                let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
+                elapsedTimes.append(elapsedTime)
+            }
         }
 
         let elapsedTimesSum = elapsedTimes.reduce(0, +)
@@ -403,7 +407,7 @@ public final class MTBenchmark: MTMapViewDelegate {
         var elapsedTimes: [CFAbsoluteTime] = []
 
         let totalStartTime = CFAbsoluteTimeGetCurrent()
-        for i in 0...iterations {
+        for _ in 0...iterations {
             let startTime = CFAbsoluteTimeGetCurrent()
 
             let lat = Double.random(in: -90...90)
@@ -411,9 +415,10 @@ public final class MTBenchmark: MTMapViewDelegate {
 
             let marker = MTMarker(coordinates: CLLocationCoordinate2D(latitude: lat, longitude: lng))
 
-            await mapView.runCommand(AddMarker(marker: marker))
-            let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
-            elapsedTimes.append(elapsedTime)
+            mapView.runCommand(AddMarker(marker: marker)) { _ in
+                let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
+                elapsedTimes.append(elapsedTime)
+            }
         }
 
         let elapsedTimesSum = elapsedTimes.reduce(0, +)

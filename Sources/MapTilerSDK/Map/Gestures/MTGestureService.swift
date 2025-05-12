@@ -37,17 +37,9 @@ public class MTGestureService {
     public func disableGesture(with type: MTGestureType, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         if let gesture = enabledGestures[type] {
             Task {
-                do {
-                    await gesture.disable()
-                    enabledGestures.removeValue(forKey: type)
-                    completionHandler?(.success(()))
-                } catch {
-                    if let error = error as? MTError {
-                        completionHandler?(.failure(error))
-                    } else {
-                        completionHandler?(.failure(MTError.bridgeNotLoaded))
-                    }
-                }
+                await gesture.disable()
+                enabledGestures.removeValue(forKey: type)
+                completionHandler?(.success(()))
             }
 
             switch type {
@@ -73,27 +65,19 @@ public class MTGestureService {
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         Task {
-            do {
-                enabledGestures[.dragPan] = MTGestureFactory.makeGesture(with: .dragPan, bridge: bridge)
+            enabledGestures[.dragPan] = MTGestureFactory.makeGesture(with: .dragPan, bridge: bridge)
 
-                guard let dragPanGesture = enabledGestures[.dragPan] as? MTDragPanGesture else {
-                    return
-                }
-
-                if let options {
-                    await dragPanGesture.enable(with: options)
-                } else {
-                    await dragPanGesture.enable()
-                }
-
-                completionHandler?(.success(()))
-            } catch {
-                if let error = error as? MTError {
-                    completionHandler?(.failure(error))
-                } else {
-                    completionHandler?(.failure(MTError.bridgeNotLoaded))
-                }
+            guard let dragPanGesture = enabledGestures[.dragPan] as? MTDragPanGesture else {
+                return
             }
+
+            if let options {
+                await dragPanGesture.enable(with: options)
+            } else {
+                await dragPanGesture.enable()
+            }
+
+            completionHandler?(.success(()))
         }
 
         mapView.options?.setDragPanIsEnabled(true)
@@ -105,25 +89,17 @@ public class MTGestureService {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func enablePinchRotateAndZoomGesture(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         Task {
-            do {
-                enabledGestures[.pinchRotateAndZoom] = MTGestureFactory
-                    .makeGesture(with: .pinchRotateAndZoom, bridge: bridge)
+            enabledGestures[.pinchRotateAndZoom] = MTGestureFactory
+                .makeGesture(with: .pinchRotateAndZoom, bridge: bridge)
 
-                let pinchRotateAndZoomGesture = enabledGestures[.pinchRotateAndZoom] as? MTPinchRotateAndZoomGesture
-                guard let pinchRotateAndZoomGesture else {
-                    return
-                }
-
-                await pinchRotateAndZoomGesture.enable()
-
-                completionHandler?(.success(()))
-            } catch {
-                if let error = error as? MTError {
-                    completionHandler?(.failure(error))
-                } else {
-                    completionHandler?(.failure(MTError.bridgeNotLoaded))
-                }
+            let pinchRotateAndZoomGesture = enabledGestures[.pinchRotateAndZoom] as? MTPinchRotateAndZoomGesture
+            guard let pinchRotateAndZoomGesture else {
+                return
             }
+
+            await pinchRotateAndZoomGesture.enable()
+
+            completionHandler?(.success(()))
         }
 
         mapView.options?.setShouldPinchToRotateAndZoom(true)
@@ -135,25 +111,17 @@ public class MTGestureService {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func enableTwoFingerDragPitchGesture(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         Task {
-            do {
-                enabledGestures[.twoFingersDragPitch] = MTGestureFactory
-                    .makeGesture(with: .twoFingersDragPitch, bridge: bridge)
+            enabledGestures[.twoFingersDragPitch] = MTGestureFactory
+                .makeGesture(with: .twoFingersDragPitch, bridge: bridge)
 
-                let twoFingersDragPitchGesture = enabledGestures[.twoFingersDragPitch] as? MTTwoFingersDragPitchGesture
-                guard let twoFingersDragPitchGesture else {
-                    return
-                }
-
-                await twoFingersDragPitchGesture.enable()
-
-                completionHandler?(.success(()))
-            } catch {
-                if let error = error as? MTError {
-                    completionHandler?(.failure(error))
-                } else {
-                    completionHandler?(.failure(MTError.bridgeNotLoaded))
-                }
+            let twoFingersDragPitchGesture = enabledGestures[.twoFingersDragPitch] as? MTTwoFingersDragPitchGesture
+            guard let twoFingersDragPitchGesture else {
+                return
             }
+
+            await twoFingersDragPitchGesture.enable()
+
+            completionHandler?(.success(()))
         }
 
         mapView.options?.setShouldDragToPitch(true)
@@ -165,24 +133,16 @@ public class MTGestureService {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func enableDoubleTapZoomInGesture(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         Task {
-            do {
-                enabledGestures[.doubleTapZoomIn] = MTGestureFactory.makeGesture(with: .doubleTapZoomIn, bridge: bridge)
+            enabledGestures[.doubleTapZoomIn] = MTGestureFactory.makeGesture(with: .doubleTapZoomIn, bridge: bridge)
 
-                let doubleTapZoomInGesture = enabledGestures[.doubleTapZoomIn] as? MTDoubleTapZoomInGesture
-                guard let doubleTapZoomInGesture else {
-                    return
-                }
-
-                await doubleTapZoomInGesture.enable()
-
-                completionHandler?(.success(()))
-            } catch {
-                if let error = error as? MTError {
-                    completionHandler?(.failure(error))
-                } else {
-                    completionHandler?(.failure(MTError.bridgeNotLoaded))
-                }
+            let doubleTapZoomInGesture = enabledGestures[.doubleTapZoomIn] as? MTDoubleTapZoomInGesture
+            guard let doubleTapZoomInGesture else {
+                return
             }
+
+            await doubleTapZoomInGesture.enable()
+
+            completionHandler?(.success(()))
         }
 
         mapView.options?.setDoubleTapShouldZoom(true)

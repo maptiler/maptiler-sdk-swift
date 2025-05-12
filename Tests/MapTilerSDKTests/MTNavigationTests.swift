@@ -51,7 +51,7 @@ struct MTNavigationTests {
     @Test func easeToCommand_shouldMatchJS() async throws {
         let cameraOptions = MTCameraOptions(zoom: zoom, bearing: bearing, pitch: pitch)
 
-        let options = EaseToOptions(center: centerCoordinate, options: cameraOptions)
+        let options = EaseToOptions(center: centerCoordinate, options: cameraOptions, animationOptions: nil)
         let optionsString: JSString = options.toJSON() ?? ""
         let easeToJS = "\(MTBridge.mapObject).easeTo(\(optionsString));"
 
@@ -61,7 +61,7 @@ struct MTNavigationTests {
     @Test func flyToCommand_shouldMatchJS() async throws {
         let flyToOptions = MTFlyToOptions(curve: 1.0, minZoom: 2.0, speed: 3.0, screenSpeed: 4.0, maxDuration: 5.0)
 
-        let options = FlyToOptions(center: centerCoordinate, options: flyToOptions)
+        let options = FlyToOptions(center: centerCoordinate, options: flyToOptions, animationOptions: nil)
         let optionsString: JSString = options.toJSON() ?? ""
         let flyToJS = "\(MTBridge.mapObject).flyTo(\(optionsString));"
 

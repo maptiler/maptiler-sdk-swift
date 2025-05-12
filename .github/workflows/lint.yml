@@ -25,4 +25,4 @@ jobs:
       if: steps.cache.outputs.cache-hit != 'true'
       run: brew install swiftlint
     - name: Run SwiftLint
-      run: swiftlint --strict --quiet
+      run: swiftlint --strict

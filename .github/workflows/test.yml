@@ -12,6 +12,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    - name: Setup Swift
+      uses: SwiftyLab/setup-swift@latest
     - uses: actions/checkout@v4
     - name: Run tests
       run: xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 

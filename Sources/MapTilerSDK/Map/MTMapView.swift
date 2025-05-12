@@ -49,7 +49,7 @@ extension MTMapViewDelegate {
 ///
 /// Exposes methods and properties that enable changes to the map,
 /// and fires events that can be interacted with.
-open class MTMapView: UIView {
+open class MTMapView: UIView, Sendable {
     /// Proxy style object of the map.
     public private(set) var style: MTStyle?
 
@@ -242,7 +242,7 @@ extension MTMapView: EventProcessorDelegate {
 
     private func handleOptionsChange(event: MTEvent) {
         if event == .zoomDidEnd {
-            let zoom = getZoom { [weak self] result in
+            getZoom { [weak self] result in
                 switch result {
                 case .success(let zoom):
                     self?.options?.setZoom(zoom)
@@ -251,7 +251,7 @@ extension MTMapView: EventProcessorDelegate {
                 }
             }
         } else if event == .dragDidEnd || event == .rotateDidEnd || event == .moveDidEnd {
-            let center = getCenter { [weak self] result in
+            getCenter { [weak self] result in
                 switch result {
                 case .success(let center):
                     if self?.options?.center != center {
@@ -262,7 +262,7 @@ extension MTMapView: EventProcessorDelegate {
                 }
             }
 
-            let pitch = getPitch { [weak self] result in
+            getPitch { [weak self] result in
                 switch result {
                 case .success(let pitch):
                     if self?.options?.pitch != pitch {
@@ -273,7 +273,7 @@ extension MTMapView: EventProcessorDelegate {
                 }
             }
 
-            let bearing = getBearing { [weak self] result in
+            getBearing { [weak self] result in
                 switch result {
                 case .success(let bearing):
                     if self?.options?.bearing != bearing {
@@ -284,7 +284,7 @@ extension MTMapView: EventProcessorDelegate {
                 }
             }
 
-            let roll = getRoll { [weak self] result in
+            getRoll { [weak self] result in
                 switch result {
                 case .success(let roll):
                     if self?.options?.roll != roll {
@@ -302,7 +302,7 @@ extension MTMapView {
     package func runCommand(_ command: MTCommand, completion: ((Result<Void, MTError>) -> Void)? = nil) {
         Task {
             do {
-                try await bridge.execute(command)
+                try await _ = bridge.execute(command)
                 completion?(.success(()))
             } catch {
                 MTLogger.log("\(error)", type: .error)
@@ -449,7 +449,7 @@ public extension MTMapView {
     /// Pins the map view to its superview edges using auto layout.
     ///
     /// - Note: Map view must be added to the superview before calling the function.
-    public func pinToSuperviewEdges() {
+    func pinToSuperviewEdges() {
         guard let superview else {
             return
         }

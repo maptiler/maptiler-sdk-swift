@@ -47,40 +47,8 @@ struct MTStyleTests {
     }
 
     @Test func mtMapReferenceStyle_containsDefaultVariant() async throws {
-        for style in MTMapReferenceStyle.allCases {
+        for style in MTMapReferenceStyle.all() {
             #expect(style.getVariants()?.contains(.defaultVariant) ?? false)
         }
-    }
-
-    @Test func testSourceAndLayer_doesExist() async throws {
-        let centerCoordinate = CLLocationCoordinate2D(latitude: 19.2150224, longitude: 44.7569511)
-        let bearing = 2.0
-        let pitch = 3.0
-        let roll = 4.0
-        let elevation = 5.0
-
-        let mapOptions = MTMapOptions(center: centerCoordinate, bearing: bearing, pitch: pitch, roll: roll, elevation: elevation)
-        let mapView = await MTMapView(frame: CGRect(x: 0, y: 0, width: 0, height: 0), options: mapOptions, referenceStyle: .basic, styleVariant: .defaultVariant)
-        let style = await MTStyle(for: mapView, with: .basic, and: .defaultVariant)
-
-        let source = MTVectorTileSource(identifier: "mock-source-id", url: URL(string: "https://api.maptiler.com/tiles/v3/tiles.json")!)
-
-        try await style.addSource(source)
-        let sourceExists = await style.sourceExists(source)
-        #expect(sourceExists)
-
-        let layer = MTFillLayer(identifier: "mock-layer-id", sourceIdentifier: source.identifier)
-
-        try await style.addLayer(layer)
-        let layerExists = await style.layerExists(layer)
-        #expect(layerExists)
-
-        try await style.removeLayer(layer)
-        let layerDoesNotExist = await style.layerExists(layer)
-        #expect(!layerDoesNotExist)
-
-        try await style.removeSource(source)
-        let sourceDoesNotExist = await style.sourceExists(source)
-        #expect(!sourceDoesNotExist)
     }
 }

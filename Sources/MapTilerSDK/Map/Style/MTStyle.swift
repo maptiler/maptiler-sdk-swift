@@ -27,7 +27,7 @@ public class MTStyle {
     /// Current style variant of the map object.
     public private(set) var styleVariant: MTMapStyleVariant?
 
-    private var mapView: MTMapView!
+    private unowned var mapView: MTMapView!
     private var mapSources: [String: MTWeakSource] = [:]
     private var mapLayers: [String: MTWeakLayer] = [:]
 
@@ -214,7 +214,7 @@ extension MTStyle {
     public func addLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
 
-        if let parentSource = mapSources[layer.sourceIdentifier] {
+        if mapSources[layer.sourceIdentifier] != nil {
             mapView.isSourceLoaded(id: layer.sourceIdentifier) { [weak self] result in
                 guard let self else {
                     completionHandler?(.failure(MTError.bridgeNotLoaded))
@@ -306,7 +306,7 @@ extension MTStyle {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: "")
                 }
             }
@@ -322,7 +322,7 @@ extension MTStyle {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: "")
                 }
             }
@@ -336,7 +336,7 @@ extension MTStyle {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: "")
                 }
             }
@@ -352,7 +352,7 @@ extension MTStyle {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: "")
                 }
             }
@@ -366,7 +366,7 @@ extension MTStyle {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: "")
                 }
             }
@@ -382,7 +382,7 @@ extension MTStyle {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: "")
                 }
             }
@@ -396,7 +396,7 @@ extension MTStyle {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: "")
                 }
             }
@@ -412,7 +412,7 @@ extension MTStyle {
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: "")
                 }
             }
@@ -433,7 +433,7 @@ extension MTStyle {
         try await withCheckedThrowingContinuation { continuation in
             addSource(source) { result in
                 switch result {
-                case .success(let success):
+                case .success:
                     continuation.resume()
                 case .failure(let error):
                     continuation.resume(throwing: error)
@@ -455,7 +455,7 @@ extension MTStyle {
         try await withCheckedThrowingContinuation { continuation in
             removeSource(source) { result in
                 switch result {
-                case .success(let success):
+                case .success:
                     continuation.resume()
                 case .failure(let error):
                     continuation.resume(throwing: error)
@@ -478,7 +478,7 @@ extension MTStyle {
         try await withCheckedThrowingContinuation { continuation in
             addLayer(layer) { result in
                 switch result {
-                case .success(let success):
+                case .success:
                     continuation.resume()
                 case .failure(let error):
                     continuation.resume(throwing: error)
@@ -496,7 +496,7 @@ extension MTStyle {
         try await withCheckedThrowingContinuation { continuation in
             addLayers(layers) { result in
                 switch result {
-                case .success(let success):
+                case .success:
                     continuation.resume()
                 case .failure(let error):
                     continuation.resume(throwing: error)
@@ -518,7 +518,7 @@ extension MTStyle {
         try await withCheckedThrowingContinuation { continuation in
             removeLayer(layer) { result in
                 switch result {
-                case .success(let success):
+                case .success:
                     continuation.resume()
                 case .failure(let error):
                     continuation.resume(throwing: error)
@@ -535,7 +535,7 @@ extension MTStyle {
         try await withCheckedThrowingContinuation { continuation in
             removeLayers(layers) { result in
                 switch result {
-                case .success(let success):
+                case .success:
                     continuation.resume()
                 case .failure(let error):
                     continuation.resume(throwing: error)

@@ -57,7 +57,7 @@ package struct AddSource: MTCommand {
 
         if let url = source.url, url.isFileURL {
             jsSourceString = replaceDataString(sourceString: sourceString)
-        } else if let jsonString = source.jsonString {
+        } else if let jsonString = source.jsonString, jsonString != "" {
             jsSourceString = replaceDataString(sourceString: sourceString)
         }
 

@@ -22,7 +22,7 @@ jobs:
         restore-keys: |
           swiftlint-${{ runner.os }}-
     - name: Install SwiftLint
-      if: steps.cache.outputs.cache-hit != 'true
+      if: steps.cache.outputs.cache-hit != 'true'
       run: brew install swiftlint
     - name: Run SwiftLint
       run: swiftlint --strict --quiet

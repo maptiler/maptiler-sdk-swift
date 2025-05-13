@@ -29,8 +29,14 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+        queries: security-extended
     - name: Set Up Swift
-      uses: maxim-lobanov/setup-xcode@v1
+      uses: maxim-lobanov/setup-xcode@592f3a0
       with:
         xcode-version: '16.2'
     - name: Verify Swift Version
@@ -39,12 +45,6 @@ jobs:
       run: xcodebuild -version
     - name: Build Swift
       run: xcodebuild -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
-        queries: security-extended
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:

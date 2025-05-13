@@ -25,10 +25,12 @@ jobs:
         - language: javascript-typescript
           build-mode: none
         - language: swift
-          build-mode: autobuild
+          build-mode: manual
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    - name: Build Swift
+      run: xcrun xcodebuild -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:

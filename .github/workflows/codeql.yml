@@ -29,8 +29,16 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    - name: Set Up Swift
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '16.2'
+    - name: Verify Swift Version
+      run: swift --version
+    - name: Verify Xcode version
+      run: xcodebuild -version
     - name: Build Swift
-      run: xcrun xcodebuild -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 
+      run: xcodebuild -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:

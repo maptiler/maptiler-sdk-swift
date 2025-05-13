@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Set Up Swift
-      uses: maxim-lobanov/setup-xcode@v1
+      uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
       with:
         xcode-version: '16.2'
     - name: Verify Swift Version

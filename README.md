@@ -25,7 +25,9 @@ The MapTiler SDK Swift is a native SDK written in Swift, designed to work with t
 Make sure to set your MapTiler Cloud API key first. (i.e. in AppDelegate):
 
 ```swift
-MTConfig.shared.setAPIKey("YOUR_API_KEY")
+Task {
+    await MTConfig.shared.setAPIKey("YOUR_API_KEY")
+}
 ```
 
 ### UIKit
@@ -172,8 +174,9 @@ In addition to `MTMarker` and `MTTextPopup`, you can use `MTCustomAnnotationView
 ```swift
 let customSize = CGSize(width: 200.0, height: 80.0)
 let coordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+let offset = MTPoint(x: 0, y: -80)
 
-let myCustomView = MTCustomAnnotationView(size: customSize, coordinates: coordinates)
+let myCustomView = MTCustomAnnotationView(size: customSize, coordinates: coordinates, offset: offset)
 myCustomView.backgroundColor = .blue
 
 myCustomView.addTo(mapView)

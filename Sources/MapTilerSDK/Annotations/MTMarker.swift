@@ -124,6 +124,11 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     public func attachAnnotationView(_ view: MTCustomAnnotationView) {
         self.annotationView = view
     }
+
+    /// Detaches custom annotation view from the marker.
+    public func detachAnnotationView() {
+        self.annotationView = nil
+    }
 }
 
 // Concurrency

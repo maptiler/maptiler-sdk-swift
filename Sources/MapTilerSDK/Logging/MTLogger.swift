@@ -42,7 +42,7 @@ public class MTLogger {
 
 package actor MTLoggerInternal {
     package enum Constants {
-        static let maxLogCount: Int = 5000
+        static let maxLogCount: Int = 8000
         static let maxCountExceededMessage: String =
         "Maximum in-memory log count exceeded, earliest logs now accessible only through OS Logs."
     }

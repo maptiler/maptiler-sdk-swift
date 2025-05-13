@@ -26,5 +26,8 @@ jobs:
     - name: Install SwiftLint
       if: steps.cache.outputs.cache-hit != 'true'
       run: brew install swiftlint
+    - name: Link SwiftLint
+      if: steps.cache.outputs.cache-hit == 'true'
+      run: brew link swiftlint --force
     - name: Run SwiftLint
       run: swiftlint --strict

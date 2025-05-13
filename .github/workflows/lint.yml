@@ -25,9 +25,11 @@ jobs:
           swiftlint-${{ runner.os }}-
     - name: Install SwiftLint
       if: steps.cache.outputs.cache-hit != 'true'
-      run: brew install swiftlint
+      run: |
+        if ! command -v swiftlint &> /dev/null; then
+          brew install swiftlint
+        fi
     - name: Link SwiftLint
-      if: steps.cache.outputs.cache-hit == 'true'
       run: brew link swiftlint --force
     - name: Run SwiftLint
       run: swiftlint --strict

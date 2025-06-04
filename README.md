@@ -83,8 +83,8 @@ guard let style = mapView.style else {
     return
 }
 
-if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY") {
-    let contoursDataSource = MTVectorTileSource(identifier: "contoursSource", tiles: [contoursTilesURL])
+if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=YOUR_API_KEY") {
+    let contoursDataSource = MTVectorTileSource(identifier: "contoursSource", url: contoursTilesURL)
     style.addSource(contoursDataSource)
 
     let contoursLayer = MTLineLayer(identifier: "contoursLayer", sourceIdentifier: contoursDataSource.identifier, sourceLayer: "contour_ft")
@@ -102,7 +102,7 @@ if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v
 
 var body: some View {
     MTMapViewContainer(map: mapView) {
-        MTVectorTileSource(identifier: "countoursSource", tiles: [URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY")])
+        MTVectorTileSource(identifier: "countoursSource", url: URL(string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=YOUR_API_KEY"))
 
         MTLineLayer(identifier: "contoursLayer", sourceIdentifier: "countoursSource", sourceLayer: "contour_ft")
             .color(.brown)

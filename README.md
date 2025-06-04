@@ -58,15 +58,11 @@ mapView.pinToSuperviewEdges()
 ```swift
 import MapTilerSDK
 
-@State private var referenceStyle: MTMapReferenceStyle = .streets
-@State private var styleVariant: MTMapStyleVariant? = .defaultVariant
-
 @State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
 
 var body: some View {
     MTMapViewContainer(map: mapView) {}
-        .referenceStyle(referenceStyle)
-        .styleVariant(styleVariant)
+        .referenceStyle(.streets)
 }
 ```
 
@@ -74,7 +70,7 @@ For detailed functionality overview refer to the API Reference documentation or 
 
 ## Sources and Layers
 
-Sources and layers can be added to the map view style object as soon as map is initialized.
+Sources and layers can be added to the map view style object as soon as map is initialized. Setting the style after adding layers resets them to default, so make sure style is finished loading first.
 
 ### UIKit
 

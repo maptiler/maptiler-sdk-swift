@@ -58,15 +58,11 @@ mapView.pinToSuperviewEdges()
 ```swift
 import MapTilerSDK
 
-@State private var referenceStyle: MTMapReferenceStyle = .streets
-@State private var styleVariant: MTMapStyleVariant? = .defaultVariant
-
 @State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
 
 var body: some View {
     MTMapViewContainer(map: mapView) {}
-        .referenceStyle(referenceStyle)
-        .styleVariant(styleVariant)
+        .referenceStyle(.streets)
 }
 ```
 
@@ -74,7 +70,7 @@ For detailed functionality overview refer to the API Reference documentation or 
 
 ## Sources and Layers
 
-Sources and layers can be added to the map view style object as soon as map is initialized.
+Sources and layers can be added to the map view style object as soon as map is initialized. Setting the style after adding layers resets them to default, so make sure style is finished loading first.
 
 ### UIKit
 
@@ -83,8 +79,8 @@ guard let style = mapView.style else {
     return
 }
 
-if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY") {
-    let contoursDataSource = MTVectorTileSource(identifier: "contoursSource", tiles: [contoursTilesURL])
+if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=YOUR_API_KEY") {
+    let contoursDataSource = MTVectorTileSource(identifier: "contoursSource", url: contoursTilesURL)
     style.addSource(contoursDataSource)
 
     let contoursLayer = MTLineLayer(identifier: "contoursLayer", sourceIdentifier: contoursDataSource.identifier, sourceLayer: "contour_ft")
@@ -102,7 +98,7 @@ if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v
 
 var body: some View {
     MTMapViewContainer(map: mapView) {
-        MTVectorTileSource(identifier: "countoursSource", tiles: [URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY")])
+        MTVectorTileSource(identifier: "countoursSource", url: URL(string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=YOUR_API_KEY"))
 
         MTLineLayer(identifier: "contoursLayer", sourceIdentifier: "countoursSource", sourceLayer: "contour_ft")
             .color(.brown)

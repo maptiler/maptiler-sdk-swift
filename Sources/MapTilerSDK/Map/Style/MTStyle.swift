@@ -51,6 +51,9 @@ public class MTStyle {
     }
 
     /// Updates the map's style object with a new value.
+    ///
+    /// Setting the style resets custom sources and layers, so make sure to wait for style to load
+    /// (``MTEvent/styleDidUpdate``) before adding them.
     ///   - Parameters:
     ///     - referenceStyle:  Desired reference map style.
     ///     - styleVariant: Optional variant of the reference style.
@@ -233,6 +236,7 @@ extension MTStyle {
                         queue.append(layerTask)
                     }
                 case .failure(let error):
+                    mapLayers[layer.identifier] = nil
                     completionHandler?(.failure(error))
                 }
             }
@@ -288,6 +292,9 @@ extension MTStyle {
 // Concurrency
 extension MTStyle {
     /// Updates the map's style object with a new value.
+    ///
+    /// Setting the style resets custom sources and layers, so make sure to wait for style to load
+    /// (``MTEvent/styleDidUpdate``) before adding them.
     ///   - Parameters:
     ///     - referenceStyle:  Desired reference map style.
     ///     - styleVariant: Optional variant of the reference style.

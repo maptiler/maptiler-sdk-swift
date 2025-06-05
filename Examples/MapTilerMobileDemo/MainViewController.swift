@@ -16,36 +16,36 @@ class MainViewController: UIViewController {
         static let defaultZoomLevel = 14.0
     }
 
-    @IBOutlet weak var mapView: MTMapView! {
+    @IBOutlet private weak var mapView: MTMapView! {
         didSet {
             mapView.delegate = self
         }
     }
 
-    @IBOutlet weak var mapControlView: MapControlView! {
+    @IBOutlet private weak var mapControlView: MapControlView! {
         didSet {
             mapControlView.delegate = self
         }
     }
 
-    @IBOutlet weak var mapZoomControlView: MapZoomControlView! {
+    @IBOutlet private weak var mapZoomControlView: MapZoomControlView! {
         didSet {
             mapZoomControlView.delegate = self
         }
     }
 
-    @IBOutlet weak var mapProjectionControlView: MapProjectionControlView! {
+    @IBOutlet private weak var mapProjectionControlView: MapProjectionControlView! {
         didSet {
             mapProjectionControlView.delegate = self
         }
     }
 
-    @IBOutlet weak var jumpContainerView: UIView!
-    @IBOutlet weak var benchmarkButton: UIButton!
-    @IBOutlet weak var loadingActivityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var layerViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var jumpContainerView: UIView!
+    @IBOutlet private weak var benchmarkButton: UIButton!
+    @IBOutlet private weak var loadingActivityIndicator: UIActivityIndicatorView!
+    @IBOutlet private weak var layerViewLeadingConstraint: NSLayoutConstraint!
 
-    @IBOutlet weak var layerView: LayerView! {
+    @IBOutlet private weak var layerView: LayerView! {
         didSet {
             layerView.delegate = self
         }
@@ -81,7 +81,7 @@ class MainViewController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+
         AppDelegate.AppUtility.lockOrientation(.all)
     }
 
@@ -132,7 +132,7 @@ class MainViewController: UIViewController {
 
     private func observeJumpCoordinates() {
         dataModel.$jumpCoordinates
-            .compactMap{ $0 }
+            .compactMap { $0 }
             .sink { [weak self] coordinates in
                 self?.jumpTo(coordinates)
             }
@@ -146,17 +146,21 @@ class MainViewController: UIViewController {
     }
 
     private func addSources() {
-        if let contoursURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=F88dOilbnFebWsh4o9oP") {
-            Task {
-                let contoursSource = MTVectorTileSource(identifier: "contourssource", tiles: [contoursURL])
-                try await mapView.style?.addSource(contoursSource)
-            }
-        }
+        Task {
+            if let mapTilerAPIKey = await MTConfig.shared.getAPIKey() {
+                if let openMapURL = URL(
+                    string: "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=\(mapTilerAPIKey)"
+                ) {
+                    let aerowaySource = MTVectorTileSource(identifier: "openmapsource", url: openMapURL)
+                    try await mapView.style?.addSource(aerowaySource)
+                }
 
-        if let openMapURL = URL(string: "https://api.maptiler.com/tiles/v3-openmaptiles/{z}/{x}/{y}.pbf?key=F88dOilbnFebWsh4o9oP") {
-            Task {
-                let aerowaySource = MTVectorTileSource(identifier: "openmapsource", tiles: [openMapURL])
-                try await mapView.style?.addSource(aerowaySource)
+                if let contoursURL = URL(
+                    string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=\(mapTilerAPIKey)"
+                ) {
+                    let contoursSource = MTVectorTileSource(identifier: "contourssource", url: contoursURL)
+                    try await mapView.style?.addSource(contoursSource)
+                }
             }
         }
     }
@@ -222,7 +226,7 @@ extension MainViewController: MapProjectionControlViewDelegate {
             globeEnabled = !globeEnabled
         }
     }
-    
+
     func mapProjectionControlViewDidTapEnableTerrain(_ mapProjectionControlView: MapProjectionControlView) {
         Task {
             if terrainEnabled {
@@ -249,12 +253,12 @@ extension MainViewController: MTMapViewDelegate {
 
         loadingActivityIndicator.stopAnimating()
 
-        // *** Uncomment for benchmark or use long press on jump view ***
+// *** Uncomment for benchmark or use long press on jump view ***
 //        Task {
 //            benchmarkButton.isHidden = false
 //            await MTConfig.shared.setLogLevel(.none)
 //        }
-        // *** ***
+// *** ***
     }
 
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {

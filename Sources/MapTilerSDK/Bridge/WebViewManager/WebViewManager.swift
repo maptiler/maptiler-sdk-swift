@@ -46,6 +46,7 @@ package final class WebViewManager: NSObject {
 
             webView = WKWebView(frame: frame, configuration: configuration)
             webView?.navigationDelegate = self
+            webView?.scrollView.contentInsetAdjustmentBehavior = .never
             webView?.load(request)
         }
     }

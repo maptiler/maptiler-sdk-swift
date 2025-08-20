@@ -180,4 +180,208 @@ struct MTNavigationTests {
 
         #expect(Project(coordinate: centerCoordinate).toJS() == projectJS)
     }
+
+    // MARK: - MTMapView Navigable API
+
+    final class MockExecutor: MTCommandExecutable, @unchecked Sendable {
+        var lastJS: JSString?
+        var pitchValue: Double = 31.0
+        var bearingValue: Double = 42.0
+        var rollValue: Double = 53.0
+        var centerValue: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 11, longitude: 22)
+        var projectedPoint: (x: Double, y: Double) = (100.0, 200.0)
+
+        func execute(_ command: MTCommand) async throws -> MTBridgeReturnType {
+            lastJS = command.toJS()
+            switch command {
+            case is GetPitch:
+                return .double(pitchValue)
+            case is GetBearing:
+                return .double(bearingValue)
+            case is GetRoll:
+                return .double(rollValue)
+            case is GetCenter:
+                return .stringDoubleDict(["lat": centerValue.latitude, "lng": centerValue.longitude])
+            case is Project:
+                return .stringDoubleDict(["x": projectedPoint.x, "y": projectedPoint.y])
+            default:
+                return .null
+            }
+        }
+    }
+
+    @MainActor private func makeMapViewWithMock() -> (MTMapView, MockExecutor) {
+        let mapView = MTMapView(options: MTMapOptions())
+        let mock = MockExecutor()
+        mapView.bridge = MTBridge(executor: mock)
+        return (mapView, mock)
+    }
+
+    @MainActor @Test func mapView_setBearing_updatesOptions_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        await mapView.setBearing(bearing)
+        #expect(mapView.options?.bearing == bearing)
+        #expect(mock.lastJS == SetBearing(bearing: bearing).toJS())
+    }
+
+    @MainActor @Test func mapView_setCenter_updatesOptions_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        await mapView.setCenter(centerCoordinate)
+        #expect(mapView.options?.center == centerCoordinate)
+        let lngLat = centerCoordinate.toLngLat()
+        #expect(mock.lastJS == SetCenter(center: centerCoordinate).toJS())
+        #expect(mock.lastJS == "\(MTBridge.mapObject).setCenter([\(lngLat.lng), \(lngLat.lat)]);")
+    }
+
+    @MainActor @Test func mapView_flyTo_updatesCenter_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        let flyOptions = MTFlyToOptions(curve: 1.2, minZoom: 2.3, speed: 3.4, screenSpeed: 4.5, maxDuration: 5.6)
+        await mapView.flyTo(centerCoordinate, options: flyOptions, animationOptions: nil)
+        #expect(mapView.options?.center == centerCoordinate)
+        #expect(mock.lastJS?.contains("flyTo(") == true)
+    }
+
+    @MainActor @Test func mapView_easeTo_updatesOptions_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        let cameraOptions = MTCameraOptions(zoom: zoom, bearing: bearing, pitch: pitch)
+        await mapView.easeTo(centerCoordinate, options: cameraOptions, animationOptions: nil)
+        #expect(mapView.options?.center == centerCoordinate)
+        #expect(mapView.options?.bearing == bearing)
+        #expect(mapView.options?.pitch == pitch)
+        #expect(mapView.options?.zoom == zoom)
+        #expect(mock.lastJS?.contains("easeTo(") == true)
+    }
+
+    @MainActor @Test func mapView_jumpTo_updatesOptions_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        let cameraOptions = MTCameraOptions(zoom: zoom, bearing: bearing, pitch: pitch)
+        await mapView.jumpTo(centerCoordinate, options: cameraOptions)
+        #expect(mapView.options?.center == centerCoordinate)
+        #expect(mapView.options?.bearing == bearing)
+        #expect(mapView.options?.pitch == pitch)
+        #expect(mapView.options?.zoom == zoom)
+        #expect(mock.lastJS?.contains("jumpTo(") == true)
+    }
+
+    @MainActor @Test func mapView_setPadding_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        let padding = MTPaddingOptions(left: 1, top: 2, right: 3, bottom: 4)
+        await mapView.setPadding(padding)
+        #expect(mock.lastJS?.contains("setPadding(") == true)
+    }
+
+    @MainActor @Test func mapView_setIsCenterClampedToGround_updatesOptions_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        await mapView.setIsCenterClampedToGround(true)
+        #expect(mapView.options?.isCenterClampedToGround == true)
+        #expect(mock.lastJS == SetCenterClampedToGround(isCenterClampedToGround: true).toJS())
+    }
+
+    @MainActor @Test func mapView_setCenterElevation_updatesOptions_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        await mapView.setCenterElevation(elevation)
+        #expect(mapView.options?.elevation == elevation)
+        #expect(mock.lastJS == SetCenterElevation(elevation: elevation).toJS())
+    }
+
+    @MainActor @Test func mapView_setMaxPitch_updatesOption_whenNonNil() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        try await mapView.setMaxPitch(pitch)
+        #expect(mapView.options?.maxPitch == pitch)
+        #expect(mock.lastJS == SetMaxPitch(maxPitch: pitch).toJS())
+    }
+
+    @MainActor @Test func mapView_setMaxZoom_updatesOption_whenNonNil() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        try await mapView.setMaxZoom(zoom)
+        #expect(mapView.options?.maxZoom == zoom)
+        #expect(mock.lastJS == SetMaxZoom(maxZoom: zoom).toJS())
+    }
+
+    @MainActor @Test func mapView_setMinPitch_updatesOption_whenNonNil() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        try await mapView.setMinPitch(pitch)
+        #expect(mapView.options?.minPitch == pitch)
+        #expect(mock.lastJS == SetMinPitch(minPitch: pitch).toJS())
+    }
+
+    @MainActor @Test func mapView_setMinZoom_updatesOption_whenNonNil() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        try await mapView.setMinZoom(zoom)
+        #expect(mapView.options?.minZoom == zoom)
+        #expect(mock.lastJS == SetMinZoom(minZoom: zoom).toJS())
+    }
+
+    @MainActor @Test func mapView_setPitch_updatesOptions_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        await mapView.setPitch(pitch)
+        #expect(mapView.options?.pitch == pitch)
+        #expect(mock.lastJS == SetPitch(pitch: pitch).toJS())
+    }
+
+    @MainActor @Test func mapView_setRoll_updatesOptions_and_callsBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        await mapView.setRoll(roll)
+        #expect(mapView.options?.roll == roll)
+        #expect(mock.lastJS == SetRoll(roll: roll).toJS())
+    }
+
+    @MainActor @Test func mapView_getters_withCompletion_returnValues_fromBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+
+        let gotPitch: Double = await mapView.getPitch()
+        let gotBearing: Double = await mapView.getBearing()
+        let gotRoll: Double = await mapView.getRoll()
+        let gotCenter: CLLocationCoordinate2D = await mapView.getCenter()
+
+        #expect(gotPitch == mock.pitchValue)
+        #expect(gotBearing == mock.bearingValue)
+        #expect(gotRoll == mock.rollValue)
+        #expect(gotCenter == mock.centerValue)
+    }
+
+    @MainActor @Test func mapView_project_withCompletion_returnsProjectedCoordinate() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+
+        let projected: CLLocationCoordinate2D = await withCheckedContinuation { continuation in
+            mapView.project(coordinates: centerCoordinate) { result in
+                switch result {
+                case .success(let value):
+                    continuation.resume(returning: value)
+                case .failure:
+                    continuation.resume(returning: .init())
+                }
+            }
+        }
+
+        #expect(projected.latitude == mock.projectedPoint.x)
+        #expect(projected.longitude == mock.projectedPoint.y)
+    }
+
+    @MainActor @Test func mapView_panBy_and_panTo_callBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+        await mapView.panBy(MTPoint(x: 7, y: 8))
+
+        #expect(mock.lastJS == PanBy(offset: MTPoint(x: 7, y: 8)).toJS())
+
+        await mapView.panTo(centerCoordinate)
+        #expect(mock.lastJS == PanTo(coordinates: centerCoordinate).toJS())
+    }
+
+    @MainActor @Test func mapView_async_getters_returnValues_fromBridge() async throws {
+        let (mapView, mock) = makeMapViewWithMock()
+
+        let asyncPitch = await mapView.getPitch()
+        let asyncBearing = await mapView.getBearing()
+        let asyncRoll = await mapView.getRoll()
+        let asyncCenter = await mapView.getCenter()
+        let projectedPoint = await mapView.project(coordinates: centerCoordinate)
+
+        #expect(asyncPitch == mock.pitchValue)
+        #expect(asyncBearing == mock.bearingValue)
+        #expect(asyncRoll == mock.rollValue)
+        #expect(asyncCenter == mock.centerValue)
+        #expect(projectedPoint.x == mock.projectedPoint.x)
+        #expect(projectedPoint.y == mock.projectedPoint.y)
+    }
 }

@@ -327,6 +327,71 @@ extension MTMapView: MTStylable {
     ) {
         runCommand(SetTilesToSource(tiles: tiles, source: source), completion: completionHandler)
     }
+
+    /// Adds a polygon via helpers.addPolygon bridge command using a data string.
+    /// - Parameters:
+    ///   - data: Data parameter passed to the JS helper (e.g., "switzerland.geojson").
+    ///   - fillOpacity: Opacity of the polygon fill (0.0 - 1.0). Defaults to 1.0.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addPolygon(
+        data: String,
+        fillOpacity: Double = 1.0,
+        fillColor: UIColor? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            AddPolygon(data: data, fillOpacity: fillOpacity, fillColorHex: fillColor?.toHex()),
+            completion: completionHandler
+        )
+    }
+
+    /// Adds a polygon to the map via helpers.addPolygon bridge command using a GeoJSON URL.
+    /// - Parameters:
+    ///   - url: URL to a GeoJSON file (local file URL supported).
+    ///   - fillOpacity: Opacity of the polygon fill (0.0 - 1.0). Defaults to 1.0.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addPolygon(
+        geoJSON url: URL,
+        fillOpacity: Double = 1.0,
+        fillColor: UIColor? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            AddPolygon(url: url, fillOpacity: fillOpacity, fillColorHex: fillColor?.toHex()),
+            completion: completionHandler
+        )
+    }
+
+    /// Adds a polygon from a bundled GeoJSON resource name via helpers.addPolygon bridge command.
+    /// - Parameters:
+    ///   - resource: Filename such as "switzerland.geojson" (if no extension is provided, ".geojson" is assumed).
+    ///   - bundle: Bundle to search in, defaults to `.main`.
+    ///   - fillOpacity: Opacity of the polygon fill (0.0 - 1.0). Defaults to 1.0.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addPolygon(
+        resource filename: String,
+        in bundle: Bundle? = .main,
+        fillOpacity: Double = 1.0,
+        fillColor: UIColor? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        let ns = filename as NSString
+        let name = ns.deletingPathExtension
+        let ext = ns.pathExtension.isEmpty ? "geojson" : ns.pathExtension
+
+        let lookupBundle = bundle ?? .main
+        guard let url = lookupBundle.url(forResource: name, withExtension: ext) else {
+            completionHandler?(
+                .failure(.unknown(description: "GeoJSON resource not found: \(filename)"))
+            )
+            return
+        }
+
+        addPolygon(geoJSON: url, fillOpacity: fillOpacity, fillColor: fillColor, completionHandler: completionHandler)
+    }
 }
 
 // Concurrency
@@ -564,6 +629,48 @@ extension MTMapView {
     package func setTiles(tiles: [URL], to source: MTSource) async {
         await withCheckedContinuation { continuation in
             setTiles(tiles: tiles, to: source) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds a polygon via helpers.addPolygon bridge command using a data string.
+    /// - Parameters:
+    ///   - data: Data parameter passed to the JS helper (e.g., "switzerland.geojson").
+    ///   - fillOpacity: Opacity of the polygon fill (0.0 - 1.0). Defaults to 1.0.
+    public func addPolygon(data: String, fillOpacity: Double = 1.0, fillColor: UIColor? = nil) async {
+        await withCheckedContinuation { continuation in
+            addPolygon(data: data, fillOpacity: fillOpacity, fillColor: fillColor) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds a polygon via helpers.addPolygon bridge command using a GeoJSON URL.
+    /// - Parameters:
+    ///   - url: URL to a GeoJSON file (local file URL supported).
+    ///   - fillOpacity: Opacity of the polygon fill (0.0 - 1.0). Defaults to 1.0.
+    public func addPolygon(geoJSON url: URL, fillOpacity: Double = 1.0, fillColor: UIColor? = nil) async {
+        await withCheckedContinuation { continuation in
+            addPolygon(geoJSON: url, fillOpacity: fillOpacity, fillColor: fillColor) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds a polygon from a bundled GeoJSON resource name via helpers.addPolygon bridge command.
+    /// - Parameters:
+    ///   - filename: Filename such as "switzerland.geojson" (if no extension is provided, ".geojson" is assumed).
+    ///   - bundle: Bundle to search in, defaults to `.main`.
+    ///   - fillOpacity: Opacity of the polygon fill (0.0 - 1.0). Defaults to 1.0.
+    public func addPolygon(
+        resource filename: String,
+        in bundle: Bundle? = .main,
+        fillOpacity: Double = 1.0,
+        fillColor: UIColor? = nil
+    ) async {
+        await withCheckedContinuation { continuation in
+            addPolygon(resource: filename, in: bundle, fillOpacity: fillOpacity, fillColor: fillColor) { _ in
                 continuation.resume()
             }
         }

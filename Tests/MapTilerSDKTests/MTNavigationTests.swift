@@ -142,4 +142,42 @@ struct MTNavigationTests {
 
         #expect(SetRoll(roll: roll).toJS() == setRollJS)
     }
+
+    @Test func getBearingCommand_shouldMatchJS() async throws {
+        let getBearingJS = "\(MTBridge.mapObject).getBearing();"
+
+        #expect(GetBearing().toJS() == getBearingJS)
+    }
+
+    @Test func getCenterCommand_shouldMatchJS() async throws {
+        let getCenterJS = "\(MTBridge.mapObject).getCenter();"
+
+        #expect(GetCenter().toJS() == getCenterJS)
+    }
+
+    @Test func getRollCommand_shouldMatchJS() async throws {
+        let getRollJS = "\(MTBridge.mapObject).getRoll();"
+
+        #expect(GetRoll().toJS() == getRollJS)
+    }
+
+    @Test func panByCommand_shouldMatchJS() async throws {
+        let offset = MTPoint(x: 10.0, y: 20.0)
+        let panByJS = "\(MTBridge.mapObject).panBy([\(10.0), \(20.0)]);"
+
+        #expect(PanBy(offset: offset).toJS() == panByJS)
+    }
+
+    @Test func panToCommand_shouldMatchJS() async throws {
+        let lngLat: LngLat = centerCoordinate.toLngLat()
+        let panToJS = "\(MTBridge.mapObject).panTo([\(lngLat.lng), \(lngLat.lat)]);"
+
+        #expect(PanTo(coordinates: centerCoordinate).toJS() == panToJS)
+    }
+
+    @Test func projectCommand_shouldMatchJS() async throws {
+        let projectJS = "\(MTBridge.mapObject).project([\(centerCoordinate.longitude), \(centerCoordinate.latitude)]);"
+
+        #expect(Project(coordinate: centerCoordinate).toJS() == projectJS)
+    }
 }

@@ -54,6 +54,9 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
     /// - Note: Defaults to 1.
     public var opacity: Double? = 1.0
 
+    /// Name of image in the style's sprite used as a repeated background pattern for the polygon fill.
+    public var pattern: String?
+
     /// The outline color of the fill.
     ///
     /// Matches the value of fill-color if unspecified.
@@ -114,6 +117,7 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         color: UIColor? = .black,
         opacity: Double? = 1.0,
         outlineColor: UIColor? = nil,
+        pattern: String? = nil,
         translate: [Double]? = nil,
         translateAnchor: MTFillTranslateAnchor? = .map,
         sortKey: Double? = nil,
@@ -128,6 +132,7 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         self.color = color
         self.opacity = opacity
         self.outlineColor = outlineColor
+        self.pattern = pattern
         self.translate = translate
         self.translateAnchor = translateAnchor
         self.sortKey = sortKey
@@ -158,6 +163,8 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
 
         let outlineColorHex = try paintContainer.decode(String.self, forKey: .outlineColor)
         outlineColor = UIColor(hex: outlineColorHex) ?? color
+
+        pattern = try paintContainer.decodeIfPresent(String.self, forKey: .pattern)
 
         let anchorString = try paintContainer.decode(String.self, forKey: .translateAnchor)
         translateAnchor = MTFillTranslateAnchor(rawValue: anchorString)
@@ -190,6 +197,7 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         try paintContainer.encodeIfPresent(color?.toHex() ?? UIColor.black.toHex(), forKey: .color)
         try paintContainer.encodeIfPresent(opacity, forKey: .opacity)
         try paintContainer.encodeIfPresent(outlineColor?.toHex() ?? UIColor.black.toHex(), forKey: .outlineColor)
+        try paintContainer.encodeIfPresent(pattern, forKey: .pattern)
         try paintContainer.encodeIfPresent(translate, forKey: .translate)
         try paintContainer.encodeIfPresent(
             translateAnchor?.rawValue ?? MTFillTranslateAnchor.map.rawValue,
@@ -223,6 +231,7 @@ public class MTFillLayer: MTLayer, @unchecked Sendable, Codable {
         case color = "fill-color"
         case opacity = "fill-opacity"
         case outlineColor = "fill-outline-color"
+        case pattern = "fill-pattern"
         case translate = "fill-translate"
         case translateAnchor = "fill-translate-anchor"
     }

@@ -8,7 +8,7 @@
 //
 
 /// Enum representing the visibility of the layer.
-public enum MTLayerVisibility: String {
+public enum MTLayerVisibility: String, Sendable {
     /// Layer is shown.
     case visible
 

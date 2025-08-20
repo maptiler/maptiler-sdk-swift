@@ -320,6 +320,11 @@ extension MTMapView: MTStylable {
         runCommand(SetDataToSource(data: data, source: source), completion: completionHandler)
     }
 
+    // Inline GeoJSON updates for GeoJSON sources
+    package func setData(jsonString: String, to source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetStringDataToSource(jsonString: jsonString, source: source), completion: completionHandler)
+    }
+
     package func setTiles(
         tiles: [URL],
         to source: MTSource,
@@ -556,6 +561,14 @@ extension MTMapView {
     package func setData(data: URL, to source: MTSource) async {
         await withCheckedContinuation { continuation in
             setData(data: data, to: source) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    package func setData(jsonString: String, to source: MTSource) async {
+        await withCheckedContinuation { continuation in
+            setData(jsonString: jsonString, to: source) { _ in
                 continuation.resume()
             }
         }

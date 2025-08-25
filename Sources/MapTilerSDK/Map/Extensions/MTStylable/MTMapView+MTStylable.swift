@@ -208,6 +208,19 @@ extension MTMapView: MTStylable {
         )
     }
 
+    /// Returns boolean value indicating whether the globe projection is currently enabled.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isGlobeProjectionEnabled(
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(
+            IsGlobeProjectionEnabled(),
+            completion: completionHandler
+        )
+    }
+
     /// Returns boolean value indicating whether the source with provided id is loaded.
     ///  - Parameters:
     ///    - id: The id of the source.
@@ -511,6 +524,20 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             setVerticalFieldOfView(degrees: degrees) { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns boolean value indicating whether the globe projection is currently enabled.
+    public func isGlobeProjectionEnabled() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isGlobeProjectionEnabled { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
             }
         }
     }

@@ -76,7 +76,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CODEX_QUIET_MODE: "1"          # suppress chatty logs
       run: |
-        export OPENAI_API_KEY="${{ secrets.OPENAI_KEY }}"
+        export OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}"
         export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
         codex exec --full-auto "Implement ticket $ISSUE_KEY: $TITLE. $DESC"
         git add -A

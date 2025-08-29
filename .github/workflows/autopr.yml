@@ -59,7 +59,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 22
-    - run: npm add -g @openai/codex
+    - run: npm i @openai/codex
 
     - id: vars
       run: |

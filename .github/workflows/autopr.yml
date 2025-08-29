@@ -59,7 +59,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 22
-    - run: npm i @openai/codex
+    - name: Install Agent
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RG_RELEASES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: npm i @openai/codex
 
     - id: vars
       run: |

@@ -78,9 +78,7 @@ jobs:
         CODEX_QUIET_MODE: "1"          # suppress chatty logs
       run: |
         set -e
-        npx codex --approvals never --no-terminal --quiet \
-              "Implement ticket $ISSUE_KEY: $TITLE. $DESC"
- 
+        npx codex --full-auto "Implement ticket $ISSUE_KEY: $TITLE. $DESC"
         git add -A
         git commit -m "$ISSUE_KEY: $TITLE"
 

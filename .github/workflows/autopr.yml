@@ -72,9 +72,12 @@ jobs:
     - name: Agent implement & commit
       env:
         OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CODEX_QUIET_MODE: "1"          # suppress chatty logs
       run: |
         export OPENAI_API_KEY="${{ secrets.OPENAI_KEY }}"
+        export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
         codex exec --full-auto "Implement ticket $ISSUE_KEY: $TITLE. $DESC"
         git add -A
         git commit -m "$ISSUE_KEY: $TITLE"

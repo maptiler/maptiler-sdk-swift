@@ -26,3 +26,5 @@ playground.xcworkspace
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+
+AGENTS.md

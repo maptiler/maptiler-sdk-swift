@@ -55,6 +55,9 @@ jobs:
     - name: Link SwiftLint
       run: brew link swiftlint --force
 
+    - name: Install Agent (Homebrew)
+      run: brew install codex
+
     - name: Setup Agent
       uses: actions/setup-node@v4
       with:
@@ -82,7 +85,7 @@ jobs:
         OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
         CODEX_QUIET_MODE: "1"          # suppress chatty logs
       run: |
-        script -q /dev/null bash -lc 'export CI=1 TERM=dumb NO_COLOR=1 FORCE_COLOR=0; ./node_modules/.bin/codex --full-auto "Implement ticket $ISSUE_KEY: $TITLE. $DESC"'
+        codex --full-auto "Implement ticket $ISSUE_KEY: $TITLE. $DESC" </dev/null
         git add -A
         git commit -m "$ISSUE_KEY: $TITLE"
 

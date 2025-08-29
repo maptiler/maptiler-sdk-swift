@@ -82,7 +82,6 @@ jobs:
         OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
         CODEX_QUIET_MODE: "1"          # suppress chatty logs
       run: |
-        set -e
         npx codex --full-auto "Implement ticket $ISSUE_KEY: $TITLE. $DESC"
         git add -A
         git commit -m "$ISSUE_KEY: $TITLE"

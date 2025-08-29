@@ -1,0 +1,97 @@
+name: Automated PR
+on:
+  workflow_dispatch:
+    inputs:
+      issue_key:
+        description: 'Issue key'
+        required: true
+      issue_summary:
+        description: 'Brief summary of the issue'
+        required: true
+      issue_description:
+        description: 'Detailed issue description'
+        required: true
+ 
+permissions:
+  contents: write           # allow the action to push code & open the PR
+  pull-requests: write      # allow the action to create and update PRs
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 
+    - name: Set Up Swift
+      uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
+      with:
+        xcode-version: '16.2'
+    - name: Verify Swift Version
+      run: swift --version
+    - name: Verify Xcode version
+      run: xcodebuild -version
+    - name: Verify Active Swift Toolchain version
+      run: xcrun swift -version
+      
+    - name: Cache SwiftLint
+      uses: actions/cache@v4
+      with:
+        path: |
+          /opt/homebrew/Cellar/swiftlint
+          /usr/local/Cellar/swiftlint
+        key: swiftlint-${{ runner.os }}-v1
+        restore-keys: |
+          swiftlint-${{ runner.os }}-
+    - name: Install SwiftLint
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        if ! command -v swiftlint &> /dev/null; then
+          brew install swiftlint
+        fi
+    - name: Link SwiftLint
+      run: brew link swiftlint --force
+
+    - name: Setup Agent
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - run: pnpm add -g @openai/codex
+
+    - id: vars
+      run: |
+        echo "ISSUE_KEY=${{ github.event.inputs.issue_key }}"        >> $GITHUB_ENV
+        echo "TITLE=${{ github.event.inputs.issue_summary }}"        >> $GITHUB_ENV
+        echo "RAW_DESC=${{ github.event.inputs.issue_description }}" >> $GITHUB_ENV
+        DESC_CLEANED=$(echo "${{ github.event.inputs.issue_description }}" | tr '\n' ' ' | sed 's/"/'\''/g')
+        echo "DESC=$DESC_CLEANED"                                    >> $GITHUB_ENV
+        echo "BRANCH=${{ github.event.inputs.issue_key }}"     >> $GITHUB_ENV
+
+    - name: Symlink agents
+      run: ln -s .github/AGENTS.md AGENTS.md
+    - name: Agent implement & commit
+      env:
+        OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
+        CODEX_QUIET_MODE: "1"          # suppress chatty logs
+      run: |
+        set -e
+        codex --approval-mode full-auto --no-terminal --quiet \
+              "Implement ticket $ISSUE_KEY: $TITLE. $DESC"
+ 
+        git add -A
+        git commit -m "$ISSUE_KEY: $TITLE"
+
+    - id: cpr
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token:  ${{ secrets.GITHUB_TOKEN }}
+        base:   main
+        branch: ${{ env.BRANCH }}
+        title:  "${{ env.ISSUE_KEY }}: ${{ env.TITLE }}"
+        body: |
+          **${{ env.ISSUE_KEY }}**.
+          ---
+          ${{ env.DESC }}

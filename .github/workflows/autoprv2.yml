@@ -16,6 +16,7 @@ permissions:
   id-token: write
   contents: write           # allow the action to push code & open the PR
   pull-requests: write      # allow the action to create and update PRs
+  issues: write
   actions: read
 
 jobs:
@@ -77,7 +78,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-        claude_args: "--allowedTools Read,Edit,Grep,Glob"
+        additional_permissions: |
+          actions: read
+        claude_args: |
+          --allowedTools "Read,Edit,Grep,Glob, Bash(swiftlint) Bash(xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16')"
         prompt: |
           Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
     - name: Agent commit

@@ -81,7 +81,7 @@ jobs:
         additional_permissions: |
           actions: read
         claude_args: |
-          --allowedTools "Read,Edit,Grep,Glob, Bash(swiftlint) Bash(xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16')"
+          --allowedTools "Write,Read,Edit,Grep,Glob"
         prompt: |
           Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
     - name: Agent commit

@@ -69,6 +69,10 @@ jobs:
       run: ln -s .github/AGENTS.md CLAUDE.md
     - name: Agent implement
       uses: anthropics/claude-code-action@v1
+      env:
+        ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
         prompt: |

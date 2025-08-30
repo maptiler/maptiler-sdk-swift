@@ -77,6 +77,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+        claude_args: "--allowedTools Read,Edit,Grep,Glob"
         prompt: |
           Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
     - name: Agent commit

@@ -378,6 +378,20 @@ extension MTMapView {
                     completion?(.success(commandValue))
                 } else if case .double(let commandValue) = value {
                     completion?(.success(commandValue != 0))
+                } else if case .string(let commandValue) = value {
+                    let lower = commandValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    if lower == "true" || lower == "1" {
+                        completion?(.success(true))
+                    } else if lower == "false" || lower == "0" {
+                        completion?(.success(false))
+                    } else {
+                        MTLogger.log("\(command) returned invalid string for bool: \(commandValue)", type: .error)
+                        completion?(
+                            .failure(
+                                MTError.unsupportedReturnType(description: "Expected bool, got string \(commandValue).")
+                            )
+                        )
+                    }
                 } else {
                     MTLogger.log("\(command) returned invalid type.", type: .error)
                     completion?(.failure(MTError.unsupportedReturnType(description: "Expected bool, got unknown.")))

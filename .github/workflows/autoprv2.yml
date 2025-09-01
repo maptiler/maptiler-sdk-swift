@@ -77,7 +77,7 @@ jobs:
     # Symlink agents file to the root
 
     - name: Symlink agents
-      run: ln -s .github/AGENTS.md CLAUDE.md
+      run: ln -s .github/copilot-instructions.md CLAUDE.md
 
     # Generate JS docs
     - name: Generate docs

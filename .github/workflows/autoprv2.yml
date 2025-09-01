@@ -25,6 +25,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
+
+    # Set up developer tools
+
     - name: Checkout code
       uses: actions/checkout@v4
       with:
@@ -40,6 +43,8 @@ jobs:
     - name: Verify Active Swift Toolchain version
       run: xcrun swift -version
       
+    # Set up linter
+
     - name: Cache SwiftLint
       uses: actions/cache@v4
       with:
@@ -58,6 +63,7 @@ jobs:
     - name: Link SwiftLint
       run: brew link swiftlint --force
 
+    # Set up environment variables
 
     - id: vars
       run: |
@@ -68,8 +74,13 @@ jobs:
         echo "DESC=$DESC_CLEANED"                                    >> $GITHUB_ENV
         echo "BRANCH=${{ github.event.inputs.issue_key }}"     >> $GITHUB_ENV
 
+    # Symlink agents file to the root
+
     - name: Symlink agents
       run: ln -s .github/AGENTS.md CLAUDE.md
+
+    # Run the LLM Agent and commit the output
+
     - name: Agent implement
       uses: anthropics/claude-code-action@v1
       env:
@@ -81,13 +92,15 @@ jobs:
         additional_permissions: |
           actions: read
         claude_args: |
-          --allowedTools "Write,Read,Edit,Grep,Glob"
+          --allowedTools "Write,Read,Edit,Grep,Glob,Bash(swiftlint),Bash(xcrun)"
         prompt: |
           Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
     - name: Agent commit
       run: |
         git add -A
         git commit -m "$ISSUE_KEY: $TITLE"
+
+    # Prepare and push Pull Request
 
     - id: cpr
       uses: peter-evans/create-pull-request@v6
@@ -97,6 +110,13 @@ jobs:
         branch: ${{ env.BRANCH }}
         title:  "${{ env.ISSUE_KEY }}: ${{ env.TITLE }}"
         body: |
-          **${{ env.ISSUE_KEY }}**.
-          ---
-          ${{ env.DESC }}
+          **${{ env.ISSUE_KEY }}**
+
+          ## Objective
+          **${{ env.TITLE }}**.
+
+          ## Description
+          **${{ env.TITLE }}**.
+
+          ## Acceptance
+          Linted.

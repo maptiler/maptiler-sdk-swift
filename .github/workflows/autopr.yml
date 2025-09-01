@@ -81,6 +81,17 @@ jobs:
     - name: Symlink agents
       run: ln -s .github/AGENTS.md AGENTS.md
 
+    # Generate JS docs
+    - name: Generate docs
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - run: |
+        cd js
+        npm i typedoc
+        npm run doc
+        cd ..
+
     # Run the LLM Agent and commit the output
 
     - name: Agent implement & commit

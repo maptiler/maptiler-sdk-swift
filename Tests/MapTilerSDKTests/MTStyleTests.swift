@@ -51,4 +51,9 @@ struct MTStyleTests {
             #expect(style.getVariants()?.contains(.defaultVariant) ?? false)
         }
     }
+
+    @Test func isGlobeProjectionEnabledCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).isGlobeProjection();"
+        #expect(IsGlobeProjectionEnabled().toJS() == expectedJS)
+    }
 }

@@ -31,7 +31,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 
+        fetch-depth: 0
+        submodules: recursive
     - name: Set Up Swift
       uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
       with:
@@ -80,15 +81,18 @@ jobs:
       run: ln -s .github/copilot-instructions.md CLAUDE.md
 
     # Generate JS docs
-    - name: Generate docs
+    - name: Set up Node
       uses: actions/setup-node@v4
       with:
         node-version: 22
-    - run: |
-        cd js
-        npm i typedoc
-        npm run doc
-        cd ..
+
+    - name: Install JS deps
+      working-directory: js
+      run: npm ci
+
+    - name: Build JS docs
+      working-directory: js
+      run: npm run doc
 
     # Run the LLM Agent and commit the output
 

@@ -61,6 +61,13 @@ jobs:
     - name: Link SwiftLint
       run: brew link swiftlint --force
 
+    - name: Ensure Homebrew in PATH
+      run: |
+        echo "/opt/homebrew/bin" >> "$GITHUB_PATH" || true
+        echo "/usr/local/bin" >> "$GITHUB_PATH" || true
+        echo "/opt/homebrew/Cellar/swiftlint" >> "$GITHUB_PATH" || true
+        echo "/usr/local/Cellar/swiftlint" >> "$GITHUB_PATH" || true
+
       # Set up LLM Agent
 
     - name: Install Agent (Homebrew)

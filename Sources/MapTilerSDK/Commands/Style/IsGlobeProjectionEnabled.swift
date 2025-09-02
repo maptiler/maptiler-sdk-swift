@@ -12,4 +12,3 @@ package struct IsGlobeProjectionEnabled: MTCommand {
         return "\(MTBridge.mapObject).isGlobeProjection();"
     }
 }
-

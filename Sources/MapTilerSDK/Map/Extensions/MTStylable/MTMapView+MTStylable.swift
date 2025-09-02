@@ -238,6 +238,19 @@ extension MTMapView: MTStylable {
         )
     }
 
+    /// Returns boolean value indicating whether globe projection is enabled.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isGlobeProjectionEnabled(
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(
+            IsGlobeProjectionEnabled(),
+            completion: completionHandler
+        )
+    }
+
     package func getId(
         for referenceStyle: MTMapReferenceStyle,
         completionHandler: ((Result<String, MTError>) -> Void)? = nil
@@ -535,6 +548,20 @@ extension MTMapView {
     public func isMapLoaded() async -> Bool {
         await withCheckedContinuation { continuation in
             isMapLoaded { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Returns boolean value indicating whether globe projection is enabled.
+    public func isGlobeProjectionEnabled() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isGlobeProjectionEnabled { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

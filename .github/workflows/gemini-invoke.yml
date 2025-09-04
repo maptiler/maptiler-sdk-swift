@@ -3,10 +3,6 @@ name: '▶️ Gemini Invoke'
 on:
   workflow_call:
     inputs:
-      request_body:
-        type: 'string'
-        description: 'The request body from the user'
-        required: false
       additional_context:
         type: 'string'
         description: 'Any additional context from the request'
@@ -41,52 +37,18 @@ jobs:
           permission-issues: 'write'
           permission-pull-requests: 'write'
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: 'Read agent directives'
-        id: 'agent_directives'
-        run: |-
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "directives<<$EOF" >> "${GITHUB_OUTPUT}"
-          cat .github/copilot-instructions.md >> "${GITHUB_OUTPUT}"
-          echo "$EOF" >> "${GITHUB_OUTPUT}"
-
-      # Symlink agents file to the root
-
-      - name: Symlink agents
-        run: ln -s .github/copilot-instructions.md AGENTS.md
-
-      # Generate JS docs
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install JS deps
-        working-directory: js
-        run: npm ci
-
-      - name: Build JS docs
-        working-directory: js
-        run: npm run doc
-
       - name: 'Run Gemini CLI'
         id: 'run_gemini'
         uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
         env:
           TITLE: '${{ github.event.pull_request.title || github.event.issue.title }}'
-          DESCRIPTION: '${{ inputs.request_body }}'
+          DESCRIPTION: '${{ github.event.pull_request.body || github.event.issue.body }}'
           EVENT_NAME: '${{ github.event_name }}'
           GITHUB_TOKEN: '${{ steps.mint_identity_token.outputs.token || secrets.GITHUB_TOKEN || github.token }}'
           IS_PULL_REQUEST: '${{ !!github.event.pull_request }}'
           ISSUE_NUMBER: '${{ github.event.pull_request.number || github.event.issue.number }}'
           REPOSITORY: '${{ github.repository }}'
           ADDITIONAL_CONTEXT: '${{ inputs.additional_context }}'
-          AGENT_DIRECTIVES: '${{ steps.agent_directives.outputs.directives }}'
         with:
           gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
           gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
@@ -153,8 +115,6 @@ jobs:
               ]
             }
           prompt: |-
-            ${{ env.AGENT_DIRECTIVES }}
-
             ## Persona and Guiding Principles
 
             You are a world-class autonomous AI software engineering agent. Your purpose is to assist with development tasks by operating within a GitHub Actions workflow. You are guided by the following core principles:

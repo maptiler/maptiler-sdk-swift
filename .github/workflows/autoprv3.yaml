@@ -1,0 +1,208 @@
+name: Automated PR
+on:
+  workflow_dispatch:
+    inputs:
+      issue_key:
+        description: 'Issue key'
+        required: true
+      issue_summary:
+        description: 'Brief summary of the issue'
+        required: true
+      issue_description:
+        description: 'Detailed issue description'
+        required: true
+ 
+permissions:
+  contents: write           # allow the action to push code & open the PR
+  pull-requests: write      # allow the action to create and update PRs
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+
+    # Set up developer tools
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: recursive
+    - name: Set Up Swift
+      uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
+      with:
+        xcode-version: '16.2'
+    - name: Verify Swift Version
+      run: swift --version
+    - name: Verify Xcode version
+      run: xcodebuild -version
+    - name: Verify Active Swift Toolchain version
+      run: xcrun swift -version
+      
+    # Set up linter
+
+    - name: Cache SwiftLint
+      uses: actions/cache@v4
+      with:
+        path: |
+          /opt/homebrew/Cellar/swiftlint
+          /usr/local/Cellar/swiftlint
+        key: swiftlint-${{ runner.os }}-v1
+        restore-keys: |
+          swiftlint-${{ runner.os }}-
+    - name: Install SwiftLint
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        if ! command -v swiftlint &> /dev/null; then
+          brew install swiftlint
+        fi
+    - name: Link SwiftLint
+      run: brew link swiftlint --force
+
+    - name: Ensure Homebrew in PATH
+      run: |
+        echo "/opt/homebrew/bin" >> "$GITHUB_PATH" || true
+        echo "/usr/local/bin" >> "$GITHUB_PATH" || true
+        echo "/opt/homebrew/Cellar/swiftlint" >> "$GITHUB_PATH" || true
+        echo "/usr/local/Cellar/swiftlint" >> "$GITHUB_PATH" || true
+
+      # Set up LLM Agent
+
+    - name: Install Agent (Homebrew)
+      run: brew install codex
+
+    # Set up environment variables
+
+    - id: vars
+      run: |
+        echo "ISSUE_KEY=${{ github.event.inputs.issue_key }}"        >> $GITHUB_ENV
+        echo "TITLE=${{ github.event.inputs.issue_summary }}"        >> $GITHUB_ENV
+        echo "RAW_DESC=${{ github.event.inputs.issue_description }}" >> $GITHUB_ENV
+        DESC_CLEANED=$(echo "${{ github.event.inputs.issue_description }}" | tr '\n' ' ' | sed 's/"/'\''/g')
+        echo "DESC=$DESC_CLEANED"                                    >> $GITHUB_ENV
+        echo "BRANCH=${{ github.event.inputs.issue_key }}"     >> $GITHUB_ENV
+
+    # Symlink agents file to the root
+
+    - name: Symlink agents
+      run: ln -s .github/copilot-instructions.md AGENTS.md
+
+    # Generate JS docs
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Install JS deps
+      working-directory: js
+      run: npm ci
+
+    - name: Build JS docs
+      working-directory: js
+      run: npm run doc
+
+    # Run the LLM Agent and commit the output
+
+    - name: 'Run Gemini CLI'
+      id: 'run_gemini'
+      uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
+      env:
+        GITHUB_TOKEN: '${{ steps.mint_identity_token.outputs.token || secrets.GITHUB_TOKEN || github.token }}'
+        IS_PULL_REQUEST: '${{ !!github.event.pull_request }}'
+        REPOSITORY: '${{ github.repository }}'
+        ADDITIONAL_CONTEXT: '${{ inputs.additional_context }}'
+        AGENT_DIRECTIVES: '${{ steps.agent_directives.outputs.directives }}'
+      with:
+        gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
+        gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
+        gcp_project_id: '${{ vars.GOOGLE_CLOUD_PROJECT }}'
+        gcp_location: '${{ vars.GOOGLE_CLOUD_LOCATION }}'
+        gcp_service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+        use_vertex_ai: '${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}'
+        google_api_key: '${{ secrets.GOOGLE_API_KEY }}'
+        use_gemini_code_assist: '${{ vars.GOOGLE_GENAI_USE_GCA }}'
+        gemini_debug: '${{ fromJSON(vars.DEBUG || vars.ACTIONS_STEP_DEBUG || false) }}'
+        gemini_model: '${{ vars.GEMINI_MODEL }}'
+        settings: |-
+          {
+            "maxSessionTurns": 25,
+            "telemetry": {
+              "enabled": ${{ vars.GOOGLE_CLOUD_PROJECT != '' }},
+              "target": "gcp"
+            },
+            "mcpServers": {
+              "github": {
+                "command": "docker",
+                "args": [
+                  "run",
+                  "-i",
+                  "--rm",
+                  "-e",
+                  "GITHUB_PERSONAL_ACCESS_TOKEN",
+                  "ghcr.io/github/github-mcp-server"
+                ],
+                "includeTools": [
+                  "add_issue_comment",
+                  "get_issue",
+                  "get_issue_comments",
+                  "list_issues",
+                  "search_issues",
+                  "create_pull_request",
+                  "get_pull_request",
+                  "get_pull_request_comments",
+                  "get_pull_request_diff",
+                  "get_pull_request_files",
+                  "list_pull_requests",
+                  "search_pull_requests",
+                  "create_branch",
+                  "create_or_update_file",
+                  "delete_file",
+                  "fork_repository",
+                  "get_commit",
+                  "get_file_contents",
+                  "list_commits",
+                  "push_files",
+                  "search_code"
+                ],
+                "env": {
+                  "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+                }
+              }
+            },
+            "coreTools": [
+              "run_shell_command(cat)",
+              "run_shell_command(echo)",
+              "run_shell_command(grep)",
+              "run_shell_command(head)",
+              "run_shell_command(tail)"
+            ]            }
+        prompt: |-
+          ${{ env.AGENT_DIRECTIVES }} 
+          Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
+    - name: Agent commit
+      run: |
+        git add -A
+        git commit -m "$ISSUE_KEY: $TITLE"
+
+    # Prepare and push Pull Request
+
+    - id: cpr
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token:  ${{ secrets.GITHUB_TOKEN }}
+        base:   main
+        branch: ${{ env.BRANCH }}
+        title:  "${{ env.ISSUE_KEY }}: ${{ env.TITLE }}"
+        body: |
+          **${{ env.ISSUE_KEY }}**
+
+          ## Objective
+          **${{ env.TITLE }}**.
+
+          ## Description
+          **${{ env.TITLE }}**.
+
+          ## Acceptance
+          Linted.

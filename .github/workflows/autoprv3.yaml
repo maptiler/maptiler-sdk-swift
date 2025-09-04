@@ -181,10 +181,10 @@ jobs:
         prompt: |-
           ${{ env.AGENT_DIRECTIVES }} 
           Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
-      - name: Agent commit
-        run: |
-          git add -A
-          git commit -m "$ISSUE_KEY: $TITLE"
+    - name: Agent commit
+      run: |
+        git add -A
+        git commit -m "$ISSUE_KEY: $TITLE"
 
     # Prepare and push Pull Request
 

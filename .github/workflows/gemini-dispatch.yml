@@ -66,7 +66,6 @@ jobs:
     outputs:
       command: '${{ steps.extract_command.outputs.command }}'
       request: '${{ steps.extract_command.outputs.request }}'
-      request_body: '${{ steps.extract_command.outputs.additional_context }}'
       additional_context: '${{ steps.extract_command.outputs.additional_context }}'
       issue_number: '${{ github.event.pull_request.number || github.event.issue.number }}'
     steps:
@@ -94,29 +93,23 @@ jobs:
             const eventType = process.env.EVENT_TYPE
             core.setOutput('request', request);
 
-            let command = 'fallthrough';
-            let additionalContext = '';
-
             if (request.startsWith("@gemini-cli /review")) {
-              command = 'review';
-              additionalContext = request.replace(/^@gemini-cli \/review/, '').trim();
+              core.setOutput('command', 'review');
+              const additionalContext = request.replace(/^@gemini-cli \/review/, '').trim();
+              core.setOutput('additional_context', additionalContext);
             } else if (request.startsWith("@gemini-cli /triage")) {
-              command = 'triage';
-              additionalContext = request.replace(/^@gemini-cli \/triage/, '').trim();
+              core.setOutput('command', 'triage');
             } else if (request.startsWith("@gemini-cli")) {
-              command = 'invoke';
-              additionalContext = request.replace(/^@gemini-cli/, '').trim();
+              core.setOutput('command', 'invoke');
+              const additionalContext = request.replace(/^@gemini-cli/, '').trim();
+              core.setOutput('additional_context', additionalContext);
             } else if (eventType === 'pull_request.opened') {
-              command = 'review';
+              core.setOutput('command', 'review');
             } else if (['issues.opened', 'issues.reopened'].includes(eventType)) {
-              command = 'triage';
+              core.setOutput('command', 'triage');
+            } else {
+              core.setOutput('command', 'fallthrough');
             }
-
-            // Clean additional_context to remove any @-mentions at the beginning of the string
-            additionalContext = additionalContext.replace(/^@\w+\s+/, '');
-
-            core.setOutput('command', command);
-            core.setOutput('additional_context', additionalContext);
 
       - name: 'Acknowledge request'
         env:
@@ -141,7 +134,6 @@ jobs:
       issues: 'write'
       pull-requests: 'write'
     with:
-      request_body: '${{ needs.dispatch.outputs.request_body }}'
       additional_context: '${{ needs.dispatch.outputs.additional_context }}'
     secrets: 'inherit'
 
@@ -170,7 +162,6 @@ jobs:
       issues: 'write'
       pull-requests: 'write'
     with:
-      request_body: '${{ needs.dispatch.outputs.request_body }}'
       additional_context: '${{ needs.dispatch.outputs.additional_context }}'
     secrets: 'inherit'
 

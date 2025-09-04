@@ -3,6 +3,10 @@ name: '▶️ Gemini Invoke'
 on:
   workflow_call:
     inputs:
+      request_body:
+        type: 'string'
+        description: 'The request body from the user'
+        required: false
       additional_context:
         type: 'string'
         description: 'Any additional context from the request'
@@ -70,26 +74,12 @@ jobs:
         working-directory: js
         run: npm run doc
 
-      - name: 'Clean DESCRIPTION'
-        id: 'clean_description'
-        uses: 'actions/github-script@v7'
-        with:
-          script: |
-            const body = process.env.BODY;
-            if (body.startsWith('@gemini-cli')) {
-              core.setOutput('description', body.replace(/^@gemini-cli/, '').trim());
-            } else {
-              core.setOutput('description', body);
-            }
-        env:
-          BODY: '${{ github.event.pull_request.body || github.event.issue.body }}'
-
       - name: 'Run Gemini CLI'
         id: 'run_gemini'
         uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
         env:
           TITLE: '${{ github.event.pull_request.title || github.event.issue.title }}'
-          DESCRIPTION: '${{ steps.clean_description.outputs.description }}'
+          DESCRIPTION: '${{ inputs.request_body }}'
           EVENT_NAME: '${{ github.event_name }}'
           GITHUB_TOKEN: '${{ steps.mint_identity_token.outputs.token || secrets.GITHUB_TOKEN || github.token }}'
           IS_PULL_REQUEST: '${{ !!github.event.pull_request }}'

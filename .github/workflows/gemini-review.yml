@@ -3,6 +3,10 @@ name: '🔎 Gemini Review'
 on:
   workflow_call:
     inputs:
+      request_body:
+        type: 'string'
+        description: 'The request body from the user'
+        required: false
       additional_context:
         type: 'string'
         description: 'Any additional context from the request'
@@ -71,27 +75,13 @@ jobs:
           cat .github/copilot-instructions.md >> "${GITHUB_OUTPUT}"
           echo "$EOF" >> "${GITHUB_OUTPUT}"
 
-      - name: 'Clean ISSUE_BODY'
-        id: 'clean_issue_body'
-        uses: 'actions/github-script@v7'
-        with:
-          script: |
-            const body = process.env.BODY;
-            if (body.startsWith('@gemini-cli /review')) {
-              core.setOutput('body', body.replace(/^@gemini-cli \/review/, '').trim());
-            } else {
-              core.setOutput('body', body);
-            }
-        env:
-          BODY: '${{ github.event.pull_request.body || github.event.issue.body }}'
-
       - name: 'Run Gemini pull request review'
         uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
         id: 'gemini_pr_review'
         env:
           GITHUB_TOKEN: '${{ steps.mint_identity_token.outputs.token || secrets.GITHUB_TOKEN || github.token }}'
           ISSUE_TITLE: '${{ github.event.pull_request.title || github.event.issue.title }}'
-          ISSUE_BODY: '${{ steps.clean_issue_body.outputs.body }}'
+          ISSUE_BODY: '${{ inputs.request_body }}'
           PULL_REQUEST_NUMBER: '${{ github.event.pull_request.number || github.event.issue.number }}'
           REPOSITORY: '${{ github.repository }}'
           ADDITIONAL_CONTEXT: '${{ inputs.additional_context }}'

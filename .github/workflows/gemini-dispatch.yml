@@ -94,23 +94,29 @@ jobs:
             const eventType = process.env.EVENT_TYPE
             core.setOutput('request', request);
 
+            let command = 'fallthrough';
+            let additionalContext = '';
+
             if (request.startsWith("@gemini-cli /review")) {
-              core.setOutput('command', 'review');
-              const additionalContext = request.replace(/^@gemini-cli \/review/, '').trim();
-              core.setOutput('additional_context', additionalContext);
+              command = 'review';
+              additionalContext = request.replace(/^@gemini-cli \/review/, '').trim();
             } else if (request.startsWith("@gemini-cli /triage")) {
-              core.setOutput('command', 'triage');
+              command = 'triage';
+              additionalContext = request.replace(/^@gemini-cli \/triage/, '').trim();
             } else if (request.startsWith("@gemini-cli")) {
-              core.setOutput('command', 'invoke');
-              const additionalContext = request.replace(/^@gemini-cli/, '').trim();
-              core.setOutput('additional_context', additionalContext);
+              command = 'invoke';
+              additionalContext = request.replace(/^@gemini-cli/, '').trim();
             } else if (eventType === 'pull_request.opened') {
-              core.setOutput('command', 'review');
+              command = 'review';
             } else if (['issues.opened', 'issues.reopened'].includes(eventType)) {
-              core.setOutput('command', 'triage');
-            } else {
-              core.setOutput('command', 'fallthrough');
+              command = 'triage';
             }
+
+            // Clean additional_context to remove any @-mentions at the beginning of the string
+            additionalContext = additionalContext.replace(/^@\w+\s+/, '');
+
+            core.setOutput('command', command);
+            core.setOutput('additional_context', additionalContext);
 
       - name: 'Acknowledge request'
         env:

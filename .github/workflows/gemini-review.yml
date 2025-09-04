@@ -63,7 +63,10 @@ jobs:
       - name: 'Read agent directives'
         id: 'agent_directives'
         run: |-
-          echo "directives=$(cat .github/copilot-instructions.md)" >> "${GITHUB_OUTPUT}"
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "directives<<$EOF" >> "${GITHUB_OUTPUT}"
+          cat .github/copilot-instructions.md >> "${GITHUB_OUTPUT}"
+          echo "$EOF" >> "${GITHUB_OUTPUT}"
 
       - name: 'Run Gemini pull request review'
         uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude

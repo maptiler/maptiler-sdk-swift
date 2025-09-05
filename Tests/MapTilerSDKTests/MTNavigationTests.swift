@@ -142,4 +142,10 @@ struct MTNavigationTests {
 
         #expect(SetRoll(roll: roll).toJS() == setRollJS)
     }
+
+    @Test func isGlobeProjectionEnabledCommand_shouldMatchJS() async throws {
+        let isGlobeProjectionJS = "\(MTBridge.mapObject).isGlobeProjection();"
+
+        #expect(IsGlobeProjectionEnabled().toJS() == isGlobeProjectionJS)
+    }
 }

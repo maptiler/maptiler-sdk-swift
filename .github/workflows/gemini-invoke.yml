@@ -37,6 +37,12 @@ jobs:
           permission-issues: 'write'
           permission-pull-requests: 'read'
 
+      - name: 'Checkout PR branch'
+        if: github.event.pull_request
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
       - name: 'Run Gemini CLI'
         id: 'run_gemini'
         uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
@@ -244,4 +250,5 @@ jobs:
             Please perform the following task based on the user's request.
             - **Repository**: ${{ github.repository }}
             - **Issue Number**: ${{ github.event.pull_request.number || github.event.issue.number }}
+            - **Branch**: ${{ github.event.pull_request.head.ref }}
             - **User Request**: "${{ inputs.additional_context }}"

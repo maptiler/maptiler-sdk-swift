@@ -109,11 +109,9 @@ jobs:
       id: 'run_gemini'
       uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
       env:
-        GITHUB_TOKEN: '${{ steps.mint_identity_token.outputs.token || secrets.GITHUB_TOKEN || github.token }}'
+        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN || github.token }}'
         IS_PULL_REQUEST: '${{ !!github.event.pull_request }}'
         REPOSITORY: '${{ github.repository }}'
-        ADDITIONAL_CONTEXT: '${{ inputs.additional_context }}'
-        AGENT_DIRECTIVES: '${{ steps.agent_directives.outputs.directives }}'
       with:
         gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
         gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
@@ -172,6 +170,12 @@ jobs:
               }
             },
             "coreTools": [
+              "read_file",
+              "write_file",
+              "replace",
+              "list_directory",
+              "glob",
+              "search_file_content",
               "run_shell_command(cat)",
               "run_shell_command(echo)",
               "run_shell_command(grep)",

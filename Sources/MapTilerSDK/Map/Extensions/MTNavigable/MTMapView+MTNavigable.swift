@@ -369,6 +369,14 @@ extension MTMapView: MTNavigable {
     public func getRoll(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
         runCommandWithDoubleReturnValue(GetRoll(), completion: completionHandler)
     }
+
+    /// Returns a Boolean indicating whether the globe projection is enabled.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute with the boolean result.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isGlobeProjectionEnabled(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
+        runCommandWithBoolReturnValue(IsGlobeProjectionEnabled(), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -687,6 +695,20 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns a Boolean indicating whether the globe projection is enabled.
+    public func isGlobeProjectionEnabled() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isGlobeProjectionEnabled { result in
+                switch result {
+                case .success(let isEnabled):
+                    continuation.resume(returning: isEnabled)
+                case .failure:
+                    continuation.resume(returning: false)
                 }
             }
         }

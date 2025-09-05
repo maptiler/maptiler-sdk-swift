@@ -244,5 +244,7 @@ jobs:
             ## TASK
 
             Please perform the following task based on the user's request.
-
             User Request: "${{ inputs.additional_context }}"
+            - **Repository**: ${{ github.repository }}
+            - **Issue Number**: ${{ github.event.pull_request.number || github.event.issue.number }}
+            - **User Request**: "${{ inputs.additional_context }}"

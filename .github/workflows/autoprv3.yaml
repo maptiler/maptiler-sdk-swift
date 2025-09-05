@@ -61,18 +61,6 @@ jobs:
     - name: Link SwiftLint
       run: brew link swiftlint --force
 
-    - name: Ensure Homebrew in PATH
-      run: |
-        echo "/opt/homebrew/bin" >> "$GITHUB_PATH" || true
-        echo "/usr/local/bin" >> "$GITHUB_PATH" || true
-        echo "/opt/homebrew/Cellar/swiftlint" >> "$GITHUB_PATH" || true
-        echo "/usr/local/Cellar/swiftlint" >> "$GITHUB_PATH" || true
-
-      # Set up LLM Agent
-
-    - name: Install Agent (Homebrew)
-      run: brew install codex
-
     # Set up environment variables
 
     - id: vars
@@ -88,6 +76,10 @@ jobs:
 
     - name: Symlink agents
       run: ln -s .github/copilot-instructions.md AGENTS.md
+
+    - name: Load agent directives
+      id: agent_directives
+      run: echo "directives=$(cat .github/copilot-instructions.md)" >> $GITHUB_OUTPUT
 
     # Generate JS docs
     - name: Set up Node
@@ -112,6 +104,7 @@ jobs:
         GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN || github.token }}'
         IS_PULL_REQUEST: '${{ !!github.event.pull_request }}'
         REPOSITORY: '${{ github.repository }}'
+        AGENT_DIRECTIVES: '${{ steps.agent_directives.outputs.directives }}'
       with:
         gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
         gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'

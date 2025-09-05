@@ -121,7 +121,7 @@ jobs:
         gemini_model: '${{ vars.GEMINI_MODEL }}'
         settings: |-
           {
-            "maxSessionTurns": 25,
+            "maxSessionTurns": 50,
             "telemetry": {
               "enabled": ${{ vars.GOOGLE_CLOUD_PROJECT != '' }},
               "target": "gcp"

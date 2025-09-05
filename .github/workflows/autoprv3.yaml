@@ -1,4 +1,4 @@
-name: Automated PR
+name: Automated PR v3
 on:
   workflow_dispatch:
     inputs:
@@ -79,7 +79,10 @@ jobs:
 
     - name: Load agent directives
       id: agent_directives
-      run: echo "directives=$(cat .github/copilot-instructions.md)" >> $GITHUB_OUTPUT
+      run: |
+        echo "directives<<EOF" >> "$GITHUB_OUTPUT"
+        cat .github/copilot-instructions.md >> "$GITHUB_OUTPUT"
+        echo "EOF" >> "$GITHUB_OUTPUT"
 
     # Generate JS docs
     - name: Set up Node

@@ -134,7 +134,7 @@ jobs:
           **${{ env.ISSUE_KEY }}**
 
           ## Objective
-          **${{ env.TITLE }}**.
+          **${{ env.DESC }}**.
 
           ## Description
           **${{ env.TITLE }}**.

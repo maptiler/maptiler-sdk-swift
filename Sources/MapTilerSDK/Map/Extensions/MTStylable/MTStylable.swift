@@ -33,6 +33,13 @@ public protocol MTStylable {
     ///    - options: Style setter options.
     func setLight(_ light: MTLight, options: MTStyleSetterOptions?) async
 
+    /// Sets the space background for globe projection (cubemap/spacebox).
+    /// - Parameters:
+    ///    - space: Space configuration or a boolean to enable default.
+    ///
+    /// - Note: Make sure space is enabled and projection is set to Globe before initializing the map via MTMapOptions.
+    func setSpace(_ space: MTSpaceOption) async
+
     /// Sets the state where multiple copies of the world will be rendered
     /// side by side beyond -180 and 180 degrees longitude.
     /// - Parameters:

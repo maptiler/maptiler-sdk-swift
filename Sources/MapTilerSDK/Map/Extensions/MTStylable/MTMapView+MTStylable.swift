@@ -54,6 +54,20 @@ extension MTMapView: MTStylable {
         runCommand(SetLight(light: light, options: options), completion: completionHandler)
     }
 
+    /// Sets the space background for globe projection (cubemap/spacebox).
+    /// - Parameters:
+    ///   - space: Space configuration or a boolean to enable default.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    /// - Note: Make sure space is enabled and projection is set to Globe before initializing the map via MTMapOptions.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setSpace(
+        _ space: MTSpaceOption,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetSpace(space: space), completion: completionHandler)
+        options?.setSpace(space)
+    }
+
     /// Sets the state of shouldRenderWorldCopies.
     ///
     /// If true , multiple copies of the world will be rendered side by side beyond -180 and 180 degrees longitude.
@@ -151,6 +165,8 @@ extension MTMapView: MTStylable {
         runCommand(EnableGlobeProjection(), completion: completionHandler)
 
         options?.setProjection(.globe)
+
+        // Do not implicitly create a space layer here; caller can setSpace explicitly
     }
 
     /// Enables the mercator projection visualization.
@@ -364,6 +380,18 @@ extension MTMapView {
     public func setLight(_ light: MTLight, options: MTStyleSetterOptions?) async {
         await withCheckedContinuation { continuation in
             setLight(light, options: options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the space background for globe projection (cubemap/spacebox).
+    /// - Parameters:
+    ///   - space: Space configuration or a boolean to enable default.
+    /// - Note: Make sure space is enabled and projection is set to Globe before initializing the map via MTMapOptions.
+    public func setSpace(_ space: MTSpaceOption) async {
+        await withCheckedContinuation { continuation in
+            setSpace(space) { _ in
                 continuation.resume()
             }
         }

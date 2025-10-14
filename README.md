@@ -282,6 +282,89 @@ mapView.didInitialize = {
 Note: When calling `setSpace`, any field not explicitly provided (e.g., `color`, `faces`, `path`, or `preset`) keeps its previous value.
 
 
+## Halo
+The halo option adds a gradient-based atmospheric glow around the globe, simulating the visual effect of Earth's atmosphere when viewed from space.
+
+- Prerequisite: use globe projection. Set `projection: .globe` in `MTMapOptions`.
+
+Usage — enable simple halo
+
+```swift
+import MapTilerSDK
+
+// UIKit
+let options = MTMapOptions(
+    projection: .globe,
+    halo: .enabled(true)
+)
+let mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .outdoor)
+
+// SwiftUI
+@State private var mapView = MTMapView(
+    options: MTMapOptions(
+        projection: .globe,
+        halo: .enabled(true)
+    )
+)
+```
+
+Custom gradient — scale and stops
+
+```swift
+let options = MTMapOptions(
+    projection: .globe,
+    halo: .config(
+        MTHalo(
+            scale: 1.5, // Controls the halo size
+            stops: [
+                MTHaloStop(position: 0.2, color: MTColor(hex: "#00000000")),
+                MTHaloStop(position: 0.2, color: MTColor(hex: "#FF0000")),
+                MTHaloStop(position: 0.4, color: MTColor(hex: "#FF0000")),
+                MTHaloStop(position: 0.4, color: MTColor(hex: "#00000000")),
+                MTHaloStop(position: 0.6, color: MTColor(hex: "#00000000")),
+                MTHaloStop(position: 0.6, color: MTColor(hex: "#FF0000")),
+                MTHaloStop(position: 0.8, color: MTColor(hex: "#FF0000")),
+                MTHaloStop(position: 0.8, color: MTColor(hex: "#00000000")),
+                MTHaloStop(position: 1.0, color: MTColor(hex: "#00000000"))
+            ]
+        )
+    )
+)
+```
+
+Dynamic updates — change halo at runtime
+
+```swift
+mapView.didInitialize = {
+    Task {
+        await mapView.setHalo(
+            .config(
+                MTHalo(
+                    scale: 2.0,
+                    stops: [
+                        MTHaloStop(position: 0.0, color: MTColor(hex: "#87CEFA")),
+                        MTHaloStop(position: 0.5, color: MTColor(hex: "#0000FABF")),
+                        MTHaloStop(position: 0.75, color: MTColor(hex: "#FF000000"))
+                    ]
+                )
+            )
+        )
+    }
+}
+```
+
+Disable animations — halo and space
+
+```swift
+mapView.didInitialize = {
+    Task {
+        await mapView.disableHaloAnimations()
+        await mapView.disableSpaceAnimations()
+    }
+}
+```
+
+
 # Installation
 MapTiler Swift SDK is a Swift Package and can be added as dependency through **Swift Package Manager**.
 

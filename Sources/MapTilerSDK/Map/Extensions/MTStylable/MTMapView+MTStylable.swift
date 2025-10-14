@@ -68,6 +68,40 @@ extension MTMapView: MTStylable {
         options?.setSpace(space)
     }
 
+    /// Sets the atmospheric halo (glow) around the globe.
+    /// - Parameters:
+    ///   - halo: Halo configuration or a boolean to enable default.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    /// - Note: Make sure halo is enabled and projection is set to Globe before initializing the map via MTMapOptions.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setHalo(
+        _ halo: MTHaloOption,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetHalo(halo: halo), completion: completionHandler)
+        options?.setHalo(halo)
+    }
+
+    /// Disables state transitions/animations for halo updates.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func disableHaloAnimations(
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(DisableHaloAnimations(), completion: completionHandler)
+    }
+
+    /// Disables state transitions/animations for space updates.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func disableSpaceAnimations(
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(DisableSpaceAnimations(), completion: completionHandler)
+    }
+
     /// Sets the state of shouldRenderWorldCopies.
     ///
     /// If true , multiple copies of the world will be rendered side by side beyond -180 and 180 degrees longitude.
@@ -538,6 +572,36 @@ extension MTMapView {
     public func setVerticalFieldOfView(degrees: Double = 36.87) async {
         await withCheckedContinuation { continuation in
             setVerticalFieldOfView(degrees: degrees) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the atmospheric halo (glow) around the globe.
+    /// - Parameters:
+    ///   - halo: Halo configuration or a boolean to enable default.
+    /// - Note: Make sure halo is enabled and projection is set to Globe before initializing the map via MTMapOptions.
+    public func setHalo(_ halo: MTHaloOption) async {
+        await withCheckedContinuation { continuation in
+            setHalo(halo) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Disables state transitions/animations for halo updates.
+    public func disableHaloAnimations() async {
+        await withCheckedContinuation { continuation in
+            disableHaloAnimations { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Disables state transitions/animations for space updates.
+    public func disableSpaceAnimations() async {
+        await withCheckedContinuation { continuation in
+            disableSpaceAnimations { _ in
                 continuation.resume()
             }
         }

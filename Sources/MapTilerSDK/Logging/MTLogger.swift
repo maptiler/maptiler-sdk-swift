@@ -47,7 +47,7 @@ package actor MTLoggerInternal {
         "Maximum in-memory log count exceeded, earliest logs now accessible only through OS Logs."
     }
 
-    package static var shared: MTLoggerInternal = MTLoggerInternal()
+    package static let shared: MTLoggerInternal = MTLoggerInternal()
     private var logger: MTLoggable = OSLogger()
 
     private init() {}

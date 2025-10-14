@@ -87,7 +87,8 @@ extension UIColor {
 }
 
 extension MTColor {
-    init(hex: String) {
+    /// Initializes the `MTColor` with a hex string (e.g., "#RRGGBB" or "#RRGGBBAA").
+    public init(hex: String) {
         self.hex = hex
     }
 }

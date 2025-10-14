@@ -199,6 +199,9 @@ public struct MTMapOptions: Sendable {
     /// Space background configuration for globe (cubemap/spacebox).
     public private(set) var space: MTSpaceOption?
 
+    /// Atmospheric glow (halo) configuration for globe.
+    public private(set) var halo: MTHaloOption?
+
     /// Initializes the map options with center and zoom.
     public init(center: CLLocationCoordinate2D?, zoom: Double?) {
         self.center = center
@@ -273,7 +276,8 @@ public struct MTMapOptions: Sendable {
         scaleControlIsVisible: Bool? = false,
         terrainControlIsVisible: Bool? = false,
         isSessionLogicEnabled: Bool = true,
-        space: MTSpaceOption? = nil
+        space: MTSpaceOption? = nil,
+        halo: MTHaloOption? = nil
     ) {
         self.language = language
         self.center = center
@@ -319,6 +323,7 @@ public struct MTMapOptions: Sendable {
         self.terrainControlIsVisible = terrainControlIsVisible
         self.isSessionLogicEnabled = isSessionLogicEnabled
         self.space = space
+        self.halo = halo
     }
 }
 
@@ -367,6 +372,7 @@ extension MTMapOptions: Codable {
         case scaleControlIsVisible = "scaleControl"
         case terrainControlIsVisible = "terrainControl"
         case space
+        case halo
     }
 }
 
@@ -513,6 +519,10 @@ extension MTMapOptions {
 
     package mutating func setSpace(_ space: MTSpaceOption) {
         self.space = space
+    }
+
+    package mutating func setHalo(_ halo: MTHaloOption) {
+        self.halo = halo
     }
 
     package mutating func setMinimapIsVisible(_ minimapIsVisible: Bool) {

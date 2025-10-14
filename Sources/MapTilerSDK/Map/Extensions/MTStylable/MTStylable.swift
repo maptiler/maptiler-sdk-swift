@@ -40,6 +40,18 @@ public protocol MTStylable {
     /// - Note: Make sure space is enabled and projection is set to Globe before initializing the map via MTMapOptions.
     func setSpace(_ space: MTSpaceOption) async
 
+    /// Sets the atmospheric halo (glow) around the globe.
+    /// - Parameters:
+    ///    - halo: Halo configuration or a boolean to enable default.
+    /// - Note: Make sure halo is enabled and projection is set to Globe before initializing the map via MTMapOptions.
+    func setHalo(_ halo: MTHaloOption) async
+
+    /// Disables state transitions/animations for halo updates.
+    func disableHaloAnimations() async
+
+    /// Disables state transitions/animations for space updates.
+    func disableSpaceAnimations() async
+
     /// Sets the state where multiple copies of the world will be rendered
     /// side by side beyond -180 and 180 degrees longitude.
     /// - Parameters:

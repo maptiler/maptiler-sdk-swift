@@ -196,6 +196,9 @@ public struct MTMapOptions: Sendable {
     ///  - SeeAlso: ``https://docs.maptiler.com/guides/maps-apis/maps-platform/what-is-map-session-in-maptiler-cloud/``
     public private(set) var isSessionLogicEnabled: Bool = true
 
+    /// Space background configuration for globe (cubemap/spacebox).
+    public private(set) var space: MTSpaceOption?
+
     /// Initializes the map options with center and zoom.
     public init(center: CLLocationCoordinate2D?, zoom: Double?) {
         self.center = center
@@ -269,7 +272,8 @@ public struct MTMapOptions: Sendable {
         projectionControlIsVisible: Bool? = false,
         scaleControlIsVisible: Bool? = false,
         terrainControlIsVisible: Bool? = false,
-        isSessionLogicEnabled: Bool = true
+        isSessionLogicEnabled: Bool = true,
+        space: MTSpaceOption? = nil
     ) {
         self.language = language
         self.center = center
@@ -314,6 +318,7 @@ public struct MTMapOptions: Sendable {
         self.scaleControlIsVisible = scaleControlIsVisible
         self.terrainControlIsVisible = terrainControlIsVisible
         self.isSessionLogicEnabled = isSessionLogicEnabled
+        self.space = space
     }
 }
 
@@ -361,6 +366,7 @@ extension MTMapOptions: Codable {
         case projectionControlIsVisible = "projectionControl"
         case scaleControlIsVisible = "scaleControl"
         case terrainControlIsVisible = "terrainControl"
+        case space
     }
 }
 
@@ -503,6 +509,10 @@ extension MTMapOptions {
 
     package mutating func setShouldValidateStyle(_ shouldValidateStyle: Bool) {
         self.shouldValidateStyle = shouldValidateStyle
+    }
+
+    package mutating func setSpace(_ space: MTSpaceOption) {
+        self.space = space
     }
 
     package mutating func setMinimapIsVisible(_ minimapIsVisible: Bool) {

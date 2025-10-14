@@ -19,6 +19,7 @@ class MainViewController: UIViewController {
     @IBOutlet private weak var mapView: MTMapView! {
         didSet {
             mapView.delegate = self
+            mapView.options = MTMapOptions(space: .enabled(true))
         }
     }
 

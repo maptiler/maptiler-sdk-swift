@@ -183,6 +183,105 @@ myCustomView.addTo(mapView)
 ```
 
 
+## Space
+The space option customizes the globe’s background, simulating deep space or skybox effects.
+
+- Prerequisite: use globe projection. Set `projection: .globe` in `MTMapOptions`.
+
+Usage — solid color background
+
+```swift
+import MapTilerSDK
+
+// UIKit
+let options = MTMapOptions(
+    projection: .globe,
+    space: .config(
+        MTSpace(
+            color: MTColor(color: UIColor(hex: "#111122")!.cgColor)
+        )
+    )
+)
+let mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .streets)
+
+// SwiftUI
+@State private var mapView = MTMapView(
+    options: MTMapOptions(
+        projection: .globe,
+        space: .config(MTSpace(color: MTColor(color: UIColor(hex: "#111122")!.cgColor)))
+    )
+)
+```
+
+Presets — predefined cubemaps
+
+- `space`: Dark blue background; stars stay white. Space color changes background color.
+- `stars` (default): Black background; space color changes stars color.
+- `milkyway`: Black half‑transparent background with standard milky way and stars; space color tints stars and milky way.
+- `milkyway-subtle`: Subtle milky way, fewer stars; space color tints stars and milky way.
+- `milkyway-bright`: Bright milky way, more stars; space color tints stars and milky way.
+- `milkyway-colored`: Full image with natural colors; space color has no effect.
+
+```swift
+// Use a preset
+let options = MTMapOptions(
+    projection: .globe,
+    space: .config(MTSpace(preset: .space))
+)
+```
+
+Custom cubemap — provide all faces
+
+```swift
+let faces = MTSpaceFaces(
+    pX: URL(string: "https://example.com/space/px.png")!,
+    nX: URL(string: "https://example.com/space/nx.png")!,
+    pY: URL(string: "https://example.com/space/py.png")!,
+    nY: URL(string: "https://example.com/space/ny.png")!,
+    pZ: URL(string: "https://example.com/space/pz.png")!,
+    nZ: URL(string: "https://example.com/space/nz.png")!
+)
+
+let options = MTMapOptions(
+    projection: .globe,
+    space: .config(MTSpace(faces: faces))
+)
+```
+
+Cubemap by path — files named px, nx, py, ny, pz, nz with the given format
+
+```swift
+let path = MTSpacePath(
+    baseUrl: URL(string: "https://example.com/spacebox/transparent")!,
+    format: "png" // defaults to PNG if omitted
+)
+
+let options = MTMapOptions(
+    projection: .globe,
+    space: .config(MTSpace(path: path))
+)
+```
+
+Dynamic updates — change space at runtime
+
+```swift
+mapView.didInitialize = {
+    Task {
+        await mapView.setSpace(
+            .config(
+                MTSpace(
+                    color: MTColor(color: UIColor.red.cgColor),
+                    path: MTSpacePath(baseUrl: URL(string: "https://example.com/spacebox/transparent")!)
+                )
+            )
+        )
+    }
+}
+```
+
+Note: When calling `setSpace`, any field not explicitly provided (e.g., `color`, `faces`, `path`, or `preset`) keeps its previous value.
+
+
 # Installation
 MapTiler Swift SDK is a Swift Package and can be added as dependency through **Swift Package Manager**.
 

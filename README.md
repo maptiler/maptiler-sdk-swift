@@ -364,6 +364,8 @@ mapView.didInitialize = {
 }
 ```
 
+### Developer Docs
+For more information and API Reference visit: https://docs.maptiler.com/mobile-sdk/ios/ or browse ready-to-use code examples at the [Examples](https://github.com/maptiler/maptiler-sdk-swift/tree/main/Examples) directory in this repo.
 
 # Installation
 MapTiler Swift SDK is a Swift Package and can be added as dependency through **Swift Package Manager**.

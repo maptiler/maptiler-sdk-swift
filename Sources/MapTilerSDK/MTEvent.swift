@@ -25,16 +25,16 @@ public enum MTEvent: String {
     /// Triggered whenever the cooperativeGestures option prevents a gesture from being handled by the map.
     case didPreventCooperativeGesture = "cooperativegestureprevented"
 
-    /// Triggerred when any map data loads or changes.
+    /// Triggered when any map data loads or changes.
     case dataDidUpdate = "data"
 
-    /// Triggerred when a request for one of the map's sources' tiles is aborted.
-    /// Triggerred when a request for one of the map's sources' data is aborted.
+    /// Triggered when a request for one of the map's sources' tiles is aborted.
+    /// Triggered when a request for one of the map's sources' data is aborted.
     case dataUpdateDidAbort = "dataabort"
 
-    /// Triggered when any map data (style, source, tile, etc) begins loading or changing asyncronously.
+    /// Triggered when any map data (style, source, tile, etc) begins loading or changing asynchronously.
     ///
-    /// All dataloading events are followed by a dataDidUpdate, dataUpdateDidAbort or error events.
+    /// All data loading events are followed by a dataDidUpdate, dataUpdateDidAbort or error events.
     case dataLoadingDidStart = "dataloading"
 
     /// Triggered when a user taps and releases twice at the same point on the map in rapid succession.
@@ -60,7 +60,7 @@ public enum MTEvent: String {
     case didLoad = "load"
 
     /// Triggered only once in a Map instance lifecycle, when both the load event
-    /// and the terrain event with non-null terrain are triggered..
+    /// and the terrain event with non-null terrain are triggered.
     case didLoadWithTerrain = "loadWithTerrain"
 
     /// Triggered repeatedly during an animated transition from one view to another,
@@ -126,7 +126,7 @@ public enum MTEvent: String {
     /// Triggered when a request for one of the map's sources' data is aborted.
     case sourceUpdateDidAbort = "sourcedataabort"
 
-    /// Triggered when one of the map's sources begins loading or changing asyncronously.
+    /// Triggered when one of the map's sources begins loading or changing asynchronously.
     ///
     /// All sourceUpdateDidStart events are followed by a sourceDidUpdate, sourceUpdateDidAbort or error events.
     case sourceUpdateDidStart = "sourcedataloading"
@@ -134,7 +134,7 @@ public enum MTEvent: String {
     /// Triggered when the map's style loads or changes.
     case styleDidUpdate = "styledata"
 
-    /// Triggered when the map's style begins loading or changing asyncronously.
+    /// Triggered when the map's style begins loading or changing asynchronously.
     ///
     /// All styleUpdateDidStart events are followed by a styleDidUpdate or error events.
     case styleUpdateDidStart = "styledataloading"

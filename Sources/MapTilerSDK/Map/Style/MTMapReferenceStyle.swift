@@ -107,7 +107,7 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable {
         }
     }
 
-    /// Returns reference style name..
+    /// Returns the reference style name.
     public func getName() -> String {
         switch self {
         case .streets:

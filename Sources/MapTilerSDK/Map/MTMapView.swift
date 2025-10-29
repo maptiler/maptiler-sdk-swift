@@ -92,7 +92,7 @@ open class MTMapView: UIView, Sendable {
         commonInit()
     }
 
-    /// Initializes the map with the coder..
+    /// Initializes the map with the coder.
     required public init?(coder: NSCoder) {
         super.init(coder: coder)
 
@@ -127,9 +127,9 @@ open class MTMapView: UIView, Sendable {
 
     /// Initializes location tracking manager.
     ///
-    /// In order to track user location you have to initalize the MLLocationManager,
-    /// add neccessary Privacy Location messages to info.plist, subscribe to MTLocationManagerDelegate
-    /// and start location updates and/or request location once via locationManager property on MTMapView.
+    /// In order to track user location you have to initialize the MLLocationManager,
+    /// add necessary Privacy Location messages to Info.plist, subscribe to MTLocationManagerDelegate
+    /// and start location updates and/or request location once via the locationManager property on MTMapView.
     /// - Parameters:
     ///    - manager: Optional external CLLocationManager to use.
     ///    - accuracy: Optional desired accuracy to use.

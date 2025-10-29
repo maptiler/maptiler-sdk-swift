@@ -13,7 +13,7 @@ import UIKit
 public struct MTColor: Sendable, Codable {
     let hex: String
 
-    /// CGColor representaion of the MTColor
+    /// CGColor representation of the MTColor.
     public var cgColor: CGColor? {
         return UIColor(hex: hex)?.cgColor
     }

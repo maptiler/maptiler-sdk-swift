@@ -131,7 +131,7 @@ public class MTMapCameraHelper {
 }
 
 extension MTMapCameraHelper {
-    /// Returns boolean inidicating whether camera object is equal to the reciever.
+    /// Returns a Boolean indicating whether the camera object is equal to the receiver.
     /// - Parameters:
     ///   - camera: MTMapCamera object to compare with.
     public func isEqualToMapCameraHelper(_ camera: MTMapCameraHelper) -> Bool {

@@ -46,7 +46,7 @@ extension MTMapView: MTNavigable {
     ///   - animationOptions: Optional animation options to use.
     ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The animation will be skipped, and this will behave equivalently to jumpTo
-    /// if the user has the reduced motion accesibility feature enabled,
+    /// if the user has the reduced motion accessibility feature enabled,
     /// unless options includes essential: true.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func flyTo(
@@ -71,7 +71,7 @@ extension MTMapView: MTNavigable {
     ///   - options: Custom options to use.
     ///   - animationOptions: Optional animation options to use.
     ///   - completionHandler: A handler block to execute when function finishes.
-    /// - Note: The transition will happen instantly if the user has enabled the reduced motion accesibility feature,
+    /// - Note: The transition will happen instantly if the user has enabled the reduced motion accessibility feature,
     /// unless options includes essential: true.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func easeTo(
@@ -408,7 +408,7 @@ extension MTMapView {
     ///   - animationOptions: Optional animation options to use.
     ///   - completionHandler: A handler block to execute when function finishes.
     /// - Note: The animation will be skipped, and this will behave equivalently to jumpTo
-    /// if the user has the reduced motion accesibility feature enabled,
+    /// if the user has the reduced motion accessibility feature enabled,
     /// unless options includes essential: true.
     public func flyTo(
         _ center: CLLocationCoordinate2D,
@@ -430,7 +430,7 @@ extension MTMapView {
     ///   - options: Custom options to use.
     ///   - animationOptions: Optional animation options to use.
     ///   - completionHandler: A handler block to execute when function finishes.
-    /// - Note: The transition will happen instantly if the user has enabled the reduced motion accesibility feature,
+    /// - Note: The transition will happen instantly if the user has enabled the reduced motion accessibility feature,
     /// unless options includes essential: true.
     public func easeTo(
         _ center: CLLocationCoordinate2D,

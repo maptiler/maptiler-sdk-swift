@@ -68,10 +68,7 @@ jobs:
         echo "/opt/homebrew/Cellar/swiftlint" >> "$GITHUB_PATH" || true
         echo "/usr/local/Cellar/swiftlint" >> "$GITHUB_PATH" || true
 
-      # Set up LLM Agent
-
-    - name: Install Agent (Homebrew)
-      run: brew install codex
+      # Set up LLM Agent (via GitHub Action)
 
     # Set up environment variables
 
@@ -103,23 +100,23 @@ jobs:
       working-directory: js
       run: npm run doc
 
-    # Run the LLM Agent and commit the output
+    # Run the LLM Agent and then commit the output
 
-    - name: Agent implement & commit
+    - name: Run Codex Action
+      uses: openai/codex-action@v1
       env:
         OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CODEX_QUIET_MODE: "1"          # suppress chatty logs
+      with:
+        openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+        prompt: |
+          Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
+
+    - name: Commit changes
       run: |
-        export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-        which swiftlint || true
-        swiftlint --version || true
-        export OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}"
-        export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-        codex exec --full-auto -c preferred_auth_method='"apikey"' "Implement ticket $ISSUE_KEY: $TITLE. $DESC"
         git add -A
-        git commit -m "$ISSUE_KEY: $TITLE"
+        git commit -m "$ISSUE_KEY: $TITLE" || echo "No changes to commit"
 
     # Prepare and push Pull Request
 

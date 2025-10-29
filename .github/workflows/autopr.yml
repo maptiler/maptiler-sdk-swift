@@ -109,7 +109,7 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+        openai-api-key: ${{ secrets.OPENAI_API_KEY }}
         prompt: |
           Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
 

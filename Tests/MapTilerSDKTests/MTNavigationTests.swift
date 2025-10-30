@@ -74,6 +74,30 @@ struct MTNavigationTests {
         #expect(GetPitch().toJS() == getPitchJS)
     }
 
+    @Test func getMaxPitchCommand_shouldMatchJS() async throws {
+        let getMaxPitchJS = "\(MTBridge.mapObject).getMaxPitch();"
+
+        #expect(GetMaxPitch().toJS() == getMaxPitchJS)
+    }
+
+    @Test func getMaxZoomCommand_shouldMatchJS() async throws {
+        let getMaxZoomJS = "\(MTBridge.mapObject).getMaxZoom();"
+
+        #expect(GetMaxZoom().toJS() == getMaxZoomJS)
+    }
+
+    @Test func getMinPitchCommand_shouldMatchJS() async throws {
+        let getMinPitchJS = "\(MTBridge.mapObject).getMinPitch();"
+
+        #expect(GetMinPitch().toJS() == getMinPitchJS)
+    }
+
+    @Test func getMinZoomCommand_shouldMatchJS() async throws {
+        let getMinZoomJS = "\(MTBridge.mapObject).getMinZoom();"
+
+        #expect(GetMinZoom().toJS() == getMinZoomJS)
+    }
+
     @Test func getCenterClampedToGroundCommand_shouldMatchJS() async throws {
         let getCenterClampedToGroundJS = "\(MTBridge.mapObject).getCenterClampedToGround();"
 

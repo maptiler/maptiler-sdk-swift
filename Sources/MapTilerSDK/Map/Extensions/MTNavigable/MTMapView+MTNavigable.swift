@@ -313,6 +313,42 @@ extension MTMapView: MTNavigable {
         runCommandWithDoubleReturnValue(GetPitch(), completion: completionHandler)
     }
 
+    /// Returns the map's maximum pitch (tilt).
+    ///
+    /// The map's maximum pitch, measured in degrees away from the plane of the screen.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getMaxPitch(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetMaxPitch(), completion: completionHandler)
+    }
+
+    /// Returns the map's maximum zoom.
+    ///
+    /// The map's maximum zoom level.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getMaxZoom(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetMaxZoom(), completion: completionHandler)
+    }
+
+    /// Returns the map's minimum pitch (tilt).
+    ///
+    /// The map's minimum pitch, measured in degrees away from the plane of the screen.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getMinPitch(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetMinPitch(), completion: completionHandler)
+    }
+
+    /// Returns the map's minimum zoom.
+    ///
+    /// The map's minimum zoom level.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getMinZoom(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetMinZoom(), completion: completionHandler)
+    }
+
     /// Pans the map by the specified offset.
     /// - Parameters:
     ///   - offset: The x and y coordinates by which to pan the map.
@@ -614,6 +650,70 @@ extension MTMapView {
     public func getPitch() async -> Double {
         await withCheckedContinuation { continuation in
             getPitch { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns the map's maximum pitch (tilt).
+    ///
+    /// The map's maximum pitch, measured in degrees away from the plane of the screen.
+    public func getMaxPitch() async -> Double {
+        await withCheckedContinuation { continuation in
+            getMaxPitch { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns the map's maximum zoom.
+    ///
+    /// The map's maximum zoom level.
+    public func getMaxZoom() async -> Double {
+        await withCheckedContinuation { continuation in
+            getMaxZoom { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns the map's minimum pitch (tilt).
+    ///
+    /// The map's minimum pitch, measured in degrees away from the plane of the screen.
+    public func getMinPitch() async -> Double {
+        await withCheckedContinuation { continuation in
+            getMinPitch { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns the map's minimum zoom.
+    ///
+    /// The map's minimum zoom level.
+    public func getMinZoom() async -> Double {
+        await withCheckedContinuation { continuation in
+            getMinZoom { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

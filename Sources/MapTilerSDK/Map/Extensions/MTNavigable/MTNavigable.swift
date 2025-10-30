@@ -110,6 +110,18 @@ public protocol MTNavigable {
     /// Returns the map's current pitch.
     func getPitch() async -> Double
 
+    /// Returns the map's maximum pitch.
+    func getMaxPitch() async -> Double
+
+    /// Returns the map's maximum zoom.
+    func getMaxZoom() async -> Double
+
+    /// Returns the map's minimum pitch.
+    func getMinPitch() async -> Double
+
+    /// Returns the map's minimum zoom.
+    func getMinZoom() async -> Double
+
     /// Returns the map's current center.
     func getCenter() async -> CLLocationCoordinate2D
 

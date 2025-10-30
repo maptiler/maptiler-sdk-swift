@@ -113,6 +113,12 @@ public protocol MTNavigable {
     /// Returns the map's current center.
     func getCenter() async -> CLLocationCoordinate2D
 
+    /// Returns the state of the center clamped to ground flag.
+    func getCenterClampedToGround() async -> Bool
+
+    /// Returns the elevation of the map's center point in meters above sea level.
+    func getCenterElevation() async -> Double
+
     /// Returns the map's current bearing.
     func getBearing() async -> Double
 

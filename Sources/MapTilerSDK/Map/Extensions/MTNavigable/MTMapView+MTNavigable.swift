@@ -342,6 +342,20 @@ extension MTMapView: MTNavigable {
         runCommandWithCoordinateReturnValue(GetCenter(), completion: completionHandler)
     }
 
+    /// Returns whether the map's center is clamped to the ground.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getCenterClampedToGround(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
+        runCommandWithBoolReturnValue(GetCenterClampedToGround(), completion: completionHandler)
+    }
+
+    /// Returns the elevation of the map's center point, in meters above sea level.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getCenterElevation(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetCenterElevation(), completion: completionHandler)
+    }
+
     /// Project coordinates to point on the container.
     /// - Parameters:
     ///   - coordinates: The location to project.
@@ -643,6 +657,34 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+                }
+            }
+        }
+    }
+
+    /// Returns whether the map's center point is clamped to the ground.
+    public func getCenterClampedToGround() async -> Bool {
+        await withCheckedContinuation { continuation in
+            getCenterClampedToGround { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Returns the elevation of the map's center point, in meters above sea level.
+    public func getCenterElevation() async -> Double {
+        await withCheckedContinuation { continuation in
+            getCenterElevation { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: .nan)
                 }
             }
         }

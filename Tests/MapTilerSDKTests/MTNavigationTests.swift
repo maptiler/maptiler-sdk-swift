@@ -74,6 +74,32 @@ struct MTNavigationTests {
         #expect(GetPitch().toJS() == getPitchJS)
     }
 
+    @Test func getCenterClampedToGroundCommand_shouldMatchJS() async throws {
+        let getCenterClampedToGroundJS = "\(MTBridge.mapObject).getCenterClampedToGround();"
+
+        #expect(GetCenterClampedToGround().toJS() == getCenterClampedToGroundJS)
+    }
+
+    @Test func getCenterElevationCommand_shouldMatchJS() async throws {
+        let getCenterElevationJS = "\(MTBridge.mapObject).getCenterElevation();"
+
+        #expect(GetCenterElevation().toJS() == getCenterElevationJS)
+    }
+
+    @Test func boolValueParsingCoversStringAndNumericValues() async throws {
+        let trueString = try MTBridgeReturnType(from: "true")
+        let falseString = try MTBridgeReturnType(from: "false")
+        let oneString = try MTBridgeReturnType(from: "1")
+        let zeroString = try MTBridgeReturnType(from: "0")
+        let unexpectedString = try MTBridgeReturnType(from: "maybe")
+
+        #expect(trueString.boolValue == true)
+        #expect(falseString.boolValue == false)
+        #expect(oneString.boolValue == true)
+        #expect(zeroString.boolValue == false)
+        #expect(unexpectedString.boolValue == nil)
+    }
+
     @Test func jumpToCommand_shouldMatchJS() async throws {
         let cameraOptions = MTCameraOptions(zoom: zoom, bearing: bearing, pitch: pitch)
 

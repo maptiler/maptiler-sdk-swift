@@ -374,10 +374,8 @@ extension MTMapView {
             do {
                 let value = try await bridge.execute(command)
 
-                if case .bool(let commandValue) = value {
+                if let commandValue = value.boolValue {
                     completion?(.success(commandValue))
-                } else if case .double(let commandValue) = value {
-                    completion?(.success(commandValue != 0))
                 } else {
                     MTLogger.log("\(command) returned invalid type.", type: .error)
                     completion?(.failure(MTError.unsupportedReturnType(description: "Expected bool, got unknown.")))

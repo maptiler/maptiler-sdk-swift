@@ -366,6 +366,33 @@ extension MTMapView {
         }
     }
 
+    package func runCommandWithProjectionReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<MTProjectionType, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
+
+                if let projection = value.projectionValue {
+                    options?.setProjection(projection)
+                    completion?(.success(projection))
+                } else {
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    let description = "Expected projection type but received \(String(describing: value))."
+                    completion?(.failure(MTError.unsupportedReturnType(description: description)))
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
     package func runCommandWithBoolReturnValue(
         _ command: MTCommand,
         completion: ((Result<Bool, MTError>) -> Void)? = nil

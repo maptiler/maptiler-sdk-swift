@@ -51,4 +51,20 @@ struct MTStyleTests {
             #expect(style.getVariants()?.contains(.defaultVariant) ?? false)
         }
     }
+
+    @Test func getProjectionCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).getProjection();"
+
+        #expect(GetProjection().toJS() == expectedJS)
+    }
+
+    @Test func projectionValueParsing_shouldReturnExpectedType() async throws {
+        let mercatorReturnType = try MTBridgeReturnType(from: "mercator")
+        let globeReturnType = try MTBridgeReturnType(from: "globe")
+        let invalidReturnType = try MTBridgeReturnType(from: "unknown")
+
+        #expect(mercatorReturnType.projectionValue == .mercator)
+        #expect(globeReturnType.projectionValue == .globe)
+        #expect(invalidReturnType.projectionValue == nil)
+    }
 }

@@ -58,6 +58,12 @@ struct MTStyleTests {
         #expect(GetProjection().toJS() == expectedJS)
     }
 
+    @Test func getRenderWorldCopiesCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).getRenderWorldCopies();"
+
+        #expect(GetRenderWorldCopies().toJS() == expectedJS)
+    }
+
     @Test func projectionValueParsing_shouldReturnExpectedType() async throws {
         let mercatorReturnType = try MTBridgeReturnType(from: "mercator")
         let globeReturnType = try MTBridgeReturnType(from: "globe")

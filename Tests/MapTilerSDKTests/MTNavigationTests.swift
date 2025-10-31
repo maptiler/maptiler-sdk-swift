@@ -115,12 +115,16 @@ struct MTNavigationTests {
         let falseString = try MTBridgeReturnType(from: "false")
         let oneString = try MTBridgeReturnType(from: "1")
         let zeroString = try MTBridgeReturnType(from: "0")
+        let oneDouble = try MTBridgeReturnType(from: 1.0)
+        let zeroDouble = try MTBridgeReturnType(from: 0.0)
         let unexpectedString = try MTBridgeReturnType(from: "maybe")
 
         #expect(trueString.boolValue == true)
         #expect(falseString.boolValue == false)
         #expect(oneString.boolValue == true)
         #expect(zeroString.boolValue == false)
+        #expect(oneDouble.boolValue == true)
+        #expect(zeroDouble.boolValue == false)
         #expect(unexpectedString.boolValue == nil)
     }
 

@@ -374,7 +374,7 @@ extension MTMapView {
             do {
                 let value = try await bridge.execute(command)
 
-                if let projection = value.projectionValue {
+                if let projection = value?.projectionValue {
                     options?.setProjection(projection)
                     completion?(.success(projection))
                 } else {
@@ -401,7 +401,7 @@ extension MTMapView {
             do {
                 let value = try await bridge.execute(command)
 
-                if let commandValue = value.boolValue {
+                if let commandValue = value?.boolValue {
                     completion?(.success(commandValue))
                 } else {
                     MTLogger.log("\(command) returned invalid type.", type: .error)

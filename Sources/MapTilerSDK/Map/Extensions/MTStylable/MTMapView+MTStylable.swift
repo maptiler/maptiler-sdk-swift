@@ -191,6 +191,14 @@ extension MTMapView: MTStylable {
         runCommand(RemoveTextPopup(popup: popup), completion: completionHandler)
     }
 
+    /// Returns the projection currently active on the map.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getProjection(completionHandler: ((Result<MTProjectionType, MTError>) -> Void)? = nil) {
+        runCommandWithProjectionReturnValue(GetProjection(), completion: completionHandler)
+    }
+
     /// Enables the globe projection visualization.
     /// - Parameters:
     ///    - completionHandler: A handler block to execute when function finishes.
@@ -518,6 +526,21 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             removeTextPopup(popup) { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns the projection currently active on the map.
+    public func getProjection() async -> MTProjectionType {
+        await withCheckedContinuation { continuation in
+            getProjection { [weak self] result in
+                switch result {
+                case .success(let projection):
+                    continuation.resume(returning: projection)
+                case .failure:
+                    let fallback = self?.options?.projection ?? .mercator
+                    continuation.resume(returning: fallback)
+                }
             }
         }
     }

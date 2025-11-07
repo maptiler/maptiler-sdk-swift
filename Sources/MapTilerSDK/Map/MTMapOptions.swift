@@ -23,6 +23,9 @@ public struct MTMapOptions: Sendable {
     /// If it is not specified in the style, it will default to (latitude: 0.0, longitude: 0.0).
     public private(set) var center: CLLocationCoordinate2D?
 
+    /// Geographic bounds that should be visible by default when the map loads.
+    public private(set) var bounds: MTBounds?
+
     /// Projection type of the map object.
     ///
     /// This will overwrite the projection property from the style (if any).
@@ -39,6 +42,9 @@ public struct MTMapOptions: Sendable {
 
     /// The minimum zoom level of the map (0-24).
     public private(set) var minZoom: Double?
+
+    /// Maximum geographical bounds that the user can pan the map to.
+    public private(set) var maxBounds: MTBounds?
 
     /// The bearing of the map, measured in degrees counter-clockwise from north.
     ///
@@ -235,10 +241,12 @@ public struct MTMapOptions: Sendable {
     public init(
         language: MTLanguage? = nil,
         center: CLLocationCoordinate2D? = nil,
+        bounds: MTBounds? = nil,
         projection: MTProjectionType? = nil,
         zoom: Double? = nil,
         maxZoom: Double? = nil,
         minZoom: Double? = nil,
+        maxBounds: MTBounds? = nil,
         bearing: Double? = nil,
         bearingSnap: Double? = nil,
         pitch: Double? = nil,
@@ -281,10 +289,12 @@ public struct MTMapOptions: Sendable {
     ) {
         self.language = language
         self.center = center
+        self.bounds = bounds
         self.projection = projection
         self.zoom = zoom
         self.maxZoom = maxZoom
         self.minZoom = minZoom
+        self.maxBounds = maxBounds
         self.bearing = bearing
         self.bearingSnap = bearingSnap
         self.pitch = pitch
@@ -331,10 +341,12 @@ extension MTMapOptions: Codable {
     package enum CodingKeys: String, CodingKey {
         case language
         case center
+        case bounds
         case projection
         case zoom
         case maxZoom
         case minZoom
+        case maxBounds
         case bearing
         case bearingSnap
         case pitch
@@ -385,6 +397,10 @@ extension MTMapOptions {
         self.center = center
     }
 
+    package mutating func setBounds(_ bounds: MTBounds) {
+        self.bounds = bounds
+    }
+
     package mutating func setProjection(_ projection: MTProjectionType) {
         self.projection = projection
     }
@@ -399,6 +415,10 @@ extension MTMapOptions {
 
     package mutating func setMinZoom(_ minZoom: Double) {
         self.minZoom = minZoom
+    }
+
+    package mutating func setMaxBounds(_ maxBounds: MTBounds?) {
+        self.maxBounds = maxBounds
     }
 
     package mutating func setBearing(_ bearing: Double) {

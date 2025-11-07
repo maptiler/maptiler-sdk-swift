@@ -141,6 +141,21 @@ extension MTMapView: MTNavigable {
         }
     }
 
+    /// Fits the map so the provided bounds are fully visible within the viewport.
+    /// - Parameters:
+    ///   - bounds: Geographic bounds to display.
+    ///   - fitOptions: Additional configuration that controls the fitting animation.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func fitBounds(
+        _ bounds: MTBounds,
+        options fitOptions: MTFitBoundsOptions? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(FitBounds(bounds: bounds, options: fitOptions), completion: completionHandler)
+        options?.setBounds(bounds)
+    }
+
     /// Sets the padding in pixels around the viewport.
     /// - Parameters:
     ///   - options: Custom options to use.
@@ -148,6 +163,13 @@ extension MTMapView: MTNavigable {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setPadding(_ options: MTPaddingOptions, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetPadding(paddingOptions: options), completion: completionHandler)
+    }
+
+    /// Fits the map to the bounds inferred from the current IP address.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func fitToIpBounds(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(FitToIpBounds(), completion: completionHandler)
     }
 
     /// Sets the value of centerClampedToGround.
@@ -246,6 +268,19 @@ extension MTMapView: MTNavigable {
         if let minZoom = minZoom {
             options?.setMinZoom(minZoom)
         }
+    }
+
+    /// Sets or clears the map's maximum bounds constraint.
+    /// - Parameters:
+    ///   - bounds: The bounds to constrain panning to, or ``nil`` to remove the constraint.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setMaxBounds(
+        _ bounds: MTBounds?,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetMaxBounds(bounds: bounds), completion: completionHandler)
+        options?.setMaxBounds(bounds)
     }
 
     /// Sets the map's pitch (tilt).
@@ -378,6 +413,32 @@ extension MTMapView: MTNavigable {
         runCommandWithCoordinateReturnValue(GetCenter(), completion: completionHandler)
     }
 
+    /// Returns the map's current geographic bounds.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getBounds(completionHandler: @escaping (Result<MTBounds, MTError>) -> Void) {
+        runCommandWithBoundsReturnValue(GetBounds()) { [weak self] result in
+            if case .success(let bounds) = result {
+                self?.options?.setBounds(bounds)
+            }
+
+            completionHandler(result)
+        }
+    }
+
+    /// Returns the maximum bounds constraint applied to the map, if any.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getMaxBounds(completionHandler: @escaping (Result<MTBounds?, MTError>) -> Void) {
+        runCommandWithOptionalBoundsReturnValue(GetMaxBounds()) { [weak self] result in
+            if case .success(let bounds) = result {
+                self?.options?.setMaxBounds(bounds)
+            }
+
+            completionHandler(result)
+        }
+    }
+
     /// Returns whether the map's center is clamped to the ground.
     /// - Parameter completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
@@ -503,10 +564,31 @@ extension MTMapView {
         }
     }
 
+    /// Fits the map so the provided bounds are fully visible within the viewport.
+    /// - Parameters:
+    ///   - bounds: Geographic bounds to display.
+    ///   - fitOptions: Additional configuration that controls the fitting animation.
+    public func fitBounds(_ bounds: MTBounds, options fitOptions: MTFitBoundsOptions? = nil) async {
+        await withCheckedContinuation { continuation in
+            fitBounds(bounds, options: fitOptions) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
     /// Sets the padding in pixels around the viewport.
     public func setPadding(_ options: MTPaddingOptions) async {
         await withCheckedContinuation { continuation in
             setPadding(options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Fits the map to the bounds inferred from the current IP address.
+    public func fitToIpBounds() async {
+        await withCheckedContinuation { continuation in
+            fitToIpBounds { _ in
                 continuation.resume()
             }
         }
@@ -611,6 +693,21 @@ extension MTMapView {
     public func setMinZoom(_ minZoom: Double?) async throws {
         try await withCheckedThrowingContinuation { continuation in
             setMinZoom(minZoom) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Sets or clears the map's maximum bounds constraint.
+    /// - Parameter bounds: The bounds to constrain panning to, or ``nil`` to remove the constraint.
+    public func setMaxBounds(_ bounds: MTBounds?) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            setMaxBounds(bounds) { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
@@ -757,6 +854,38 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+                }
+            }
+        }
+    }
+
+    /// Returns the map's current geographic bounds.
+    public func getBounds() async -> MTBounds {
+        await withCheckedContinuation { continuation in
+            getBounds { result in
+                switch result {
+                case .success(let bounds):
+                    continuation.resume(returning: bounds)
+                case .failure:
+                    let defaultBounds = MTBounds(
+                        southWest: CLLocationCoordinate2D(latitude: -85.0, longitude: -180.0),
+                        northEast: CLLocationCoordinate2D(latitude: 85.0, longitude: 180.0)
+                    )
+                    continuation.resume(returning: defaultBounds)
+                }
+            }
+        }
+    }
+
+    /// Returns the maximum bounds constraint applied to the map, if any.
+    public func getMaxBounds() async -> MTBounds? {
+        await withCheckedContinuation { continuation in
+            getMaxBounds { result in
+                switch result {
+                case .success(let bounds):
+                    continuation.resume(returning: bounds)
+                case .failure:
+                    continuation.resume(returning: nil)
                 }
             }
         }

@@ -48,6 +48,12 @@ public protocol MTNavigable {
     ///    - options: Camera options.
     func jumpTo(_ center: CLLocationCoordinate2D, options: MTCameraOptions?) async
 
+    /// Fits the camera so that the provided bounds are fully visible within the viewport.
+    /// - Parameters:
+    ///   - bounds: Geographic bounds to display.
+    ///   - options: Additional fit configuration.
+    func fitBounds(_ bounds: MTBounds, options: MTFitBoundsOptions?) async
+
     /// Pans the map by the specified offset.
     /// - Parameters:
     ///    - offset: Offset to pan by.
@@ -62,6 +68,9 @@ public protocol MTNavigable {
     /// - Parameters:
     ///    - options: Padding options.
     func setPadding(_ options: MTPaddingOptions) async
+
+    /// Fits the map to the country-level bounds inferred from the current IP address.
+    func fitToIpBounds() async
 
     /// Sets the center clamped to the ground.
     ///
@@ -97,6 +106,10 @@ public protocol MTNavigable {
     ///    - minZoom: Desired zoom.
     func setMinZoom(_ minZoom: Double?) async throws
 
+    /// Sets or clears the maximum bounds constraint applied to the map.
+    /// - Parameter bounds: Geographic bounds to restrict panning, or ``nil`` to remove the constraint.
+    func setMaxBounds(_ bounds: MTBounds?) async throws
+
     /// Sets the map's pitch.
     /// - Parameters:
     ///    - pitch: The pitch to set, measured in degrees away from the plane of the screen (0-60).
@@ -124,6 +137,12 @@ public protocol MTNavigable {
 
     /// Returns the map's current center.
     func getCenter() async -> CLLocationCoordinate2D
+
+    /// Returns the current viewport bounds.
+    func getBounds() async -> MTBounds
+
+    /// Returns the maximum allowed bounds constraint if one is set.
+    func getMaxBounds() async -> MTBounds?
 
     /// Returns the state of the center clamped to ground flag.
     func getCenterClampedToGround() async -> Bool

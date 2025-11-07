@@ -196,4 +196,74 @@ struct MTNavigationTests {
 
         #expect(SetRoll(roll: roll).toJS() == setRollJS)
     }
+
+    @Test func fitBoundsCommand_shouldMatchJS() async throws {
+        let bounds = MTBounds(
+            southWest: CLLocationCoordinate2D(latitude: 10.0, longitude: 20.0),
+            northEast: CLLocationCoordinate2D(latitude: 30.0, longitude: 40.0)
+        )
+        let padding = MTFitBoundsPadding.directional(MTPaddingOptions(left: 12.0, top: 8.0, right: 6.0, bottom: 4.0))
+        let animationOptions = MTAnimationOptions(
+            duration: 2500,
+            offset: MTPoint(x: 1.5, y: 2.5),
+            shouldAnimate: true,
+            isEssential: false,
+            easing: .cubic
+        )
+        let options = MTFitBoundsOptions(
+            padding: padding,
+            maxZoom: 14.0,
+            linear: true,
+            bearing: 15.0,
+            pitch: 25.0,
+            animationOptions: animationOptions
+        )
+
+        let boundsString = bounds.toJSON() ?? ""
+        var optionsString = options.toJSON() ?? ""
+        optionsString = optionsString.replaceEasing()
+        let fitBoundsJS = "\(MTBridge.mapObject).fitBounds(\(boundsString), \(optionsString));"
+
+        #expect(FitBounds(bounds: bounds, options: options).toJS() == fitBoundsJS)
+    }
+
+    @Test func getBoundsCommand_shouldMatchJS() async throws {
+        let getBoundsJS = "JSON.stringify(\(MTBridge.mapObject).getBounds().toArray());"
+
+        #expect(GetBounds().toJS() == getBoundsJS)
+    }
+
+    @Test func fitToIpBoundsCommand_shouldMatchJS() async throws {
+        let fitToIpBoundsJS = "\(MTBridge.mapObject).fitToIpBounds();"
+
+        #expect(FitToIpBounds().toJS() == fitToIpBoundsJS)
+    }
+
+    @Test func getMaxBoundsCommand_shouldMatchJS() async throws {
+        let getMaxBoundsJS = """
+(() => {
+    const bounds = \(MTBridge.mapObject).getMaxBounds();
+    return bounds ? JSON.stringify(bounds.toArray()) : null;
+})()
+"""
+
+        #expect(GetMaxBounds().toJS() == getMaxBoundsJS)
+    }
+
+    @Test func setMaxBoundsCommand_shouldMatchJS() async throws {
+        let bounds = MTBounds(
+            southWest: CLLocationCoordinate2D(latitude: -10.0, longitude: -20.0),
+            northEast: CLLocationCoordinate2D(latitude: 10.0, longitude: 20.0)
+        )
+        let boundsString = bounds.toJSON() ?? ""
+        let setMaxBoundsJS = "\(MTBridge.mapObject).setMaxBounds(\(boundsString));"
+
+        #expect(SetMaxBounds(bounds: bounds).toJS() == setMaxBoundsJS)
+    }
+
+    @Test func setMaxBoundsCommandWithNil_shouldMatchJS() async throws {
+        let setMaxBoundsJS = "\(MTBridge.mapObject).setMaxBounds(null);"
+
+        #expect(SetMaxBounds(bounds: nil).toJS() == setMaxBoundsJS)
+    }
 }

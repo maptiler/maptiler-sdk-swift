@@ -458,6 +458,108 @@ extension MTMapView {
             }
         }
     }
+
+    package func runCommandWithBoundsReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<MTBounds, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
+
+                if case .string(let commandValue) = value, let bounds = decodeBounds(from: commandValue) {
+                    completion?(.success(bounds))
+                } else {
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(
+                        .failure(
+                            MTError.unsupportedReturnType(
+                                description: "Expected bounds encoded as JSON string, got invalid type."
+                            )
+                        )
+                    )
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
+    package func runCommandWithOptionalBoundsReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<MTBounds?, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
+
+                switch value {
+                case .string(let commandValue):
+                    if commandValue == "null" {
+                        completion?(.success(nil))
+                    } else if let bounds = decodeBounds(from: commandValue) {
+                        completion?(.success(bounds))
+                    } else {
+                        MTLogger.log("\(command) returned invalid type.", type: .error)
+                        completion?(
+                            .failure(
+                                MTError.unsupportedReturnType(
+                                    description: "Expected bounds encoded as JSON string, got invalid type."
+                                )
+                            )
+                        )
+                    }
+                case .null:
+                    completion?(.success(nil))
+                default:
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(
+                        .failure(
+                            MTError.unsupportedReturnType(
+                                description: "Expected bounds encoded as JSON string, got invalid type."
+                            )
+                        )
+                    )
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
+    private func decodeBounds(from string: String) -> MTBounds? {
+        guard let data = string.data(using: .utf8) else {
+            return nil
+        }
+
+        do {
+            let coordinates = try JSONDecoder().decode([[Double]].self, from: data)
+
+            guard coordinates.count == 2,
+                coordinates[0].count >= 2,
+                coordinates[1].count >= 2 else {
+                return nil
+            }
+
+            let southWest = CLLocationCoordinate2D(latitude: coordinates[0][1], longitude: coordinates[0][0])
+            let northEast = CLLocationCoordinate2D(latitude: coordinates[1][1], longitude: coordinates[1][0])
+
+            return MTBounds(southWest: southWest, northEast: northEast)
+        } catch {
+            MTLogger.log("Failed to decode bounds from string: \(string).", type: .error)
+            return nil
+        }
+    }
 }
 
 extension MTMapView: MTLocationManagerDelegate {

@@ -64,6 +64,47 @@ public struct MTFitBoundsOptions: Sendable, Codable {
         case easing
     }
 
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.padding = try container.decodeIfPresent(MTFitBoundsPadding.self, forKey: .padding)
+        self.maxZoom = try container.decodeIfPresent(Double.self, forKey: .maxZoom)
+        self.linear = try container.decodeIfPresent(Bool.self, forKey: .linear)
+        self.bearing = try container.decodeIfPresent(Double.self, forKey: .bearing)
+        self.pitch = try container.decodeIfPresent(Double.self, forKey: .pitch)
+
+        let duration = try container.decodeIfPresent(Double.self, forKey: .duration)
+        let offset = try container.decodeIfPresent(MTPoint.self, forKey: .offset)
+        let shouldAnimate = try container.decodeIfPresent(Bool.self, forKey: .shouldAnimate)
+        let isEssential = try container.decodeIfPresent(Bool.self, forKey: .isEssential)
+
+        var easingValue: MTEasing?
+        if let easing = try? container.decode(MTEasing.self, forKey: .easing) {
+            easingValue = easing
+        } else if let easingJS = try container.decodeIfPresent(String.self, forKey: .easing) {
+            // Map JS function string back to the corresponding easing case, if possible.
+            if easingJS == MTEasing.bezierCurve.toJS() {
+                easingValue = .bezierCurve
+            } else if easingJS == MTEasing.quint.toJS() {
+                easingValue = .quint
+            } else if easingJS == MTEasing.cubic.toJS() {
+                easingValue = .cubic
+            }
+        }
+
+        if duration != nil || offset != nil || shouldAnimate != nil || isEssential != nil || easingValue != nil {
+            self.animationOptions = MTAnimationOptions(
+                duration: duration,
+                offset: offset,
+                shouldAnimate: shouldAnimate,
+                isEssential: isEssential,
+                easing: easingValue
+            )
+        } else {
+            self.animationOptions = nil
+        }
+    }
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 

@@ -65,6 +65,12 @@ struct MTStyleTests {
         #expect(GetRenderWorldCopies().toJS() == expectedJS)
     }
 
+    @Test func areTilesLoadedCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).areTilesLoaded();"
+
+        #expect(AreTilesLoaded().toJS() == expectedJS)
+    }
+
     @Test func addImageCommand_shouldGenerateExpectedJS() async throws {
         let image = Self.makeTestImage()
         let command = AddImage(name: "poi-icon", image: image, options: nil)
@@ -184,6 +190,42 @@ struct MTStyleTests {
 
         #expect(command?.id == "async-sprite")
         #expect(command?.url == spriteURL)
+    }
+
+    @MainActor
+    @Test func areTilesLoadedWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.areTilesLoaded { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let isLoaded):
+            #expect(isLoaded)
+        case .failure(let error):
+            Issue.record("Expected areTilesLoaded wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is AreTilesLoaded)
+    }
+
+    @MainActor
+    @Test func areTilesLoadedAsyncWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let isLoaded = await mapView.areTilesLoaded()
+
+        #expect(isLoaded)
+        #expect(executor.lastCommand is AreTilesLoaded)
     }
 }
 

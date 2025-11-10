@@ -318,6 +318,19 @@ extension MTMapView: MTStylable {
         )
     }
 
+    /// Returns boolean value indicating whether all tiles required for the current viewport are loaded.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func areTilesLoaded(
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(
+            AreTilesLoaded(),
+            completion: completionHandler
+        )
+    }
+
     /// Returns boolean value indicating whether the map is fully loaded.
     ///  - Parameters:
     ///    - completionHandler: A handler block to execute when function finishes.
@@ -709,6 +722,20 @@ extension MTMapView {
     public func isSourceLoaded(id: String) async -> Bool {
         await withCheckedContinuation { continuation in
             isSourceLoaded(id: id) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Returns boolean value indicating whether all tiles required for the current viewport are loaded.
+    public func areTilesLoaded() async -> Bool {
+        await withCheckedContinuation { continuation in
+            areTilesLoaded { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

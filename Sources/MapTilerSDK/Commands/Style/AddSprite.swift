@@ -33,6 +33,7 @@ package struct AddSprite: MTCommand {
             return "\"\(value)\""
         }
 
-        return string
+        // Avoid escaping forward slashes to match expected JS output
+        return string.replacingOccurrences(of: "\\/", with: "/")
     }
 }

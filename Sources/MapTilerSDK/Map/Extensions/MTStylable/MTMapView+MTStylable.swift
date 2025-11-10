@@ -149,6 +149,20 @@ extension MTMapView: MTStylable {
         runCommand(command, completion: completionHandler)
     }
 
+    /// Registers a sprite with the current style so it can be referenced by layers and annotations.
+    /// - Parameters:
+    ///   - id: Unique identifier for the sprite.
+    ///   - url: URL pointing to the sprite resource.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addSprite(
+        id: String,
+        url: URL,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(AddSprite(id: id, url: url), completion: completionHandler)
+    }
+
     /// Adds a marker to the map.
     /// - Parameters:
     ///    - marker: Marker to be added to the map.
@@ -501,6 +515,18 @@ extension MTMapView {
     public func addImage(name: String, image: UIImage, options: MTStyleImageOptions? = nil) async {
         await withCheckedContinuation { continuation in
             addImage(name: name, image: image, options: options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Registers a sprite with the current style so it can be referenced by layers and annotations.
+    /// - Parameters:
+    ///   - id: Unique identifier for the sprite.
+    ///   - url: URL pointing to the sprite resource.
+    public func addSprite(id: String, url: URL) async {
+        await withCheckedContinuation { continuation in
+            addSprite(id: id, url: url) { _ in
                 continuation.resume()
             }
         }

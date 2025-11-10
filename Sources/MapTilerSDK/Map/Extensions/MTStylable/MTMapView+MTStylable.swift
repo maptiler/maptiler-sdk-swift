@@ -128,6 +128,27 @@ extension MTMapView: MTStylable {
         options?.setShouldRenderWorldCopies(shouldRenderWorldCopies)
     }
 
+    /// Registers an image with the current style so it can be referenced by layers and annotations.
+    /// - Parameters:
+    ///   - name: Unique identifier for the image.
+    ///   - image: Image to register.
+    ///   - options: Additional configuration that controls how the image is rendered.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addImage(
+        name: String,
+        image: UIImage,
+        options: MTStyleImageOptions? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        guard let command = AddImage(name: name, image: image, options: options) else {
+            completionHandler?(.failure(.unknown(description: "Failed to encode image for addImage command.")))
+            return
+        }
+
+        runCommand(command, completion: completionHandler)
+    }
+
     /// Adds a marker to the map.
     /// - Parameters:
     ///    - marker: Marker to be added to the map.
@@ -467,6 +488,19 @@ extension MTMapView {
     public func setShouldRenderWorldCopies(_ shouldRenderWorldCopies: Bool) async {
         await withCheckedContinuation { continuation in
             setShouldRenderWorldCopies(shouldRenderWorldCopies) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Registers an image with the current style so it can be referenced by layers and annotations.
+    /// - Parameters:
+    ///   - name: Unique identifier for the image.
+    ///   - image: Image to register.
+    ///   - options: Additional configuration that controls how the image is rendered.
+    public func addImage(name: String, image: UIImage, options: MTStyleImageOptions? = nil) async {
+        await withCheckedContinuation { continuation in
+            addImage(name: name, image: image, options: options) { _ in
                 continuation.resume()
             }
         }

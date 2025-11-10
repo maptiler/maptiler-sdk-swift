@@ -58,6 +58,13 @@ public protocol MTStylable {
     ///    - shouldRenderWorldCopies: Boolean indicating whether world copies should be rendered.
     func setShouldRenderWorldCopies(_ shouldRenderWorldCopies: Bool) async
 
+    /// Registers an image with the current style so it can be referenced by layers and annotations.
+    /// - Parameters:
+    ///   - name: Unique identifier for the image.
+    ///   - image: Image to register.
+    ///   - options: Additional configuration that controls how the image is rendered.
+    func addImage(name: String, image: UIImage, options: MTStyleImageOptions?) async
+
     /// Adds the marker to the map.
     /// - Parameters:
     ///    - marker: Marker to add to the map.

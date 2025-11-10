@@ -9,6 +9,7 @@ import Testing
 
 import Foundation
 import CoreLocation
+import UIKit
 
 @Suite
 struct MTStyleTests {
@@ -64,6 +65,39 @@ struct MTStyleTests {
         #expect(GetRenderWorldCopies().toJS() == expectedJS)
     }
 
+    @Test func addImageCommand_shouldGenerateExpectedJS() async throws {
+        let image = Self.makeTestImage()
+        let command = AddImage(name: "poi-icon", image: image, options: nil)
+
+        #expect(command != nil)
+
+        let js = command?.toJS() ?? ""
+
+        #expect(js.contains("\(MTBridge.mapObject).style.addImage(\"poi-icon\","))
+        #expect(js.contains("data:image/png;base64,"))
+        #expect(js.contains("var imagepoiicon"))
+    }
+
+    @Test func addImageCommand_shouldIncludeOptionsJSON() async throws {
+        let image = Self.makeTestImage()
+        let options = MTStyleImageOptions(
+            pixelRatio: 2.0,
+            sdf: true,
+            stretchX: [MTStyleImageOptions.Stretch(from: 0, to: 10)],
+            stretchY: [MTStyleImageOptions.Stretch(from: 5, to: 15)],
+            content: MTStyleImageOptions.Content(left: 1, top: 2, right: 3, bottom: 4)
+        )
+
+        let command = AddImage(name: "poi", image: image, options: options)
+
+        #expect(command != nil)
+
+        let js = command?.toJS() ?? ""
+        let optionsJSON = options.toJSON() ?? ""
+
+        #expect(js.contains(optionsJSON))
+    }
+
     @Test func projectionValueParsing_shouldReturnExpectedType() async throws {
         let mercatorReturnType = try MTBridgeReturnType(from: "mercator")
         let globeReturnType = try MTBridgeReturnType(from: "globe")
@@ -72,5 +106,56 @@ struct MTStyleTests {
         #expect(mercatorReturnType.projectionValue == .mercator)
         #expect(globeReturnType.projectionValue == .globe)
         #expect(invalidReturnType.projectionValue == nil)
+    }
+
+    @MainActor
+    @Test func addImageWrapper_shouldDispatchCommand() async throws {
+        let image = Self.makeTestImage()
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.addImage(name: "wrapper-icon", image: image) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected addImage wrapper to succeed, but failed with \(error)")
+        }
+
+        let command = executor.lastCommand as? AddImage
+
+        #expect(command?.name == "wrapper-icon")
+        #expect(command?.options == nil)
+    }
+}
+
+private extension MTStyleTests {
+    static func makeTestImage() -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 2, height: 2))
+        return renderer.image { context in
+            UIColor.red.setFill()
+            context.fill(CGRect(origin: .zero, size: CGSize(width: 2, height: 2)))
+        }
+    }
+}
+
+private final class MockExecutor: MTCommandExecutable {
+    var lastCommand: (any MTCommand)?
+    var result: MTBridgeReturnType
+
+    init(result: MTBridgeReturnType = .null) {
+        self.result = result
+    }
+
+    func execute(_ command: MTCommand) async throws -> MTBridgeReturnType {
+        lastCommand = command
+        return result
     }
 }

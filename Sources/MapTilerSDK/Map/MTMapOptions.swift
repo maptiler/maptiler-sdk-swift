@@ -121,6 +121,11 @@ public struct MTMapOptions: Sendable {
     /// styling transitions or raster tile cross-fading.
     public private(set) var fadeDuration: Double?
 
+    /// Pixel ratio to use when rendering the map.
+    ///
+    /// Defaults to the device pixel ratio if not specified.
+    public private(set) var pixelRatio: Double?
+
     // Boolean indicating whether interaction on the map is enabled.
     public private(set) var isInteractionEnabled: Bool?
 
@@ -262,6 +267,7 @@ public struct MTMapOptions: Sendable {
         shouldCollectResourceTiming: Bool? = nil,
         crossSourceCollisionsAreEnabled: Bool? = nil,
         fadeDuration: Double? = nil,
+        pixelRatio: Double? = nil,
         isInteractionEnabled: Bool? = nil,
         logoPosition: MTMapCorner? = nil,
         maptilerLogoIsVisible: Bool? = nil,
@@ -310,6 +316,7 @@ public struct MTMapOptions: Sendable {
         self.shouldCollectResourceTiming = shouldCollectResourceTiming
         self.crossSourceCollisionsAreEnabled = crossSourceCollisionsAreEnabled
         self.fadeDuration = fadeDuration
+        self.pixelRatio = pixelRatio
         self.isInteractionEnabled = isInteractionEnabled
         self.logoPosition = logoPosition
         self.maptilerLogoIsVisible = maptilerLogoIsVisible
@@ -362,6 +369,7 @@ extension MTMapOptions: Codable {
         case shouldCollectResourceTiming = "collectResourceTiming"
         case crossSourceCollisionsAreEnabled = "crossSourceCollisions"
         case fadeDuration
+        case pixelRatio
         case isInteractionEnabled = "interactive"
         case logoPosition
         case maptilerLogoIsVisible = "maptilerLogo"
@@ -479,6 +487,10 @@ extension MTMapOptions {
 
     package mutating func setFadeDuration(_ fadeDuration: Double) {
         self.fadeDuration = fadeDuration
+    }
+
+    package mutating func setPixelRatio(_ pixelRatio: Double) {
+        self.pixelRatio = pixelRatio
     }
 
     package mutating func setIsInteractionEnabled(_ isInteractionEnabled: Bool) {

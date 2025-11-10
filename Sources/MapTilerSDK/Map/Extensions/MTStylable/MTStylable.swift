@@ -65,6 +65,12 @@ public protocol MTStylable {
     ///   - options: Additional configuration that controls how the image is rendered.
     func addImage(name: String, image: UIImage, options: MTStyleImageOptions?) async
 
+    /// Registers a sprite with the current style so it can be referenced by layers and annotations.
+    /// - Parameters:
+    ///   - id: Unique identifier for the sprite.
+    ///   - url: URL pointing to the sprite resource.
+    func addSprite(id: String, url: URL) async
+
     /// Adds the marker to the map.
     /// - Parameters:
     ///    - marker: Marker to add to the map.

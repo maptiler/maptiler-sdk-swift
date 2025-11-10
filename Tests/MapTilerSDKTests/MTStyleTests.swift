@@ -98,6 +98,14 @@ struct MTStyleTests {
         #expect(js.contains(optionsJSON))
     }
 
+    @Test func addSpriteCommand_shouldGenerateExpectedJS() async throws {
+        let spriteURL = URL(string: "https://example.com/sprite.png")!
+        let command = AddSprite(id: "test-sprite", url: spriteURL)
+        let expectedJS = "\(MTBridge.mapObject).addSprite(\"test-sprite\", \"\(spriteURL.absoluteString)\");"
+
+        #expect(command.toJS() == expectedJS)
+    }
+
     @Test func projectionValueParsing_shouldReturnExpectedType() async throws {
         let mercatorReturnType = try MTBridgeReturnType(from: "mercator")
         let globeReturnType = try MTBridgeReturnType(from: "globe")
@@ -133,6 +141,49 @@ struct MTStyleTests {
 
         #expect(command?.name == "wrapper-icon")
         #expect(command?.options == nil)
+    }
+
+    @MainActor
+    @Test func addSpriteWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        let spriteURL = URL(string: "https://example.com/sprite.json")!
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.addSprite(id: "sprite-wrapper", url: spriteURL) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected addSprite wrapper to succeed, but failed with \(error)")
+        }
+
+        let command = executor.lastCommand as? AddSprite
+
+        #expect(command?.id == "sprite-wrapper")
+        #expect(command?.url == spriteURL)
+    }
+
+    @MainActor
+    @Test func addSpriteAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        let spriteURL = URL(string: "https://example.com/async-sprite.json")!
+
+        mapView.bridge.executor = executor
+
+        await mapView.addSprite(id: "async-sprite", url: spriteURL)
+
+        let command = executor.lastCommand as? AddSprite
+
+        #expect(command?.id == "async-sprite")
+        #expect(command?.url == spriteURL)
     }
 }
 

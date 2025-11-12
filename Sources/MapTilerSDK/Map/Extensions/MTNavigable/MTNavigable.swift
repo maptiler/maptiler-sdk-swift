@@ -150,6 +150,9 @@ public protocol MTNavigable {
     /// Returns the elevation of the map's center point in meters above sea level.
     func getCenterElevation() async -> Double
 
+    /// Returns the elevation for the point where the camera is looking, in meters above sea level multiplied by exaggeration.
+    func getCameraTargetElevation() async -> Double
+
     /// Returns the map's current bearing.
     func getBearing() async -> Double
 

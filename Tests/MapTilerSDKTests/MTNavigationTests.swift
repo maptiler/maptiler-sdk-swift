@@ -111,6 +111,12 @@ struct MTNavigationTests {
         #expect(GetCenterElevation().toJS() == getCenterElevationJS)
     }
 
+    @Test func getCameraTargetElevationCommand_shouldMatchJS() async throws {
+        let getCameraTargetElevationJS = "\(MTBridge.mapObject).getCameraTargetElevation();"
+
+        #expect(GetCameraTargetElevation().toJS() == getCameraTargetElevationJS)
+    }
+
     @Test func boolValueParsingCoversStringAndNumericValues() async throws {
         let trueString = try MTBridgeReturnType(from: "true")
         let falseString = try MTBridgeReturnType(from: "false")
@@ -298,6 +304,30 @@ struct MTNavigationTests {
     }
 
     @MainActor
+    @Test func getCameraTargetElevationWrapper_shouldDispatchCommand() async throws {
+        let expectedElevation = 512.0
+        let executor = MockExecutor(result: .double(expectedElevation))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.getCameraTargetElevation { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let elevation):
+            #expect(elevation == expectedElevation)
+        case .failure(let error):
+            Issue.record("Expected getCameraTargetElevation wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is GetCameraTargetElevation)
+    }
+
+    @MainActor
     @Test func centerOnIpPointAsyncWrapper_shouldDispatchCommand() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
@@ -307,6 +337,20 @@ struct MTNavigationTests {
         await mapView.centerOnIpPoint()
 
         #expect(executor.lastCommand is CenterOnIpPoint)
+    }
+
+    @MainActor
+    @Test func getCameraTargetElevationAsyncWrapper_shouldDispatchCommand() async throws {
+        let expectedElevation = 384.0
+        let executor = MockExecutor(result: .double(expectedElevation))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let elevation = await mapView.getCameraTargetElevation()
+
+        #expect(elevation == expectedElevation)
+        #expect(executor.lastCommand is GetCameraTargetElevation)
     }
 }
 

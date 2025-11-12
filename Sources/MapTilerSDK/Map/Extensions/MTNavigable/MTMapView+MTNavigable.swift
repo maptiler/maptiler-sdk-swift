@@ -460,6 +460,13 @@ extension MTMapView: MTNavigable {
         runCommandWithDoubleReturnValue(GetCenterElevation(), completion: completionHandler)
     }
 
+    /// Returns the elevation for the point where the camera is looking, in meters above sea level multiplied by exaggeration.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getCameraTargetElevation(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetCameraTargetElevation(), completion: completionHandler)
+    }
+
     /// Project coordinates to point on the container.
     /// - Parameters:
     ///   - coordinates: The location to project.
@@ -925,6 +932,20 @@ extension MTMapView {
     public func getCenterElevation() async -> Double {
         await withCheckedContinuation { continuation in
             getCenterElevation { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns the elevation for the point where the camera is looking, in meters above sea level multiplied by exaggeration.
+    public func getCameraTargetElevation() async -> Double {
+        await withCheckedContinuation { continuation in
+            getCameraTargetElevation { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

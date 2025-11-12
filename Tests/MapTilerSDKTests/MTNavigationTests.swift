@@ -9,6 +9,7 @@ import Testing
 
 import Foundation
 import CoreLocation
+import UIKit
 
 @Suite
 struct MTNavigationTests {
@@ -239,6 +240,12 @@ struct MTNavigationTests {
         #expect(FitToIpBounds().toJS() == fitToIpBoundsJS)
     }
 
+    @Test func centerOnIpPointCommand_shouldMatchJS() async throws {
+        let centerOnIpPointJS = "\(MTBridge.mapObject).centerOnIpPoint();"
+
+        #expect(CenterOnIpPoint().toJS() == centerOnIpPointJS)
+    }
+
     @Test func getMaxBoundsCommand_shouldMatchJS() async throws {
         let getMaxBoundsJS = """
 (() => {
@@ -265,5 +272,54 @@ struct MTNavigationTests {
         let setMaxBoundsJS = "\(MTBridge.mapObject).setMaxBounds(null);"
 
         #expect(SetMaxBounds(bounds: nil).toJS() == setMaxBoundsJS)
+    }
+
+    @MainActor
+    @Test func centerOnIpPointWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.centerOnIpPoint { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected centerOnIpPoint wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is CenterOnIpPoint)
+    }
+
+    @MainActor
+    @Test func centerOnIpPointAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.centerOnIpPoint()
+
+        #expect(executor.lastCommand is CenterOnIpPoint)
+    }
+}
+
+private final class MockExecutor: MTCommandExecutable {
+    var lastCommand: (any MTCommand)?
+    var result: MTBridgeReturnType
+
+    init(result: MTBridgeReturnType = .null) {
+        self.result = result
+    }
+
+    func execute(_ command: MTCommand) async throws -> MTBridgeReturnType {
+        lastCommand = command
+        return result
     }
 }

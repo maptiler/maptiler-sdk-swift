@@ -172,6 +172,13 @@ extension MTMapView: MTNavigable {
         runCommand(FitToIpBounds(), completion: completionHandler)
     }
 
+    /// Centers the map on the location inferred from the current IP address.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func centerOnIpPoint(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(CenterOnIpPoint(), completion: completionHandler)
+    }
+
     /// Sets the value of centerClampedToGround.
     ///
     /// If true, the elevation of the center point will automatically be set to the terrain elevation
@@ -589,6 +596,15 @@ extension MTMapView {
     public func fitToIpBounds() async {
         await withCheckedContinuation { continuation in
             fitToIpBounds { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Centers the map on the location inferred from the current IP address.
+    public func centerOnIpPoint() async {
+        await withCheckedContinuation { continuation in
+            centerOnIpPoint { _ in
                 continuation.resume()
             }
         }

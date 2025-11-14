@@ -15,11 +15,69 @@ package struct AddSource: MTCommand {
     package func toJS() -> JSString {
         if let source = source as? MTVectorTileSource {
             return handleMTVectorTileSource(source)
+        } else if let source = source as? MTRasterTileSource {
+            return handleMTRasterTileSource(source)
+        } else if let source = source as? MTRasterDEMSource {
+            return handleMTRasterDEMSource(source)
         } else if let source = source as? MTGeoJSONSource {
             return handleGeoJSONSource(source)
         }
 
         return emptyReturnValue
+    }
+
+    private func handleMTRasterTileSource(_ source: MTRasterTileSource) -> JSString {
+        var data: JSString = ""
+        if let dataUrl = source.url {
+            data = "url: '\(dataUrl.absoluteString)'"
+        } else if let tiles = source.tiles {
+            data = "tiles: \(tiles.map { $0.absoluteString.removingPercentEncoding ?? "" })"
+        }
+
+        var attributionString: JSString = ""
+        if let attr = source.attribution, !attr.isEmpty {
+            attributionString = "attribution: '\(attr)'"
+        }
+
+        return """
+        \(MTBridge.mapObject).addSource('\(source.identifier)', {
+            type: '\(source.type.rawValue)',
+            minzoom: \(source.minZoom),
+            maxzoom: \(source.maxZoom),
+            bounds: \(source.bounds),
+            scheme: '\(source.scheme.rawValue)',
+            tileSize: \(source.tileSize),
+            \(data),
+            \(attributionString)
+        });
+        """
+    }
+
+    private func handleMTRasterDEMSource(_ source: MTRasterDEMSource) -> JSString {
+        var data: JSString = ""
+        if let dataUrl = source.url {
+            data = "url: '\(dataUrl.absoluteString)'"
+        } else if let tiles = source.tiles {
+            data = "tiles: \(tiles.map { $0.absoluteString.removingPercentEncoding ?? "" })"
+        }
+
+        var attributionString: JSString = ""
+        if let attr = source.attribution, !attr.isEmpty {
+            attributionString = "attribution: '\(attr)'"
+        }
+
+        return """
+        \(MTBridge.mapObject).addSource('\(source.identifier)', {
+            type: '\(source.type.rawValue)',
+            minzoom: \(source.minZoom),
+            maxzoom: \(source.maxZoom),
+            bounds: \(source.bounds),
+            encoding: '\(source.encoding.rawValue)',
+            tileSize: \(source.tileSize),
+            \(data),
+            \(attributionString)
+        });
+        """
     }
 
     private func handleMTVectorTileSource(_ source: MTVectorTileSource) -> JSString {

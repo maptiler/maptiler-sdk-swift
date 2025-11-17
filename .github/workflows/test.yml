@@ -41,21 +41,30 @@ jobs:
             sudo xcodebuild -downloadPlatform iOS
           fi
           echo "Selecting an iOS runtime identifier..."
-          RUNTIME_ID=$(xcrun simctl list runtimes | awk '/iOS/ && /(Available|Installed)/{print $NF; exit}')
+          RUNTIME_ID=$(xcrun simctl list runtimes | sed -nE 's/.*(com\.apple\.CoreSimulator\.SimRuntime\.iOS[^ )]*).*/\1/p' | head -n1)
           echo "RUNTIME_ID=$RUNTIME_ID"
+          if [ -z "${RUNTIME_ID:-}" ]; then
+            echo "Failed to determine iOS runtime identifier" >&2
+            xcrun simctl list runtimes
+            exit 1
+          fi
           echo "Selecting a device type (prefer iPhone 16)..."
-          DEVICETYPE_ID=$(xcrun simctl list devicetypes | awk -F' - ' '/iPhone 16/{print $NF; exit}')
+          DEVICETYPE_ID=$(xcrun simctl list devicetypes | awk -F'[()]' '/iPhone 16/{print $2; exit}')
           if [ -z "${DEVICETYPE_ID:-}" ]; then
-            DEVICETYPE_ID=$(xcrun simctl list devicetypes | awk -F' - ' '/iPhone [0-9]/{print $NF; exit}')
+            DEVICETYPE_ID=$(xcrun simctl list devicetypes | awk -F'[()]' '/iPhone [0-9]/{print $2; exit}')
           fi
           echo "DEVICETYPE_ID=$DEVICETYPE_ID"
-          if ! xcrun simctl list devices available | grep -q "(Booted)"; then
-            echo "Creating a simulator..."
-            NEW_ID=$(xcrun simctl create "CI iPhone" "$DEVICETYPE_ID" "$RUNTIME_ID")
-            echo "Created simulator: $NEW_ID"
-            # Attempt to boot; ignore failures on headless CI
-            xcrun simctl boot "$NEW_ID" || true
+          if [ -z "${DEVICETYPE_ID:-}" ]; then
+            echo "Failed to determine iPhone device type identifier" >&2
+            xcrun simctl list devicetypes
+            exit 1
           fi
+          echo "Creating a simulator..."
+          NEW_ID=$(xcrun simctl create "CI iPhone" "$DEVICETYPE_ID" "$RUNTIME_ID")
+          echo "Created simulator: $NEW_ID"
+          # Attempt to boot; ignore failures on headless CI
+          xcrun simctl boot "$NEW_ID" || true
+          xcrun simctl bootstatus "$NEW_ID" -b || true
           echo "Re-probing destinations after setup..."
           SHOW=$(xcodebuild -scheme MapTilerSDK -showdestinations || true)
           echo "$SHOW"

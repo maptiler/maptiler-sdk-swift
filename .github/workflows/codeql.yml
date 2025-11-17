@@ -47,8 +47,12 @@ jobs:
       run: xcodebuild -version
     - name: Resolve package dependencies
       run: xcrun xcodebuild -resolvePackageDependencies -package-path .
+    - name: Show available simulators
+      run: |
+        xcrun simctl list runtimes
+        xcrun simctl list devices available
     - name: Build Swift
-      run: xcodebuild -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' -derivedDataPath .build/DerivedData
+      run: xcodebuild -scheme MapTilerSDK -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' -derivedDataPath .build/DerivedData
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:

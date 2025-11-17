@@ -247,7 +247,7 @@ MUST wait for `didLoad`/`isReady` before mutating style or layers. Changing the 
 
 ## Tests
 
-- Before you make the Pull Request ALWAYS run unit tests to validate the code and fix potential issues. Use following command to run the tests: xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16'
+- Before you make the Pull Request ALWAYS run unit tests to validate the code and fix potential issues. Use the following command to run the tests: xcrun xcodebuild test -workspace .swiftpm/xcode/package.xcworkspace -scheme MapTilerSDK -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2'
 - Add or update unit tests as required (encoding, clamping, `toJS()` contract), but leave execution to the user/CI.
 - Prefer small, focused tests near the code you change; avoid introducing unrelated tests.
 

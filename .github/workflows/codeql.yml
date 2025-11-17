@@ -46,7 +46,7 @@ jobs:
     - name: Verify Xcode version
       run: xcodebuild -version
     - name: Build Swift
-      run: xcodebuild -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 
+      run: xcrun xcodebuild test -workspace .swiftpm/xcode/package.xcworkspace -scheme MapTilerSDK -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2'
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:

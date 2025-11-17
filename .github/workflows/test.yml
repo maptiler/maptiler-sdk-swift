@@ -27,4 +27,4 @@ jobs:
     - name: Verify Active Swift Toolchain version
       run: xcrun swift -version
     - name: Run tests
-      run: xcrun xcodebuild test -workspace .swiftpm/xcode/package.xcworkspace -scheme MapTilerSDK -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2'
+      run: xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' 

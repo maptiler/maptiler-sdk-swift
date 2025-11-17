@@ -26,37 +26,25 @@ jobs:
       run: xcodebuild -version
     - name: Verify Active Swift Toolchain version
       run: xcrun swift -version
-    - name: Ensure iOS runtime and device
+    - name: Choose destination
       shell: bash
       run: |
         set -euo pipefail
-        echo "Checking installed iOS runtimes..."
-        if ! xcrun simctl list runtimes | grep -q "iOS"; then
-          echo "No iOS runtime found. Downloading..."
-          sudo xcodebuild -downloadPlatform iOS
-        fi
-        echo "Selecting runtime identifier..."
-        RUNTIME_ID=$(xcrun simctl list runtimes | awk -F' - ' '/iOS/{print $NF}' | head -n1)
-        echo "RUNTIME_ID=$RUNTIME_ID"
-        echo "Looking for an existing iPhone 16 simulator..."
-        if xcrun simctl list devices available | grep -q "iPhone 16 ("; then
-          DEVICE_UDID=$(xcrun simctl list devices available | awk -F'[()]' '/iPhone 16/{print $2; exit}')
-          echo "Found existing iPhone 16: $DEVICE_UDID"
+        echo "Probing available destinations..."
+        SHOW=$(xcodebuild -scheme MapTilerSDK -showdestinations || true)
+        echo "$SHOW"
+        IOS_ID=$(printf "%s\n" "$SHOW" | grep -m1 -oE 'platform:iOS Simulator[^}]+' | grep -oE 'id:[A-F0-9-]+' | cut -d: -f2 | tr -d ' ' || true)
+        if [ -n "${IOS_ID:-}" ]; then
+          DESTINATION="id=$IOS_ID"
+          echo "Selected iOS Simulator destination: $DESTINATION"
         else
-          echo "No iPhone 16 found. Creating one..."
-          DEVICETYPE_ID=$(xcrun simctl list devicetypes | awk -F' - ' '/iPhone 16/{print $NF; exit}')
-          if [ -z "${DEVICETYPE_ID:-}" ]; then
-            echo "iPhone 16 type not found, falling back to first available iPhone device type..."
-            DEVICETYPE_ID=$(xcrun simctl list devicetypes | awk -F' - ' '/iPhone [0-9]/{print $NF; exit}')
-          fi
-          echo "Using device type: $DEVICETYPE_ID"
-          DEVICE_UDID=$(xcrun simctl create "CI iPhone" "$DEVICETYPE_ID" "$RUNTIME_ID")
-          echo "Created simulator: $DEVICE_UDID"
+          DESTINATION="platform=macOS"
+          echo "No iOS Simulator available. Falling back to: $DESTINATION"
         fi
-        echo "DEVICE_UDID=$DEVICE_UDID" >> "$GITHUB_ENV"
+        echo "DESTINATION=$DESTINATION" >> "$GITHUB_ENV"
     - name: Show available simulators
       run: |
         xcrun simctl list runtimes
         xcrun simctl list devices available
     - name: Run tests
-      run: xcrun xcodebuild test -scheme MapTilerSDK -destination "id=${DEVICE_UDID}"
+      run: xcrun xcodebuild test -scheme MapTilerSDK -destination "$DESTINATION"

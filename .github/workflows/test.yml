@@ -26,21 +26,47 @@ jobs:
       run: xcodebuild -version
     - name: Verify Active Swift Toolchain version
       run: xcrun swift -version
-    - name: Choose destination
+    - name: Ensure iOS simulator destination
       shell: bash
       run: |
         set -euo pipefail
-        echo "Probing available destinations..."
+        echo "Probing available destinations (initial)..."
         SHOW=$(xcodebuild -scheme MapTilerSDK -showdestinations || true)
         echo "$SHOW"
         IOS_ID=$(printf "%s\n" "$SHOW" | grep -m1 -oE 'platform:iOS Simulator[^}]+' | grep -oE 'id:[A-F0-9-]+' | cut -d: -f2 | tr -d ' ' || true)
-        if [ -n "${IOS_ID:-}" ]; then
-          DESTINATION="id=$IOS_ID"
-          echo "Selected iOS Simulator destination: $DESTINATION"
-        else
-          DESTINATION="platform=macOS"
-          echo "No iOS Simulator available. Falling back to: $DESTINATION"
+        if [ -z "${IOS_ID:-}" ]; then
+          echo "No iOS Simulator reported by xcodebuild. Ensuring iOS runtime and a simulator exist..."
+          if ! xcrun simctl list runtimes | grep -qE '^\s*iOS .*\(Installed\)|^iOS .*\(Available\)'; then
+            echo "Downloading iOS runtime (requires sudo)..."
+            sudo xcodebuild -downloadPlatform iOS
+          fi
+          echo "Selecting an iOS runtime identifier..."
+          RUNTIME_ID=$(xcrun simctl list runtimes | awk '/iOS/ && /(Available|Installed)/{print $NF; exit}')
+          echo "RUNTIME_ID=$RUNTIME_ID"
+          echo "Selecting a device type (prefer iPhone 16)..."
+          DEVICETYPE_ID=$(xcrun simctl list devicetypes | awk -F' - ' '/iPhone 16/{print $NF; exit}')
+          if [ -z "${DEVICETYPE_ID:-}" ]; then
+            DEVICETYPE_ID=$(xcrun simctl list devicetypes | awk -F' - ' '/iPhone [0-9]/{print $NF; exit}')
+          fi
+          echo "DEVICETYPE_ID=$DEVICETYPE_ID"
+          if ! xcrun simctl list devices available | grep -q "(Booted)"; then
+            echo "Creating a simulator..."
+            NEW_ID=$(xcrun simctl create "CI iPhone" "$DEVICETYPE_ID" "$RUNTIME_ID")
+            echo "Created simulator: $NEW_ID"
+            # Attempt to boot; ignore failures on headless CI
+            xcrun simctl boot "$NEW_ID" || true
+          fi
+          echo "Re-probing destinations after setup..."
+          SHOW=$(xcodebuild -scheme MapTilerSDK -showdestinations || true)
+          echo "$SHOW"
+          IOS_ID=$(printf "%s\n" "$SHOW" | grep -m1 -oE 'platform:iOS Simulator[^}]+' | grep -oE 'id:[A-F0-9-]+' | cut -d: -f2 | tr -d ' ' || true)
         fi
+        if [ -z "${IOS_ID:-}" ]; then
+          echo "Error: No iOS Simulator destination available after attempting setup." >&2
+          exit 1
+        fi
+        DESTINATION="id=$IOS_ID"
+        echo "Selected destination: $DESTINATION"
         echo "DESTINATION=$DESTINATION" >> "$GITHUB_ENV"
     - name: Show available simulators
       run: |

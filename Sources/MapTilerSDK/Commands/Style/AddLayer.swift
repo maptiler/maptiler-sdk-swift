@@ -19,6 +19,8 @@ package struct AddLayer: MTCommand {
             return handleMTSymbolLayer(layer)
         } else if let layer = layer as? MTLineLayer {
             return handleMTLineLayer(layer)
+        } else if let layer = layer as? MTRasterLayer {
+            return handleMTRasterLayer(layer)
         }
 
         return emptyReturnValue
@@ -57,6 +59,14 @@ package struct AddLayer: MTCommand {
     }
 
     private func handleMTLineLayer(_ layer: MTLineLayer) -> JSString {
+        guard let layerString: JSString = layer.toJSON() else {
+            return emptyReturnValue
+        }
+
+        return "\(MTBridge.mapObject).addLayer(\(layerString));"
+    }
+
+    private func handleMTRasterLayer(_ layer: MTRasterLayer) -> JSString {
         guard let layerString: JSString = layer.toJSON() else {
             return emptyReturnValue
         }

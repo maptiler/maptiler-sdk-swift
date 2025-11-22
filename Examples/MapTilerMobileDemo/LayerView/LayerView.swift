@@ -9,6 +9,7 @@ enum LayerType {
     case contours
     case aeroway
     case place
+    case satellite
 }
 
 protocol LayerViewDelegate: AnyObject {
@@ -16,15 +17,12 @@ protocol LayerViewDelegate: AnyObject {
 }
 
 class LayerView: BaseView {
-    @IBOutlet weak var contoursSwitch: UISwitch!
-    @IBOutlet weak var aerowaySwitch: UISwitch!
-    @IBOutlet weak var placeSwitch: UISwitch!
+    @IBOutlet private weak var contoursSwitch: UISwitch!
+    @IBOutlet private weak var aerowaySwitch: UISwitch!
+    @IBOutlet private weak var placeSwitch: UISwitch!
+    @IBOutlet private weak var satelliteSwitch: UISwitch!
 
     weak var delegate: LayerViewDelegate?
-
-    override func commonInit() {
-        super.commonInit()
-    }
 
     @IBAction func contoursSwitchValueChanged(_ sender: UISwitch) {
         delegate?.layerView(self, didUpdateLayerState: contoursSwitch.isOn, layer: .contours)
@@ -36,5 +34,9 @@ class LayerView: BaseView {
 
     @IBAction func placeSwitchValueChanged(_ sender: UISwitch) {
         delegate?.layerView(self, didUpdateLayerState: placeSwitch.isOn, layer: .place)
+    }
+
+    @IBAction func satelliteSwitchValueChanged(_ sender: UISwitch) {
+        delegate?.layerView(self, didUpdateLayerState: satelliteSwitch.isOn, layer: .satellite)
     }
 }

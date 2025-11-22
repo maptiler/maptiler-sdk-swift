@@ -66,6 +66,7 @@ class MainViewController: UIViewController {
     var contoursLayer: MTLineLayer!
     var aerowayLayer: MTFillLayer!
     var placeLayer: MTSymbolLayer!
+    var satelliteLayer: MTRasterLayer!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -102,6 +103,9 @@ class MainViewController: UIViewController {
         placeLayer = MTSymbolLayer(identifier: "placelayer", sourceIdentifier: "openmapsource")
         placeLayer.icon = UIImage(named: "maptiler-marker")
         placeLayer.sourceLayer = "place"
+
+        satelliteLayer = MTRasterLayer(identifier: "satellitelayer", sourceIdentifier: "satellitesource")
+        satelliteLayer.opacity = 0.7
     }
 
     private func setUpLongPress() {
@@ -164,6 +168,14 @@ class MainViewController: UIViewController {
                 ) {
                     let contoursSource = MTVectorTileSource(identifier: "contourssource", url: contoursURL)
                     try await mapView.style?.addSource(contoursSource)
+                }
+
+                // Satellite raster source (TileJSON)
+                if let satelliteURL = URL(
+                    string: "https://api.maptiler.com/tiles/satellite/tiles.json?key=\(mapTilerAPIKey)"
+                ) {
+                    let satelliteSource = MTRasterTileSource(identifier: "satellitesource", url: satelliteURL)
+                    try await mapView.style?.addSource(satelliteSource)
                 }
             }
         }
@@ -285,6 +297,8 @@ extension MainViewController: LayerViewDelegate {
             updateLayer(aerowayLayer, for: state)
         case .place:
             updateLayer(placeLayer, for: state)
+        case .satellite:
+            updateLayer(satelliteLayer, for: state)
         }
     }
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,6 +13,7 @@
                 <outlet property="contentView" destination="Ltl-kb-PcK" id="VzX-dc-CCx"/>
                 <outlet property="contoursSwitch" destination="k0x-Mb-Cjn" id="eTR-8G-KEo"/>
                 <outlet property="placeSwitch" destination="Mrt-4a-ONA" id="zwd-sb-X9C"/>
+                <outlet property="satelliteSwitch" destination="w4y-qA-a6N" id="vWg-0k-2hU"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -36,7 +37,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="k0x-Mb-Cjn">
-                    <rect key="frame" x="115" y="51" width="51" height="31"/>
+                    <rect key="frame" x="115" y="52.666666666666657" width="63" height="28"/>
                     <color key="onTintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                     <connections>
                         <action selector="contoursSwitchValueChanged:" destination="-1" eventType="valueChanged" id="7XJ-KL-OXA"/>
@@ -52,7 +53,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="FwZ-RF-U88">
-                    <rect key="frame" x="115" y="98.333333333333329" width="51" height="30.999999999999986"/>
+                    <rect key="frame" x="115" y="100" width="63" height="28"/>
                     <color key="onTintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                     <connections>
                         <action selector="aerowaySwitchValueChanged:" destination="-1" eventType="valueChanged" id="4Bn-P1-ETe"/>
@@ -68,10 +69,26 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Mrt-4a-ONA">
-                    <rect key="frame" x="115" y="145.66666666666666" width="51" height="31"/>
+                    <rect key="frame" x="115" y="147.33333333333334" width="63" height="28"/>
                     <color key="onTintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                     <connections>
                         <action selector="placeSwitchValueChanged:" destination="-1" eventType="valueChanged" id="kte-VO-hcG"/>
+                    </connections>
+                </switch>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Raster" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0cB-hm-1m3">
+                    <rect key="frame" x="15" y="197.33333333333334" width="80" height="22.333333333333343"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="80" id="11D-jC-wVY"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="19"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="w4y-qA-a6N">
+                    <rect key="frame" x="115" y="194.66666666666666" width="63" height="28"/>
+                    <color key="onTintColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <connections>
+                        <action selector="satelliteSwitchValueChanged:" destination="-1" eventType="valueChanged" id="h4y-Dg-TXr"/>
                     </connections>
                 </switch>
             </subviews>
@@ -89,8 +106,12 @@
                 <constraint firstItem="Mrt-4a-ONA" firstAttribute="leading" secondItem="jWm-af-Kh8" secondAttribute="trailing" constant="20" id="hWa-5E-pTo"/>
                 <constraint firstItem="YvM-6r-A5q" firstAttribute="top" secondItem="dSL-Fq-TTF" secondAttribute="bottom" constant="25" id="k54-S3-IHP"/>
                 <constraint firstItem="k0x-Mb-Cjn" firstAttribute="centerY" secondItem="dSL-Fq-TTF" secondAttribute="centerY" id="kLc-2S-N9q"/>
+                <constraint firstItem="0cB-hm-1m3" firstAttribute="leading" secondItem="jWm-af-Kh8" secondAttribute="leading" id="r1L-EG-2dZ"/>
+                <constraint firstItem="w4y-qA-a6N" firstAttribute="centerY" secondItem="0cB-hm-1m3" secondAttribute="centerY" id="r9B-rc-mxR"/>
                 <constraint firstItem="Mrt-4a-ONA" firstAttribute="centerY" secondItem="jWm-af-Kh8" secondAttribute="centerY" id="v72-iT-JJO"/>
+                <constraint firstItem="0cB-hm-1m3" firstAttribute="top" secondItem="jWm-af-Kh8" secondAttribute="bottom" constant="25" id="w8K-xF-p3n"/>
                 <constraint firstItem="dSL-Fq-TTF" firstAttribute="top" secondItem="Cgl-eV-AV6" secondAttribute="bottom" constant="15" id="yQs-DC-5UI"/>
+                <constraint firstItem="w4y-qA-a6N" firstAttribute="leading" secondItem="0cB-hm-1m3" secondAttribute="trailing" constant="20" id="yqC-6C-0y4"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="193.89312977099235" y="-253.52112676056339"/>

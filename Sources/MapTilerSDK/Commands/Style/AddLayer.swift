@@ -21,6 +21,8 @@ package struct AddLayer: MTCommand {
             return handleMTLineLayer(layer)
         } else if let layer = layer as? MTRasterLayer {
             return handleMTRasterLayer(layer)
+        } else if let layer = layer as? MTCircleLayer {
+            return handleMTCircleLayer(layer)
         }
 
         return emptyReturnValue
@@ -31,7 +33,13 @@ package struct AddLayer: MTCommand {
             return emptyReturnValue
         }
 
-        return "\(MTBridge.mapObject).addLayer(\(layerString));"
+        let processed = unquoteExpressions(in: layerString)
+        var js = "\(MTBridge.mapObject).addLayer(\(processed));"
+        if let filter = layer.initialFilter {
+            js.append("\n \(MTBridge.mapObject).setFilter('\(layer.identifier)', \(filter.toJS()));")
+        }
+
+        return js
     }
 
     private func handleMTSymbolLayer(_ layer: MTSymbolLayer) -> JSString {
@@ -39,23 +47,20 @@ package struct AddLayer: MTCommand {
             return emptyReturnValue
         }
 
-        var jsString = ""
-
+        // If an icon is provided, load it and then add the layer inside onload callback.
         if let icon = layer.icon, let encodedImageString = icon.getEncodedString() {
-            let iconString = """
+            return """
             var icon\(layer.identifier) = new Image();
-                icon\(layer.identifier).src = 'data:image/png;base64,\(encodedImageString)';
-                icon\(layer.identifier).onload = function() {
-                    map.addImage('icon\(layer.identifier)', icon\(layer.identifier))
-        """
-            jsString.append(iconString)
-            jsString.append("\n ")
+            icon\(layer.identifier).src = 'data:image/png;base64,\(encodedImageString)';
+            icon\(layer.identifier).onload = function() {
+                map.addImage('icon\(layer.identifier)', icon\(layer.identifier));
+                \(MTBridge.mapObject).addLayer(\(unquoteExpressions(in: layerString)));
+            };
+            """
+        } else {
+            // No icon: just add the layer.
+            return "\(MTBridge.mapObject).addLayer(\(unquoteExpressions(in: layerString)));"
         }
-
-        jsString.append("\(MTBridge.mapObject).addLayer(\(layerString))")
-        jsString.append("\n };")
-
-        return jsString
     }
 
     private func handleMTLineLayer(_ layer: MTLineLayer) -> JSString {
@@ -63,7 +68,12 @@ package struct AddLayer: MTCommand {
             return emptyReturnValue
         }
 
-        return "\(MTBridge.mapObject).addLayer(\(layerString));"
+        let processed = unquoteExpressions(in: layerString)
+        var js = "\(MTBridge.mapObject).addLayer(\(processed));"
+        if let filter = layer.initialFilter {
+            js.append("\n \(MTBridge.mapObject).setFilter('\(layer.identifier)', \(filter.toJS()));")
+        }
+        return js
     }
 
     private func handleMTRasterLayer(_ layer: MTRasterLayer) -> JSString {
@@ -71,6 +81,42 @@ package struct AddLayer: MTCommand {
             return emptyReturnValue
         }
 
-        return "\(MTBridge.mapObject).addLayer(\(layerString));"
+        return "\(MTBridge.mapObject).addLayer(\(unquoteExpressions(in: layerString)));"
     }
+
+    private func handleMTCircleLayer(_ layer: MTCircleLayer) -> JSString {
+        guard let layerString: JSString = layer.toJSON() else {
+            return emptyReturnValue
+        }
+
+        let processed = unquoteExpressions(in: layerString)
+        var js = "\(MTBridge.mapObject).addLayer(\(processed));"
+        if let filter = layer.initialFilter {
+            js.append("\n \(MTBridge.mapObject).setFilter('\(layer.identifier)', \(filter.toJS()));")
+        }
+        return js
+    }
+}
+/// Replaces string-encoded expressions with raw JSON arrays.
+/// Ensures the style parser reads them as expressions (not strings).
+fileprivate func unquoteExpressions(in json: String) -> String {
+    var s = json
+    s = s.replacingOccurrences(
+        of: #"(?s)("filter"\s*:\s*)"(\[.*?\])""#,
+        with: "$1$2",
+        options: .regularExpression
+    )
+    s = s.replacingOccurrences(
+        of: #"(?s)("circle-color"\s*:\s*)"(\[.*?\])""#,
+        with: "$1$2",
+        options: .regularExpression
+    )
+    s = s.replacingOccurrences(
+        of: #"(?s)("circle-radius"\s*:\s*)"(\[.*?\])""#,
+        with: "$1$2",
+        options: .regularExpression
+    )
+    // Unescape escaped quotes inside expression arrays (e.g., \"step\" -> "step")
+    s = s.replacingOccurrences(of: "\\\"", with: "\"")
+    return s
 }

@@ -44,6 +44,32 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
     /// Enum controlling whether this layer is displayed.
     public var visibility: MTLayerVisibility? = .visible
 
+    /// Optional initial filter to apply after the layer is added to the map.
+    public var initialFilter: MTPropertyValue?
+
+    // MARK: - Layout: text properties
+    /// Text field (tokens allowed), e.g. "{point_count_abbreviated}"
+    public var textField: String?
+
+    /// Text size in px
+    public var textSize: Double?
+
+    /// Text allow overlap
+    public var textAllowOverlap: Bool?
+
+    /// Text anchor
+    public var textAnchor: MTTextAnchor?
+
+    /// Text font stack
+    public var textFont: [String]?
+
+    /// Inline filter expression for this layer
+    public var filterExpression: MTPropertyValue?
+
+    // MARK: - Paint: text properties
+    /// Text color
+    public var textColor: UIColor?
+
     package var iconName: String? {
         return "icon\(identifier)"
     }
@@ -104,11 +130,26 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         sourceLayer = try container.decodeIfPresent(String.self, forKey: .sourceLayer)
 
         // LAYOUT
-
         let layoutContainer = try container.nestedContainer(keyedBy: LayoutCodingKeys.self, forKey: .layout)
 
         let visibilityString = try layoutContainer.decode(String.self, forKey: .visibility)
         visibility = MTLayerVisibility(rawValue: visibilityString)
+
+        textField = try layoutContainer.decodeIfPresent(String.self, forKey: .textField)
+        textSize = try layoutContainer.decodeIfPresent(Double.self, forKey: .textSize)
+        textAllowOverlap = try layoutContainer.decodeIfPresent(Bool.self, forKey: .textAllowOverlap)
+        if let anchorRaw = try layoutContainer.decodeIfPresent(String.self, forKey: .textAnchor) {
+            textAnchor = MTTextAnchor(rawValue: anchorRaw)
+        }
+        textFont = try layoutContainer.decodeIfPresent([String].self, forKey: .textFont)
+
+        // PAINT
+        if container.contains(.paint) {
+            let paintContainer = try container.nestedContainer(keyedBy: PaintCodingKeys.self, forKey: .paint)
+            if let hex = try paintContainer.decodeIfPresent(String.self, forKey: .textColor) {
+                textColor = UIColor(hex: hex)
+            }
+        }
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -122,7 +163,6 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         try container.encodeIfPresent(sourceLayer, forKey: .sourceLayer)
 
         // LAYOUT
-
         var layoutContainer = container.nestedContainer(keyedBy: LayoutCodingKeys.self, forKey: .layout)
 
         try layoutContainer.encodeIfPresent(iconName, forKey: .icon)
@@ -130,6 +170,20 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
             visibility?.rawValue ?? MTLayerVisibility.visible.rawValue,
             forKey: .visibility
         )
+        try layoutContainer.encodeIfPresent(textField, forKey: .textField)
+        try layoutContainer.encodeIfPresent(textSize, forKey: .textSize)
+        try layoutContainer.encodeIfPresent(textAllowOverlap, forKey: .textAllowOverlap)
+        try layoutContainer.encodeIfPresent(textAnchor?.rawValue, forKey: .textAnchor)
+        try layoutContainer.encodeIfPresent(textFont, forKey: .textFont)
+
+        // Inline filter expression
+        if let filterExpr = filterExpression?.toJS() {
+            try container.encode(filterExpr, forKey: .filter)
+        }
+
+        // PAINT
+        var paintContainer = container.nestedContainer(keyedBy: PaintCodingKeys.self, forKey: .paint)
+        try paintContainer.encodeIfPresent(textColor?.toHex(), forKey: .textColor)
     }
 
     package enum CodingKeys: String, CodingKey {
@@ -140,11 +194,21 @@ public class MTSymbolLayer: MTLayer, @unchecked Sendable, Codable {
         case minZoom = "minzoom"
         case sourceLayer = "source-layer"
         case layout
+        case filter
+        case paint
     }
 
     package enum LayoutCodingKeys: String, CodingKey {
         case icon = "icon-image"
         case visibility
+        case textField = "text-field"
+        case textSize = "text-size"
+        case textAllowOverlap = "text-allow-overlap"
+        case textAnchor = "text-anchor"
+        case textFont = "text-font"
+    }
+    package enum PaintCodingKeys: String, CodingKey {
+        case textColor = "text-color"
     }
 }
 

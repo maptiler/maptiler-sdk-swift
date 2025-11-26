@@ -98,6 +98,9 @@ public class MTLineLayer: MTLayer, @unchecked Sendable, Codable {
     /// Enum controlling whether this layer is displayed.
     public var visibility: MTLayerVisibility? = .visible
 
+    /// Optional initial filter to apply after the layer is added to the map.
+    public var initialFilter: MTPropertyValue?
+
     /// Initializes the layer with unique identifier, source identifier, max and min zoom levels and source layer,
     /// which is required for vector tile sources.
     public init(

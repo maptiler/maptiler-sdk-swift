@@ -551,3 +551,165 @@ extension MTStyle {
         }
     }
 }
+
+// MARK: - Style property setters
+extension MTStyle {
+    /// Sets a filter expression on a layer.
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - filter: Expression value
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setFilter(
+        layerId: String,
+        filter: MTPropertyValue,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.setFilter(forLayerId: layerId, filter: filter, completionHandler: completionHandler)
+    }
+
+    /// Sets a layout property on a layer.
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - name: Layout property name
+    ///   - value: Property value or expression.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setLayoutProperty(
+        layerId: String,
+        name: String,
+        value: MTPropertyValue,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.setLayoutProperty(forLayerId: layerId, name: name, value: value, completionHandler: completionHandler)
+    }
+
+    /// Sets a paint property on a layer.
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - name: Paint property name
+    ///   - value: Property value or expression.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setPaintProperty(
+        layerId: String,
+        name: String,
+        value: MTPropertyValue,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.setPaintProperty(forLayerId: layerId, name: name, value: value, completionHandler: completionHandler)
+    }
+
+    // MARK: - Typed property setters (overloads)
+    /// Sets a symbol layout property using a typed key.
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - property: Typed layout property key for symbol layers.
+    ///   - value: Property value or expression.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    public func setLayoutProperty(
+        layerId: String,
+        property: MTSymbolLayoutProperty,
+        value: MTPropertyValue,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.setLayoutProperty(
+            forLayerId: layerId,
+            property: property,
+            value: value,
+            completionHandler: completionHandler
+        )
+    }
+
+    /// Sets a circle paint property using a typed key.
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - property: Typed paint property key for circle layers.
+    ///   - value: Property value or expression.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    public func setPaintProperty(
+        layerId: String,
+        property: MTCirclePaintProperty,
+        value: MTPropertyValue,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.setPaintProperty(
+            forLayerId: layerId,
+            property: property,
+            value: value,
+            completionHandler: completionHandler
+        )
+    }
+
+    /// Sets a symbol paint property using a typed key.
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - property: Typed paint property key for symbol layers.
+    ///   - value: Property value or expression.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    public func setPaintProperty(
+        layerId: String,
+        property: MTSymbolPaintProperty,
+        value: MTPropertyValue,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.setPaintProperty(
+            forLayerId: layerId,
+            property: property,
+            value: value,
+            completionHandler: completionHandler
+        )
+    }
+}
+
+// Concurrency: style property setters
+extension MTStyle {
+    public func setFilter(layerId: String, filter: MTPropertyValue) async {
+        await withCheckedContinuation { continuation in
+            setFilter(layerId: layerId, filter: filter) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    public func setLayoutProperty(layerId: String, name: String, value: MTPropertyValue) async {
+        await withCheckedContinuation { continuation in
+            setLayoutProperty(layerId: layerId, name: name, value: value) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    public func setPaintProperty(layerId: String, name: String, value: MTPropertyValue) async {
+        await withCheckedContinuation { continuation in
+            setPaintProperty(layerId: layerId, name: name, value: value) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    // MARK: - Typed property setters (async)
+    /// Sets a symbol layout property using a typed key (async).
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - property: Typed layout property key for symbol layers.
+    ///   - value: Property value or expression.
+    public func setLayoutProperty(layerId: String, property: MTSymbolLayoutProperty, value: MTPropertyValue) async {
+        await setLayoutProperty(layerId: layerId, name: property.rawValue, value: value)
+    }
+
+    /// Sets a circle paint property using a typed key (async).
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - property: Typed paint property key for circle layers.
+    ///   - value: Property value or expression.
+    public func setPaintProperty(layerId: String, property: MTCirclePaintProperty, value: MTPropertyValue) async {
+        await setPaintProperty(layerId: layerId, name: property.rawValue, value: value)
+    }
+
+    /// Sets a symbol paint property using a typed key (async).
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - property: Typed paint property key for symbol layers.
+    ///   - value: Property value or expression.
+    public func setPaintProperty(layerId: String, property: MTSymbolPaintProperty, value: MTPropertyValue) async {
+        await setPaintProperty(layerId: layerId, name: property.rawValue, value: value)
+    }
+}

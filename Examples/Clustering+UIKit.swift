@@ -17,7 +17,7 @@ final class ClusteringUIKitExampleViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        Task { await MTConfig.shared.setAPIKey("YOUR_API_KEY") }
         let options = MTMapOptions(center: CLLocationCoordinate2D(latitude: 20, longitude: 0), zoom: 0.3)
         mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .dataviz, styleVariant: .dark)
         view.addSubview(mapView)

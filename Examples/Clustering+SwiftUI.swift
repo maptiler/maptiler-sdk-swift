@@ -17,6 +17,12 @@ struct ClusteringSwiftUIExample: View {
     private let clusterCountLayerId = "clusterCount"
     private let unclusteredLayerId = "unclusteredPoint"
 
+    // Note: Best practice is to set the API key at app startup (App/Scene or AppDelegate).
+    // It's set here for standalone copy-paste convenience.
+    init() {
+        Task { await MTConfig.shared.setAPIKey("YOUR_API_KEY") }
+    }
+
     var body: some View {
         MTMapViewContainer(map: mapView) {
             // Add clustered source via DSL so it exists before layers are added.

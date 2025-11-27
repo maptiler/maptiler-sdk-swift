@@ -17,12 +17,17 @@ class SourcesAndLayersMapViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        Task { await MTConfig.shared.setAPIKey("YOUR_API_KEY") }
         initializeMapView()
     }
 
     private func initializeMapView() {
-        let options = MTMapOptions(center: Constants.unterageriCoordinates, zoom: Constants.defaultZoomLevel, bearing: 1.0, pitch: 20.0)
+        let options = MTMapOptions(
+            center: Constants.unterageriCoordinates,
+            zoom: Constants.defaultZoomLevel,
+            bearing: 1.0,
+            pitch: 20.0
+        )
         mapView = MTMapView(frame: view.frame, options: options, referenceStyle: .basic)
         mapView.delegate = self
 
@@ -34,11 +39,17 @@ class SourcesAndLayersMapViewController: UIViewController {
             return
         }
 
-        if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY") {
+        if let contoursTilesURL = URL(
+            string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY"
+        ) {
             let contoursDataSource = MTVectorTileSource(identifier: "contoursSource", tiles: [contoursTilesURL])
             style.addSource(contoursDataSource)
 
-            let contoursLayer = MTLineLayer(identifier: "contoursLayer", sourceIdentifier: contoursDataSource.identifier, sourceLayer: "contour_ft")
+            let contoursLayer = MTLineLayer(
+                identifier: "contoursLayer",
+                sourceIdentifier: contoursDataSource.identifier,
+                sourceLayer: "contour_ft"
+            )
             contoursLayer.color = .brown
             contoursLayer.width = 2.0
 

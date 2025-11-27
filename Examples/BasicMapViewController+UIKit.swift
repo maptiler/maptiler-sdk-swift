@@ -17,12 +17,17 @@ class BasicMapViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        Task { await MTConfig.shared.setAPIKey("YOUR_API_KEY") }
         initializeMapView()
     }
 
     private func initializeMapView() {
-        let options = MTMapOptions(center: Constants.unterageriCoordinates, zoom: Constants.defaultZoomLevel, bearing: 1.0, pitch: 20.0)
+        let options = MTMapOptions(
+            center: Constants.unterageriCoordinates,
+            zoom: Constants.defaultZoomLevel,
+            bearing: 1.0,
+            pitch: 20.0
+        )
         mapView = MTMapView(frame: view.frame, options: options, referenceStyle: .basic)
         mapView.delegate = self
 

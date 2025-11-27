@@ -134,4 +134,12 @@ extension MTFillLayer {
 
         return self
     }
+
+    /// Modifier. Sets the initial filter to apply upon add.
+    /// - Note: Not to be used outside of DSL.
+    @discardableResult
+    public func withFilter(_ value: MTPropertyValue) -> Self {
+        self.initialFilter = value
+        return self
+    }
 }

@@ -16,12 +16,20 @@ struct SourcesAndLayersMapView: View {
     let contoursSourceID = "contoursSource"
     let airportsSourceID = "airportsSource"
 
-    let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY") ?? URL.documentsDirectory
+    let contoursTilesURL = URL(
+        string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY"
+    ) ?? URL.documentsDirectory
 
     @State private var referenceStyle: MTMapReferenceStyle = .basic
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
 
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: Constants.defaultZoomLevel))
+
+    // Note: Best practice is to set the API key at app startup (App/Scene or AppDelegate).
+    // It's set here for standalone copy-paste convenience.
+    init() {
+        Task { await MTConfig.shared.setAPIKey("YOUR_API_KEY") }
+    }
 
     var body: some View {
         MTMapViewContainer(map: mapView) {

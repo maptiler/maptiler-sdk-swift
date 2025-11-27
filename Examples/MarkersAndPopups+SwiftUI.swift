@@ -20,6 +20,12 @@ struct MarkersAndPopupsMapView: View {
 
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: Constants.defaultZoomLevel))
 
+    // Note: Best practice is to set the API key at app startup (App/Scene or AppDelegate).
+    // It's set here for standalone copy-paste convenience.
+    init() {
+        Task { await MTConfig.shared.setAPIKey("YOUR_API_KEY") }
+    }
+
     var body: some View {
         MTMapViewContainer(map: mapView) {
             let unterageriPopup = MTTextPopup(coordinates: unterageriCoordinates, text: "MapTiler", offset: 20.0)

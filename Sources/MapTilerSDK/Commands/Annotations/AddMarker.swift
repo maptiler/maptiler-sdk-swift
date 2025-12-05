@@ -18,6 +18,12 @@ package struct AddMarker: MTCommand {
         var iconInit = ""
         var iconData = ""
         var popupAttachment = ""
+        var markerOptions: [String] = [
+            "color: '\(marker.color?.toHex() ?? UIColor.blue.toHex())'",
+            "draggable: \(marker.draggable ?? false)",
+            "anchor: '\(marker.anchor.rawValue)'",
+            "offset: [\(marker.offset), \(marker.offset)]"
+        ]
 
         let drag = """
             function onDrag() {
@@ -56,15 +62,19 @@ package struct AddMarker: MTCommand {
             iconData = "element: icon\(marker.identifier)"
         }
 
+        if !iconData.isEmpty {
+            markerOptions.append(iconData)
+        }
+
+        let optionsString = markerOptions.joined(separator: ",\n                ")
+
         return """
             \(popupAttachment)
 
             \(iconInit)
 
             const \(marker.identifier) = new maptilersdk.Marker({
-                color: '\(marker.color?.toHex() ?? UIColor.blue.toHex())',
-                draggable: \(marker.draggable ?? false),
-                \(iconData)
+                \(optionsString)
             });
 
             \(popupString)

@@ -32,3 +32,4 @@ CLAUDE.md
 output.txt
 .gemini/
 gha-creds-*.json
+test.log

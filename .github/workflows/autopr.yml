@@ -18,7 +18,6 @@ permissions:
 
 jobs:
   build:
-
     runs-on: macos-latest
 
     steps:
@@ -80,7 +79,7 @@ jobs:
         echo "ISSUE_KEY=${{ github.event.inputs.issue_key }}"        >> $GITHUB_ENV
         echo "TITLE=${{ github.event.inputs.issue_summary }}"        >> $GITHUB_ENV
         echo "RAW_DESC=${{ github.event.inputs.issue_description }}" >> $GITHUB_ENV
-        DESC_CLEANED=$(echo "${{ github.event.inputs.issue_description }}" | tr '\n' ' ' | sed 's/"/'\''/g')
+        DESC_CLEANED=$(echo "${{ github.event.inputs.issue_description }}" | tr '\n' ' ' | sed 's/\"/'\''/g')
         echo "DESC=$DESC_CLEANED"                                    >> $GITHUB_ENV
         echo "BRANCH=${{ github.event.inputs.issue_key }}"     >> $GITHUB_ENV
 
@@ -125,8 +124,14 @@ jobs:
         status=0
         xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 2>&1 | tee test.log || status=$?
         echo "exit_code=$status" >> $GITHUB_OUTPUT
+    # Clear only Codex proxy marker JSON files to avoid sudo error on re-run
+    - name: Clear Codex Proxy Marker
+      if: ${{ steps.unit_tests.outputs.exit_code != '0' }}
+      run: |
+        if [ -d "$HOME/.codex" ]; then
+          find "$HOME/.codex" -maxdepth 1 -type f -name '[0-9]*.json' -print -delete || true
+        fi
 
-    # If tests failed, run Codex again with the test log to apply fixes
     - name: Run Codex Action (Fix tests)
       if: ${{ steps.unit_tests.outputs.exit_code != '0' }}
       uses: openai/codex-action@v1
@@ -170,3 +175,5 @@ jobs:
 
           ## Acceptance
           Linted.
+
+  

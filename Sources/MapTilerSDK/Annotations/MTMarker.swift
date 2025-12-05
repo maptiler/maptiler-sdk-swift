@@ -27,6 +27,12 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Custom icon to use for marker.
     public var icon: UIImage?
 
+    /// Anchor position of the marker.
+    public var anchor: MTAnchor = .center
+
+    /// Offset distance from the marker's anchor, applied on both axes in pixels.
+    public var offset: Double = 0.0
+
     /// Optional attached popup.
     public private(set) var popup: MTTextPopup?
 
@@ -38,19 +44,36 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Initializes the marker with the specified position.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
-    public init(coordinates: CLLocationCoordinate2D) {
+    ///    - anchor: Anchor position for the marker.
+    ///    - offset: Pixel offset from the anchor applied on both axes.
+    public init(
+        coordinates: CLLocationCoordinate2D,
+        anchor: MTAnchor = .center,
+        offset: Double = 0.0
+    ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
+        self.anchor = anchor
+        self.offset = offset
     }
 
     /// Initializes the marker with the specified position and text popup.
     /// - Parameters:
     ///    - coordinates: Position of the marker.
     ///    - popup: Popup to attach to the marker.
-    public init(coordinates: CLLocationCoordinate2D, popup: MTTextPopup?) {
+    ///    - anchor: Anchor position for the marker.
+    ///    - offset: Pixel offset from the anchor applied on both axes.
+    public init(
+        coordinates: CLLocationCoordinate2D,
+        popup: MTTextPopup?,
+        anchor: MTAnchor = .center,
+        offset: Double = 0.0
+    ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
         self.popup = popup
+        self.anchor = anchor
+        self.offset = offset
     }
 
     /// Initializes the marker with the specified position, color/icon and behaviour.
@@ -59,17 +82,23 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     ///    - color: Color of the marker.
     ///    - icon: Icon for the marker.
     ///    - draggable: Boolean indicating whether the  marker is draggable.
+    ///    - anchor: Anchor position for the marker.
+    ///    - offset: Pixel offset from the anchor applied on both axes.
     public init(
         coordinates: CLLocationCoordinate2D,
         color: UIColor? = .blue,
         icon: UIImage? = nil,
-        draggable: Bool? = false
+        draggable: Bool? = false,
+        anchor: MTAnchor = .center,
+        offset: Double = 0.0
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
         self.color = color
         self.icon = icon
         self.draggable = draggable
+        self.anchor = anchor
+        self.offset = offset
     }
 
     /// Initializes the marker with the specified position, color/icon and popup.
@@ -79,12 +108,16 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     ///    - icon: Icon for the marker.
     ///    - draggable: Boolean indicating whether the  marker is draggable.
     ///    - popup: Popup to attach to the marker.
+    ///    - anchor: Anchor position for the marker.
+    ///    - offset: Pixel offset from the anchor applied on both axes.
     public init(
         coordinates: CLLocationCoordinate2D,
         color: UIColor? = .blue,
         icon: UIImage? = nil,
         draggable: Bool? = false,
-        popup: MTTextPopup?
+        popup: MTTextPopup?,
+        anchor: MTAnchor = .center,
+        offset: Double = 0.0
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -92,6 +125,8 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.icon = icon
         self.draggable = draggable
         self.popup = popup
+        self.anchor = anchor
+        self.offset = offset
     }
 
     /// Sets coordinates for the marker.
@@ -160,7 +195,9 @@ extension MTMarker {
                 coordinates: self.coordinates,
                 color: self.color,
                 icon: self.icon,
-                draggable: self.draggable
+                draggable: self.draggable,
+                anchor: self.anchor,
+                offset: self.offset
             )
 
             marker.popup = self.popup

@@ -47,6 +47,8 @@ package struct AddMarkers: MTCommand {
                     const \(marker.identifier) = new maptilersdk.Marker({
                         color: '\(marker.color?.toHex() ?? UIColor.blue.toHex())',
                         draggable: \(marker.draggable ?? false),
+                        anchor: '\(marker.anchor.rawValue)',
+                        offset: [\(marker.offset), \(marker.offset)],
                         element: img\(marker.identifier)
                     });
 
@@ -81,6 +83,8 @@ package struct AddMarkers: MTCommand {
         const \(marker.identifier) = new maptilersdk.Marker({
             color: '\(marker.color?.toHex() ?? UIColor.blue.toHex())',
             draggable: \(marker.draggable ?? false),
+            anchor: '\(marker.anchor.rawValue)',
+            offset: [\(marker.offset), \(marker.offset)],
             element: icon\(marker.identifier)
         });
 

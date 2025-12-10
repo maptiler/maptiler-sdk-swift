@@ -713,3 +713,26 @@ extension MTStyle {
         await setPaintProperty(layerId: layerId, name: property.rawValue, value: value)
     }
 }
+
+// MARK: - Helpers: Point layer
+extension MTStyle {
+    // Adds a point visualization layer using the helper with the provided options.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    internal func addPointLayer(
+        _ options: MTPointLayerOptions,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommand(AddPointLayer(options: options), completion: completionHandler)
+    }
+}
+
+extension MTStyle {
+    // Adds a point visualization layer using the helper with the provided options (async).
+    internal func addPointLayer(_ options: MTPointLayerOptions) async {
+        await withCheckedContinuation { continuation in
+            addPointLayer(options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+}

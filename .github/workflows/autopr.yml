@@ -124,13 +124,15 @@ jobs:
         status=0
         xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 2>&1 | tee test.log || status=$?
         echo "exit_code=$status" >> $GITHUB_OUTPUT
-    # Clear only Codex proxy marker JSON files to avoid sudo error on re-run
-    - name: Clear Codex Proxy Marker
+    # Ensure Codex proxy is fully stopped before re-run on macOS
+    - name: Stop Codex proxy and clean state
       if: ${{ steps.unit_tests.outputs.exit_code != '0' }}
+      shell: bash
       run: |
-        if [ -d "$HOME/.codex" ]; then
-          find "$HOME/.codex" -maxdepth 1 -type f -name '[0-9]*.json' -print -delete || true
-        fi
+        # Best-effort kill of any proxy from the first run (no sudo)
+        pkill -f "responses-api-proxy" || true
+        # Remove all Codex state to avoid sudo-managed cleanup paths
+        rm -rf "$HOME/.codex" || true
 
     - name: Run Codex Action (Fix tests)
       if: ${{ steps.unit_tests.outputs.exit_code != '0' }}

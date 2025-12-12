@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/1.2.0)
+Released on 2025-12-12.
+### Added
+- Raster source: Custom raster and raster DEM data can now be added to the map.
+- Raster layer: New raster layer allows visualization of custom raster data.
+- MTCircle layer: Added new type of layer for visualizing data as circles.
+- Clustering filters: MTCircle and MTSymbol layers now support clustering filters and expressions.
+
 ## [1.1.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/1.1.0)
 Released on 2025-10-14.
 ### Added

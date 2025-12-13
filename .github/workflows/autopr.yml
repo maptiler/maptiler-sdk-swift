@@ -114,39 +114,6 @@ jobs:
         openai-api-key: ${{ secrets.OPENAI_API_KEY }}
         prompt: |
           Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
-    
-    # Run unit tests and capture output; don't fail the job yet
-    - name: Run unit tests
-      id: unit_tests
-      continue-on-error: true
-      run: |
-        set -o pipefail
-        status=0
-        xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 2>&1 | tee test.log || status=$?
-        echo "exit_code=$status" >> $GITHUB_OUTPUT
-    # Ensure Codex proxy is fully stopped before re-run on macOS
-    - name: Stop Codex proxy and clean state
-      if: ${{ steps.unit_tests.outputs.exit_code != '0' }}
-      shell: bash
-      run: |
-        # Best-effort kill of any proxy from the first run (no sudo)
-        pkill -f "responses-api-proxy" || true
-        # Remove all Codex state to avoid sudo-managed cleanup paths
-        rm -rf "$HOME/.codex" || true
-
-    - name: Run Codex Action (Fix tests)
-      if: ${{ steps.unit_tests.outputs.exit_code != '0' }}
-      uses: openai/codex-action@v1
-      env:
-        OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
-        GH_TOKEN:        ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_TOKEN:    ${{ secrets.GITHUB_TOKEN }}
-      with:
-        openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-        prompt: |
-          Unit tests failed (exit=${{ steps.unit_tests.outputs.exit_code }}).
-          Read ./test.log from the workspace and fix the failures with minimal, focused changes.
-          Follow AGENTS.md rules strictly.
 
     # Auto-format Swift code to satisfy SwiftLint after Codex fixes
     - name: SwiftLint fix

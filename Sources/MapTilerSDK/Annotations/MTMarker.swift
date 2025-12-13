@@ -39,6 +39,15 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Offset distance from the marker's anchor, applied on both axes in pixels.
     public var offset: Double = 0.0
 
+    /// Rotation of the marker in degrees.
+    public var rotation: Double = 0.0
+
+    /// Alignment of the marker rotation relative to the map or viewport.
+    public var rotationAlignment: MTMarkerRotationAlignment = .auto
+
+    /// Alignment of the marker pitch relative to the map or viewport.
+    public var pitchAlignment: MTMarkerPitchAlignment = .auto
+
     /// Optional attached popup.
     public private(set) var popup: MTTextPopup?
 
@@ -57,7 +66,10 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         anchor: MTAnchor = .center,
         offset: Double = 0.0,
         opacity: Double = 1.0,
-        opacityWhenCovered: Double = 0.2
+        opacityWhenCovered: Double = 0.2,
+        rotation: Double = 0.0,
+        rotationAlignment: MTMarkerRotationAlignment = .auto,
+        pitchAlignment: MTMarkerPitchAlignment = .auto
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -65,6 +77,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.offset = offset
         self.opacity = opacity
         self.opacityWhenCovered = opacityWhenCovered
+        self.rotation = rotation
+        self.rotationAlignment = rotationAlignment
+        self.pitchAlignment = pitchAlignment
     }
 
     /// Initializes the marker with the specified position and text popup.
@@ -79,7 +94,10 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         anchor: MTAnchor = .center,
         offset: Double = 0.0,
         opacity: Double = 1.0,
-        opacityWhenCovered: Double = 0.2
+        opacityWhenCovered: Double = 0.2,
+        rotation: Double = 0.0,
+        rotationAlignment: MTMarkerRotationAlignment = .auto,
+        pitchAlignment: MTMarkerPitchAlignment = .auto
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -88,6 +106,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.offset = offset
         self.opacity = opacity
         self.opacityWhenCovered = opacityWhenCovered
+        self.rotation = rotation
+        self.rotationAlignment = rotationAlignment
+        self.pitchAlignment = pitchAlignment
     }
 
     /// Initializes the marker with the specified position, color/icon and behaviour.
@@ -106,7 +127,10 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         anchor: MTAnchor = .center,
         offset: Double = 0.0,
         opacity: Double = 1.0,
-        opacityWhenCovered: Double = 0.2
+        opacityWhenCovered: Double = 0.2,
+        rotation: Double = 0.0,
+        rotationAlignment: MTMarkerRotationAlignment = .auto,
+        pitchAlignment: MTMarkerPitchAlignment = .auto
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -117,6 +141,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.offset = offset
         self.opacity = opacity
         self.opacityWhenCovered = opacityWhenCovered
+        self.rotation = rotation
+        self.rotationAlignment = rotationAlignment
+        self.pitchAlignment = pitchAlignment
     }
 
     /// Initializes the marker with the specified position, color/icon and popup.
@@ -137,7 +164,10 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         anchor: MTAnchor = .center,
         offset: Double = 0.0,
         opacity: Double = 1.0,
-        opacityWhenCovered: Double = 0.2
+        opacityWhenCovered: Double = 0.2,
+        rotation: Double = 0.0,
+        rotationAlignment: MTMarkerRotationAlignment = .auto,
+        pitchAlignment: MTMarkerPitchAlignment = .auto
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -149,6 +179,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.offset = offset
         self.opacity = opacity
         self.opacityWhenCovered = opacityWhenCovered
+        self.rotation = rotation
+        self.rotationAlignment = rotationAlignment
+        self.pitchAlignment = pitchAlignment
     }
 
     /// Sets coordinates for the marker.
@@ -221,7 +254,10 @@ extension MTMarker {
                 anchor: self.anchor,
                 offset: self.offset,
                 opacity: self.opacity,
-                opacityWhenCovered: self.opacityWhenCovered
+                opacityWhenCovered: self.opacityWhenCovered,
+                rotation: self.rotation,
+                rotationAlignment: self.rotationAlignment,
+                pitchAlignment: self.pitchAlignment
             )
 
             marker.popup = self.popup

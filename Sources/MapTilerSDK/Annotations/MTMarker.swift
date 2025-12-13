@@ -21,6 +21,12 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Color of the marker.
     public var color: UIColor?
 
+    /// Opacity of the marker.
+    public var opacity: Double = 1.0
+
+    /// Opacity applied when the marker is covered by another object.
+    public var opacityWhenCovered: Double = 0.2
+
     /// Boolean indicating whether marker is draggable.
     public var draggable: Bool?
 
@@ -49,12 +55,16 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     public init(
         coordinates: CLLocationCoordinate2D,
         anchor: MTAnchor = .center,
-        offset: Double = 0.0
+        offset: Double = 0.0,
+        opacity: Double = 1.0,
+        opacityWhenCovered: Double = 0.2
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
         self.anchor = anchor
         self.offset = offset
+        self.opacity = opacity
+        self.opacityWhenCovered = opacityWhenCovered
     }
 
     /// Initializes the marker with the specified position and text popup.
@@ -67,13 +77,17 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         coordinates: CLLocationCoordinate2D,
         popup: MTTextPopup?,
         anchor: MTAnchor = .center,
-        offset: Double = 0.0
+        offset: Double = 0.0,
+        opacity: Double = 1.0,
+        opacityWhenCovered: Double = 0.2
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
         self.popup = popup
         self.anchor = anchor
         self.offset = offset
+        self.opacity = opacity
+        self.opacityWhenCovered = opacityWhenCovered
     }
 
     /// Initializes the marker with the specified position, color/icon and behaviour.
@@ -90,7 +104,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         icon: UIImage? = nil,
         draggable: Bool? = false,
         anchor: MTAnchor = .center,
-        offset: Double = 0.0
+        offset: Double = 0.0,
+        opacity: Double = 1.0,
+        opacityWhenCovered: Double = 0.2
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -99,6 +115,8 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.draggable = draggable
         self.anchor = anchor
         self.offset = offset
+        self.opacity = opacity
+        self.opacityWhenCovered = opacityWhenCovered
     }
 
     /// Initializes the marker with the specified position, color/icon and popup.
@@ -117,7 +135,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         draggable: Bool? = false,
         popup: MTTextPopup?,
         anchor: MTAnchor = .center,
-        offset: Double = 0.0
+        offset: Double = 0.0,
+        opacity: Double = 1.0,
+        opacityWhenCovered: Double = 0.2
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -127,6 +147,8 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.popup = popup
         self.anchor = anchor
         self.offset = offset
+        self.opacity = opacity
+        self.opacityWhenCovered = opacityWhenCovered
     }
 
     /// Sets coordinates for the marker.
@@ -197,7 +219,9 @@ extension MTMarker {
                 icon: self.icon,
                 draggable: self.draggable,
                 anchor: self.anchor,
-                offset: self.offset
+                offset: self.offset,
+                opacity: self.opacity,
+                opacityWhenCovered: self.opacityWhenCovered
             )
 
             marker.popup = self.popup

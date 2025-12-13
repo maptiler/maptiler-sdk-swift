@@ -21,13 +21,17 @@ struct MTMarkerTests {
             icon: nil,
             draggable: true,
             anchor: .bottomLeft,
-            offset: 8.0
+            offset: 8.0,
+            opacity: 0.6,
+            opacityWhenCovered: 0.3
         )
 
         let jsString = AddMarker(marker: marker).toJS()
 
         #expect(jsString.contains("anchor: '\(marker.anchor.rawValue)'"))
         #expect(jsString.contains("offset: [\(marker.offset), \(marker.offset)]"))
+        #expect(jsString.contains("opacity: \(marker.opacity)"))
+        #expect(jsString.contains("opacityWhenCovered: \(marker.opacityWhenCovered)"))
     }
 
     @Test func addMarkersCommand_includesAnchorAndOffsetForSharedIcon() async throws {
@@ -46,11 +50,18 @@ struct MTMarkerTests {
             )
         ]
 
+        markers[0].opacity = 0.5
+        markers[0].opacityWhenCovered = 0.25
+        markers[1].opacity = 0.7
+        markers[1].opacityWhenCovered = 0.4
+
         let jsString = AddMarkers(markers: markers, withSingleIcon: image).toJS()
 
         for marker in markers {
             #expect(jsString.contains("anchor: '\(marker.anchor.rawValue)'"))
             #expect(jsString.contains("offset: [\(marker.offset), \(marker.offset)]"))
+            #expect(jsString.contains("opacity: \(marker.opacity)"))
+            #expect(jsString.contains("opacityWhenCovered: \(marker.opacityWhenCovered)"))
         }
     }
 
@@ -72,12 +83,18 @@ struct MTMarkerTests {
 
         markers[0].icon = icon
         markers[1].icon = icon
+        markers[0].opacity = 0.55
+        markers[0].opacityWhenCovered = 0.35
+        markers[1].opacity = 0.8
+        markers[1].opacityWhenCovered = 0.45
 
         let jsString = AddMarkers(markers: markers, withSingleIcon: nil).toJS()
 
         for marker in markers {
             #expect(jsString.contains("anchor: '\(marker.anchor.rawValue)'"))
             #expect(jsString.contains("offset: [\(marker.offset), \(marker.offset)]"))
+            #expect(jsString.contains("opacity: \(marker.opacity)"))
+            #expect(jsString.contains("opacityWhenCovered: \(marker.opacityWhenCovered)"))
         }
     }
 }

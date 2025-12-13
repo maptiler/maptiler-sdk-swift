@@ -20,6 +20,8 @@ package struct AddMarker: MTCommand {
         var popupAttachment = ""
         var markerOptions: [String] = [
             "color: '\(marker.color?.toHex() ?? UIColor.blue.toHex())'",
+            "opacity: \(marker.opacity)",
+            "opacityWhenCovered: \(marker.opacityWhenCovered)",
             "draggable: \(marker.draggable ?? false)",
             "anchor: '\(marker.anchor.rawValue)'",
             "offset: [\(marker.offset), \(marker.offset)]"

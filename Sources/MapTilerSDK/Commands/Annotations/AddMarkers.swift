@@ -51,6 +51,9 @@ package struct AddMarkers: MTCommand {
                         draggable: \(marker.draggable ?? false),
                         anchor: '\(marker.anchor.rawValue)',
                         offset: [\(marker.offset), \(marker.offset)],
+                        rotation: \(marker.rotation),
+                        rotationAlignment: '\(marker.rotationAlignment.rawValue)',
+                        pitchAlignment: '\(marker.pitchAlignment.rawValue)',
                         element: img\(marker.identifier)
                     });
 
@@ -89,6 +92,9 @@ package struct AddMarkers: MTCommand {
             draggable: \(marker.draggable ?? false),
             anchor: '\(marker.anchor.rawValue)',
             offset: [\(marker.offset), \(marker.offset)],
+            rotation: \(marker.rotation),
+            rotationAlignment: '\(marker.rotationAlignment.rawValue)',
+            pitchAlignment: '\(marker.pitchAlignment.rawValue)',
             element: icon\(marker.identifier)
         });
 

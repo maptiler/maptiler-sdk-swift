@@ -243,6 +243,147 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     }
 }
 
+// Getters
+extension MTMarker {
+    /// Returns current coordinates of the marker.
+    /// - Parameters:
+    ///   - mapView: Map view to query.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getCoordinates(
+        in mapView: MTMapView,
+        completionHandler: ((Result<CLLocationCoordinate2D, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommandWithCoordinateReturnValue(GetMarkerCoordinates(marker: self)) { [weak self] result in
+            if case .success(let coordinates) = result {
+                self?.coordinates = coordinates
+            }
+
+            completionHandler?(result)
+        }
+    }
+
+    /// Returns the marker's pitch alignment.
+    /// - Parameters:
+    ///   - mapView: Map view to query.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getPitchAlignment(
+        in mapView: MTMapView,
+        completionHandler: ((Result<MTMarkerPitchAlignment, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommandWithStringReturnValue(GetMarkerPitchAlignment(marker: self)) { [weak self] result in
+            switch result {
+            case .success(let value):
+                if let alignment = MTMarkerPitchAlignment(rawValue: value) {
+                    self?.pitchAlignment = alignment
+                    completionHandler?(.success(alignment))
+                } else {
+                    completionHandler?(
+                        .failure(
+                            MTError.unsupportedReturnType(
+                                description: "Expected marker pitch alignment, got \(value)."
+                            )
+                        )
+                    )
+                }
+            case .failure(let error):
+                completionHandler?(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the marker's rotation value.
+    /// - Parameters:
+    ///   - mapView: Map view to query.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getRotation(
+        in mapView: MTMapView,
+        completionHandler: ((Result<Double, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommandWithDoubleReturnValue(GetMarkerRotation(marker: self)) { [weak self] result in
+            if case .success(let rotation) = result {
+                self?.rotation = rotation
+            }
+
+            completionHandler?(result)
+        }
+    }
+
+    /// Returns the marker's rotation alignment.
+    /// - Parameters:
+    ///   - mapView: Map view to query.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getRotationAlignment(
+        in mapView: MTMapView,
+        completionHandler: ((Result<MTMarkerRotationAlignment, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommandWithStringReturnValue(GetMarkerRotationAlignment(marker: self)) { [weak self] result in
+            switch result {
+            case .success(let value):
+                if let alignment = MTMarkerRotationAlignment(rawValue: value) {
+                    self?.rotationAlignment = alignment
+                    completionHandler?(.success(alignment))
+                } else {
+                    completionHandler?(
+                        .failure(
+                            MTError.unsupportedReturnType(
+                                description: "Expected marker rotation alignment, got \(value)."
+                            )
+                        )
+                    )
+                }
+            case .failure(let error):
+                completionHandler?(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the marker's offset value in pixels.
+    /// - Parameters:
+    ///   - mapView: Map view to query.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getOffset(
+        in mapView: MTMapView,
+        completionHandler: ((Result<Double, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommandWithDoubleReturnValue(GetMarkerOffset(marker: self)) { [weak self] result in
+            if case .success(let offset) = result {
+                self?.offset = offset
+            }
+
+            completionHandler?(result)
+        }
+    }
+
+    /// Returns whether the marker is draggable.
+    /// - Parameters:
+    ///   - mapView: Map view to query.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isDraggable(
+        in mapView: MTMapView,
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommandWithBoolReturnValue(IsMarkerDraggable(marker: self)) { [weak self] result in
+            if case .success(let draggable) = result {
+                self?.draggable = draggable
+            }
+
+            completionHandler?(result)
+        }
+    }
+}
+
 // Concurrency
 extension MTMarker {
     /// Sets coordinates for the marker.
@@ -256,6 +397,102 @@ extension MTMarker {
         await withCheckedContinuation { continuation in
             setCoordinates(coordinates, in: mapView) { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns current coordinates of the marker.
+    /// - Parameter mapView: Map view to query.
+    @MainActor
+    public func getCoordinates(in mapView: MTMapView) async -> CLLocationCoordinate2D {
+        await withCheckedContinuation { continuation in
+            getCoordinates(in: mapView) { [weak self] result in
+                switch result {
+                case .success(let coordinates):
+                    continuation.resume(returning: coordinates)
+                case .failure:
+                    continuation.resume(returning: self?.coordinates ?? CLLocationCoordinate2D())
+                }
+            }
+        }
+    }
+
+    /// Returns the marker's pitch alignment.
+    /// - Parameter mapView: Map view to query.
+    @MainActor
+    public func getPitchAlignment(in mapView: MTMapView) async -> MTMarkerPitchAlignment {
+        await withCheckedContinuation { continuation in
+            getPitchAlignment(in: mapView) { [weak self] result in
+                switch result {
+                case .success(let alignment):
+                    continuation.resume(returning: alignment)
+                case .failure:
+                    continuation.resume(returning: self?.pitchAlignment ?? .auto)
+                }
+            }
+        }
+    }
+
+    /// Returns the marker's rotation value.
+    /// - Parameter mapView: Map view to query.
+    @MainActor
+    public func getRotation(in mapView: MTMapView) async -> Double {
+        await withCheckedContinuation { continuation in
+            getRotation(in: mapView) { [weak self] result in
+                switch result {
+                case .success(let rotation):
+                    continuation.resume(returning: rotation)
+                case .failure:
+                    continuation.resume(returning: self?.rotation ?? .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns the marker's rotation alignment.
+    /// - Parameter mapView: Map view to query.
+    @MainActor
+    public func getRotationAlignment(in mapView: MTMapView) async -> MTMarkerRotationAlignment {
+        await withCheckedContinuation { continuation in
+            getRotationAlignment(in: mapView) { [weak self] result in
+                switch result {
+                case .success(let alignment):
+                    continuation.resume(returning: alignment)
+                case .failure:
+                    continuation.resume(returning: self?.rotationAlignment ?? .auto)
+                }
+            }
+        }
+    }
+
+    /// Returns the marker's offset value in pixels.
+    /// - Parameter mapView: Map view to query.
+    @MainActor
+    public func getOffset(in mapView: MTMapView) async -> Double {
+        await withCheckedContinuation { continuation in
+            getOffset(in: mapView) { [weak self] result in
+                switch result {
+                case .success(let offset):
+                    continuation.resume(returning: offset)
+                case .failure:
+                    continuation.resume(returning: self?.offset ?? .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns whether the marker is draggable.
+    /// - Parameter mapView: Map view to query.
+    @MainActor
+    public func isDraggable(in mapView: MTMapView) async -> Bool {
+        await withCheckedContinuation { continuation in
+            isDraggable(in: mapView) { [weak self] result in
+                switch result {
+                case .success(let draggable):
+                    continuation.resume(returning: draggable)
+                case .failure:
+                    continuation.resume(returning: self?.draggable ?? false)
+                }
             }
         }
     }

@@ -138,4 +138,15 @@ struct MTMarkerTests {
             #expect(jsString.contains("pitchAlignment: '\(marker.pitchAlignment.rawValue)'"))
         }
     }
+
+    @Test func markerGetterCommands_matchExpectedJS() async throws {
+        let marker = MTMarker(coordinates: coordinate, draggable: true, anchor: .top, offset: 5.0)
+
+        #expect(GetMarkerCoordinates(marker: marker).toJS() == "\(marker.identifier).getLngLat();")
+        #expect(GetMarkerPitchAlignment(marker: marker).toJS() == "\(marker.identifier).getPitchAlignment();")
+        #expect(GetMarkerRotation(marker: marker).toJS() == "\(marker.identifier).getRotation();")
+        #expect(GetMarkerRotationAlignment(marker: marker).toJS() == "\(marker.identifier).getRotationAlignment();")
+        #expect(GetMarkerOffset(marker: marker).toJS() == "\(marker.identifier).getOffset().x;")
+        #expect(IsMarkerDraggable(marker: marker).toJS() == "\(marker.identifier).isDraggable();")
+    }
 }

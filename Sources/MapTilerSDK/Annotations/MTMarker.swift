@@ -39,6 +39,12 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Offset distance from the marker's anchor, applied on both axes in pixels.
     public var offset: Double = 0.0
 
+    /// Scale factor applied to the marker.
+    public var scale: Double = 1.0
+
+    /// Enables subpixel positioning when rendering the marker.
+    public var subpixelPositioning: Bool = true
+
     /// Rotation of the marker in degrees.
     public var rotation: Double = 0.0
 
@@ -69,7 +75,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         opacityWhenCovered: Double = 0.2,
         rotation: Double = 0.0,
         rotationAlignment: MTMarkerRotationAlignment = .auto,
-        pitchAlignment: MTMarkerPitchAlignment = .auto
+        pitchAlignment: MTMarkerPitchAlignment = .auto,
+        scale: Double = 1.0,
+        subpixelPositioning: Bool = true
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -80,6 +88,8 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.rotation = rotation
         self.rotationAlignment = rotationAlignment
         self.pitchAlignment = pitchAlignment
+        self.scale = scale
+        self.subpixelPositioning = subpixelPositioning
     }
 
     /// Initializes the marker with the specified position and text popup.
@@ -97,7 +107,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         opacityWhenCovered: Double = 0.2,
         rotation: Double = 0.0,
         rotationAlignment: MTMarkerRotationAlignment = .auto,
-        pitchAlignment: MTMarkerPitchAlignment = .auto
+        pitchAlignment: MTMarkerPitchAlignment = .auto,
+        scale: Double = 1.0,
+        subpixelPositioning: Bool = true
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -109,6 +121,8 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.rotation = rotation
         self.rotationAlignment = rotationAlignment
         self.pitchAlignment = pitchAlignment
+        self.scale = scale
+        self.subpixelPositioning = subpixelPositioning
     }
 
     /// Initializes the marker with the specified position, color/icon and behaviour.
@@ -130,7 +144,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         opacityWhenCovered: Double = 0.2,
         rotation: Double = 0.0,
         rotationAlignment: MTMarkerRotationAlignment = .auto,
-        pitchAlignment: MTMarkerPitchAlignment = .auto
+        pitchAlignment: MTMarkerPitchAlignment = .auto,
+        scale: Double = 1.0,
+        subpixelPositioning: Bool = true
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -144,6 +160,8 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.rotation = rotation
         self.rotationAlignment = rotationAlignment
         self.pitchAlignment = pitchAlignment
+        self.scale = scale
+        self.subpixelPositioning = subpixelPositioning
     }
 
     /// Initializes the marker with the specified position, color/icon and popup.
@@ -167,7 +185,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         opacityWhenCovered: Double = 0.2,
         rotation: Double = 0.0,
         rotationAlignment: MTMarkerRotationAlignment = .auto,
-        pitchAlignment: MTMarkerPitchAlignment = .auto
+        pitchAlignment: MTMarkerPitchAlignment = .auto,
+        scale: Double = 1.0,
+        subpixelPositioning: Bool = true
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -182,6 +202,8 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.rotation = rotation
         self.rotationAlignment = rotationAlignment
         self.pitchAlignment = pitchAlignment
+        self.scale = scale
+        self.subpixelPositioning = subpixelPositioning
     }
 
     /// Sets coordinates for the marker.
@@ -257,7 +279,9 @@ extension MTMarker {
                 opacityWhenCovered: self.opacityWhenCovered,
                 rotation: self.rotation,
                 rotationAlignment: self.rotationAlignment,
-                pitchAlignment: self.pitchAlignment
+                pitchAlignment: self.pitchAlignment,
+                scale: self.scale,
+                subpixelPositioning: self.subpixelPositioning
             )
 
             marker.popup = self.popup

@@ -29,11 +29,15 @@ struct MTMarkerTests {
         marker.rotation = 30.0
         marker.rotationAlignment = .map
         marker.pitchAlignment = .viewport
+        marker.scale = 1.25
+        marker.subpixelPositioning = false
 
         let jsString = AddMarker(marker: marker).toJS()
 
         #expect(jsString.contains("anchor: '\(marker.anchor.rawValue)'"))
         #expect(jsString.contains("offset: [\(marker.offset), \(marker.offset)]"))
+        #expect(jsString.contains("scale: \(marker.scale)"))
+        #expect(jsString.contains("subpixelPositioning: \(marker.subpixelPositioning)"))
         #expect(jsString.contains("opacity: \(marker.opacity)"))
         #expect(jsString.contains("opacityWhenCovered: \(marker.opacityWhenCovered)"))
         #expect(jsString.contains("rotation: \(marker.rotation)"))
@@ -62,17 +66,23 @@ struct MTMarkerTests {
         markers[0].rotation = 10.0
         markers[0].rotationAlignment = .map
         markers[0].pitchAlignment = .map
+        markers[0].scale = 0.75
+        markers[0].subpixelPositioning = true
         markers[1].opacity = 0.7
         markers[1].opacityWhenCovered = 0.4
         markers[1].rotation = 20.0
         markers[1].rotationAlignment = .viewport
         markers[1].pitchAlignment = .auto
+        markers[1].scale = 1.5
+        markers[1].subpixelPositioning = false
 
         let jsString = AddMarkers(markers: markers, withSingleIcon: image).toJS()
 
         for marker in markers {
             #expect(jsString.contains("anchor: '\(marker.anchor.rawValue)'"))
             #expect(jsString.contains("offset: [\(marker.offset), \(marker.offset)]"))
+            #expect(jsString.contains("scale: \(marker.scale)"))
+            #expect(jsString.contains("subpixelPositioning: \(marker.subpixelPositioning)"))
             #expect(jsString.contains("opacity: \(marker.opacity)"))
             #expect(jsString.contains("opacityWhenCovered: \(marker.opacityWhenCovered)"))
             #expect(jsString.contains("rotation: \(marker.rotation)"))
@@ -104,17 +114,23 @@ struct MTMarkerTests {
         markers[0].rotation = 15.0
         markers[0].rotationAlignment = .auto
         markers[0].pitchAlignment = .viewport
+        markers[0].scale = 1.1
+        markers[0].subpixelPositioning = true
         markers[1].opacity = 0.8
         markers[1].opacityWhenCovered = 0.45
         markers[1].rotation = 25.0
         markers[1].rotationAlignment = .map
         markers[1].pitchAlignment = .map
+        markers[1].scale = 0.9
+        markers[1].subpixelPositioning = false
 
         let jsString = AddMarkers(markers: markers, withSingleIcon: nil).toJS()
 
         for marker in markers {
             #expect(jsString.contains("anchor: '\(marker.anchor.rawValue)'"))
             #expect(jsString.contains("offset: [\(marker.offset), \(marker.offset)]"))
+            #expect(jsString.contains("scale: \(marker.scale)"))
+            #expect(jsString.contains("subpixelPositioning: \(marker.subpixelPositioning)"))
             #expect(jsString.contains("opacity: \(marker.opacity)"))
             #expect(jsString.contains("opacityWhenCovered: \(marker.opacityWhenCovered)"))
             #expect(jsString.contains("rotation: \(marker.rotation)"))

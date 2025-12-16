@@ -25,6 +25,8 @@ package struct AddMarker: MTCommand {
             "draggable: \(marker.draggable ?? false)",
             "anchor: '\(marker.anchor.rawValue)'",
             "offset: [\(marker.offset), \(marker.offset)]",
+            "scale: \(marker.scale)",
+            "subpixelPositioning: \(marker.subpixelPositioning)",
             "rotation: \(marker.rotation)",
             "rotationAlignment: '\(marker.rotationAlignment.rawValue)'",
             "pitchAlignment: '\(marker.pitchAlignment.rawValue)'"

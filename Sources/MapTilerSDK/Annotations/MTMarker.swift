@@ -694,11 +694,13 @@ extension MTMarker {
 
 extension MTMarker: MTMapViewContentDelegate {
     package func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
-        if event == .isDragging {
-            if let data = data, let coordinates = data.coordinate {
-                self.coordinates = coordinates
-                annotationView?.setCoordinates(self.coordinates, in: mapView)
+        if event == .isDragging || event == .dragDidStart || event == .dragDidEnd {
+            guard data?.id == identifier, let coordinates = data?.coordinate else {
+                return
             }
+
+            self.coordinates = coordinates
+            annotationView?.setCoordinates(self.coordinates, in: mapView)
         } else if event == .didTap {
             if let tapCoordinate = data?.coordinate {
                 Task {

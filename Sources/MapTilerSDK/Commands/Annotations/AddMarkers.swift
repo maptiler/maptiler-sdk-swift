@@ -62,6 +62,8 @@ package struct AddMarkers: MTCommand {
                     \(marker.identifier)
                     .setLngLat([\(marker.coordinates.longitude), \(marker.coordinates.latitude)])
                     .addTo(\(MTBridge.mapObject));
+
+                    \(markerDragEventHandlers(for: marker))
             """
                 jsString.append("\n")
                 jsString.append(markerJS)
@@ -105,6 +107,7 @@ package struct AddMarkers: MTCommand {
         \(marker.identifier)
         .setLngLat([\(coordinates.lng), \(coordinates.lat)])
         .addTo(\(MTBridge.mapObject));
+        \(markerDragEventHandlers(for: marker))
         """
         }
 

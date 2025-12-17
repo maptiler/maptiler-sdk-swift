@@ -32,23 +32,6 @@ package struct AddMarker: MTCommand {
             "pitchAlignment: '\(marker.pitchAlignment.rawValue)'"
         ]
 
-        let drag = """
-            function onDrag() {
-                var markerCoord = \(marker.identifier).getLngLat();
-                var data = {
-                    id: '\(marker.identifier)',
-                    lngLat: markerCoord
-                };
-
-                window.webkit.messageHandlers.mapHandler.postMessage({
-                    event: 'drag',
-                    data: data
-                });
-            };
-
-            \(marker.identifier).on('drag', onDrag);
-        """
-
         if let popup = marker.popup {
             popupAttachment = """
                 const \(popup.identifier) = new maptilersdk.Popup({ offset: \(popup.offset ?? 0) });
@@ -90,7 +73,28 @@ package struct AddMarker: MTCommand {
             .setLngLat([\(coordinates.lng), \(coordinates.lat)])
             .addTo(\(MTBridge.mapObject));
 
-            \(drag)
+            \(markerDragEventHandlers(for: marker))
             """
     }
+}
+
+package func markerDragEventHandlers(for marker: MTMarker) -> String {
+    """
+        const postDragEvent\(marker.identifier) = (eventName) => {
+            var markerCoord = \(marker.identifier).getLngLat();
+            var data = {
+                id: '\(marker.identifier)',
+                lngLat: markerCoord
+            };
+
+            window.webkit.messageHandlers.mapHandler.postMessage({
+                event: eventName,
+                data: data
+            });
+        };
+
+        \(marker.identifier).on('drag', () => postDragEvent\(marker.identifier)('drag'));
+        \(marker.identifier).on('dragstart', () => postDragEvent\(marker.identifier)('dragstart'));
+        \(marker.identifier).on('dragend', () => postDragEvent\(marker.identifier)('dragend'));
+    """
 }

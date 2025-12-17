@@ -243,6 +243,90 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     }
 }
 
+// Setters
+extension MTMarker {
+    /// Sets whether the marker is draggable.
+    /// - Parameters:
+    ///   - draggable: Boolean indicating whether the marker should be draggable.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setDraggable(
+        _ draggable: Bool,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.draggable = draggable
+
+        mapView.setDraggable(draggable, to: self, completionHandler: completionHandler)
+    }
+
+    /// Sets the offset distance from the marker's anchor.
+    /// - Parameters:
+    ///   - offset: Pixel offset applied on both axes.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setOffset(
+        _ offset: Double,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.offset = offset
+
+        mapView.setOffset(offset, to: self, completionHandler: completionHandler)
+    }
+
+    /// Sets the rotation of the marker in degrees.
+    /// - Parameters:
+    ///   - rotation: Rotation in degrees.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setRotation(
+        _ rotation: Double,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.rotation = rotation
+
+        mapView.setRotation(rotation, to: self, completionHandler: completionHandler)
+    }
+
+    /// Sets the rotation alignment of the marker.
+    /// - Parameters:
+    ///   - alignment: Rotation alignment relative to map or viewport.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setRotationAlignment(
+        _ alignment: MTMarkerRotationAlignment,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.rotationAlignment = alignment
+
+        mapView.setRotationAlignment(alignment, to: self, completionHandler: completionHandler)
+    }
+
+    /// Toggles the popup bound to the marker.
+    /// - Parameters:
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func togglePopup(
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.togglePopup(for: self, completionHandler: completionHandler)
+    }
+}
+
 // Getters
 extension MTMarker {
     /// Returns current coordinates of the marker.
@@ -396,6 +480,77 @@ extension MTMarker {
 
         await withCheckedContinuation { continuation in
             setCoordinates(coordinates, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets whether the marker is draggable.
+    /// - Parameters:
+    ///   - draggable: Boolean indicating whether the marker should be draggable.
+    ///   - mapView: Map view to apply to.
+    @MainActor
+    public func setDraggable(_ draggable: Bool, in mapView: MTMapView) async {
+        self.draggable = draggable
+
+        await withCheckedContinuation { continuation in
+            setDraggable(draggable, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the offset distance from the marker's anchor.
+    /// - Parameters:
+    ///   - offset: Pixel offset applied on both axes.
+    ///   - mapView: Map view to apply to.
+    @MainActor
+    public func setOffset(_ offset: Double, in mapView: MTMapView) async {
+        self.offset = offset
+
+        await withCheckedContinuation { continuation in
+            setOffset(offset, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the rotation of the marker in degrees.
+    /// - Parameters:
+    ///   - rotation: Rotation in degrees.
+    ///   - mapView: Map view to apply to.
+    @MainActor
+    public func setRotation(_ rotation: Double, in mapView: MTMapView) async {
+        self.rotation = rotation
+
+        await withCheckedContinuation { continuation in
+            setRotation(rotation, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the rotation alignment of the marker.
+    /// - Parameters:
+    ///   - alignment: Rotation alignment relative to map or viewport.
+    ///   - mapView: Map view to apply to.
+    @MainActor
+    public func setRotationAlignment(_ alignment: MTMarkerRotationAlignment, in mapView: MTMapView) async {
+        self.rotationAlignment = alignment
+
+        await withCheckedContinuation { continuation in
+            setRotationAlignment(alignment, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Toggles the popup bound to the marker.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func togglePopup(in mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            togglePopup(in: mapView) { _ in
                 continuation.resume()
             }
         }

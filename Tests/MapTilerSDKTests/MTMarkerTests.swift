@@ -149,4 +149,20 @@ struct MTMarkerTests {
         #expect(GetMarkerOffset(marker: marker).toJS() == "\(marker.identifier).getOffset().x;")
         #expect(IsMarkerDraggable(marker: marker).toJS() == "\(marker.identifier).isDraggable();")
     }
+
+    @Test func markerSetterCommands_matchExpectedJS() async throws {
+        let marker = MTMarker(coordinates: coordinate, draggable: true, anchor: .top, offset: 5.0)
+
+        let draggableJS = SetMarkerDraggable(marker: marker, draggable: false).toJS()
+        let offsetJS = SetMarkerOffset(marker: marker, offset: 12.0).toJS()
+        let rotationJS = SetMarkerRotation(marker: marker, rotation: 15.5).toJS()
+        let alignmentJS = SetMarkerRotationAlignment(marker: marker, alignment: .map).toJS()
+        let togglePopupJS = ToggleMarkerPopup(marker: marker).toJS()
+
+        #expect(draggableJS == "\(marker.identifier).setDraggable(false);")
+        #expect(offsetJS == "\(marker.identifier).setOffset([12.0, 12.0]);")
+        #expect(rotationJS == "\(marker.identifier).setRotation(15.5);")
+        #expect(alignmentJS == "\(marker.identifier).setRotationAlignment('\(MTMarkerRotationAlignment.map.rawValue)');")
+        #expect(togglePopupJS == "\(marker.identifier).togglePopup();")
+    }
 }

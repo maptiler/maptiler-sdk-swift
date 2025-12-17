@@ -45,6 +45,28 @@ struct MTMarkerTests {
         #expect(jsString.contains("pitchAlignment: '\(marker.pitchAlignment.rawValue)'"))
     }
 
+    @Test func addMarkerCommand_registersDragEvents() async throws {
+        let marker = MTMarker(
+            coordinates: coordinate,
+            color: .red,
+            icon: nil,
+            draggable: true,
+            anchor: .bottomLeft,
+            offset: 8.0,
+            opacity: 0.6,
+            opacityWhenCovered: 0.3
+        )
+
+        let jsString = AddMarker(marker: marker).toJS()
+
+        #expect(jsString.contains("id: '\(marker.identifier)'"))
+        #expect(jsString.contains("postDragEvent\(marker.identifier)('drag')"))
+        #expect(jsString.contains("postDragEvent\(marker.identifier)('dragstart')"))
+        #expect(jsString.contains("postDragEvent\(marker.identifier)('dragend')"))
+        #expect(jsString.contains("event: 'dragstart'"))
+        #expect(jsString.contains("event: 'dragend'"))
+    }
+
     @Test func addMarkersCommand_includesAnchorAndOffsetForSharedIcon() async throws {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 2, height: 2))
         let image = renderer.image { context in
@@ -88,6 +110,8 @@ struct MTMarkerTests {
             #expect(jsString.contains("rotation: \(marker.rotation)"))
             #expect(jsString.contains("rotationAlignment: '\(marker.rotationAlignment.rawValue)'"))
             #expect(jsString.contains("pitchAlignment: '\(marker.pitchAlignment.rawValue)'"))
+            #expect(jsString.contains("postDragEvent\(marker.identifier)('dragstart')"))
+            #expect(jsString.contains("postDragEvent\(marker.identifier)('dragend')"))
         }
     }
 
@@ -136,6 +160,8 @@ struct MTMarkerTests {
             #expect(jsString.contains("rotation: \(marker.rotation)"))
             #expect(jsString.contains("rotationAlignment: '\(marker.rotationAlignment.rawValue)'"))
             #expect(jsString.contains("pitchAlignment: '\(marker.pitchAlignment.rawValue)'"))
+            #expect(jsString.contains("postDragEvent\(marker.identifier)('dragstart')"))
+            #expect(jsString.contains("postDragEvent\(marker.identifier)('dragend')"))
         }
     }
 

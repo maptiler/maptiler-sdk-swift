@@ -512,6 +512,45 @@ extension MTMapView: MTStylable {
         )
     }
 
+    package func setDraggable(
+        _ draggable: Bool,
+        to marker: MTMarker,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetMarkerDraggable(marker: marker, draggable: draggable), completion: completionHandler)
+    }
+
+    package func setOffset(
+        _ offset: Double,
+        to marker: MTMarker,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetMarkerOffset(marker: marker, offset: offset), completion: completionHandler)
+    }
+
+    package func setRotation(
+        _ rotation: Double,
+        to marker: MTMarker,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetMarkerRotation(marker: marker, rotation: rotation), completion: completionHandler)
+    }
+
+    package func setRotationAlignment(
+        _ alignment: MTMarkerRotationAlignment,
+        to marker: MTMarker,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetMarkerRotationAlignment(marker: marker, alignment: alignment), completion: completionHandler)
+    }
+
+    package func togglePopup(
+        for marker: MTMarker,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(ToggleMarkerPopup(marker: marker), completion: completionHandler)
+    }
+
     package func setCoordinatesTo(_ marker: MTMarker, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetCoordinatesToMarker(marker: marker), completion: completionHandler)
     }

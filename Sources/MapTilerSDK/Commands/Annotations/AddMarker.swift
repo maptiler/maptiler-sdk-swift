@@ -87,10 +87,22 @@ package func markerDragEventHandlers(for marker: MTMarker) -> String {
                 lngLat: markerCoord
             };
 
-            window.webkit.messageHandlers.mapHandler.postMessage({
-                event: eventName,
-                data: data
-            });
+            if (eventName === 'dragstart') {
+                window.webkit.messageHandlers.mapHandler.postMessage({
+                    event: 'dragstart',
+                    data: data
+                });
+            } else if (eventName === 'dragend') {
+                window.webkit.messageHandlers.mapHandler.postMessage({
+                    event: 'dragend',
+                    data: data
+                });
+            } else {
+                window.webkit.messageHandlers.mapHandler.postMessage({
+                    event: eventName,
+                    data: data
+                });
+            }
         };
 
         \(marker.identifier).on('drag', () => postDragEvent\(marker.identifier)('drag'));

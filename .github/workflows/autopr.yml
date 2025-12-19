@@ -82,6 +82,11 @@ jobs:
         DESC_CLEANED=$(echo "${{ github.event.inputs.issue_description }}" | tr '\n' ' ' | sed 's/\"/'\''/g')
         echo "DESC=$DESC_CLEANED"                                    >> $GITHUB_ENV
         echo "BRANCH=${{ github.event.inputs.issue_key }}"     >> $GITHUB_ENV
+        {
+          echo 'DESC_MD<<EOF'
+          printf '%s\n' "${{ github.event.inputs.issue_description }}"
+          echo EOF
+        } >> "$GITHUB_ENV"
 
     # Symlink agents file to the root
 
@@ -137,7 +142,7 @@ jobs:
           **${{ env.ISSUE_KEY }}**
 
           ## Objective
-          **${{ env.DESC }}**.
+          ${{ env.DESC_MD }}
 
           ## Description
           **${{ env.TITLE }}**.

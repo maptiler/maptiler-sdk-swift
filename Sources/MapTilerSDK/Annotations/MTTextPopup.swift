@@ -25,7 +25,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// The pixel distance from the popup's coordinates.
     public private(set) var offset: Double? = 0.0
 
-    /// The maximum width of the popup in CSS pixels.
+    /// The maximum width of the popup in pixels.
     public private(set) var maxWidth: Double?
 
     /// Boolean value indicating whether the popup is currently open on the map.

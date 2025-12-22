@@ -45,4 +45,21 @@ struct MTTextPopupTests {
         #expect(GetTextPopupCoordinates(popup: popup).toJS() == "\(popup.identifier).getLngLat();")
         #expect(IsTextPopupOpen(popup: popup).toJS() == "\(popup.identifier).isOpen();")
     }
+
+    @Test func textPopupSetterCommands_matchExpectedJS() async throws {
+        let popup = MTTextPopup(coordinates: coordinate, text: "O'Brien")
+
+        #expect(SetCoordinatesToTextPopup(popup: popup).toJS() == "\(popup.identifier).setLngLat([20.0, 10.0]);")
+        #expect(SetMaxWidthToTextPopup(popup: popup, maxWidth: 240).toJS() == "\(popup.identifier).setMaxWidth(240.0);")
+        #expect(SetOffsetToTextPopup(popup: popup, offset: 8).toJS() == "\(popup.identifier).setOffset(8.0);")
+        #expect(
+            SetSubpixelPositioningToTextPopup(popup: popup, isEnabled: true).toJS()
+                == "\(popup.identifier).setSubpixelPositioning(true);"
+        )
+        #expect(
+            SetTextToTextPopup(popup: popup, text: popup.text).toJS()
+                == "\(popup.identifier).setText('O\\'Brien');"
+        )
+        #expect(TrackTextPopupPointer(popup: popup).toJS() == "\(popup.identifier).trackPointer();")
+    }
 }

@@ -559,6 +559,48 @@ extension MTMapView: MTStylable {
         runCommand(SetCoordinatesToTextPopup(popup: popup), completion: completionHandler)
     }
 
+    package func setMaxWidth(
+        _ maxWidth: Double,
+        to popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetMaxWidthToTextPopup(popup: popup, maxWidth: maxWidth), completion: completionHandler)
+    }
+
+    package func setOffset(
+        _ offset: Double,
+        to popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetOffsetToTextPopup(popup: popup, offset: offset), completion: completionHandler)
+    }
+
+    package func setSubpixelPositioning(
+        _ isEnabled: Bool,
+        for popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            SetSubpixelPositioningToTextPopup(popup: popup, isEnabled: isEnabled),
+            completion: completionHandler
+        )
+    }
+
+    package func setText(
+        _ text: String,
+        to popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetTextToTextPopup(popup: popup, text: text), completion: completionHandler)
+    }
+
+    package func trackPointer(
+        for popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(TrackTextPopupPointer(popup: popup), completion: completionHandler)
+    }
+
     package func setURL(url: URL, to source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetUrlToSource(url: url, source: source), completion: completionHandler)
     }

@@ -28,6 +28,12 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// The maximum width of the popup in pixels.
     public private(set) var maxWidth: Double?
 
+    /// Boolean value indicating whether the popup uses subpixel positioning.
+    public private(set) var isSubpixelPositioningEnabled: Bool = false
+
+    /// Boolean value indicating whether the popup is tracking the pointer.
+    public private(set) var isTrackingPointer: Bool = false
+
     /// Boolean value indicating whether the popup is currently open on the map.
     public private(set) var isOpen: Bool = false
 
@@ -65,6 +71,104 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.coordinates = coordinates
 
         mapView.setCoordinatesTo(self, completionHandler: completionHandler)
+    }
+
+    /// Sets coordinates for the popup.
+    /// - Parameters:
+    ///    - coordinates: Position of the popup.
+    ///    - mapView: Map view to apply to.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setLngLat(
+        _ coordinates: CLLocationCoordinate2D,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        setCoordinates(coordinates, in: mapView, completionHandler: completionHandler)
+    }
+
+    /// Sets the maximum width of the popup in pixels.
+    /// - Parameters:
+    ///   - maxWidth: Maximum width in pixels.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setMaxWidth(
+        _ maxWidth: Double,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.maxWidth = maxWidth
+
+        mapView.setMaxWidth(maxWidth, to: self, completionHandler: completionHandler)
+    }
+
+    /// Sets the pixel offset distance from the popup's anchor coordinate.
+    /// - Parameters:
+    ///   - offset: Pixel offset applied on both axes.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setOffset(
+        _ offset: Double,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.offset = offset
+
+        mapView.setOffset(offset, to: self, completionHandler: completionHandler)
+    }
+
+    /// Enables or disables subpixel positioning for the popup.
+    /// - Parameters:
+    ///   - isEnabled: Boolean indicating whether subpixel positioning is enabled.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setSubpixelPositioning(
+        _ isEnabled: Bool,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        isSubpixelPositioningEnabled = isEnabled
+
+        mapView.setSubpixelPositioning(isEnabled, for: self, completionHandler: completionHandler)
+    }
+
+    /// Updates the popup text content.
+    /// - Parameters:
+    ///   - text: Text content of the popup.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setText(
+        _ text: String,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.text = text
+
+        mapView.setText(text, to: self, completionHandler: completionHandler)
+    }
+
+    /// Enables tracking the pointer position for the popup.
+    /// - Parameters:
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func trackPointer(
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        isTrackingPointer = true
+
+        mapView.trackPointer(for: self, completionHandler: completionHandler)
     }
 }
 
@@ -121,6 +225,78 @@ extension MTTextPopup {
 
         await withCheckedContinuation { continuation in
             setCoordinates(coordinates, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets coordinates for the popup.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setLngLat(_ coordinates: CLLocationCoordinate2D, in mapView: MTMapView) async {
+        await setCoordinates(coordinates, in: mapView)
+    }
+
+    /// Sets the maximum width of the popup in pixels.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setMaxWidth(_ maxWidth: Double, in mapView: MTMapView) async {
+        self.maxWidth = maxWidth
+
+        await withCheckedContinuation { continuation in
+            setMaxWidth(maxWidth, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the pixel offset distance from the popup's anchor coordinate.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setOffset(_ offset: Double, in mapView: MTMapView) async {
+        self.offset = offset
+
+        await withCheckedContinuation { continuation in
+            setOffset(offset, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Enables or disables subpixel positioning for the popup.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setSubpixelPositioning(_ isEnabled: Bool, in mapView: MTMapView) async {
+        isSubpixelPositioningEnabled = isEnabled
+
+        await withCheckedContinuation { continuation in
+            setSubpixelPositioning(isEnabled, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Updates the popup text content.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setText(_ text: String, in mapView: MTMapView) async {
+        self.text = text
+
+        await withCheckedContinuation { continuation in
+            setText(text, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Enables tracking the pointer position for the popup.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func trackPointer(in mapView: MTMapView) async {
+        isTrackingPointer = true
+
+        await withCheckedContinuation { continuation in
+            trackPointer(in: mapView) { _ in
                 continuation.resume()
             }
         }

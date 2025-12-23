@@ -37,6 +37,12 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Boolean value indicating whether the popup is currently open on the map.
     public private(set) var isOpen: Bool = false
 
+    /// Called when the popup opens on the map.
+    public var onOpen: (() -> Void)?
+
+    /// Called when the popup closes from the map.
+    public var onClose: (() -> Void)?
+
     /// Initializes the popup with the specified position and text.
     /// - Parameters:
     ///    - coordinates: Position of the popup.
@@ -170,6 +176,44 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
 
         mapView.trackPointer(for: self, completionHandler: completionHandler)
     }
+
+    /// Opens the popup on the provided map view.
+    /// - Parameters:
+    ///   - mapView: Map view to add the popup to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func open(
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.open(self) { [weak self] result in
+            if case .success = result {
+                self?.isOpen = true
+            }
+
+            completionHandler?(result)
+        }
+    }
+
+    /// Closes the popup on the provided map view.
+    /// - Parameters:
+    ///   - mapView: Map view to remove the popup from.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func close(
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.close(self) { [weak self] result in
+            if case .success = result {
+                self?.isOpen = false
+            }
+
+            completionHandler?(result)
+        }
+    }
 }
 
 // Getters
@@ -209,6 +253,24 @@ extension MTTextPopup {
             }
 
             completionHandler?(result)
+        }
+    }
+}
+
+// Event handling
+extension MTTextPopup: MTMapViewContentDelegate {
+    package func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
+        guard data?.id == identifier else { return }
+
+        switch event {
+        case .popupDidOpen:
+            isOpen = true
+            onOpen?()
+        case .popupDidClose:
+            isOpen = false
+            onClose?()
+        default:
+            break
         }
     }
 }
@@ -297,6 +359,28 @@ extension MTTextPopup {
 
         await withCheckedContinuation { continuation in
             trackPointer(in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Opens the popup on the provided map view.
+    /// - Parameter mapView: Map view to add the popup to.
+    @MainActor
+    public func open(in mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            open(in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Closes the popup on the provided map view.
+    /// - Parameter mapView: Map view to remove the popup from.
+    @MainActor
+    public func close(in mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            close(in: mapView) { _ in
                 continuation.resume()
             }
         }

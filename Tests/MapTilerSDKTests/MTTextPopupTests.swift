@@ -46,6 +46,13 @@ struct MTTextPopupTests {
         #expect(IsTextPopupOpen(popup: popup).toJS() == "\(popup.identifier).isOpen();")
     }
 
+    @Test func textPopupLifecycleCommands_matchExpectedJS() async throws {
+        let popup = MTTextPopup(coordinates: coordinate, text: "Hello World")
+
+        #expect(OpenTextPopup(popup: popup).toJS() == "\(popup.identifier).addTo(\(MTBridge.mapObject));")
+        #expect(CloseTextPopup(popup: popup).toJS() == "\(popup.identifier).remove();")
+    }
+
     @Test func textPopupSetterCommands_matchExpectedJS() async throws {
         let popup = MTTextPopup(coordinates: coordinate, text: "O'Brien")
 

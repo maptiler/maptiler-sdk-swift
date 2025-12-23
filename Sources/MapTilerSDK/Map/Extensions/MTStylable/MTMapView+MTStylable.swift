@@ -214,6 +214,8 @@ extension MTMapView: MTStylable {
     ///    - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addTextPopup(_ popup: MTTextPopup, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        // Register for popup events before adding to map
+        addContentDelegate(popup)
         runCommand(AddTextPopup(popup: popup), completion: completionHandler)
     }
 
@@ -599,6 +601,20 @@ extension MTMapView: MTStylable {
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(TrackTextPopupPointer(popup: popup), completion: completionHandler)
+    }
+
+    package func open(
+        _ popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(OpenTextPopup(popup: popup), completion: completionHandler)
+    }
+
+    package func close(
+        _ popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(CloseTextPopup(popup: popup), completion: completionHandler)
     }
 
     package func setURL(url: URL, to source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {

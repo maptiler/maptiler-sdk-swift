@@ -601,6 +601,20 @@ extension MTMapView: MTStylable {
         runCommand(TrackTextPopupPointer(popup: popup), completion: completionHandler)
     }
 
+    package func open(
+        _ popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(OpenTextPopup(popup: popup), completion: completionHandler)
+    }
+
+    package func close(
+        _ popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(CloseTextPopup(popup: popup), completion: completionHandler)
+    }
+
     package func setURL(url: URL, to source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetUrlToSource(url: url, source: source), completion: completionHandler)
     }

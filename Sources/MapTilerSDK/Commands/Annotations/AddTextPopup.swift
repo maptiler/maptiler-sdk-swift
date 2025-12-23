@@ -41,6 +41,17 @@ package struct AddTextPopup: MTCommand {
             .setLngLat([\(coordinates.lng), \(coordinates.lat)])
             .setText('\(popup.text)')
             .addTo(\(MTBridge.mapObject));
+
+            // Bridge popup open/close events to Swift
+            const postPopupEvent\(popup.identifier) = (eventName) => {
+                window.webkit.messageHandlers.mapHandler.postMessage({
+                    event: eventName,
+                    data: { id: '\(popup.identifier)' }
+                });
+            };
+
+            \(popup.identifier).on('open', () => postPopupEvent\(popup.identifier)('open'));
+            \(popup.identifier).on('close', () => postPopupEvent\(popup.identifier)('close'));
             """
     }
 }

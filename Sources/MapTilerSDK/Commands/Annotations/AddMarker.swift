@@ -38,6 +38,17 @@ package struct AddMarker: MTCommand {
 
                 \(popup.identifier)
                 .setText('\(popup.text)')
+
+                // Bridge popup open/close events to Swift for marker-attached popup
+                const postPopupEvent\(popup.identifier) = (eventName) => {
+                    window.webkit.messageHandlers.mapHandler.postMessage({
+                        event: eventName,
+                        data: { id: '\(popup.identifier)' }
+                    });
+                };
+
+                \(popup.identifier).on('open', () => postPopupEvent\(popup.identifier)('open'));
+                \(popup.identifier).on('close', () => postPopupEvent\(popup.identifier)('close'));
                 """
         }
 

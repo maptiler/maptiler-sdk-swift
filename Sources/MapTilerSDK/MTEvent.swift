@@ -9,6 +9,12 @@
 
 /// Events triggered by the SDK
 public enum MTEvent: String {
+    /// Triggered when a popup has been opened and added to the map.
+    case popupDidOpen = "open"
+
+    /// Triggered when a popup has been closed and removed from the map.
+    case popupDidClose = "close"
+
     /// Triggered when the user cancels a "box zoom" interaction,
     /// or when the bounding box does not meet the minimum size threshold.
     case boxZoomDidCancel = "boxzoomcancel"

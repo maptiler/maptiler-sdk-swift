@@ -1,0 +1,166 @@
+name: PR Tests and Auto-Fix
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-autofix-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Run Swift tests
+    if: ${{ github.event.pull_request.user.login == 'github-actions[bot]' }}
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Up Swift
+        uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
+        with:
+          xcode-version: '16.2'
+
+      - name: Select Xcode
+        run: sudo xcode-select --switch /Applications/Xcode_16.2.app
+
+      - name: Verify Swift Version
+        run: swift --version
+
+      - name: Verify Xcode version
+        run: xcodebuild -version
+
+      - name: Verify Active Swift Toolchain version
+        run: xcrun swift -version
+
+      - id: tests
+        name: Run tests (capture log)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 2>&1 | tee xcodebuild-test.log
+
+      - name: Upload test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-test-log
+          path: xcodebuild-test.log
+
+      - name: Fail job if tests failed
+        if: ${{ steps.tests.outcome == 'failure' }}
+        run: |
+          echo "Tests failed; marking job as failed to trigger fix job."
+          exit 1
+
+  autofix:
+    name: Run Codex auto-fix on failures
+    needs: test
+    if: ${{ needs.test.result == 'failure' && github.event.pull_request.user.login == 'github-actions[bot]' }}
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout PR head branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Set Up Swift
+        uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
+        with:
+          xcode-version: '16.2'
+
+      - name: Select Xcode
+        run: sudo xcode-select --switch /Applications/Xcode_16.2.app
+
+      - name: Verify Swift Version
+        run: swift --version
+
+      - name: Verify Xcode version
+        run: xcodebuild -version
+
+      - name: Verify Active Swift Toolchain version
+        run: xcrun swift -version
+
+      - name: Download failing test log
+        uses: actions/download-artifact@v4
+        with:
+          name: xcode-test-log
+          path: .
+
+      - id: failure_excerpt
+        name: Prepare failure excerpt for prompt
+        run: |
+          # Extract a concise failure summary to keep prompt focused
+          {
+            echo 'FAILURE_EXCERPT<<EOF'
+            if command -v gsed >/dev/null 2>&1; then SED=gsed; else SED=sed; fi
+            # Try to capture failing tests sections and error lines; fallback to last 400 lines
+            (grep -E "(\b(error|failed|Failing tests)\b)" -n xcodebuild-test.log || tail -n 400 xcodebuild-test.log) | $SED -e 's/\r$//'
+            echo EOF
+          } >> "$GITHUB_ENV"
+
+      - name: Configure Git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - id: guard
+        name: Guard against repeated auto-fix attempts
+        run: |
+          if git log --oneline -n 100 | grep -qi 'codex auto-fix for failing tests'; then
+            echo "already=true" >> $GITHUB_OUTPUT
+            echo "Previous auto-fix attempt detected; skipping Codex run."
+          else
+            echo "already=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Codex Action
+        if: ${{ steps.guard.outputs.already == 'false' }}
+        uses: openai/codex-action@v1
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt: |
+            Swift tests failed on this PR. Analyze the failure log and make minimal, high-quality code changes that fix the issues while preserving intended behavior and style. Re-run tests locally if needed before finalizing.
+
+            Constraints:
+            - Only modify code relevant to the failures.
+            - Keep changes small and focused.
+            - Maintain SwiftLint style; prefer idiomatic Swift.
+            - Do not alter unrelated workflows or config.
+
+            Failure log excerpt:
+            ${{ env.FAILURE_EXCERPT }}
+
+      - name: SwiftLint fix
+        if: ${{ steps.guard.outputs.already == 'false' }}
+        run: swiftlint --fix --quiet || true
+
+      - name: Commit changes if any
+        if: ${{ steps.guard.outputs.already == 'false' }}
+        run: |
+          git add -A
+          git commit -m "ci: codex auto-fix for failing tests" || echo "No changes to commit"
+
+      - name: Push changes to PR branch
+        if: ${{ steps.guard.outputs.already == 'false' }}
+        run: |
+          # Only push if there are new commits
+          if [ -n "$(git log origin/${{ github.event.pull_request.head.ref }}..HEAD)" ]; then
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          else
+            echo "No changes to push"
+          fi

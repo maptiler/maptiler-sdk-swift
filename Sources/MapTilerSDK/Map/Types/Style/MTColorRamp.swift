@@ -654,7 +654,7 @@ private extension MTColorRamp {
         return json
     }
 
-    func executeWithCompletion<T>(
+    func executeWithCompletion<T: Sendable>(
         _ operation: @escaping () async throws -> T,
         completion: ((Result<T, MTError>) -> Void)?
     ) {

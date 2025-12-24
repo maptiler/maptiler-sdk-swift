@@ -124,9 +124,10 @@ jobs:
       - id: guard
         name: Guard against repeated auto-fix attempts
         run: |
-          if git log --oneline -n 100 | grep -qi 'codex auto-fix for failing tests'; then
+          last_msg="$(git log -1 --pretty=%s)"
+          if echo "$last_msg" | grep -qi '^ci: codex auto-fix for failing tests'; then
             echo "already=true" >> $GITHUB_OUTPUT
-            echo "Previous auto-fix attempt detected; skipping Codex run."
+            echo "Most recent commit is an auto-fix; skipping Codex run."
           else
             echo "already=false" >> $GITHUB_OUTPUT
           fi

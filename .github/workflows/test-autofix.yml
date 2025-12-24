@@ -63,8 +63,9 @@ jobs:
   autofix:
     name: Run Codex auto-fix on failures
     needs: test
-    # Only attempt auto-fix on bot-authored PRs to ensure we can push back
-    if: ${{ needs.test.result == 'failure' && (github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]') }}
+    # Only attempt auto-fix on bot-authored PRs to ensure we can push back.
+    # Use always() so this job still evaluates even if the test job fails.
+    if: ${{ always() && needs.test.result == 'failure' && (github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]') }}
     runs-on: macos-latest
 
     steps:

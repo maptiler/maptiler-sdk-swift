@@ -15,7 +15,8 @@ concurrency:
 jobs:
   test:
     name: Run Swift tests
-    if: ${{ github.event.pull_request.user.login == 'github-actions[bot]' }}
+    # Run only for bot-authored PRs (more robust than checking a specific login)
+    if: ${{ github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]' }}
     runs-on: macos-latest
 
     steps:
@@ -62,7 +63,8 @@ jobs:
   autofix:
     name: Run Codex auto-fix on failures
     needs: test
-    if: ${{ needs.test.result == 'failure' && github.event.pull_request.user.login == 'github-actions[bot]' }}
+    # Only attempt auto-fix on bot-authored PRs to ensure we can push back
+    if: ${{ needs.test.result == 'failure' && (github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]') }}
     runs-on: macos-latest
 
     steps:

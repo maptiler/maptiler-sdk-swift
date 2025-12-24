@@ -662,7 +662,7 @@ private extension MTColorRamp {
             return
         }
 
-        Task {
+        Task { @MainActor in
             do {
                 completion(.success(try await operation()))
             } catch let error as MTError {

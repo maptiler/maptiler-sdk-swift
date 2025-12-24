@@ -54,18 +54,22 @@ jobs:
           name: xcode-test-log
           path: xcodebuild-test.log
 
-      - name: Fail job if tests failed
-        if: ${{ steps.tests.outcome == 'failure' }}
+      - id: set_status
+        name: Set job output if tests failed
         run: |
-          echo "Tests failed; marking job as failed to trigger fix job."
-          exit 1
+          if [ "${{ steps.tests.outcome }}" = "failure" ]; then
+            echo "tests_failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tests_failed=false" >> "$GITHUB_OUTPUT"
+          fi
+    outputs:
+      tests_failed: ${{ steps.set_status.outputs.tests_failed }}
 
   autofix:
     name: Run Codex auto-fix on failures
     needs: test
-    # Only attempt auto-fix on bot-authored PRs to ensure we can push back.
-    # Use always() so this job still evaluates even if the test job fails.
-    if: ${{ always() && needs.test.result == 'failure' && (github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]') }}
+    # Only attempt auto-fix when tests_failed output is true and PR is bot-authored
+    if: ${{ needs.test.outputs.tests_failed == 'true' && (github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]') }}
     runs-on: macos-latest
 
     steps:

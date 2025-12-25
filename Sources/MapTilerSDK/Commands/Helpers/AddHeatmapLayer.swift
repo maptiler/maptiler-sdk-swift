@@ -3,14 +3,14 @@
 // All rights reserved.
 // SPDX-License-Identifier: BSD 3-Clause
 //
-//  AddPointLayer.swift
+//  AddHeatmapLayer.swift
 //  MapTilerSDK
 //
 
 import Foundation
 
-package struct AddPointLayer: MTCommand {
-    var options: MTPointLayerOptions
+package struct AddHeatmapLayer: MTCommand {
+    var options: MTHeatmapLayerOptions
     var colorRampIdentifier: String?
 
     package func toJS() -> JSString {
@@ -22,15 +22,15 @@ package struct AddPointLayer: MTCommand {
             return """
             (() => {
                 const opts = \(optionsString);
-                opts.pointColor = window.\(colorRampIdentifier) ?? opts.pointColor;
-                \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), opts);
+                opts.colorRamp = window.\(colorRampIdentifier) ?? opts.colorRamp;
+                \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), opts);
                 return "";
             })();
             """
         } else {
             return """
             (() => {
-                \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), \(optionsString));
+                \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), \(optionsString));
                 return "";
             })();
             """

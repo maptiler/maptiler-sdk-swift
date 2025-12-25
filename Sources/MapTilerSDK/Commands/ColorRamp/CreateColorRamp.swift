@@ -20,7 +20,7 @@ package struct CreateColorRamp: MTCommand {
                 window.\(identifier) = new \(MTBridge.sdkObject).ColorRamp(\(optionsJSON));
             }
 
-            return null;
+            return "";
         })();
         """
     }
@@ -38,7 +38,7 @@ package struct CreateColorRampFromPreset: MTCommand {
                 window.\(identifier) = base ? base.clone() : null;
             }
 
-            return null;
+            return "";
         })();
         """
     }
@@ -55,7 +55,7 @@ package struct CreateColorRampFromArrayDefinition: MTCommand {
                 window.\(identifier) = \(MTBridge.sdkObject).ColorRamp.fromArrayDefinition(\(definitionJSON));
             }
 
-            return null;
+            return "";
         })();
         """
     }

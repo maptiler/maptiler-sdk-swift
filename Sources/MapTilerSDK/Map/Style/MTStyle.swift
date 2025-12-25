@@ -722,7 +722,7 @@ extension MTStyle {
         _ options: MTPointLayerOptions,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        mapView.runCommand(AddPointLayer(options: options), completion: completionHandler)
+        mapView.runCommand(AddPointLayer(options: options, colorRampIdentifier: nil), completion: completionHandler)
     }
 }
 
@@ -731,6 +731,89 @@ extension MTStyle {
     internal func addPointLayer(_ options: MTPointLayerOptions) async {
         await withCheckedContinuation { continuation in
             addPointLayer(options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+}
+
+// MARK: - Helpers: Point layer with ColorRamp
+extension MTStyle {
+    // Deprecated completion-based variant that sets a ColorRamp as pointColor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    internal func addPointLayer(
+        _ options: MTPointLayerOptions,
+        colorRamp: MTColorRamp,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        Task { @MainActor in
+            _ = try? await colorRamp.getBounds(in: mapView) // ensure ramp is initialized
+            mapView.runCommand(
+                AddPointLayer(
+                    options: options,
+                    colorRampIdentifier: colorRamp.identifier
+                ),
+                completion: completionHandler
+            )
+        }
+    }
+
+    // Async variant that sets a ColorRamp as pointColor
+    internal func addPointLayer(_ options: MTPointLayerOptions, colorRamp: MTColorRamp, in mapView: MTMapView) async {
+        _ = try? await colorRamp.getBounds(in: mapView) // ensure ramp is initialized
+        await withCheckedContinuation { continuation in
+            self.addPointLayer(options, colorRamp: colorRamp, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+}
+
+// MARK: - Helpers: Heatmap layer
+extension MTStyle {
+    // Deprecated completion-based variant
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    internal func addHeatmapLayer(
+        _ options: MTHeatmapLayerOptions,
+        colorRamp: MTColorRamp? = nil,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        Task { @MainActor in
+            if let colorRamp {
+                _ = try? await colorRamp.getBounds(in: mapView)
+                mapView.runCommand(
+                    AddHeatmapLayer(
+                        options: options,
+                        colorRampIdentifier: colorRamp.identifier
+                    ),
+                    completion: completionHandler
+                )
+            } else {
+                mapView.runCommand(
+                    AddHeatmapLayer(
+                        options: options,
+                        colorRampIdentifier: nil
+                    ),
+                    completion: completionHandler
+                )
+            }
+        }
+    }
+
+    // Async variant
+    internal func addHeatmapLayer(
+        _ options: MTHeatmapLayerOptions,
+        colorRamp: MTColorRamp? = nil,
+        in mapView: MTMapView
+    ) async {
+        if let colorRamp {
+            _ = try? await colorRamp.getBounds(in: mapView)
+        }
+
+        await withCheckedContinuation { continuation in
+            self.addHeatmapLayer(options, colorRamp: colorRamp, in: mapView) { _ in
                 continuation.resume()
             }
         }

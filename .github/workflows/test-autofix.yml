@@ -15,7 +15,8 @@ concurrency:
 jobs:
   test:
     name: Run Swift tests
-    if: ${{ github.event.pull_request.user.login == 'github-actions[bot]' }}
+    # Run only for bot-authored PRs (more robust than checking a specific login)
+    if: ${{ github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]' }}
     runs-on: macos-latest
 
     steps:
@@ -53,16 +54,22 @@ jobs:
           name: xcode-test-log
           path: xcodebuild-test.log
 
-      - name: Fail job if tests failed
-        if: ${{ steps.tests.outcome == 'failure' }}
+      - id: set_status
+        name: Set job output if tests failed
         run: |
-          echo "Tests failed; marking job as failed to trigger fix job."
-          exit 1
+          if [ "${{ steps.tests.outcome }}" = "failure" ]; then
+            echo "tests_failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tests_failed=false" >> "$GITHUB_OUTPUT"
+          fi
+    outputs:
+      tests_failed: ${{ steps.set_status.outputs.tests_failed }}
 
   autofix:
     name: Run Codex auto-fix on failures
     needs: test
-    if: ${{ needs.test.result == 'failure' && github.event.pull_request.user.login == 'github-actions[bot]' }}
+    # Only attempt auto-fix when tests_failed output is true and PR is bot-authored
+    if: ${{ needs.test.outputs.tests_failed == 'true' && (github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]') }}
     runs-on: macos-latest
 
     steps:
@@ -117,9 +124,10 @@ jobs:
       - id: guard
         name: Guard against repeated auto-fix attempts
         run: |
-          if git log --oneline -n 100 | grep -qi 'codex auto-fix for failing tests'; then
+          last_msg="$(git log -1 --pretty=%s)"
+          if echo "$last_msg" | grep -qi '^ci: codex auto-fix for failing tests'; then
             echo "already=true" >> $GITHUB_OUTPUT
-            echo "Previous auto-fix attempt detected; skipping Codex run."
+            echo "Most recent commit is an auto-fix; skipping Codex run."
           else
             echo "already=false" >> $GITHUB_OUTPUT
           fi

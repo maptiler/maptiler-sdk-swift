@@ -29,4 +29,9 @@ public final class MTPointLayerHelper: @unchecked Sendable {
     public func addPoint(_ options: MTPointLayerOptions) async {
         await style.addPointLayer(options)
     }
+
+    /// Adds a point layer using a ColorRamp for pointColor.
+    public func addPoint(_ options: MTPointLayerOptions, colorRamp: MTColorRamp, in mapView: MTMapView) async {
+        await style.addPointLayer(options, colorRamp: colorRamp, in: mapView)
+    }
 }

@@ -71,6 +71,53 @@ struct MTStyleTests {
         #expect(AreTilesLoaded().toJS() == expectedJS)
     }
 
+    @Test func setSkyCommand_shouldMatchJS() async throws {
+        let sky = MTSky(
+            skyColor: .color(MTColor(hex: "#199EF3")),
+            skyHorizonBlend: .number(0.5),
+            horizonColor: .color(MTColor(hex: "#ffffff")),
+            horizonFogBlend: .number(0.5),
+            fogColor: .color(MTColor(hex: "#0000ff")),
+            fogGroundBlend: .number(0.5),
+            atmosphereBlend: .expression([
+                .string("interpolate"),
+                .array([.string("linear")]),
+                .array([.string("zoom")]),
+                .number(0),
+                .number(1),
+                .number(10),
+                .number(1),
+                .number(12),
+                .number(0)
+            ])
+        )
+
+        let command = SetSky(sky: sky, options: MTStyleSetterOptions(shouldValidate: false))
+        let expectedJS =
+            "\(MTBridge.mapObject).setSky({\"atmosphere-blend\":[\"interpolate\",[\"linear\"],[\"zoom\"],0,1,10,1,12,0]," +
+            "\"fog-color\":\"#0000ff\",\"fog-ground-blend\":0.5,\"horizon-color\":\"#ffffff\"," +
+            "\"horizon-fog-blend\":0.5,\"sky-color\":\"#199EF3\",\"sky-horizon-blend\":0.5}," +
+            "{\"shouldValidate\":false});"
+
+        #expect(command.toJS() == expectedJS)
+    }
+
+    @Test func mtSky_shouldClampNumericValues() async throws {
+        let sky = MTSky(
+            skyHorizonBlend: .number(2.2),
+            horizonFogBlend: .number(-0.5),
+            fogGroundBlend: .number(1.5),
+            atmosphereBlend: .number(-1)
+        )
+
+        let skyJSON = sky.toJSON() ?? ""
+
+        #expect(skyJSON.contains("\"sky-horizon-blend\":1"))
+        #expect(skyJSON.contains("\"horizon-fog-blend\":0"))
+        #expect(skyJSON.contains("\"fog-ground-blend\":1"))
+        #expect(skyJSON.contains("\"atmosphere-blend\":0"))
+    }
+
     @Test func addImageCommand_shouldGenerateExpectedJS() async throws {
         let image = Self.makeTestImage()
         let command = AddImage(name: "poi-icon", image: image, options: nil)

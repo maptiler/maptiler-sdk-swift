@@ -10,7 +10,7 @@
 import UIKit
 
 /// Color wrapper.
-public struct MTColor: Sendable, Codable {
+public struct MTColor: Sendable, Codable, Equatable {
     let hex: String
 
     /// CGColor representation of the MTColor.

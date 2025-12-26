@@ -177,6 +177,32 @@ public class MTStyle {
     ) {
         mapView.getName(for: styleVariant, completionHandler: completionHandler)
     }
+
+    // MARK: - Utilities
+    /// Forces a style reload using the current reference style and variant.
+    /// Also reapplies any configured `space` from map options to keep background consistent.
+    /// - Parameters:
+    ///   - completionHandler: Optional completion handler (deprecated; prefer async overload).
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func forceReloadStyle(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        setStyle(referenceStyle, styleVariant: styleVariant) { [weak self] result in
+            // Re-apply space if configured in options.
+            if let space = self?.mapView.options?.space {
+                Task { await self?.mapView.setSpace(space) }
+            }
+            completionHandler?(result)
+        }
+    }
+
+    /// Forces a style reload using the current reference style and variant.
+    /// Also reapplies any configured `space` from map options to keep background consistent.
+    public func forceReloadStyle() async {
+        await withCheckedContinuation { continuation in
+            forceReloadStyle { _ in
+                continuation.resume()
+            }
+        }
+    }
 }
 
 extension MTStyle {

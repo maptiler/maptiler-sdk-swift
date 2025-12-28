@@ -121,12 +121,25 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
         }
 
         Task {
-            await mapView.style?.setStyle(referenceStyle, styleVariant: styleVariant)
+            // Only reset the style if it actually changed; avoid clobbering runtime tweaks like sky.
+            if let style = mapView.style {
+                let needsUpdate = style.referenceStyle != referenceStyle || style.styleVariant != styleVariant
+                if needsUpdate {
+                    await style.setStyle(referenceStyle, styleVariant: styleVariant)
 
-            // Re-apply space after style changes. setStyle() may override space
-            // to transparent when style metadata lacks maptiler.space.
-            if let space = mapView.options?.space {
-                await mapView.setSpace(space)
+                    // Re-apply space after style changes. setStyle() may override space
+                    // to transparent when style metadata lacks maptiler.space.
+                    if let space = mapView.options?.space {
+                        await mapView.setSpace(space)
+                    }
+                }
+            } else {
+                // Fallback: if style proxy not ready yet, request setStyle.
+                await mapView.style?.setStyle(referenceStyle, styleVariant: styleVariant)
+
+                if let space = mapView.options?.space {
+                    await mapView.setSpace(space)
+                }
             }
         }
     }

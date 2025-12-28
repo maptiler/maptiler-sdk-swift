@@ -54,6 +54,20 @@ extension MTMapView: MTStylable {
         runCommand(SetLight(light: light, options: options), completion: completionHandler)
     }
 
+    /// Sets the sky configuration for the map.
+    /// - Parameters:
+    ///   - sky: Sky definition.
+    ///   - options: Supporting type to add validation to another style related type.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setSky(
+        _ sky: MTSky,
+        options: MTStyleSetterOptions?,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetSky(sky: sky, options: options), completion: completionHandler)
+    }
+
     /// Sets the space background for globe projection (cubemap/spacebox).
     /// - Parameters:
     ///   - space: Space configuration or a boolean to enable default.
@@ -736,6 +750,18 @@ extension MTMapView {
     public func setLight(_ light: MTLight, options: MTStyleSetterOptions?) async {
         await withCheckedContinuation { continuation in
             setLight(light, options: options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the sky configuration for the map.
+    /// - Parameters:
+    ///   - sky: Sky definition.
+    ///   - options: Supporting type to add validation to another style related type.
+    public func setSky(_ sky: MTSky, options: MTStyleSetterOptions?) async {
+        await withCheckedContinuation { continuation in
+            setSky(sky, options: options) { _ in
                 continuation.resume()
             }
         }

@@ -33,6 +33,12 @@ public protocol MTStylable {
     ///    - options: Style setter options.
     func setLight(_ light: MTLight, options: MTStyleSetterOptions?) async
 
+    /// Sets the sky configuration for the map.
+    /// - Parameters:
+    ///   - sky: Sky definition.
+    ///   - options: Style setter options.
+    func setSky(_ sky: MTSky, options: MTStyleSetterOptions?) async
+
     /// Sets the space background for globe projection (cubemap/spacebox).
     /// - Parameters:
     ///    - space: Space configuration or a boolean to enable default.

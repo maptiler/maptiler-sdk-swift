@@ -263,10 +263,6 @@ extension MainViewController: MTMapViewDelegate {
         print("--- Map Initialized ---")
         print("-------------------------")
 
-        Task {
-            await mapView.addMapTilerLogoControl(position: .topLeft)
-        }
-
         loadingActivityIndicator.stopAnimating()
 
 // *** Uncomment for benchmark or use long press on jump view ***

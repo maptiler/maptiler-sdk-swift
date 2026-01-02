@@ -13,7 +13,7 @@ class JumpDataModel: ObservableObject {
     func updateJumpCoordinates(jumpSelection: String) {
         Task {
             let geocoder = CLGeocoder()
-            
+
             let placemarks = try await geocoder.geocodeAddressString(jumpSelection)
 
             var location: CLLocation?
@@ -35,23 +35,24 @@ struct JumpView: View {
     enum Constants {
         static let jumpActionTitle = "Jump"
         static let pickerPlaceholder = "Select location"
-        static let defaultSpacing: CGFloat = 10.0
+        static let defaultSpacing: CGFloat = 8.0
         static let defaultWidth: CGFloat = 90.0
-        static let pickerWidth: CGFloat = 160.0
-        static let defaultHeight: CGFloat = 10.0
+        static let pickerWidth: CGFloat = 180.0
+        // Standard control height for tappable targets
+        static let controlHeight: CGFloat = 36.0
         static let defaultCornerRadius: CGFloat = 8.0
-        static let jumpActionBackgroundColor = Color(red: 255/255, green: 255/255, blue: 255/255)
+        static let jumpActionBackgroundColor = Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255)
     }
 
     private let jumpSelections = [
-            "Amsterdam",
-            "Quito",
-            "Miami",
-            "Tokyo",
-            "Prague",
-            "Nairobi",
-            "Zürich"
-        ]
+        "Amsterdam",
+        "Quito",
+        "Miami",
+        "Tokyo",
+        "Prague",
+        "Nairobi",
+        "Zürich"
+    ]
 
     @ObservedObject var dataModel: JumpDataModel
 
@@ -59,11 +60,10 @@ struct JumpView: View {
 
     var body: some View {
         HStack(spacing: Constants.defaultSpacing) {
-            Spacer()
-
-            Picker(Constants.jumpActionTitle,
-                   selection: $selected,
-                   content: {
+            Picker(
+                Constants.jumpActionTitle,
+                selection: $selected
+            ) {
                 if selected == Constants.pickerPlaceholder {
                     Text(Constants.pickerPlaceholder).tag(Constants.pickerPlaceholder)
                 }
@@ -74,24 +74,28 @@ struct JumpView: View {
                         .foregroundStyle(.black)
                         .tint(.black)
                 }
-            })
+            }
             .pickerStyle(.menu)
             .tint(.white)
-            .frame(maxWidth: Constants.pickerWidth, maxHeight: Constants.defaultHeight)
+            .frame(height: Constants.controlHeight)
+            .fixedSize(horizontal: true, vertical: false)
 
-            Button(action: {
-                dataModel.updateJumpCoordinates(jumpSelection: selected)
-            }) {
-                Text(Constants.jumpActionTitle)
-                    .bold()
-                    .frame(maxWidth: Constants.defaultWidth, maxHeight: Constants.defaultHeight)
-                    .padding()
-                    .background(Constants.jumpActionBackgroundColor)
-                    .foregroundColor(.gray)
-                    .cornerRadius(Constants.defaultCornerRadius)
-            }
-            .padding()
+            Button(
+                action: {
+                    dataModel.updateJumpCoordinates(jumpSelection: selected)
+                },
+                label: {
+                    Text(Constants.jumpActionTitle)
+                        .bold()
+                        .frame(width: Constants.defaultWidth, height: Constants.controlHeight)
+                        .background(Constants.jumpActionBackgroundColor)
+                        .foregroundColor(.gray)
+                        .cornerRadius(Constants.defaultCornerRadius)
+                }
+            )
         }
+        // Right-align the controls and keep them visually grouped
+        .frame(maxWidth: .infinity, alignment: .trailing)
         .background(.clear)
         .padding()
     }

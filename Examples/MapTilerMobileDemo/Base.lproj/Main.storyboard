@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="a6j-nn-Qnz">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="a6j-nn-Qnz">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -17,7 +17,7 @@
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="FTf-oR-4cD">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" red="0.19607843137254902" green="0.20000000000000001" blue="0.3411764705882353" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="0.60504357990000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="barTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="selectedImageTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -31,7 +31,7 @@
             </objects>
             <point key="canvasLocation" x="-1295" y="106"/>
         </scene>
-        <!--UIKit-->
+        <!--Demo-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="MainViewController" customModule="MapTilerMobileDemo" customModuleProvider="target" sceneMemberID="viewController">
@@ -40,10 +40,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vtk-8K-li4" userLabel="MapContainerView">
-                                <rect key="frame" x="0.0" y="119" width="393" height="650"/>
+                                <rect key="frame" x="0.0" y="178" width="393" height="557"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uRD-JF-5ak" customClass="MTMapView" customModule="MapTilerSDK">
-                                        <rect key="frame" x="0.0" y="0.0" width="393" height="650"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="557"/>
                                         <viewLayoutGuide key="safeArea" id="4ZL-yc-grc"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </view>
@@ -58,35 +58,35 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bPo-zQ-sJh" customClass="MapControlView" customModule="MapTilerMobileDemo" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="687" width="383" height="82"/>
+                                <rect key="frame" x="10" y="653" width="378" height="82"/>
                                 <viewLayoutGuide key="safeArea" id="gWl-SH-VCi"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="82" id="8a5-Os-XPX"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="g21-yJ-aeI" customClass="MapProjectionControlView" customModule="MapTilerMobileDemo" customModuleProvider="target">
+                                <rect key="frame" x="20" y="188" width="255" height="58"/>
+                                <viewLayoutGuide key="safeArea" id="fol-Ec-iJ8"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="255" id="UrC-WF-L9n"/>
+                                    <constraint firstAttribute="height" constant="58" id="eQw-OU-skw"/>
+                                </constraints>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1gL-KZ-0Hm" customClass="MapZoomControlView" customModule="MapTilerMobileDemo" customModuleProvider="target">
-                                <rect key="frame" x="304" y="129" width="84" height="110"/>
+                                <rect key="frame" x="311" y="188" width="80" height="110"/>
                                 <viewLayoutGuide key="safeArea" id="Mfa-N4-WKJ"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="110" id="q8C-G1-fM5"/>
-                                    <constraint firstAttribute="width" constant="84" id="tNd-wy-KeI"/>
-                                </constraints>
-                            </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="g21-yJ-aeI" customClass="MapProjectionControlView" customModule="MapTilerMobileDemo" customModuleProvider="target">
-                                <rect key="frame" x="304" y="239" width="84" height="110"/>
-                                <viewLayoutGuide key="safeArea" id="fol-Ec-iJ8"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="84" id="UrC-WF-L9n"/>
-                                    <constraint firstAttribute="height" constant="110" id="eQw-OU-skw"/>
+                                    <constraint firstAttribute="width" constant="80" id="tNd-wy-KeI"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JMD-r8-val" userLabel="JumpContainerView">
-                                <rect key="frame" x="0.0" y="59" width="393" height="60"/>
+                                <rect key="frame" x="0.0" y="118" width="393" height="60"/>
                                 <viewLayoutGuide key="safeArea" id="rvd-sS-rjL"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="0.60504357990000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="2s7-f3-ASs"/>
@@ -105,14 +105,14 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="G0X-Sh-jol" userLabel="Layers">
-                                <rect key="frame" x="12" y="74" width="51" height="30"/>
+                                <rect key="frame" x="12.000000000000004" y="128" width="50.333333333333343" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="1RV-zv-VI2"/>
-                                    <constraint firstAttribute="height" constant="30" id="9IS-lN-5kf"/>
+                                    <constraint firstAttribute="height" constant="40" id="9IS-lN-5kf"/>
                                 </constraints>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" image="square.2.layers.3d" catalog="system">
+                                <buttonConfiguration key="configuration" style="filled" image="square.3.layers.3d.down.left" catalog="system">
                                     <color key="baseForegroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <color key="baseBackgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </buttonConfiguration>
@@ -121,7 +121,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aRW-VD-Sgs" customClass="LayerView" customModule="MapTilerMobileDemo" customModuleProvider="target">
-                                <rect key="frame" x="-210" y="159" width="210" height="610"/>
+                                <rect key="frame" x="-210" y="188" width="210" height="547"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="210" id="DNg-Gi-xbl"/>
@@ -135,31 +135,31 @@
                         <viewLayoutGuide key="safeArea" id="jAF-J6-Clo"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="g21-yJ-aeI" firstAttribute="leading" secondItem="jAF-J6-Clo" secondAttribute="leading" constant="20" id="55d-u4-KNE"/>
                             <constraint firstItem="vcA-jg-OMy" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="5dS-Dc-mgq"/>
-                            <constraint firstItem="G0X-Sh-jol" firstAttribute="top" secondItem="jAF-J6-Clo" secondAttribute="top" constant="15" id="Ao9-A1-yJ6"/>
+                            <constraint firstItem="G0X-Sh-jol" firstAttribute="top" secondItem="jAF-J6-Clo" secondAttribute="top" constant="10" id="Ao9-A1-yJ6"/>
                             <constraint firstItem="vcA-jg-OMy" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="BYc-GL-rtk"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="bottom" secondItem="Vtk-8K-li4" secondAttribute="bottom" id="Cle-zq-5Br"/>
                             <constraint firstItem="1gL-KZ-0Hm" firstAttribute="top" secondItem="JMD-r8-val" secondAttribute="bottom" constant="10" id="JVh-zJ-aTA"/>
-                            <constraint firstItem="aRW-VD-Sgs" firstAttribute="top" secondItem="G0X-Sh-jol" secondAttribute="bottom" constant="55" id="MP1-4k-X2s"/>
-                            <constraint firstItem="g21-yJ-aeI" firstAttribute="top" secondItem="1gL-KZ-0Hm" secondAttribute="bottom" id="PRT-el-Cc6"/>
+                            <constraint firstItem="aRW-VD-Sgs" firstAttribute="top" secondItem="G0X-Sh-jol" secondAttribute="bottom" constant="20" id="MP1-4k-X2s"/>
                             <constraint firstItem="aRW-VD-Sgs" firstAttribute="leading" secondItem="jAF-J6-Clo" secondAttribute="leading" constant="-210" id="SCH-tk-7at"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="bottom" secondItem="bPo-zQ-sJh" secondAttribute="bottom" id="T9s-c6-ave"/>
-                            <constraint firstAttribute="trailing" secondItem="1gL-KZ-0Hm" secondAttribute="trailing" constant="5" id="WbW-pu-0po"/>
+                            <constraint firstAttribute="trailing" secondItem="1gL-KZ-0Hm" secondAttribute="trailing" constant="2" id="WbW-pu-0po"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="G0X-Sh-jol" secondAttribute="trailing" symbolic="YES" id="ahP-vz-eJO"/>
                             <constraint firstItem="Vtk-8K-li4" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailing" id="dNQ-Nk-Rrt"/>
                             <constraint firstItem="Vtk-8K-li4" firstAttribute="top" secondItem="JMD-r8-val" secondAttribute="bottom" id="f8r-2t-JXl"/>
-                            <constraint firstItem="jAF-J6-Clo" firstAttribute="trailing" secondItem="bPo-zQ-sJh" secondAttribute="trailing" constant="10" id="iyb-nd-v04"/>
+                            <constraint firstItem="g21-yJ-aeI" firstAttribute="top" secondItem="JMD-r8-val" secondAttribute="bottom" constant="10" id="fx5-eG-6Nc"/>
+                            <constraint firstItem="jAF-J6-Clo" firstAttribute="trailing" secondItem="bPo-zQ-sJh" secondAttribute="trailing" constant="5" id="iyb-nd-v04"/>
                             <constraint firstItem="G0X-Sh-jol" firstAttribute="leading" secondItem="jAF-J6-Clo" secondAttribute="leading" constant="12" id="lne-7A-q4w"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="top" secondItem="JMD-r8-val" secondAttribute="top" id="mAb-fx-qRK"/>
-                            <constraint firstItem="g21-yJ-aeI" firstAttribute="trailing" secondItem="1gL-KZ-0Hm" secondAttribute="trailing" id="mIh-uT-gtY"/>
-                            <constraint firstItem="bPo-zQ-sJh" firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="nRp-gd-gZr"/>
+                            <constraint firstItem="bPo-zQ-sJh" firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" constant="10" id="nRp-gd-gZr"/>
                             <constraint firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="xxb-4C-0bd"/>
                             <constraint firstItem="jAF-J6-Clo" firstAttribute="bottom" secondItem="aRW-VD-Sgs" secondAttribute="bottom" id="ybu-Sb-jf8"/>
                             <constraint firstItem="JMD-r8-val" firstAttribute="trailing" secondItem="Vtk-8K-li4" secondAttribute="trailing" id="zHu-Sz-v8C"/>
                             <constraint firstItem="JMD-r8-val" firstAttribute="leading" secondItem="Vtk-8K-li4" secondAttribute="leading" id="zuk-Fz-80W"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="UIKit" id="xeb-W8-Wg9">
+                    <tabBarItem key="tabBarItem" title="Demo" id="xeb-W8-Wg9">
                         <imageReference key="image" image="map" catalog="system" symbolScale="large"/>
                         <color key="badgeColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                         <imageReference key="selectedImage" image="map" catalog="system" symbolScale="large"/>
@@ -198,7 +198,7 @@
             </objects>
             <point key="canvasLocation" x="148" y="349"/>
         </scene>
-        <!--SwiftUI-->
+        <!--Styles-->
         <scene sceneID="Nlb-BW-3eu">
             <objects>
                 <viewController id="ym7-yT-SK7" customClass="MapStyleViewController" customModule="MapTilerMobileDemo" customModuleProvider="target" sceneMemberID="viewController">
@@ -208,10 +208,10 @@
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xj5-Gt-uQa">
                                 <rect key="frame" x="0.0" y="-62" width="403" height="914"/>
-                                <color key="backgroundColor" red="0.19607843137254902" green="0.20000000000000001" blue="0.3411764705882353" alpha="0.76320684523809523" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="0.60504357990000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EK3-jW-maa" userLabel="FullScreen">
-                                <rect key="frame" x="327" y="714" width="46" height="30"/>
+                                <rect key="frame" x="337" y="680" width="46" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="7nw-2j-yli"/>
                                     <constraint firstAttribute="width" constant="46" id="lOp-QQ-dWU"/>
@@ -230,7 +230,7 @@
                         <viewLayoutGuide key="safeArea" id="xCO-WB-ubO"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="xCO-WB-ubO" firstAttribute="trailing" secondItem="EK3-jW-maa" secondAttribute="trailing" constant="20" id="0gn-o0-5jE"/>
+                            <constraint firstItem="xCO-WB-ubO" firstAttribute="trailing" secondItem="EK3-jW-maa" secondAttribute="trailing" constant="10" id="0gn-o0-5jE"/>
                             <constraint firstAttribute="trailing" secondItem="Xj5-Gt-uQa" secondAttribute="trailing" constant="-10" id="2UA-Xl-151"/>
                             <constraint firstItem="Xj5-Gt-uQa" firstAttribute="top" secondItem="SQw-Ix-FCz" secondAttribute="top" constant="-62" id="PKP-OP-2gB"/>
                             <constraint firstItem="xCO-WB-ubO" firstAttribute="bottom" secondItem="EK3-jW-maa" secondAttribute="bottom" constant="25" id="dgh-T6-YCR"/>
@@ -238,7 +238,7 @@
                             <constraint firstItem="Xj5-Gt-uQa" firstAttribute="leading" secondItem="SQw-Ix-FCz" secondAttribute="leading" id="zxV-Y0-wQD"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="SwiftUI" id="w5I-pr-diG">
+                    <tabBarItem key="tabBarItem" title="Styles" id="w5I-pr-diG">
                         <imageReference key="image" image="uiwindow.split.2x1" catalog="system" symbolScale="large"/>
                         <color key="badgeColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
                         <imageReference key="selectedImage" image="uiwindow.split.2x1" catalog="system" symbolScale="large"/>
@@ -255,7 +255,7 @@
     <resources>
         <image name="arrow.up.left.and.arrow.down.right" catalog="system" width="128" height="115"/>
         <image name="map" catalog="system" width="128" height="112"/>
-        <image name="square.2.layers.3d" catalog="system" width="128" height="117"/>
+        <image name="square.3.layers.3d.down.left" catalog="system" width="122" height="128"/>
         <image name="uiwindow.split.2x1" catalog="system" width="128" height="93"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

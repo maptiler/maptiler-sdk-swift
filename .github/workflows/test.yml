@@ -17,9 +17,9 @@ jobs:
     - name: Set up Xcode
       uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
       with:
-        xcode-version: '16.2'
+        xcode-version: '16.3'
     - name: Select Xcode
-      run: sudo xcode-select --switch /Applications/Xcode_16.2.app
+      run: sudo xcode-select --switch /Applications/Xcode_16.3.app
     - name: Verify Swift Version
       run: swift --version
     - name: Verify Xcode version
@@ -33,8 +33,21 @@ jobs:
         xcrun simctl list devicetypes | sed -n '1,80p'
     - name: Run tests
       run: |
+        set -u
+        echo "Attempt 1: run tests on iPhone 16"
+        if xcrun xcodebuild test \
+          -sdk iphonesimulator \
+          -scheme MapTilerSDK \
+          -destination 'platform=iOS Simulator,name=iPhone 16' \
+          -retry-tests-on-failure -test-iterations 3; then
+          exit 0
+        fi
+        echo "First attempt failed; installing iOS runtime, then retrying on iPhone 17..."
+        sudo xcodebuild -downloadPlatform iOS
+        xcrun simctl list runtimes | grep iOS || true
+        echo "Attempt 2: run tests on iPhone 17"
         xcrun xcodebuild test \
           -sdk iphonesimulator \
           -scheme MapTilerSDK \
-          -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
+          -destination 'platform=iOS Simulator,name=iPhone 17' \
           -retry-tests-on-failure -test-iterations 3

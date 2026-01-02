@@ -9,12 +9,12 @@ on:
 jobs:
   build:
 
-    runs-on: macos-latest
+    runs-on: macos-15
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Set Up Swift
+    - name: Set up Xcode
       uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
       with:
         xcode-version: '16.2'
@@ -26,5 +26,15 @@ jobs:
       run: xcodebuild -version
     - name: Verify Active Swift Toolchain version
       run: xcrun swift -version
+    - name: Show available SDKs (debug)
+      run: |
+        xcodebuild -showsdks
+        xcrun simctl list runtimes
+        xcrun simctl list devicetypes | sed -n '1,80p'
     - name: Run tests
-      run: xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16'
+      run: |
+        xcrun xcodebuild test \
+          -sdk iphonesimulator \
+          -scheme MapTilerSDK \
+          -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
+          -retry-tests-on-failure -test-iterations 3

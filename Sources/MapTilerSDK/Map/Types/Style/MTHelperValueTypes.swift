@@ -88,9 +88,9 @@ public struct MTColorValue: Codable, Sendable {
     }
 
     #if canImport(UIKit)
-    private static func hexString(from color: UIColor) -> String {
+    static func hexString(from color: UIColor) -> String {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        guard color.getRed(&r, &g, &b, &a) else { return "#000000" }
+        guard color.getRed(&r, green: &g, blue: &b, alpha: &a) else { return "#000000" }
         let ri = Int(round(r * 255)), gi = Int(round(g * 255)), bi = Int(round(b * 255)), ai = Int(round(a * 255))
         if ai < 255 {
             return String(format: "#%02X%02X%02X%02X", ri, gi, bi, ai)

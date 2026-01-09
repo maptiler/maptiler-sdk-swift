@@ -1,30 +1,49 @@
+<img src="Examples/maptiler-logo.png" alt="Company Logo" height="32"/>
 
 # MapTiler SDK Swift
-<p align="center">
-<img src="Examples/maptiler-logo.png" alt="MapTiler" title="MapTiler"/>
-</p>
-
-<div align="center">
-
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmaptiler%2Fmaptiler-sdk-swift%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/maptiler/maptiler-sdk-swift)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmaptiler%2Fmaptiler-sdk-swift%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/maptiler/maptiler-sdk-swift)
-
-</div>
-
 
 The MapTiler SDK Swift is a native SDK written in Swift, designed to work with the well-established MapTiler Cloud service, which provides all the data required to fuel a complete mobile mapping experience: vector tiles, geojson, map interaction, custom styles, data visualization and more.
 
-## Features
-- [x] Map interaction
-- [x] Pre-made map styles
-- [x] VectorTile and GeoJSON sources
-- [x] Fill, Line and Symbol layers
-- [x] Custom Annotation Views
-- [x] Location tracking
-- [x] Globe and 3D Terrain
-- [x] UIKit and SwiftUI support
+[![](https://img.shields.io/endpoint?style=for-the-badge&logo=swift&labelColor=D3DBEC&logoColor=333359&color=f2f6ff&url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmaptiler%2Fmaptiler-sdk-swift%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/maptiler/maptiler-sdk-swift) [![](https://img.shields.io/badge/Platforms-iOS-f2f6ff?style=for-the-badge&labelColor=D3DBEC&logo=apple&logoColor=333359)](https://swiftpackageindex.com/maptiler/maptiler-sdk-swift)
 
-## Basic Usage
+---
+
+📖 [Documentation](https://docs.maptiler.com/mobile-sdk/ios/) &nbsp; 🌐 [Website](https://docs.maptiler.com/guides/getting-started/mobile/) &nbsp; 🔑 [Get API Key](https://cloud.maptiler.com/account/keys/)
+
+---
+
+<br>
+
+<details> <summary><b>Table of Contents</b></summary>
+<ul>
+<li><a href="#-installation">Installation</a></li>
+<li><a href="#-basic-usage">Basic Usage</a></li>
+<li><a href="#-related-examples">Examples</a></li>
+<li><a href="#-api-reference">API Reference</a></li>
+<li><a href="#migration-guide">Migration Guide</a></li>
+<li><a href="#-support">Support</a></li>
+<li><a href="#-contributing">Contributing</a></li>
+<li><a href="#-license">License</a></li>
+<li><a href="#-acknowledgements">Acknowledgements</a></li>
+</ul>
+</details>
+
+<p align="center">
+<img src="Examples/streets.png" alt="MapTiler" title="MapTiler"/>
+<img src="Examples/satellite.png" alt="MapTiler" title="MapTiler"/>
+</p>
+<br>
+
+## 📦 Installation
+
+MapTiler Swift SDK is a Swift Package and can be added as dependency through **Swift Package Manager**.
+
+- File -> Add Package Dependencies
+- Add https://github.com/maptiler/maptiler-sdk-swift.git
+
+<br>
+
+## 🚀 Basic Usage
 
 Make sure to set your MapTiler Cloud API key first. (i.e. in AppDelegate):
 
@@ -68,11 +87,29 @@ var body: some View {
 
 For detailed functionality overview refer to the API Reference documentation or build local docs in Xcode: Product -> Build Documentation.
 
-## Sources and Layers
+<br>
+
+## 💡 Related Examples
+
+- [Getting Started](https://docs.maptiler.com/mobile-sdk/ios/examples/get-started/)
+- [Globe with milkyway and halo](https://docs.maptiler.com/mobile-sdk/ios/examples/globe/)
+- [Point Helper Clusters](https://docs.maptiler.com/mobile-sdk/ios/examples/point-helper-cluster/)
+
+Check out the full list of [MapTiler SDK Swift examples](https://docs.maptiler.com/mobile-sdk/ios/examples/) or browse ready-to-use code examples at the [Examples](https://github.com/maptiler/maptiler-sdk-swift/tree/main/Examples) directory in this repo.
+
+<br>
+
+## 📘 API Reference
+
+For detailed guides, API reference, and advanced examples, visit our comprehensive documentation:
+
+[API documentation](https://docs.maptiler.com/mobile-sdk/ios/)
+
+### Sources and Layers
 
 Sources and layers can be added to the map view style object as soon as map is initialized. Setting the style after adding layers resets them to default, so make sure style is finished loading first.
 
-### UIKit
+#### UIKit
 
 ```swift
 guard let style = mapView.style else {
@@ -91,7 +128,7 @@ if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v
 }
 ```
 
-### SwiftUI
+#### SwiftUI
 
 ```swift
 @State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
@@ -108,11 +145,12 @@ var body: some View {
 }
 ```
 
-## Markers and Popups
+### Markers and Popups
 
 Markers and popups (Text, Custom Annotation) can be used for highlighting points of interest on the map.
 
-### UIKit
+#### UIKit
+
 ```swift
 let coordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
 
@@ -123,7 +161,8 @@ marker.draggable = true
 mapView.addMarker(marker)
 ```
 
-### SwiftUI
+#### SwiftUI
+
 ```swift
 @State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
 
@@ -168,7 +207,8 @@ var body: some View {
 
 For additional examples refer to the Examples directory.
 
-## Custom Annotations
+### Custom Annotations
+
 In addition to `MTMarker` and `MTTextPopup`, you can use `MTCustomAnnotationView` class to make your own annotations and add them to the map. You can subclass to create custom UI it or use it as is for simple designs.
 
 ```swift
@@ -182,8 +222,8 @@ myCustomView.backgroundColor = .blue
 myCustomView.addTo(mapView)
 ```
 
+### Space
 
-## Space
 The space option customizes the globe’s background, simulating deep space or skybox effects.
 
 - Prerequisite: use globe projection. Set `projection: .globe` in `MTMapOptions`.
@@ -281,8 +321,8 @@ mapView.didInitialize = {
 
 Note: When calling `setSpace`, any field not explicitly provided (e.g., `color`, `faces`, `path`, or `preset`) keeps its previous value.
 
+### Halo
 
-## Halo
 The halo option adds a gradient-based atmospheric glow around the globe, simulating the visual effect of Earth's atmosphere when viewed from space.
 
 - Prerequisite: use globe projection. Set `projection: .globe` in `MTMapOptions`.
@@ -364,19 +404,68 @@ mapView.didInitialize = {
 }
 ```
 
-### Developer Docs
-For more information and API Reference visit: https://docs.maptiler.com/mobile-sdk/ios/ or browse ready-to-use code examples at the [Examples](https://github.com/maptiler/maptiler-sdk-swift/tree/main/Examples) directory in this repo.
+<br>
 
-# Installation
-MapTiler Swift SDK is a Swift Package and can be added as dependency through **Swift Package Manager**.
+## Migration Guide
 
-- File -> Add Package Dependencies
-- Add https://github.com/maptiler/maptiler-sdk-swift.git
+- [How To Migrate/Switch From MapBox iOS SDK to MapTiler SDK Swift](https://docs.maptiler.com/mobile-sdk/ios/examples/switch-from-mapbox/)
+- [How To Migrate/Switch From MapLibre Native iOS to MapTiler SDK Swift](https://docs.maptiler.com/mobile-sdk/ios/examples/switch-from-maplibre/)
 
+<br>
+
+## 💬 Support
+
+- 📚 [Documentation](https://docs.maptiler.com/mobile-sdk/ios/) - Comprehensive guides and API reference
+- ✉️ [Contact us](https://maptiler.com/contact) - Get in touch or submit a request
+- 🐦 [Twitter/X](https://twitter.com/maptiler) - Follow us for updates
+
+<br>
+
+---
+
+<br>
+
+## 🤝 Contributing
+
+We love contributions from the community! Whether it's bug reports, feature requests, or pull requests, all contributions are welcome:
+
+- Fork the repository and create your branch from `main`
+- If you've added code, add tests that cover your changes
+- Ensure your code follows our style guidelines
+- Give your pull request a clear, descriptive summary
+- Open a Pull Request with a comprehensive description
+- Read the [CONTRIBUTING](./CONTRIBUTING.md) file
+
+<br>
+
+## 📄 License
+
+MapTiler SDK Swift is released under the BSD 3-Clause license – see the [LICENSE](./LICENSE) file for details.
+
+<br>
+
+## 🙏 Acknowledgements
+
+### Features
+
+- [x] Map interaction
+- [x] Pre-made map styles
+- [x] VectorTile and GeoJSON sources
+- [x] Fill, Line and Symbol layers
+- [x] Custom Annotation Views
+- [x] Location tracking
+- [x] Globe and 3D Terrain
+- [x] UIKit and SwiftUI support
+
+<br>
+
+<p align="center" style="margin-top:20px;margin-bottom:20px;"> <a href="https://cloud.maptiler.com/account/keys/" style="display:inline-block;padding:12px 32px;background:#F2F6FF;color:#000;font-weight:bold;border-radius:6px;text-decoration:none;"> Get Your API Key <sup style="background-color:#0000ff;color:#fff;padding:2px 6px;font-size:12px;border-radius:3px;">FREE</sup><br /> <span style="font-size:90%;font-weight:400;">Start building with 100,000 free map loads per month ・ No credit card required.</span> </a> </p>
+
+<br>
+
+<p align="center"> 💜 Made with love by the <a href="https://www.maptiler.com/">MapTiler</a> team <br />
 <p align="center">
-<img src="Examples/streets.png" alt="MapTiler" title="MapTiler"/>
-<img src="Examples/satellite.png" alt="MapTiler" title="MapTiler"/>
+  <a href="https://www.maptiler.com/">Website</a> •
+  <a href="https://docs.maptiler.com/mobile-sdk/ios/">Documentation</a> •
+  <a href="https://github.com/maptiler/maptiler-sdk-swift">GitHub</a>
 </p>
-
-# License
-MapTiler SDK Swift is released under the BSD 3-Clause license. See LICENSE for details.

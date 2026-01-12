@@ -21,10 +21,10 @@ public struct MTHeatmapLayerOptions: Codable, Sendable {
 
     // HeatmapLayerOptions subset
     public var property: String?
-    public var weight: Double?
-    public var radius: Double?
-    public var opacity: Double?
-    public var intensity: Double?
+    public var weight: MTNumberOrPropertyValues?
+    public var radius: MTRadiusOption?
+    public var opacity: MTNumberOrZoomNumberValues?
+    public var intensity: MTNumberOrZoomNumberValues?
     public var zoomCompensation: Bool?
 
     public init(
@@ -39,6 +39,35 @@ public struct MTHeatmapLayerOptions: Codable, Sendable {
         radius: Double? = nil,
         opacity: Double? = nil,
         intensity: Double? = nil,
+        zoomCompensation: Bool? = nil
+    ) {
+        self.data = data
+        self.layerId = layerId
+        self.sourceId = sourceId
+        self.beforeId = beforeId
+        self.minzoom = minzoom
+        self.maxzoom = maxzoom
+        self.property = property
+        self.weight = weight.map { .number($0) }
+        self.radius = radius.map { .number($0) }
+        self.opacity = opacity.map { .number($0) }
+        self.intensity = intensity.map { .number($0) }
+        self.zoomCompensation = zoomCompensation
+    }
+
+    /// Convenience initializer accepting ramp-capable types.
+    public init(
+        data: String,
+        layerId: String? = nil,
+        sourceId: String? = nil,
+        beforeId: String? = nil,
+        minzoom: Double? = nil,
+        maxzoom: Double? = nil,
+        property: String? = nil,
+        weight: MTNumberOrPropertyValues? = nil,
+        radius: MTRadiusOption? = nil,
+        opacity: MTNumberOrZoomNumberValues? = nil,
+        intensity: MTNumberOrZoomNumberValues? = nil,
         zoomCompensation: Bool? = nil
     ) {
         self.data = data

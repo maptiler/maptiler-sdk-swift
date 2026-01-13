@@ -10,11 +10,13 @@
 import Foundation
 
 /// Helper for creating a heatmap visualization layer from data and styling options.
-public final class MTHeatmapLayerHelper: @unchecked Sendable {
-    private let style: MTStyle
+public final class MTHeatmapLayerHelper: MTVectorLayerHelper, @unchecked Sendable {
+    private let baseStyle: MTStyle
+
+    public var style: MTStyle { baseStyle }
 
     public init(_ style: MTStyle) {
-        self.style = style
+        self.baseStyle = style
     }
 
     /// Adds a heatmap layer based on the provided options.
@@ -25,8 +27,9 @@ public final class MTHeatmapLayerHelper: @unchecked Sendable {
         in mapView: MTMapView,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
+        let normalized = applyCommonDefaults(to: options)
         style.addHeatmapLayer(
-            options,
+            normalized,
             in: mapView,
             completionHandler: completionHandler
         )
@@ -38,6 +41,7 @@ public final class MTHeatmapLayerHelper: @unchecked Sendable {
         colorRamp: MTColorRamp?,
         in mapView: MTMapView
     ) async {
-        await style.addHeatmapLayer(options, colorRamp: colorRamp, in: mapView)
+        let normalized = applyCommonDefaults(to: options)
+        await style.addHeatmapLayer(normalized, colorRamp: colorRamp, in: mapView)
     }
 }

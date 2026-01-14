@@ -26,7 +26,7 @@ public protocol MTVectorLayerHelper: AnyObject {
 public extension MTVectorLayerHelper {
     // Shared default values
     static var baseMinZoom: Double { 0 }
-    static var baseMaxZoom: Double { 22 }
+    static var baseMaxZoom: Double { 23 }
     static var baseOutline: Bool { false }
     static var baseOutlineColor: MTStringOrZoomStringValues { .string("white") }
     static var baseOutlineWidth: MTNumberOrZoomNumberValues { .number(1) }

@@ -254,3 +254,39 @@ public enum MTRadiusOption: Codable, Sendable {
         }
     }
 }
+
+// MARK: - Line-specific helper values
+
+/// Represents a dash pattern that can be provided as an array of numbers or as a string pattern
+/// composed of underscores and spaces (e.g. "___ _ ").
+public enum MTDashArrayValue: Codable, Sendable {
+    case array([Double])
+    case pattern(String)
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let arr = try? container.decode([Double].self) {
+            self = .array(arr)
+        } else if let str = try? container.decode(String.self) {
+            self = .pattern(str)
+        } else {
+            throw DecodingError.typeMismatch(
+                MTDashArrayValue.self,
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Expected [Double] or String for dash array"
+                )
+            )
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case let .array(values):
+            try container.encode(values)
+        case let .pattern(string):
+            try container.encode(string)
+        }
+    }
+}

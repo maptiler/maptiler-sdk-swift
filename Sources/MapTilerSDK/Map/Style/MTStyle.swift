@@ -845,3 +845,26 @@ extension MTStyle {
         }
     }
 }
+
+// MARK: - Helpers: Polyline (Line) layer
+extension MTStyle {
+    // Deprecated completion-based variant
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    internal func addPolylineLayer(
+        _ options: MTPolylineLayerOptions,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommand(AddPolylineLayer(options: options), completion: completionHandler)
+    }
+}
+
+extension MTStyle {
+    // Async variant
+    internal func addPolylineLayer(_ options: MTPolylineLayerOptions) async {
+        await withCheckedContinuation { continuation in
+            addPolylineLayer(options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+}

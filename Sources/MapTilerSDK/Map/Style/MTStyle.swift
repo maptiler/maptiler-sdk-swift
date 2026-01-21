@@ -868,3 +868,26 @@ extension MTStyle {
         }
     }
 }
+
+// MARK: - Helpers: Polygon (Fill) layer
+extension MTStyle {
+    // Deprecated completion-based variant
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    internal func addPolygonLayer(
+        _ options: MTPolygonLayerOptions,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommand(AddPolygonLayer(options: options), completion: completionHandler)
+    }
+}
+
+extension MTStyle {
+    // Async variant
+    internal func addPolygonLayer(_ options: MTPolygonLayerOptions) async {
+        await withCheckedContinuation { continuation in
+            addPolygonLayer(options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+}

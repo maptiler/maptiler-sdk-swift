@@ -45,6 +45,7 @@ package final class WebViewExecutor: MTCommandExecutable {
     }
 
     @MainActor
+    // swiftlint:disable cyclomatic_complexity function_body_length
     package func execute(_ command: MTCommand) async throws -> MTBridgeReturnType {
         guard let webView = webView else {
             throw MTError.bridgeNotLoaded
@@ -52,41 +53,84 @@ package final class WebViewExecutor: MTCommandExecutable {
 
         let isVerbose = await MTConfig.shared.logLevel == .debug(verbose: true)
 
-        return try await withCheckedThrowingContinuation { continuation in
-            webView.evaluateJavaScript(command.toJS()) { [weak self] result, error in
-                if let error = error {
-                    // Log errors based on the log level.
-                    // Most of the JS functions return the Map itself which is not supported in the native code.
-                    if let error = error as? WKError, error.code != .javaScriptResultTypeIsUnsupported {
-                        if isVerbose {
-                            let commandMessage = "Bridging error occurred for \(command)"
-                            MTLogger.log("\(commandMessage): \(error.errorUserInfo.debugDescription)", type: .error)
-                        }
+        // Prefer callAsyncJavaScript on iOS 15+; fallback to evaluateJavaScript on older versions.
+        let js: String = command.toJS()
 
-                        if let reason = error.errorUserInfo[self?.exceptionKey ?? ""] as? String {
-                            let exception = MTException(code: error.code.rawValue, reason: reason)
-                            continuation.resume(throwing: MTError.exception(body: exception))
+        if #available(iOS 15.0, *) {
+            do {
+                let trimmed = js.trimmingCharacters(in: .whitespacesAndNewlines)
+                let jsForCall: String
+
+                if (command is ZoomIn) || (command is ZoomOut) {
+                    jsForCall = trimmed
+                } else {
+                    let noSemi = trimmed.hasSuffix(";") ? String(trimmed.dropLast()) : trimmed
+                    jsForCall = "(() => { return (\(noSemi)); })()"
+                }
+
+                let result = try await webView.callAsyncJavaScript(
+                    jsForCall,
+                    arguments: [:],
+                    in: nil,
+                    contentWorld: .page
+                )
+                return try MTBridgeReturnType(from: result)
+            } catch {
+                if isVerbose {
+                    MTLogger.log(
+                        "Bridging error occurred for: \(command): \(error)",
+                        type: .warning
+                    )
+                }
+                return .unsupportedType
+            }
+        // swiftlint:disable indentation_width
+        } else {
+            return try await withCheckedThrowingContinuation { continuation in
+                webView.evaluateJavaScript(js) { [weak self] result, error in
+                    if let error = error {
+                        if let error = error as? WKError,
+                           error.code != .javaScriptResultTypeIsUnsupported {
+                            if isVerbose {
+                                let commandMessage = "Bridging error occurred for \(command)"
+                                MTLogger.log(
+                                    "\(commandMessage): \(error.errorUserInfo.debugDescription)",
+                                    type: .error
+                                )
+                            }
+                            if let reason = error.errorUserInfo[self?.exceptionKey ?? ""] as? String {
+                                let exception = MTException(code: error.code.rawValue, reason: reason)
+                                continuation.resume(throwing: MTError.exception(body: exception))
+                            } else {
+                                continuation.resume(throwing: MTError.unknown(description: "\(error)"))
+                            }
                         } else {
-                            continuation.resume(throwing: MTError.unknown(description: "\(error)"))
+                            if isVerbose {
+                                MTLogger.log(
+                                    "\(command) completed with unsupported return type.",
+                                    type: .warning
+                                )
+                            }
+                            continuation.resume(returning: .unsupportedType)
                         }
-                    } else { // Execution completed successfully, but with unsupported type. Log based on log level.
-                        if isVerbose {
-                            MTLogger.log("\(command) completed with unsupported return type.", type: .warning)
+                    } else {
+                        do {
+                            let parsedResult = try MTBridgeReturnType(from: result)
+                            continuation.resume(returning: parsedResult)
+                        } catch {
+                            continuation.resume(
+                                throwing: MTError.invalidResultType(
+                                    description: result.debugDescription
+                                )
+                            )
                         }
-
-                        continuation.resume(returning: .unsupportedType)
-                    }
-                } else { // Pass result, handle if type is invalid.
-                    do {
-                        let parsedResult = try MTBridgeReturnType(from: result)
-                        continuation.resume(returning: parsedResult)
-                    } catch {
-                        continuation.resume(throwing: MTError.invalidResultType(description: result.debugDescription))
                     }
                 }
             }
         }
+        // swiftlint:enable indentation_width
     }
+    // swiftlint:enable cyclomatic_complexity function_body_length
 }
 
 extension WebViewExecutor: WebViewManagerDelegate {

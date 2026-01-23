@@ -23,13 +23,12 @@ extension WebViewManager: WKScriptMessageHandler {
     }
 
     private func handleError(with message: WKScriptMessage) {
-        if let errorInfo = message.body as? [String: Any] {
-            let message = errorInfo[Constants.Error.message] as? String ?? Constants.Error.unknown
-
-            handleContextFailure(message: message)
+        if let json = message.body as? String,
+            let data = json.data(using: .utf8),
+            let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            if let msg = dict[Constants.Error.message] as? String { handleContextFailure(message: msg) }
         } else if let error = message.body as? String {
-            let message = error
-            handleContextFailure(message: message)
+            handleContextFailure(message: error)
         }
     }
 
@@ -40,20 +39,20 @@ extension WebViewManager: WKScriptMessageHandler {
     }
 
     private func handleEvent(with message: WKScriptMessage) {
-        if let messageBody = message.body as? [String: Any], let event = messageBody[Constants.Map.event] as? String {
-            if let data = messageBody[Constants.Map.data] as? [String: Any] {
-                do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: data)
-                    let decoder = JSONDecoder()
-                    let eventData = try decoder.decode(MTData.self, from: jsonData)
-
+        if let json = message.body as? String,
+            let data = json.data(using: .utf8),
+            let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let event = dict[Constants.Map.event] as? String {
+            if let payload = dict[Constants.Map.data] as? [String: Any],
+                JSONSerialization.isValidJSONObject(payload),
+                let jsonData = try? JSONSerialization.data(withJSONObject: payload) {
+                let decoder = JSONDecoder()
+                if let eventData = try? decoder.decode(MTData.self, from: jsonData) {
                     eventProcessor.registerEvent(MTEvent(rawValue: event), with: eventData)
-                } catch {
-                    MTLogger.log("Data parsing error for event: \(event): \(error)", type: .error)
+                    return
                 }
-            } else {
-                eventProcessor.registerEvent(MTEvent(rawValue: event))
             }
+            eventProcessor.registerEvent(MTEvent(rawValue: event))
         }
     }
 }

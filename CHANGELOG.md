@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.2.1](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/1.2.1)
+Released on 2025-01-23.
+### Fixed
+Bridging performance regression introduced in iOS 26.2 patched.
+
 ## [1.2.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/1.2.0)
 Released on 2025-12-12.
 ### Added

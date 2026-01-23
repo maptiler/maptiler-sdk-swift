@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetCenterElevation: MTCommand {
+package struct GetCenterElevation: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getCenterElevation();"
     }

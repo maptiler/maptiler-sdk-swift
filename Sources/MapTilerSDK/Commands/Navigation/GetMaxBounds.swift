@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetMaxBounds: MTCommand {
+package struct GetMaxBounds: MTValueCommand {
     package func toJS() -> JSString {
         return """
 (() => {

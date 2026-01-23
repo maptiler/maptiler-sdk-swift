@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetCenterClampedToGround: MTCommand {
+package struct GetCenterClampedToGround: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getCenterClampedToGround();"
     }

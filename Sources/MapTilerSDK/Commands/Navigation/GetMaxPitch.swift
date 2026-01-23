@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetMaxPitch: MTCommand {
+package struct GetMaxPitch: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getMaxPitch();"
     }

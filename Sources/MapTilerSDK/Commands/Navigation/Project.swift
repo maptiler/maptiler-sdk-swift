@@ -9,7 +9,7 @@
 
 import CoreLocation
 
-package struct Project: MTCommand {
+package struct Project: MTValueCommand {
     var coordinate: CLLocationCoordinate2D
 
     package func toJS() -> JSString {

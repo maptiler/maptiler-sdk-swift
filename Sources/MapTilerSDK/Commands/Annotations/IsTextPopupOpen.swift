@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct IsTextPopupOpen: MTCommand {
+package struct IsTextPopupOpen: MTValueCommand {
     var popup: MTTextPopup
 
     package func toJS() -> JSString {

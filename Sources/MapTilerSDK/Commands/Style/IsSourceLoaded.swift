@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct IsSourceLoaded: MTCommand {
+package struct IsSourceLoaded: MTValueCommand {
     var sourceId: String
 
     package func toJS() -> JSString {

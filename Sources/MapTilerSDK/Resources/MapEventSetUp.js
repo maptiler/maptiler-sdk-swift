@@ -4,11 +4,47 @@
  */
 
 function setUpMapEvents(map) {
+    // Helpers to ensure JSON-safe payloads on iOS 26.2
+    function serializeError(err) {
+        try {
+            return {
+                message: String(err && err.message ? err.message : err),
+                status: (err && err.status) ? err.status : (err && err.error && err.error.status) ? err.error.status : undefined,
+                url: (err && err.url) ? err.url : (err && err.resource && err.resource.url) ? err.resource.url : undefined,
+                sourceId: err && err.sourceId ? err.sourceId : undefined
+            };
+        } catch (_) {
+            return { message: 'unknown' };
+        }
+    }
+
+    function safeSource(src) {
+        if (!src) return undefined;
+        try {
+            return { type: src.type, url: src.url };
+        } catch (_) { return undefined; }
+    }
+
+    function safeData(e) {
+        try {
+            return {
+                dataType: e.dataType,
+                isSourceLoaded: e.isSourceLoaded,
+                source: safeSource(e.source),
+                sourceDataType: e.sourceDataType,
+                // Avoid passing complex/cyclic objects
+                coord: e.coord
+            };
+        } catch (_) { return undefined; }
+    }
+
     // BRIDGE - Error event propagation
     map.on('error', function(error) {
-        window.webkit.messageHandlers.errorHandler.postMessage({
-            error: error
-        });
+        try {
+            window.webkit.messageHandlers.errorHandler.postMessage(
+                JSON.stringify({ error: serializeError(error) })
+            );
+        } catch (_) {}
     });
 
     // BRIDGE - WebGL event propagation
@@ -48,35 +84,32 @@ function setUpMapEvents(map) {
 
     events.forEach(event => {
         map.on(event, function() {
-            window.webkit.messageHandlers.mapHandler.postMessage({
-                event: event
-            });
+            try {
+                window.webkit.messageHandlers.mapHandler.postMessage(
+                    JSON.stringify({ event: event })
+                );
+            } catch (_) {}
         });
     });
 
     // MapTapEvent
     map.on('click', function(e) {
-        var data = {
-            lngLat: e.lngLat,
-            point: e.point
-        };
-
-        window.webkit.messageHandlers.mapHandler.postMessage({
-            event: 'click',
-            data: data
-        });
+        var data = { lngLat: e.lngLat, point: e.point };
+        try {
+            window.webkit.messageHandlers.mapHandler.postMessage(
+                JSON.stringify({ event: 'click', data: data })
+            );
+        } catch (_) {}
     });
 
     // MapImageEvent
     map.on('styleimagemissing', function(e) {
-        var data = {
-            id: e.id,
-        };
-
-        window.webkit.messageHandlers.mapHandler.postMessage({
-            event: 'click',
-            data: data
-        });
+        var data = { id: e.id };
+        try {
+            window.webkit.messageHandlers.mapHandler.postMessage(
+                JSON.stringify({ event: 'styleimagemissing', data: data })
+            );
+        } catch (_) {}
     });
 
     // MapDataEvents
@@ -96,19 +129,12 @@ function setUpMapEvents(map) {
 
     mapDataEvents.forEach(event => {
         map.on(event, function(e) {
-            var data = {
-                dataType: e.dataType,
-                isSourceLoaded: e.isSourceLoaded,
-                source: e.source,
-                sourceDataType: e.sourceDataType,
-                tile: e.tile,
-                coord: e.coord
-            };
-
-            window.webkit.messageHandlers.mapHandler.postMessage({
-                event: event,
-                data: data
-            });
+            var data = safeData(e);
+            try {
+                window.webkit.messageHandlers.mapHandler.postMessage(
+                    JSON.stringify({ event: event, data: data })
+                );
+            } catch (_) {}
         });
     });
 
@@ -128,17 +154,12 @@ function setUpMapEvents(map) {
 
     mapTouchEvents.forEach(event => {
         map.on(event, function(e) {
-            var data = {
-                lngLat: e.lngLat,
-                lngLats: e.lngLats,
-                point: e.point,
-                points: e.points
-            };
-
-            window.webkit.messageHandlers.mapHandler.postMessage({
-                event: event,
-                data: data
-            });
+            var data = { lngLat: e.lngLat, lngLats: e.lngLats, point: e.point, points: e.points };
+            try {
+                window.webkit.messageHandlers.mapHandler.postMessage(
+                    JSON.stringify({ event: event, data: data })
+                );
+            } catch (_) {}
         });
     });
 }

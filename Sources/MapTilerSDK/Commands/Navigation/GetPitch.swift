@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetPitch: MTCommand {
+package struct GetPitch: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getPitch();"
     }

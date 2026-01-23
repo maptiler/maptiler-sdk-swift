@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct CloneColorRamp: MTCommand {
+package struct CloneColorRamp: MTValueCommand {
     var sourceIdentifier: String
     var targetIdentifier: String
 
@@ -26,7 +26,7 @@ package struct CloneColorRamp: MTCommand {
     }
 }
 
-package struct ReverseColorRamp: MTCommand {
+package struct ReverseColorRamp: MTValueCommand {
     var sourceIdentifier: String
     var targetIdentifier: String
     var clone: Bool
@@ -45,7 +45,7 @@ package struct ReverseColorRamp: MTCommand {
     }
 }
 
-package struct ScaleColorRamp: MTCommand {
+package struct ScaleColorRamp: MTValueCommand {
     var sourceIdentifier: String
     var targetIdentifier: String
     var min: Double
@@ -66,7 +66,7 @@ package struct ScaleColorRamp: MTCommand {
     }
 }
 
-package struct SetStopsOnColorRamp: MTCommand {
+package struct SetStopsOnColorRamp: MTValueCommand {
     var sourceIdentifier: String
     var targetIdentifier: String
     var stopsJSON: String
@@ -87,7 +87,7 @@ package struct SetStopsOnColorRamp: MTCommand {
     }
 }
 
-package struct ResampleColorRamp: MTCommand {
+package struct ResampleColorRamp: MTValueCommand {
     var sourceIdentifier: String
     var targetIdentifier: String
     var method: String
@@ -107,7 +107,7 @@ package struct ResampleColorRamp: MTCommand {
     }
 }
 
-package struct TransparentStartColorRamp: MTCommand {
+package struct TransparentStartColorRamp: MTValueCommand {
     var sourceIdentifier: String
     var targetIdentifier: String
 

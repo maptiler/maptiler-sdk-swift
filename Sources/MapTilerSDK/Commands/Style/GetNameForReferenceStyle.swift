@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetNameForReferenceStyle: MTCommand {
+package struct GetNameForReferenceStyle: MTValueCommand {
     var referenceStyle: MTMapReferenceStyle
 
     package func toJS() -> JSString {

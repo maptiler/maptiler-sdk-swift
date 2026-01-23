@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct GetColorRampBounds: MTCommand {
+package struct GetColorRampBounds: MTValueCommand {
     var identifier: String
 
     package func toJS() -> JSString {
@@ -22,7 +22,7 @@ package struct GetColorRampBounds: MTCommand {
     }
 }
 
-package struct GetColorFromColorRamp: MTCommand {
+package struct GetColorFromColorRamp: MTValueCommand {
     var identifier: String
     var value: Double
     var optionsJSON: String?
@@ -39,7 +39,7 @@ package struct GetColorFromColorRamp: MTCommand {
     }
 }
 
-package struct GetColorHexFromColorRamp: MTCommand {
+package struct GetColorHexFromColorRamp: MTValueCommand {
     var identifier: String
     var value: Double
     var optionsJSON: String?
@@ -56,7 +56,7 @@ package struct GetColorHexFromColorRamp: MTCommand {
     }
 }
 
-package struct GetColorRelativeFromColorRamp: MTCommand {
+package struct GetColorRelativeFromColorRamp: MTValueCommand {
     var identifier: String
     var value: Double
     var optionsJSON: String?
@@ -73,7 +73,7 @@ package struct GetColorRelativeFromColorRamp: MTCommand {
     }
 }
 
-package struct GetRawColorStopsFromColorRamp: MTCommand {
+package struct GetRawColorStopsFromColorRamp: MTValueCommand {
     var identifier: String
 
     package func toJS() -> JSString {
@@ -86,7 +86,7 @@ package struct GetRawColorStopsFromColorRamp: MTCommand {
     }
 }
 
-package struct GetCanvasStripFromColorRamp: MTCommand {
+package struct GetCanvasStripFromColorRamp: MTValueCommand {
     var identifier: String
     var optionsJSON: String
 
@@ -103,7 +103,7 @@ package struct GetCanvasStripFromColorRamp: MTCommand {
     }
 }
 
-package struct HasTransparentStartColorRamp: MTCommand {
+package struct HasTransparentStartColorRamp: MTValueCommand {
     var identifier: String
 
     package func toJS() -> JSString {

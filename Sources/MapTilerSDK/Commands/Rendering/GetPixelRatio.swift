@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetPixelRatio: MTCommand {
+package struct GetPixelRatio: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getPixelRatio();"
     }

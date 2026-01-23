@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct IsMarkerDraggable: MTCommand {
+package struct IsMarkerDraggable: MTValueCommand {
     var marker: MTMarker
 
     package func toJS() -> JSString {

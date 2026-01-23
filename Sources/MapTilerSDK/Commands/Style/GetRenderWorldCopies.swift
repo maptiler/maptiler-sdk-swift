@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetRenderWorldCopies: MTCommand {
+package struct GetRenderWorldCopies: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getRenderWorldCopies();"
     }

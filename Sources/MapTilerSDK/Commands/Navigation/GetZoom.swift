@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetZoom: MTCommand {
+package struct GetZoom: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getZoom();"
     }

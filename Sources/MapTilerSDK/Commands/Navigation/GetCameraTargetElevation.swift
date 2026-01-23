@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetCameraTargetElevation: MTCommand {
+package struct GetCameraTargetElevation: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getCameraTargetElevation();"
     }

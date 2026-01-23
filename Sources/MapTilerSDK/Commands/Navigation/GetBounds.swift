@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetBounds: MTCommand {
+package struct GetBounds: MTValueCommand {
     package func toJS() -> JSString {
         return "JSON.stringify(\(MTBridge.mapObject).getBounds().toArray());"
     }

@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetBearing: MTCommand {
+package struct GetBearing: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getBearing();"
     }

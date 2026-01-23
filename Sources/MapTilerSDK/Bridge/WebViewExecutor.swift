@@ -45,7 +45,6 @@ package final class WebViewExecutor: MTCommandExecutable {
     }
 
     @MainActor
-    // swiftlint:disable cyclomatic_complexity function_body_length
     package func execute(_ command: MTCommand) async throws -> MTBridgeReturnType {
         guard let webView = webView else {
             throw MTError.bridgeNotLoaded
@@ -58,18 +57,15 @@ package final class WebViewExecutor: MTCommandExecutable {
 
         if #available(iOS 15.0, *) {
             do {
-                let trimmed = js.trimmingCharacters(in: .whitespacesAndNewlines)
-                let jsForCall: String
+                // On iOS 15+, callAsyncJavaScript executes the string as a function body.
+                // For value-returning commands, prepend an explicit `return`.
+                let leftTrimmed = js.drop { $0.isWhitespace || $0.isNewline }
+                let needsReturn = (command is MTValueCommand) && !leftTrimmed.hasPrefix("return ")
 
-                if (command is ZoomIn) || (command is ZoomOut) {
-                    jsForCall = trimmed
-                } else {
-                    let noSemi = trimmed.hasSuffix(";") ? String(trimmed.dropLast()) : trimmed
-                    jsForCall = "(() => { return (\(noSemi)); })()"
-                }
+                let jsToExecute = needsReturn ? "return \(leftTrimmed)" : js
 
                 let result = try await webView.callAsyncJavaScript(
-                    jsForCall,
+                    jsToExecute,
                     arguments: [:],
                     in: nil,
                     contentWorld: .page
@@ -130,7 +126,6 @@ package final class WebViewExecutor: MTCommandExecutable {
         }
         // swiftlint:enable indentation_width
     }
-    // swiftlint:enable cyclomatic_complexity function_body_length
 }
 
 extension WebViewExecutor: WebViewManagerDelegate {

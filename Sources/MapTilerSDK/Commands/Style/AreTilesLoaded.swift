@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct AreTilesLoaded: MTCommand {
+package struct AreTilesLoaded: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).areTilesLoaded();"
     }

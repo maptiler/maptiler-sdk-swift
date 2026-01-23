@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetIdForStyleVariant: MTCommand {
+package struct GetIdForStyleVariant: MTValueCommand {
     var styleVariant: MTMapStyleVariant
 
     package func toJS() -> JSString {

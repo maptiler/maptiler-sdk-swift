@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetTextPopupCoordinates: MTCommand {
+package struct GetTextPopupCoordinates: MTValueCommand {
     var popup: MTTextPopup
 
     package func toJS() -> JSString {

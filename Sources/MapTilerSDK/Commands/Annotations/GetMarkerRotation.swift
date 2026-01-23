@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetMarkerRotation: MTCommand {
+package struct GetMarkerRotation: MTValueCommand {
     var marker: MTMarker
 
     package func toJS() -> JSString {

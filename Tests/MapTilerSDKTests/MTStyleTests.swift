@@ -54,7 +54,28 @@ struct MTStyleTests {
     }
 
     @Test func getProjectionCommand_shouldMatchJS() async throws {
-        let expectedJS = "\(MTBridge.mapObject).getProjection();"
+        let expectedJS = """
+        (()=>{
+          try {
+            const spec = \(MTBridge.mapObject).getProjection();
+            const isGlobeToken = (s) => {
+              if (!s) return false;
+              const v = String(s).toLowerCase();
+              return v === 'globe' || v === 'vertical-perspective' ||
+                v === 'vertical_perspective' || v === 'perspective';
+            };
+            const scan = (v) => {
+              if (typeof v === 'string') return isGlobeToken(v);
+              if (Array.isArray(v)) return v.some(scan);
+              if (v && typeof v === 'object') return scan(v.type);
+              return false;
+            };
+            return scan(spec) ? 'globe' : 'mercator';
+          } catch (_) {
+            return 'mercator';
+          }
+        })()
+        """
 
         #expect(GetProjection().toJS() == expectedJS)
     }

@@ -9,8 +9,8 @@
 
 package struct GetProjection: MTValueCommand {
     package func toJS() -> JSString {
-        // Simple extraction: scan the projection spec; if it contains a globe-like value,
-        // return 'globe', otherwise 'mercator'. No expression evaluation.
+        // Extract projection spec and normalize on the JS side to a stable string
+        // ('globe' or 'mercator') so Swift can map it reliably.
         return "(()=>{\n" +
         "  try {\n" +
         "    const spec = \(MTBridge.mapObject).getProjection();\n" +

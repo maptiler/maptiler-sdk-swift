@@ -11,6 +11,6 @@ package struct GetMarkerOffset: MTValueCommand {
     var marker: MTMarker
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).getOffset().x;"
+        return "window.\(marker.identifier).getOffset().x;"
     }
 }

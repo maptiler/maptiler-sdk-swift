@@ -60,9 +60,9 @@ struct MTMarkerTests {
         let jsString = AddMarker(marker: marker).toJS()
 
         #expect(jsString.contains("id: '\(marker.identifier)'"))
-        #expect(jsString.contains("postDragEvent\(marker.identifier)('drag')"))
-        #expect(jsString.contains("postDragEvent\(marker.identifier)('dragstart')"))
-        #expect(jsString.contains("postDragEvent\(marker.identifier)('dragend')"))
+        #expect(jsString.contains("postDragEvent_\(marker.identifier)('drag')"))
+        #expect(jsString.contains("postDragEvent_\(marker.identifier)('dragstart')"))
+        #expect(jsString.contains("postDragEvent_\(marker.identifier)('dragend')"))
         #expect(jsString.contains("event: 'dragstart'"))
         #expect(jsString.contains("event: 'dragend'"))
     }
@@ -110,8 +110,8 @@ struct MTMarkerTests {
             #expect(jsString.contains("rotation: \(marker.rotation)"))
             #expect(jsString.contains("rotationAlignment: '\(marker.rotationAlignment.rawValue)'"))
             #expect(jsString.contains("pitchAlignment: '\(marker.pitchAlignment.rawValue)'"))
-            #expect(jsString.contains("postDragEvent\(marker.identifier)('dragstart')"))
-            #expect(jsString.contains("postDragEvent\(marker.identifier)('dragend')"))
+            #expect(jsString.contains("postDragEvent_\(marker.identifier)('dragstart')"))
+            #expect(jsString.contains("postDragEvent_\(marker.identifier)('dragend')"))
         }
     }
 
@@ -160,20 +160,20 @@ struct MTMarkerTests {
             #expect(jsString.contains("rotation: \(marker.rotation)"))
             #expect(jsString.contains("rotationAlignment: '\(marker.rotationAlignment.rawValue)'"))
             #expect(jsString.contains("pitchAlignment: '\(marker.pitchAlignment.rawValue)'"))
-            #expect(jsString.contains("postDragEvent\(marker.identifier)('dragstart')"))
-            #expect(jsString.contains("postDragEvent\(marker.identifier)('dragend')"))
+            #expect(jsString.contains("postDragEvent_\(marker.identifier)('dragstart')"))
+            #expect(jsString.contains("postDragEvent_\(marker.identifier)('dragend')"))
         }
     }
 
     @Test func markerGetterCommands_matchExpectedJS() async throws {
         let marker = MTMarker(coordinates: coordinate, draggable: true, anchor: .top, offset: 5.0)
 
-        #expect(GetMarkerCoordinates(marker: marker).toJS() == "\(marker.identifier).getLngLat();")
-        #expect(GetMarkerPitchAlignment(marker: marker).toJS() == "\(marker.identifier).getPitchAlignment();")
-        #expect(GetMarkerRotation(marker: marker).toJS() == "\(marker.identifier).getRotation();")
-        #expect(GetMarkerRotationAlignment(marker: marker).toJS() == "\(marker.identifier).getRotationAlignment();")
-        #expect(GetMarkerOffset(marker: marker).toJS() == "\(marker.identifier).getOffset().x;")
-        #expect(IsMarkerDraggable(marker: marker).toJS() == "\(marker.identifier).isDraggable();")
+        #expect(GetMarkerCoordinates(marker: marker).toJS() == "(() => {\n    const p = window.\(marker.identifier).getLngLat();\n    return p ? { lat: p.lat, lng: p.lng } : null;\n})();")
+        #expect(GetMarkerPitchAlignment(marker: marker).toJS() == "window.\(marker.identifier).getPitchAlignment();")
+        #expect(GetMarkerRotation(marker: marker).toJS() == "window.\(marker.identifier).getRotation();")
+        #expect(GetMarkerRotationAlignment(marker: marker).toJS() == "window.\(marker.identifier).getRotationAlignment();")
+        #expect(GetMarkerOffset(marker: marker).toJS() == "window.\(marker.identifier).getOffset().x;")
+        #expect(IsMarkerDraggable(marker: marker).toJS() == "window.\(marker.identifier).isDraggable();")
     }
 
     @Test func markerSetterCommands_matchExpectedJS() async throws {
@@ -185,10 +185,10 @@ struct MTMarkerTests {
         let alignmentJS = SetMarkerRotationAlignment(marker: marker, alignment: .map).toJS()
         let togglePopupJS = ToggleMarkerPopup(marker: marker).toJS()
 
-        #expect(draggableJS == "\(marker.identifier).setDraggable(false);")
-        #expect(offsetJS == "\(marker.identifier).setOffset([12.0, 12.0]);")
-        #expect(rotationJS == "\(marker.identifier).setRotation(15.5);")
-        #expect(alignmentJS == "\(marker.identifier).setRotationAlignment('\(MTMarkerRotationAlignment.map.rawValue)');")
-        #expect(togglePopupJS == "\(marker.identifier).togglePopup();")
+        #expect(draggableJS == "window.\(marker.identifier).setDraggable(false);")
+        #expect(offsetJS == "window.\(marker.identifier).setOffset([12.0, 12.0]);")
+        #expect(rotationJS == "window.\(marker.identifier).setRotation(15.5);")
+        #expect(alignmentJS == "window.\(marker.identifier).setRotationAlignment('\(MTMarkerRotationAlignment.map.rawValue)');")
+        #expect(togglePopupJS == "window.\(marker.identifier).togglePopup();")
     }
 }

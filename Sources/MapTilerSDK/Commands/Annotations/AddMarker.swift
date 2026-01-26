@@ -34,25 +34,27 @@ package struct AddMarker: MTCommand {
 
         if let popup = marker.popup {
             popupAttachment = """
-                const \(popup.identifier) = new maptilersdk.Popup({ offset: \(popup.offset ?? 0) });
+                window.\(popup.identifier) = new maptilersdk.Popup({ offset: \(popup.offset ?? 0) });
 
-                \(popup.identifier)
+                window.\(popup.identifier)
                 .setText('\(popup.text)')
 
                 // Bridge popup open/close events to Swift for marker-attached popup
-                const postPopupEvent\(popup.identifier) = (eventName) => {
+                window.postPopupEvent_\(popup.identifier) = (eventName) => {
                     window.webkit.messageHandlers.mapHandler.postMessage({
                         event: eventName,
                         data: { id: '\(popup.identifier)' }
                     });
                 };
 
-                \(popup.identifier).on('open', () => postPopupEvent\(popup.identifier)('open'));
-                \(popup.identifier).on('close', () => postPopupEvent\(popup.identifier)('close'));
+                window.\(popup.identifier).on('open', () => window.postPopupEvent_\(popup.identifier)('open'));
+                window.\(popup.identifier).on('close', () => window.postPopupEvent_\(popup.identifier)('close'));
                 """
         }
 
-        let popupString = marker.popup != nil ? "\(marker.identifier).setPopup(\(marker.popup!.identifier))" : ""
+        let popupString = marker.popup != nil
+            ? "window.\(marker.identifier).setPopup(window.\(marker.popup!.identifier))"
+            : ""
 
         if let icon = marker.icon, let encodedImageString = icon.getEncodedString() {
             iconInit = """
@@ -74,13 +76,13 @@ package struct AddMarker: MTCommand {
 
             \(iconInit)
 
-            const \(marker.identifier) = new maptilersdk.Marker({
+            window.\(marker.identifier) = new maptilersdk.Marker({
                 \(optionsString)
             });
 
             \(popupString)
 
-            \(marker.identifier)
+            window.\(marker.identifier)
             .setLngLat([\(coordinates.lng), \(coordinates.lat)])
             .addTo(\(MTBridge.mapObject));
 
@@ -91,8 +93,8 @@ package struct AddMarker: MTCommand {
 
 package func markerDragEventHandlers(for marker: MTMarker) -> String {
     """
-        const postDragEvent\(marker.identifier) = (eventName) => {
-            var markerCoord = \(marker.identifier).getLngLat();
+        window.postDragEvent_\(marker.identifier) = (eventName) => {
+            var markerCoord = window.\(marker.identifier).getLngLat();
             var data = {
                 id: '\(marker.identifier)',
                 lngLat: markerCoord
@@ -116,8 +118,8 @@ package func markerDragEventHandlers(for marker: MTMarker) -> String {
             }
         };
 
-        \(marker.identifier).on('drag', () => postDragEvent\(marker.identifier)('drag'));
-        \(marker.identifier).on('dragstart', () => postDragEvent\(marker.identifier)('dragstart'));
-        \(marker.identifier).on('dragend', () => postDragEvent\(marker.identifier)('dragend'));
+        window.\(marker.identifier).on('drag', () => window.postDragEvent_\(marker.identifier)('drag'));
+        window.\(marker.identifier).on('dragstart', () => window.postDragEvent_\(marker.identifier)('dragstart'));
+        window.\(marker.identifier).on('dragend', () => window.postDragEvent_\(marker.identifier)('dragend'));
     """
 }

@@ -12,6 +12,6 @@ package struct SetMaxWidthToTextPopup: MTCommand {
     var maxWidth: Double
 
     package func toJS() -> JSString {
-        "\(popup.identifier).setMaxWidth(\(maxWidth));"
+        "window.\(popup.identifier).setMaxWidth(\(maxWidth));"
     }
 }

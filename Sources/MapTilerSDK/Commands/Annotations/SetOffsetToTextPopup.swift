@@ -12,6 +12,6 @@ package struct SetOffsetToTextPopup: MTCommand {
     var offset: Double
 
     package func toJS() -> JSString {
-        "\(popup.identifier).setOffset(\(offset));"
+        "window.\(popup.identifier).setOffset(\(offset));"
     }
 }

@@ -44,7 +44,7 @@ package struct AddMarkers: MTCommand {
                     img\(marker.identifier).style.width = '\(markerIcon.size.width * markerIcon.scale)px';
                     img\(marker.identifier).style.height = '\(markerIcon.size.height * markerIcon.scale)px';
 
-                    const \(marker.identifier) = new maptilersdk.Marker({
+                    window.\(marker.identifier) = new maptilersdk.Marker({
                         color: '\(marker.color?.toHex() ?? UIColor.blue.toHex())',
                         opacity: \(marker.opacity),
                         opacityWhenCovered: \(marker.opacityWhenCovered),
@@ -59,7 +59,7 @@ package struct AddMarkers: MTCommand {
                         element: img\(marker.identifier)
                     });
 
-                    \(marker.identifier)
+                    window.\(marker.identifier)
                     .setLngLat([\(marker.coordinates.longitude), \(marker.coordinates.latitude)])
                     .addTo(\(MTBridge.mapObject));
 
@@ -89,7 +89,7 @@ package struct AddMarkers: MTCommand {
         var icon\(marker.identifier) = new Image();
         icon\(marker.identifier).src = 'data:image/png;base64,\(encodedImageString)';
 
-        const \(marker.identifier) = new maptilersdk.Marker({
+        window.\(marker.identifier) = new maptilersdk.Marker({
             color: '\(marker.color?.toHex() ?? UIColor.blue.toHex())',
             opacity: \(marker.opacity),
             opacityWhenCovered: \(marker.opacityWhenCovered),
@@ -104,7 +104,7 @@ package struct AddMarkers: MTCommand {
             element: icon\(marker.identifier)
         });
 
-        \(marker.identifier)
+        window.\(marker.identifier)
         .setLngLat([\(coordinates.lng), \(coordinates.lat)])
         .addTo(\(MTBridge.mapObject));
         \(markerDragEventHandlers(for: marker))

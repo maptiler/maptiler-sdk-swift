@@ -11,6 +11,6 @@ package struct IsTextPopupOpen: MTValueCommand {
     var popup: MTTextPopup
 
     package func toJS() -> JSString {
-        return "\(popup.identifier).isOpen();"
+        return "window.\(popup.identifier).isOpen();"
     }
 }

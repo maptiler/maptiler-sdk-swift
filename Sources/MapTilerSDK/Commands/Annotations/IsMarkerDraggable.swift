@@ -11,6 +11,6 @@ package struct IsMarkerDraggable: MTValueCommand {
     var marker: MTMarker
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).isDraggable();"
+        return "window.\(marker.identifier).isDraggable();"
     }
 }

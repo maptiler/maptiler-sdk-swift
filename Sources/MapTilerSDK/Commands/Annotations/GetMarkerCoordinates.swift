@@ -11,6 +11,9 @@ package struct GetMarkerCoordinates: MTValueCommand {
     var marker: MTMarker
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).getLngLat();"
+        return "(() => {\n" +
+            "    const p = window.\(marker.identifier).getLngLat();\n" +
+            "    return p ? { lat: p.lat, lng: p.lng } : null;\n" +
+            "})();"
     }
 }

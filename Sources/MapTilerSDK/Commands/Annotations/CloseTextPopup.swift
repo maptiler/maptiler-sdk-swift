@@ -11,6 +11,6 @@ package struct CloseTextPopup: MTCommand {
     var popup: MTTextPopup
 
     package func toJS() -> JSString {
-        return "\(popup.identifier).remove();"
+        return "window.\(popup.identifier).remove();"
     }
 }

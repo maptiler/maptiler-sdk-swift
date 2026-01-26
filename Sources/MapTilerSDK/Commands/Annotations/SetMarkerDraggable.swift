@@ -12,6 +12,6 @@ package struct SetMarkerDraggable: MTCommand {
     var draggable: Bool
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).setDraggable(\(draggable));"
+        return "window.\(marker.identifier).setDraggable(\(draggable));"
     }
 }

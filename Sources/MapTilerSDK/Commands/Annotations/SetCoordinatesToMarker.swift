@@ -13,6 +13,6 @@ package struct SetCoordinatesToMarker: MTCommand {
     package func toJS() -> JSString {
         let coordinates = marker.coordinates.toLngLat()
 
-        return "\(marker.identifier).setLngLat([\(coordinates.lng), \(coordinates.lat)]);"
+        return "window.\(marker.identifier).setLngLat([\(coordinates.lng), \(coordinates.lat)]);"
     }
 }

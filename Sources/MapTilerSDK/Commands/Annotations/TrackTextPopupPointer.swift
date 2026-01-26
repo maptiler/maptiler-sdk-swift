@@ -11,6 +11,6 @@ package struct TrackTextPopupPointer: MTCommand {
     var popup: MTTextPopup
 
     package func toJS() -> JSString {
-        "\(popup.identifier).trackPointer();"
+        "window.\(popup.identifier).trackPointer();"
     }
 }

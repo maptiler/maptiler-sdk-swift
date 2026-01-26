@@ -17,6 +17,12 @@ package extension MTBridgeReturnType {
 
         let normalizedValue = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 
-        return MTProjectionType(rawValue: normalizedValue)
+        // Map known aliases to supported enum cases
+        switch normalizedValue {
+        case "vertical-perspective", "vertical_perspective", "verticalperspective", "perspective":
+            return .globe
+        default:
+            return MTProjectionType(rawValue: normalizedValue)
+        }
     }
 }

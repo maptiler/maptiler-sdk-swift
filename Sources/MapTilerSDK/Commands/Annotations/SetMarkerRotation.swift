@@ -12,6 +12,6 @@ package struct SetMarkerRotation: MTCommand {
     var rotation: Double
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).setRotation(\(rotation));"
+        return "window.\(marker.identifier).setRotation(\(rotation));"
     }
 }

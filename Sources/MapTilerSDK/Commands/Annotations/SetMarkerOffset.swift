@@ -12,6 +12,6 @@ package struct SetMarkerOffset: MTCommand {
     var offset: Double
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).setOffset([\(offset), \(offset)]);"
+        return "window.\(marker.identifier).setOffset([\(offset), \(offset)]);"
     }
 }

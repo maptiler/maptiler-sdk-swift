@@ -11,6 +11,11 @@ package struct GetTextPopupCoordinates: MTValueCommand {
     var popup: MTTextPopup
 
     package func toJS() -> JSString {
-        return "\(popup.identifier).getLngLat();"
+        return """
+        (() => {
+            const p = window.\(popup.identifier).getLngLat();
+            return p ? { lat: p.lat, lng: p.lng } : null;
+        })();
+        """
     }
 }

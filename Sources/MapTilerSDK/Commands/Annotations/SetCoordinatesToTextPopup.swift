@@ -13,6 +13,6 @@ package struct SetCoordinatesToTextPopup: MTCommand {
     package func toJS() -> JSString {
         let coordinates = popup.coordinates.toLngLat()
 
-        return "\(popup.identifier).setLngLat([\(coordinates.lng), \(coordinates.lat)]);"
+        return "window.\(popup.identifier).setLngLat([\(coordinates.lng), \(coordinates.lat)]);"
     }
 }

@@ -11,6 +11,6 @@ package struct GetMarkerPitchAlignment: MTValueCommand {
     var marker: MTMarker
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).getPitchAlignment();"
+        return "window.\(marker.identifier).getPitchAlignment();"
     }
 }

@@ -11,6 +11,6 @@ package struct ToggleMarkerPopup: MTCommand {
     var marker: MTMarker
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).togglePopup();"
+        return "window.\(marker.identifier).togglePopup();"
     }
 }

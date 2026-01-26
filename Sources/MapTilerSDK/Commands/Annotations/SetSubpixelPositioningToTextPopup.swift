@@ -12,6 +12,6 @@ package struct SetSubpixelPositioningToTextPopup: MTCommand {
     var isEnabled: Bool
 
     package func toJS() -> JSString {
-        "\(popup.identifier).setSubpixelPositioning(\(isEnabled));"
+        "window.\(popup.identifier).setSubpixelPositioning(\(isEnabled));"
     }
 }

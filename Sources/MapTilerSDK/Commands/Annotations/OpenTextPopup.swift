@@ -11,6 +11,6 @@ package struct OpenTextPopup: MTCommand {
     var popup: MTTextPopup
 
     package func toJS() -> JSString {
-        return "\(popup.identifier).addTo(\(MTBridge.mapObject));"
+        return "window.\(popup.identifier).addTo(\(MTBridge.mapObject));"
     }
 }

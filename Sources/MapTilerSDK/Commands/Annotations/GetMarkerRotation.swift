@@ -11,6 +11,6 @@ package struct GetMarkerRotation: MTValueCommand {
     var marker: MTMarker
 
     package func toJS() -> JSString {
-        return "\(marker.identifier).getRotation();"
+        return "window.\(marker.identifier).getRotation();"
     }
 }

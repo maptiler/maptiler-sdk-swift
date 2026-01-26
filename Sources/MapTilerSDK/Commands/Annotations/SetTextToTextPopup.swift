@@ -13,6 +13,6 @@ package struct SetTextToTextPopup: MTCommand {
 
     package func toJS() -> JSString {
         let escapedText = text.replacingOccurrences(of: "'", with: "\\'")
-        return "\(popup.identifier).setText('\(escapedText)');"
+        return "window.\(popup.identifier).setText('\(escapedText)');"
     }
 }

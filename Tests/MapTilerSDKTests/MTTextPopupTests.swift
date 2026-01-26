@@ -42,31 +42,38 @@ struct MTTextPopupTests {
     @Test func textPopupGetterCommands_matchExpectedJS() async throws {
         let popup = MTTextPopup(coordinates: coordinate, text: "Hello World")
 
-        #expect(GetTextPopupCoordinates(popup: popup).toJS() == "\(popup.identifier).getLngLat();")
-        #expect(IsTextPopupOpen(popup: popup).toJS() == "\(popup.identifier).isOpen();")
+        #expect(
+            GetTextPopupCoordinates(popup: popup).toJS() == """
+            (() => {
+                const p = window.\(popup.identifier).getLngLat();
+                return p ? { lat: p.lat, lng: p.lng } : null;
+            })();
+            """
+        )
+        #expect(IsTextPopupOpen(popup: popup).toJS() == "window.\(popup.identifier).isOpen();")
     }
 
     @Test func textPopupLifecycleCommands_matchExpectedJS() async throws {
         let popup = MTTextPopup(coordinates: coordinate, text: "Hello World")
 
-        #expect(OpenTextPopup(popup: popup).toJS() == "\(popup.identifier).addTo(\(MTBridge.mapObject));")
-        #expect(CloseTextPopup(popup: popup).toJS() == "\(popup.identifier).remove();")
+        #expect(OpenTextPopup(popup: popup).toJS() == "window.\(popup.identifier).addTo(\(MTBridge.mapObject));")
+        #expect(CloseTextPopup(popup: popup).toJS() == "window.\(popup.identifier).remove();")
     }
 
     @Test func textPopupSetterCommands_matchExpectedJS() async throws {
         let popup = MTTextPopup(coordinates: coordinate, text: "O'Brien")
 
-        #expect(SetCoordinatesToTextPopup(popup: popup).toJS() == "\(popup.identifier).setLngLat([20.0, 10.0]);")
-        #expect(SetMaxWidthToTextPopup(popup: popup, maxWidth: 240).toJS() == "\(popup.identifier).setMaxWidth(240.0);")
-        #expect(SetOffsetToTextPopup(popup: popup, offset: 8).toJS() == "\(popup.identifier).setOffset(8.0);")
+        #expect(SetCoordinatesToTextPopup(popup: popup).toJS() == "window.\(popup.identifier).setLngLat([20.0, 10.0]);")
+        #expect(SetMaxWidthToTextPopup(popup: popup, maxWidth: 240).toJS() == "window.\(popup.identifier).setMaxWidth(240.0);")
+        #expect(SetOffsetToTextPopup(popup: popup, offset: 8).toJS() == "window.\(popup.identifier).setOffset(8.0);")
         #expect(
             SetSubpixelPositioningToTextPopup(popup: popup, isEnabled: true).toJS()
-                == "\(popup.identifier).setSubpixelPositioning(true);"
+                == "window.\(popup.identifier).setSubpixelPositioning(true);"
         )
         #expect(
             SetTextToTextPopup(popup: popup, text: popup.text).toJS()
-                == "\(popup.identifier).setText('O\\'Brien');"
+                == "window.\(popup.identifier).setText('O\\'Brien');"
         )
-        #expect(TrackTextPopupPointer(popup: popup).toJS() == "\(popup.identifier).trackPointer();")
+        #expect(TrackTextPopupPointer(popup: popup).toJS() == "window.\(popup.identifier).trackPointer();")
     }
 }

@@ -21,6 +21,8 @@ package struct AddSource: MTCommand {
             return handleMTRasterDEMSource(source)
         } else if let source = source as? MTGeoJSONSource {
             return handleGeoJSONSource(source)
+        } else if let source = source as? MTImageSource {
+            return handleImageSource(source)
         }
 
         return emptyReturnValue
@@ -120,6 +122,17 @@ package struct AddSource: MTCommand {
         }
 
         return "\(MTBridge.mapObject).addSource('\(source.identifier)', \(jsSourceString));"
+    }
+
+    private func handleImageSource(_ source: MTImageSource) -> JSString {
+        guard let url = source.url else { return emptyReturnValue }
+        return """
+        \(MTBridge.mapObject).addSource('\(source.identifier)', {
+            type: '\(source.type.rawValue)',
+            url: '\(url.absoluteString)',
+            coordinates: \(source.coordinates)
+        });
+        """
     }
 }
 

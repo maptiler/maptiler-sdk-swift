@@ -646,6 +646,27 @@ extension MTMapView: MTStylable {
     ) {
         runCommand(SetTilesToSource(tiles: tiles, source: source), completion: completionHandler)
     }
+
+    // MARK: - Image source helpers
+    package func setCoordinates(
+        _ coordinates: [[Double]],
+        to source: MTImageSource,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetCoordinatesToImageSource(source: source, coordinates: coordinates), completion: completionHandler)
+    }
+
+    package func updateImage(
+        url: URL,
+        coordinates: [[Double]],
+        to source: MTImageSource,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            UpdateImageInSource(source: source, url: url, coordinates: coordinates),
+            completion: completionHandler
+        )
+    }
 }
 
 // Concurrency: style property setters

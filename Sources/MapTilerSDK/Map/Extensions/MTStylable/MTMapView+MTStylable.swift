@@ -680,6 +680,15 @@ extension MTMapView: MTStylable {
         let coords = coordinates.map { [$0.longitude, $0.latitude] }
         runCommand(SetCoordinatesToVideoSource(source: source, coordinates: coords), completion: completionHandler)
     }
+
+    // Control playback on a video source
+    package func play(_ source: MTVideoSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(PlayVideoSource(source: source), completion: completionHandler)
+    }
+
+    package func pause(_ source: MTVideoSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(PauseVideoSource(source: source), completion: completionHandler)
+    }
 }
 
 // Concurrency: style property setters

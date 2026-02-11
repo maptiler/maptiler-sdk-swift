@@ -80,6 +80,52 @@ extension MTVideoSource {
     }
 }
 
+// MARK: - Playback controls
+extension MTVideoSource {
+    /// Starts playback of the video source.
+    /// - Parameters:
+    ///   - mapView: MTMapView which holds the source.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func play(in mapView: MTMapView, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        mapView.play(self, completionHandler: completionHandler)
+    }
+
+    /// Pauses playback of the video source.
+    /// - Parameters:
+    ///   - mapView: MTMapView which holds the source.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pause(in mapView: MTMapView, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        mapView.pause(self, completionHandler: completionHandler)
+    }
+}
+
+// MARK: - Playback controls (async)
+extension MTVideoSource {
+    /// Starts playback of the video source (async).
+    @MainActor
+    public func play(in mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            play(in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Pauses playback of the video source (async).
+    @MainActor
+    public func pause(in mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            pause(in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+}
+
 // MARK: - DSL
 extension MTVideoSource {
     /// Adds source to map DSL style.

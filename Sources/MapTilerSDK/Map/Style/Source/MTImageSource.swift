@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 /// An image source.
 ///
@@ -21,9 +22,9 @@ public class MTImageSource: MTSource, @unchecked Sendable {
     /// URL that points to an image.
     public var url: URL?
 
-    /// Corners of image specified in longitude, latitude pairs.
+    /// Corners of image specified as `CLLocationCoordinate2D`.
     /// Clockwise order: top-left, top-right, bottom-right, bottom-left.
-    public var coordinates: [[Double]]
+    public var coordinates: [CLLocationCoordinate2D]
 
     /// Type of the source.
     public private(set) var type: MTSourceType = .image
@@ -32,8 +33,8 @@ public class MTImageSource: MTSource, @unchecked Sendable {
     /// - Parameters:
     ///   - identifier: Unique id of the source.
     ///   - url: URL to the image resource.
-    ///   - coordinates: Corners of image in [lng, lat] clockwise order.
-    public init(identifier: String, url: URL, coordinates: [[Double]]) {
+    ///   - coordinates: Corners of image in clockwise order using `CLLocationCoordinate2D`.
+    public init(identifier: String, url: URL, coordinates: [CLLocationCoordinate2D]) {
         self.identifier = identifier
         self.url = url
         self.coordinates = coordinates
@@ -44,13 +45,13 @@ public class MTImageSource: MTSource, @unchecked Sendable {
 extension MTImageSource {
     /// Updates the coordinates of the image source.
     /// - Parameters:
-    ///   - coordinates: New corners of the image specified in [lng, lat] pairs.
+    ///   - coordinates: New corners of the image using `CLLocationCoordinate2D`.
     ///   - mapView: MTMapView which holds the source.
     ///   - completionHandler: A handler block to execute when function finishes.
     @MainActor
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setCoordinates(
-        _ coordinates: [[Double]],
+        _ coordinates: [CLLocationCoordinate2D],
         in mapView: MTMapView,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
@@ -60,14 +61,14 @@ extension MTImageSource {
     /// Updates the image URL and coordinates simultaneously.
     /// - Parameters:
     ///   - url: New image URL.
-    ///   - coordinates: New corners of the image specified in [lng, lat] pairs.
+    ///   - coordinates: New corners of the image using `CLLocationCoordinate2D`.
     ///   - mapView: MTMapView which holds the source.
     ///   - completionHandler: A handler block to execute when function finishes.
     @MainActor
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func updateImage(
         url: URL,
-        coordinates: [[Double]],
+        coordinates: [CLLocationCoordinate2D],
         in mapView: MTMapView,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
@@ -79,10 +80,10 @@ extension MTImageSource {
 extension MTImageSource {
     /// Updates the coordinates of the image source.
     /// - Parameters:
-    ///   - coordinates: New corners of the image specified in [lng, lat] pairs.
+    ///   - coordinates: New corners of the image using `CLLocationCoordinate2D`.
     ///   - mapView: MTMapView which holds the source.
     @MainActor
-    public func setCoordinates(_ coordinates: [[Double]], in mapView: MTMapView) async {
+    public func setCoordinates(_ coordinates: [CLLocationCoordinate2D], in mapView: MTMapView) async {
         await withCheckedContinuation { continuation in
             setCoordinates(coordinates, in: mapView) { _ in
                 continuation.resume()
@@ -93,10 +94,10 @@ extension MTImageSource {
     /// Updates the image URL and coordinates simultaneously.
     /// - Parameters:
     ///   - url: New image URL.
-    ///   - coordinates: New corners of the image specified in [lng, lat] pairs.
+    ///   - coordinates: New corners of the image using `CLLocationCoordinate2D`.
     ///   - mapView: MTMapView which holds the source.
     @MainActor
-    public func updateImage(url: URL, coordinates: [[Double]], in mapView: MTMapView) async {
+    public func updateImage(url: URL, coordinates: [CLLocationCoordinate2D], in mapView: MTMapView) async {
         await withCheckedContinuation { continuation in
             updateImage(url: url, coordinates: coordinates, in: mapView) { _ in
                 continuation.resume()

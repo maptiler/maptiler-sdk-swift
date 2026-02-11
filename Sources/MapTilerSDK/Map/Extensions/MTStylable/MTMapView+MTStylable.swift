@@ -650,21 +650,23 @@ extension MTMapView: MTStylable {
 
     // MARK: - Image source helpers
     package func setCoordinates(
-        _ coordinates: [[Double]],
+        _ coordinates: [CLLocationCoordinate2D],
         to source: MTImageSource,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        runCommand(SetCoordinatesToImageSource(source: source, coordinates: coordinates), completion: completionHandler)
+        let coords = coordinates.map { [$0.longitude, $0.latitude] }
+        runCommand(SetCoordinatesToImageSource(source: source, coordinates: coords), completion: completionHandler)
     }
 
     package func updateImage(
         url: URL,
-        coordinates: [[Double]],
+        coordinates: [CLLocationCoordinate2D],
         to source: MTImageSource,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
+        let coords = coordinates.map { [$0.longitude, $0.latitude] }
         runCommand(
-            UpdateImageInSource(source: source, url: url, coordinates: coordinates),
+            UpdateImageInSource(source: source, url: url, coordinates: coords),
             completion: completionHandler
         )
     }

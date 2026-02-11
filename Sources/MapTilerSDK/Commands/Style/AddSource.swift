@@ -128,11 +128,12 @@ package struct AddSource: MTCommand {
 
     private func handleImageSource(_ source: MTImageSource) -> JSString {
         guard let url = source.url else { return emptyReturnValue }
+        let coords = source.coordinates.map { [$0.longitude, $0.latitude] }
         return """
         \(MTBridge.mapObject).addSource('\(source.identifier)', {
             type: '\(source.type.rawValue)',
             url: '\(url.absoluteString)',
-            coordinates: \(source.coordinates)
+            coordinates: \(coords)
         });
         """
     }

@@ -27,6 +27,8 @@ package struct AddLayer: MTCommand {
             return handleMTCircleLayer(layer)
         } else if let layer = layer as? MTHeatmapLayer {
             return handleMTHeatmapLayer(layer)
+        } else if let layer = layer as? MTFillExtrusionLayer {
+            return handleMTFillExtrusionLayer(layer)
         }
 
         return emptyReturnValue
@@ -121,6 +123,19 @@ package struct AddLayer: MTCommand {
         }
         return js
     }
+
+    private func handleMTFillExtrusionLayer(_ layer: MTFillExtrusionLayer) -> JSString {
+        guard let layerString: JSString = layer.toJSON() else {
+            return emptyReturnValue
+        }
+
+        let processed = unquoteExpressions(in: layerString)
+        var js = "\(MTBridge.mapObject).addLayer(\(processed));"
+        if let filter = layer.initialFilter {
+            js.append("\n \(MTBridge.mapObject).setFilter('\(layer.identifier)', \(filter.toJS()));")
+        }
+        return js
+    }
 }
 /// Replaces string-encoded expressions with raw JSON arrays.
 /// Ensures the style parser reads them as expressions (not strings).
@@ -163,6 +178,26 @@ fileprivate func unquoteExpressions(in json: String) -> String {
     )
     s = s.replacingOccurrences(
         of: #"(?s)("heatmap-weight"\s*:\s*)"(\[.*?\])""#,
+        with: "$1$2",
+        options: .regularExpression
+    )
+    s = s.replacingOccurrences(
+        of: #"(?s)("fill-extrusion-color"\s*:\s*)"(\[.*?\])""#,
+        with: "$1$2",
+        options: .regularExpression
+    )
+    s = s.replacingOccurrences(
+        of: #"(?s)("fill-extrusion-height"\s*:\s*)"(\[.*?\])""#,
+        with: "$1$2",
+        options: .regularExpression
+    )
+    s = s.replacingOccurrences(
+        of: #"(?s)("fill-extrusion-base"\s*:\s*)"(\[.*?\])""#,
+        with: "$1$2",
+        options: .regularExpression
+    )
+    s = s.replacingOccurrences(
+        of: #"(?s)("fill-extrusion-opacity"\s*:\s*)"(\[.*?\])""#,
         with: "$1$2",
         options: .regularExpression
     )

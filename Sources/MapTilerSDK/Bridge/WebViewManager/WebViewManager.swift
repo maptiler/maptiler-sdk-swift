@@ -43,10 +43,12 @@ package final class WebViewManager: NSObject {
 
             let configuration = WKWebViewConfiguration()
             configuration.userContentController = makeUserContentController()
+            configuration.allowsInlineMediaPlayback = true
 
             webView = WKWebView(frame: frame, configuration: configuration)
             webView?.navigationDelegate = self
             webView?.scrollView.contentInsetAdjustmentBehavior = .never
+
             webView?.load(request)
         }
     }

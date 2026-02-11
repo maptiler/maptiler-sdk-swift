@@ -8,6 +8,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 extension MTMapView: MTStylable {
     /// Sets the value of the style's glyphs property.
@@ -649,23 +650,44 @@ extension MTMapView: MTStylable {
 
     // MARK: - Image source helpers
     package func setCoordinates(
-        _ coordinates: [[Double]],
+        _ coordinates: [CLLocationCoordinate2D],
         to source: MTImageSource,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        runCommand(SetCoordinatesToImageSource(source: source, coordinates: coordinates), completion: completionHandler)
+        let coords = coordinates.map { [$0.longitude, $0.latitude] }
+        runCommand(SetCoordinatesToImageSource(source: source, coordinates: coords), completion: completionHandler)
     }
 
     package func updateImage(
         url: URL,
-        coordinates: [[Double]],
+        coordinates: [CLLocationCoordinate2D],
         to source: MTImageSource,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
+        let coords = coordinates.map { [$0.longitude, $0.latitude] }
         runCommand(
-            UpdateImageInSource(source: source, url: url, coordinates: coordinates),
+            UpdateImageInSource(source: source, url: url, coordinates: coords),
             completion: completionHandler
         )
+    }
+
+    // MARK: - Video source helpers
+    package func setCoordinates(
+        _ coordinates: [CLLocationCoordinate2D],
+        to source: MTVideoSource,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        let coords = coordinates.map { [$0.longitude, $0.latitude] }
+        runCommand(SetCoordinatesToVideoSource(source: source, coordinates: coords), completion: completionHandler)
+    }
+
+    // Control playback on a video source
+    package func play(_ source: MTVideoSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(PlayVideoSource(source: source), completion: completionHandler)
+    }
+
+    package func pause(_ source: MTVideoSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(PauseVideoSource(source: source), completion: completionHandler)
     }
 }
 

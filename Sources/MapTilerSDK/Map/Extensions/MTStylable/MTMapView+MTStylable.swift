@@ -8,6 +8,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 extension MTMapView: MTStylable {
     /// Sets the value of the style's glyphs property.
@@ -666,6 +667,16 @@ extension MTMapView: MTStylable {
             UpdateImageInSource(source: source, url: url, coordinates: coordinates),
             completion: completionHandler
         )
+    }
+
+    // MARK: - Video source helpers
+    package func setCoordinates(
+        _ coordinates: [CLLocationCoordinate2D],
+        to source: MTVideoSource,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        let coords = coordinates.map { [$0.longitude, $0.latitude] }
+        runCommand(SetCoordinatesToVideoSource(source: source, coordinates: coords), completion: completionHandler)
     }
 }
 

@@ -23,6 +23,8 @@ package struct AddSource: MTCommand {
             return handleGeoJSONSource(source)
         } else if let source = source as? MTImageSource {
             return handleImageSource(source)
+        } else if let source = source as? MTVideoSource {
+            return handleVideoSource(source)
         }
 
         return emptyReturnValue
@@ -131,6 +133,18 @@ package struct AddSource: MTCommand {
             type: '\(source.type.rawValue)',
             url: '\(url.absoluteString)',
             coordinates: \(source.coordinates)
+        });
+        """
+    }
+
+    private func handleVideoSource(_ source: MTVideoSource) -> JSString {
+        let urls = source.urls.map { $0.absoluteString }
+        let coords = source.coordinates.map { [$0.longitude, $0.latitude] }
+        return """
+        \(MTBridge.mapObject).addSource('\(source.identifier)', {
+            type: '\(source.type.rawValue)',
+            urls: \(urls),
+            coordinates: \(coords)
         });
         """
     }

@@ -34,6 +34,8 @@ package struct AddLayers: MTCommand {
                 jsString.append(handleMTHeatmapLayer(layer))
             } else if let layer = layer as? MTFillExtrusionLayer {
                 jsString.append(handleMTFillExtrusionLayer(layer))
+            } else if let layer = layer as? MTBackgroundLayer {
+                jsString.append(handleMTBackgroundLayer(layer))
             }
         }
 
@@ -135,6 +137,14 @@ package struct AddLayers: MTCommand {
         }
         return js
     }
+
+    private func handleMTBackgroundLayer(_ layer: MTBackgroundLayer) -> JSString {
+        guard let layerString: JSString = layer.toJSON() else {
+            return emptyReturnValue
+        }
+        let processed = unquoteExpressions(in: layerString)
+        return "\(MTBridge.mapObject).addLayer(\(processed));"
+    }
 }
 
 /// Replaces string-encoded expressions with raw JSON arrays.
@@ -198,6 +208,11 @@ fileprivate func unquoteExpressions(in json: String) -> String {
     )
     s = s.replacingOccurrences(
         of: #"(?s)("fill-extrusion-opacity"\s*:\s*)"(\[.*?\])""#,
+        with: "$1$2",
+        options: .regularExpression
+    )
+    s = s.replacingOccurrences(
+        of: #"(?s)("background-color"\s*:\s*)"(\[.*?\])""#,
         with: "$1$2",
         options: .regularExpression
     )

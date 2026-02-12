@@ -243,7 +243,10 @@ extension MTStyle {
     public func addLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
 
-        if mapSources[layer.sourceIdentifier] != nil {
+        // Background layers have no source; add them directly.
+        if layer.type == .background {
+            mapView.addLayer(layer, completionHandler: completionHandler)
+        } else if mapSources[layer.sourceIdentifier] != nil {
             mapView.isSourceLoaded(id: layer.sourceIdentifier) { [weak self] result in
                 guard let self else {
                     completionHandler?(.failure(MTError.bridgeNotLoaded))

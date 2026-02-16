@@ -450,8 +450,8 @@ MapTiler SDK Swift is released under the BSD 3-Clause license – see the [LICE
 
 - [x] Map interaction
 - [x] Pre-made map styles
-- [x] VectorTile and GeoJSON sources
-- [x] Fill, Line and Symbol layers
+- [x] Sources: Vector tiles, Raster tiles, Raster DEM (terrain), GeoJSON, Image, Video
+- [x] Layers: Background, Fill, Line, Symbol, Circle, Raster, Heatmap, Hillshade, Fill Extrusion
 - [x] Custom Annotation Views
 - [x] Location tracking
 - [x] Globe and 3D Terrain

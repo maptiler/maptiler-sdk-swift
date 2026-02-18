@@ -192,10 +192,18 @@ jobs:
               "run_shell_command(echo)",
               "run_shell_command(grep)",
               "run_shell_command(head)",
-              "run_shell_command(tail)"
+              "run_shell_command(tail)",
+              "run_shell_command(swiftlint)",
+              "run_shell_command(xcrun)",
+              "run_shell_command(xcodebuild)"
             ]            }
         prompt: |-
           Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}. Write the code changes to the disc.
+          
+          Verify your changes:
+          1. Run swiftlint.
+          2. Run tests using this command (flaky tests handled):
+          xcrun xcodebuild test -sdk iphonesimulator -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' -retry-tests-on-failure -test-iterations 3
     - name: Commit changes
       run: |
         git add -A

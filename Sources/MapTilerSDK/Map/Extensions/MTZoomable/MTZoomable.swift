@@ -23,4 +23,10 @@ public protocol MTZoomable {
     ///  - Parameters:
     ///   - zoom: The zoom level to set (0-20).
     func setZoom(_ zoom: Double) async
+
+    /// Zooms to a specific zoom level with optional animation.
+    /// - Parameters:
+    ///   - zoom: The zoom level to set (0-24).
+    ///   - animationOptions: Options for the animation (duration, easing, etc.).
+    func zoomTo(_ zoom: Double, animationOptions: MTAnimationOptions?) async
 }

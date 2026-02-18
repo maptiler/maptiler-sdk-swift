@@ -1,0 +1,8 @@
+# Ignore large assets and generated files to save context window
+js/images/
+*.map
+*.min.js
+*.geojson
+
+# Ignore documentation generated files
+js/docs/

@@ -49,6 +49,19 @@ struct MTNavigationTests {
         #expect(SetMinZoom(minZoom: zoom).toJS() == setMinZoomJS)
     }
 
+    @Test func zoomToCommand_shouldMatchJS() async throws {
+        let zoom = 10.0
+        let zoomToJS = "\(MTBridge.mapObject).zoomTo(\(zoom));"
+
+        #expect(ZoomTo(zoom: zoom).toJS() == zoomToJS)
+
+        let animationOptions = MTAnimationOptions(duration: 1000)
+        let optionsString = animationOptions.toJSON() ?? ""
+        let zoomToWithDurationJS = "\(MTBridge.mapObject).zoomTo(\(zoom), \(optionsString));"
+
+        #expect(ZoomTo(zoom: zoom, options: animationOptions).toJS() == zoomToWithDurationJS)
+    }
+
     @Test func easeToCommand_shouldMatchJS() async throws {
         let cameraOptions = MTCameraOptions(zoom: zoom, bearing: bearing, pitch: pitch)
 

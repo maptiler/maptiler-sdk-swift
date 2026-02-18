@@ -42,6 +42,20 @@ extension MTMapView: MTZoomable {
     public func setZoom(_ zoom: Double, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetZoom(zoom: zoom), completion: completionHandler)
     }
+
+    /// Zooms the map to the specified zoom level.
+    /// - Parameters:
+    ///   - zoom: The zoom level to transition to.
+    ///   - options: Animation options.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func zoomTo(
+        _ zoom: Double,
+        options: MTAnimationOptions? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(ZoomTo(zoom: zoom, options: options), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -84,6 +98,18 @@ extension MTMapView {
     public func setZoom(_ zoom: Double) async {
         await withCheckedContinuation { continuation in
             setZoom(zoom) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Zooms the map to the specified zoom level with optional animation options.
+    /// - Parameters:
+    ///   - zoom: The zoom level to transition to.
+    ///   - options: Animation options.
+    public func zoomTo(_ zoom: Double, options: MTAnimationOptions? = nil) async {
+        await withCheckedContinuation { continuation in
+            zoomTo(zoom, options: options) { _ in
                 continuation.resume()
             }
         }

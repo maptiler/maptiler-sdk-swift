@@ -45,7 +45,28 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          xcrun xcodebuild test -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' 2>&1 | tee xcodebuild-test.log
+          {
+            set -u
+            echo "Attempt 1: run tests on iPhone 16"
+            if xcrun xcodebuild test \
+              -sdk iphonesimulator \
+              -scheme MapTilerSDK \
+              -destination 'platform=iOS Simulator,name=iPhone 16' \
+              -retry-tests-on-failure -test-iterations 3; then
+              exit 0
+            fi
+            
+            echo "First attempt failed; installing iOS runtime, then retrying on iPhone 17..."
+            sudo xcodebuild -downloadPlatform iOS
+            xcrun simctl list runtimes | grep iOS || true
+            
+            echo "Attempt 2: run tests on iPhone 17"
+            xcrun xcodebuild test \
+              -sdk iphonesimulator \
+              -scheme MapTilerSDK \
+              -destination 'platform=iOS Simulator,name=iPhone 17' \
+              -retry-tests-on-failure -test-iterations 3
+          } 2>&1 | tee xcodebuild-test.log
 
       - name: Upload test log
         if: always()
@@ -66,7 +87,7 @@ jobs:
       tests_failed: ${{ steps.set_status.outputs.tests_failed }}
 
   autofix:
-    name: Run Codex auto-fix on failures
+    name: Run Gemini auto-fix on failures
     needs: test
     # Only attempt auto-fix when tests_failed output is true and PR is bot-authored
     if: ${{ needs.test.outputs.tests_failed == 'true' && (github.event.pull_request.user.type == 'Bot' || github.actor == 'github-actions[bot]') }}
@@ -116,34 +137,115 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
-      - name: Configure Git author
+      - name: Symlink agents
+        run: ln -s .github/copilot-instructions.md GEMINI.md
+      - name: Symlink ignore
+        run: ln -s .github/.copilot-ignore .geminiignore
+
+      - name: Load agent directives
+        id: agent_directives
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          echo "directives<<EOF" >> "$GITHUB_OUTPUT"
+          cat .github/copilot-instructions.md >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - id: guard
         name: Guard against repeated auto-fix attempts
         run: |
           last_msg="$(git log -1 --pretty=%s)"
-          if echo "$last_msg" | grep -qi '^ci: codex auto-fix for failing tests'; then
+          if echo "$last_msg" | grep -qi '^ci: auto-fix for failing tests'; then
             echo "already=true" >> $GITHUB_OUTPUT
-            echo "Most recent commit is an auto-fix; skipping Codex run."
+            echo "Most recent commit is an auto-fix; skipping run."
           else
             echo "already=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Run Codex Action
+      - name: 'Run Gemini CLI'
         if: ${{ steps.guard.outputs.already == 'false' }}
-        uses: openai/codex-action@v1
+        id: 'run_gemini'
+        uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN || github.token }}'
+          IS_PULL_REQUEST: '${{ !!github.event.pull_request }}'
+          REPOSITORY: '${{ github.repository }}'
+          AGENT_DIRECTIVES: '${{ steps.agent_directives.outputs.directives }}'
         with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          prompt: |
-            Swift tests failed on this PR. Analyze the failure log and make minimal, high-quality code changes that fix the issues while preserving intended behavior and style. Re-run tests locally if needed before finalizing.
-
+          gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
+          gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
+          gcp_project_id: '${{ vars.GOOGLE_CLOUD_PROJECT }}'
+          gcp_location: '${{ vars.GOOGLE_CLOUD_LOCATION }}'
+          gcp_service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+          use_vertex_ai: '${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}'
+          google_api_key: '${{ secrets.GOOGLE_API_KEY }}'
+          use_gemini_code_assist: '${{ vars.GOOGLE_GENAI_USE_GCA }}'
+          gemini_debug: '${{ fromJSON(vars.DEBUG || vars.ACTIONS_STEP_DEBUG || false) }}'
+          gemini_model: '${{ vars.GEMINI_MODEL }}'
+          settings: |-
+            {
+              "maxSessionTurns": 50,
+              "telemetry": {
+                "enabled": ${{ vars.GOOGLE_CLOUD_PROJECT != '' }},
+                "target": "gcp"
+              },
+              "mcpServers": {
+                "github": {
+                  "command": "docker",
+                  "args": [
+                    "run",
+                    "-i",
+                    "--rm",
+                    "-e",
+                    "GITHUB_PERSONAL_ACCESS_TOKEN",
+                    "ghcr.io/github/github-mcp-server"
+                  ],
+                  "includeTools": [
+                    "add_issue_comment",
+                    "get_issue",
+                    "get_issue_comments",
+                    "list_issues",
+                    "search_issues",
+                    "create_pull_request",
+                    "get_pull_request",
+                    "get_pull_request_comments",
+                    "get_pull_request_diff",
+                    "get_pull_request_files",
+                    "list_pull_requests",
+                    "search_pull_requests",
+                    "create_branch",
+                    "create_or_update_file",
+                    "delete_file",
+                    "fork_repository",
+                    "get_commit",
+                    "get_file_contents",
+                    "list_commits",
+                    "push_files",
+                    "search_code"
+                  ],
+                  "env": {
+                    "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+                  }
+                }
+              },
+              "coreTools": [
+                "read_file",
+                "write_file",
+                "replace",
+                "list_directory",
+                "glob",
+                "search_file_content",
+                "run_shell_command(cat)",
+                "run_shell_command(echo)",
+                "run_shell_command(grep)",
+                "run_shell_command(head)",
+                "run_shell_command(tail)",
+                "run_shell_command(swiftlint)",
+                "run_shell_command(xcrun)",
+                "run_shell_command(xcodebuild)"
+              ]
+            }
+          prompt: |-
+            Swift tests failed on this PR. Analyze the failure log and make minimal, high-quality code changes that fix the issues while preserving intended behavior and style.
+            
             Constraints:
             - Only modify code relevant to the failures.
             - Keep changes small and focused.
@@ -161,7 +263,7 @@ jobs:
         if: ${{ steps.guard.outputs.already == 'false' }}
         run: |
           git add -A
-          git commit -m "ci: codex auto-fix for failing tests" || echo "No changes to commit"
+          git commit -m "ci: auto-fix for failing tests" || echo "No changes to commit"
 
       - name: Push changes to PR branch
         if: ${{ steps.guard.outputs.already == 'false' }}

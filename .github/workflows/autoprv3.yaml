@@ -34,6 +34,8 @@ jobs:
       uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
       with:
         xcode-version: '16.2'
+    - name: Select Xcode
+      run: sudo xcode-select --switch /Applications/Xcode_16.2.app
     - name: Verify Swift Version
       run: swift --version
     - name: Verify Xcode version
@@ -60,6 +62,13 @@ jobs:
         fi
     - name: Link SwiftLint
       run: brew link swiftlint --force
+    
+    - name: Ensure Homebrew in PATH
+      run: |
+        echo "/opt/homebrew/bin" >> "$GITHUB_PATH" || true
+        echo "/usr/local/bin" >> "$GITHUB_PATH" || true
+        echo "/opt/homebrew/Cellar/swiftlint" >> "$GITHUB_PATH" || true
+        echo "/usr/local/Cellar/swiftlint" >> "$GITHUB_PATH" || true
 
     # Set up environment variables
 
@@ -68,14 +77,21 @@ jobs:
         echo "ISSUE_KEY=${{ github.event.inputs.issue_key }}"        >> $GITHUB_ENV
         echo "TITLE=${{ github.event.inputs.issue_summary }}"        >> $GITHUB_ENV
         echo "RAW_DESC=${{ github.event.inputs.issue_description }}" >> $GITHUB_ENV
-        DESC_CLEANED=$(echo "${{ github.event.inputs.issue_description }}" | tr '\n' ' ' | sed 's/"/'\''/g')
+        DESC_CLEANED=$(echo "${{ github.event.inputs.issue_description }}" | tr '\n' ' ' | sed 's/\"/'\''/g')
         echo "DESC=$DESC_CLEANED"                                    >> $GITHUB_ENV
         echo "BRANCH=${{ github.event.inputs.issue_key }}"     >> $GITHUB_ENV
+        {
+          echo 'DESC_MD<<EOF'
+          printf '%s\n' "${{ github.event.inputs.issue_description }}"
+          echo EOF
+        } >> "$GITHUB_ENV"
 
     # Symlink agents file to the root
 
     - name: Symlink agents
-      run: ln -s .github/copilot-instructions.md AGENTS.md
+      run: ln -s .github/copilot-instructions.md GEMINI.md
+    - name: Symlink ignore
+      run: ln -s .github/.copilot-ignore .geminiignore
 
     - name: Load agent directives
       id: agent_directives
@@ -176,14 +192,22 @@ jobs:
               "run_shell_command(echo)",
               "run_shell_command(grep)",
               "run_shell_command(head)",
-              "run_shell_command(tail)"
+              "run_shell_command(tail)",
+              "run_shell_command(swiftlint)",
+              "run_shell_command(xcrun)",
+              "run_shell_command(xcodebuild)"
             ]            }
         prompt: |-
-          Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}
-    - name: Agent commit
+          Implement ticket ${{ env.ISSUE_KEY }}: ${{ env.TITLE }}. ${{ env.DESC }}. Write the code changes to the disc.
+          
+          Verify your changes:
+          1. Run swiftlint.
+          2. Run tests using this command (flaky tests handled):
+          xcrun xcodebuild test -sdk iphonesimulator -scheme MapTilerSDK -destination 'platform=iOS Simulator,name=iPhone 16' -retry-tests-on-failure -test-iterations 3
+    - name: Commit changes
       run: |
         git add -A
-        git commit -m "$ISSUE_KEY: $TITLE"
+        git commit -m "$ISSUE_KEY: $TITLE" || echo "No changes to commit"
 
     # Prepare and push Pull Request
 
@@ -198,7 +222,7 @@ jobs:
           **${{ env.ISSUE_KEY }}**
 
           ## Objective
-          **${{ env.DESC }}**.
+          ${{ env.DESC_MD }}
 
           ## Description
           **${{ env.TITLE }}**.

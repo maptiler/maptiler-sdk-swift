@@ -49,6 +49,24 @@ struct MTNavigationTests {
         #expect(SetMinZoom(minZoom: zoom).toJS() == setMinZoomJS)
     }
 
+    @Test func zoomToCommand_shouldMatchJS() async throws {
+        let animationOptions = MTAnimationOptions(
+            duration: 2500,
+            offset: MTPoint(x: 1.5, y: 2.5),
+            shouldAnimate: true,
+            isEssential: false,
+            easing: .cubic
+        )
+        
+        let options = ZoomToOptions(animationOptions: animationOptions)
+        var optionsString: JSString = options.toJSON() ?? ""
+        optionsString = optionsString.replaceEasing()
+
+        let zoomToJS = "\(MTBridge.mapObject).zoomTo(\(zoom), \(optionsString));"
+
+        #expect(ZoomTo(zoom: zoom, animationOptions: animationOptions).toJS() == zoomToJS)
+    }
+
     @Test func easeToCommand_shouldMatchJS() async throws {
         let cameraOptions = MTCameraOptions(zoom: zoom, bearing: bearing, pitch: pitch)
 
@@ -351,6 +369,41 @@ struct MTNavigationTests {
 
         #expect(elevation == expectedElevation)
         #expect(executor.lastCommand is GetCameraTargetElevation)
+    }
+
+    @MainActor
+    @Test func zoomToWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.zoomTo(10) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected zoomTo wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is ZoomTo)
+    }
+
+    @MainActor
+    @Test func zoomToAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.zoomTo(10)
+
+        #expect(executor.lastCommand is ZoomTo)
     }
 }
 

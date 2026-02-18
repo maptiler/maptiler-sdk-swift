@@ -33,3 +33,6 @@ output.txt
 .gemini/
 gha-creds-*.json
 test.log
+GEMINI.md
+gemini-artifacts
+.geminiignore

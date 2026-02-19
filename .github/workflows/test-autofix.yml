@@ -130,11 +130,11 @@ jobs:
         run: |
           # Extract a concise failure summary to keep prompt focused
           {
-            echo 'FAILURE_EXCERPT<<EOF'
+            echo 'FAILURE_EXCERPT<<END_OF_LOG_EXCERPT'
             if command -v gsed >/dev/null 2>&1; then SED=gsed; else SED=sed; fi
             # Try to capture failing tests sections and error lines; fallback to last 400 lines
             (grep -E "(\b(error|failed|Failing tests)\b)" -n xcodebuild-test.log || tail -n 400 xcodebuild-test.log) | $SED -e 's/\r$//'
-            echo EOF
+            echo END_OF_LOG_EXCERPT
           } >> "$GITHUB_ENV"
 
       - name: Symlink agents
@@ -147,6 +147,7 @@ jobs:
         run: |
           echo "directives<<EOF" >> "$GITHUB_OUTPUT"
           cat .github/copilot-instructions.md >> "$GITHUB_OUTPUT"
+          echo "" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - id: guard

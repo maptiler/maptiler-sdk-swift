@@ -80,10 +80,11 @@ jobs:
         DESC_CLEANED=$(echo "${{ github.event.inputs.issue_description }}" | tr '\n' ' ' | sed 's/\"/'\''/g')
         echo "DESC=$DESC_CLEANED"                                    >> $GITHUB_ENV
         echo "BRANCH=${{ github.event.inputs.issue_key }}"     >> $GITHUB_ENV
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         {
-          echo 'DESC_MD<<EOF'
+          echo "DESC_MD<<$EOF"
           printf '%s\n' "${{ github.event.inputs.issue_description }}"
-          echo EOF
+          echo "$EOF"
         } >> "$GITHUB_ENV"
 
     # Symlink agents file to the root
@@ -96,9 +97,11 @@ jobs:
     - name: Load agent directives
       id: agent_directives
       run: |
-        echo "directives<<EOF" >> "$GITHUB_OUTPUT"
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "directives<<$EOF" >> "$GITHUB_OUTPUT"
         cat .github/copilot-instructions.md >> "$GITHUB_OUTPUT"
-        echo "EOF" >> "$GITHUB_OUTPUT"
+        echo "" >> "$GITHUB_OUTPUT"
+        echo "$EOF" >> "$GITHUB_OUTPUT"
 
     # Generate JS docs
     - name: Set up Node

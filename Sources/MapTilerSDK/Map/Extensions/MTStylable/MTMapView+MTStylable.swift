@@ -164,6 +164,25 @@ extension MTMapView: MTStylable {
         runCommand(command, completion: completionHandler)
     }
 
+    /// Updates an image in a style.
+    /// - Parameters:
+    ///   - name: Unique identifier for the image to update.
+    ///   - image: New image to set.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func updateImage(
+        name: String,
+        image: UIImage,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        guard let command = UpdateImage(name: name, image: image) else {
+            completionHandler?(.failure(.unknown(description: "Failed to encode image for updateImage command.")))
+            return
+        }
+
+        runCommand(command, completion: completionHandler)
+    }
+
     /// Registers a sprite with the current style so it can be referenced by layers and annotations.
     /// - Parameters:
     ///   - id: Unique identifier for the sprite.
@@ -850,6 +869,18 @@ extension MTMapView {
     public func addImage(name: String, image: UIImage, options: MTStyleImageOptions? = nil) async {
         await withCheckedContinuation { continuation in
             addImage(name: name, image: image, options: options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Updates an image in a style.
+    /// - Parameters:
+    ///   - name: Unique identifier for the image to update.
+    ///   - image: New image to set.
+    public func updateImage(name: String, image: UIImage) async {
+        await withCheckedContinuation { continuation in
+            updateImage(name: name, image: image) { _ in
                 continuation.resume()
             }
         }

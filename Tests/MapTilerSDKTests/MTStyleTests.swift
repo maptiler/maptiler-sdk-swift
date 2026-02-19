@@ -172,6 +172,19 @@ struct MTStyleTests {
         #expect(js.contains(optionsJSON))
     }
 
+    @Test func updateImageCommand_shouldGenerateExpectedJS() async throws {
+        let image = Self.makeTestImage()
+        let command = UpdateImage(name: "updated-icon", image: image)
+
+        #expect(command != nil)
+
+        let js = command?.toJS() ?? ""
+
+        #expect(js.contains("\(MTBridge.mapObject).updateImage(\"updated-icon\","))
+        #expect(js.contains("data:image/png;base64,"))
+        #expect(js.contains("var imageupdatedicon"))
+    }
+
     @Test func addSpriteCommand_shouldGenerateExpectedJS() async throws {
         let spriteURL = URL(string: "https://example.com/sprite.png")!
         let command = AddSprite(id: "test-sprite", url: spriteURL)
@@ -215,6 +228,47 @@ struct MTStyleTests {
 
         #expect(command?.name == "wrapper-icon")
         #expect(command?.options == nil)
+    }
+
+    @MainActor
+    @Test func updateImageWrapper_shouldDispatchCommand() async throws {
+        let image = Self.makeTestImage()
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.updateImage(name: "updated-wrapper-icon", image: image) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected updateImage wrapper to succeed, but failed with \(error)")
+        }
+
+        let command = executor.lastCommand as? UpdateImage
+
+        #expect(command?.name == "updated-wrapper-icon")
+    }
+
+    @MainActor
+    @Test func updateImageAsyncWrapper_shouldDispatchCommand() async throws {
+        let image = Self.makeTestImage()
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.updateImage(name: "updated-async-wrapper", image: image)
+
+        let command = executor.lastCommand as? UpdateImage
+
+        #expect(command?.name == "updated-async-wrapper")
     }
 
     @MainActor

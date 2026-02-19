@@ -46,7 +46,7 @@ package struct UpdateImage: MTCommand {
             let data = try? JSONEncoder().encode(name),
             let string = String(data: data, encoding: .utf8)
         else {
-            return ""\(name)""
+            return "\(name)"
         }
 
         return string

@@ -28,6 +28,17 @@ extension MTMapView: MTRendering {
 
         options?.setPixelRatio(pixelRatio)
     }
+
+    /// Trigger the rendering of a single frame. Use this method with custom layers to repaint the map
+    /// when the layer changes. Calling this multiple times before the next frame is rendered will still
+    /// result in only a single frame being rendered.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func triggerRepaint(
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(TriggerRepaint(), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -51,6 +62,17 @@ extension MTMapView {
     public func setPixelRatio(_ pixelRatio: Double) async {
         await withCheckedContinuation { continuation in
             setPixelRatio(pixelRatio) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Trigger the rendering of a single frame. Use this method with custom layers to repaint the map
+    /// when the layer changes. Calling this multiple times before the next frame is rendered will still
+    /// result in only a single frame being rendered.
+    public func triggerRepaint() async {
+        await withCheckedContinuation { continuation in
+            triggerRepaint { _ in
                 continuation.resume()
             }
         }

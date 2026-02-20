@@ -480,6 +480,18 @@ extension MTMapView: MTNavigable {
         runCommandWithCoordinateReturnValue(Project(coordinate: coordinates), completion: completionHandler)
     }
 
+    /// Unproject screen coordinates to geographical coordinates.
+    /// - Parameters:
+    ///   - point: The screen coordinates to unproject.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func unproject(
+        point: MTPoint,
+        completionHandler: @escaping (Result<CLLocationCoordinate2D, MTError>) -> Void
+    ) {
+        runCommandWithCoordinateReturnValue(Unproject(point: point), completion: completionHandler)
+    }
+
     /// Returns the map's current bearing.
     /// - Parameters:
     ///   - completionHandler: A handler block to execute when function finishes.
@@ -969,6 +981,22 @@ extension MTMapView {
                     continuation.resume(returning: MTPoint(x: result.latitude, y: result.longitude))
                 case .failure:
                     continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Unproject screen coordinates to geographical coordinates.
+    /// - Parameters:
+    ///   - point: The screen coordinates to unproject.
+    public func unproject(point: MTPoint) async -> CLLocationCoordinate2D {
+        await withCheckedContinuation { continuation in
+            unproject(point: point) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
                 }
             }
         }

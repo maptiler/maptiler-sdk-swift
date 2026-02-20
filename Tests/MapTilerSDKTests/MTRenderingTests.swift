@@ -19,6 +19,12 @@ struct MTRenderingTests {
         #expect(GetPixelRatio().toJS() == expectedGetPixelRatioJS)
     }
 
+    @Test func triggerRepaintCommand_shouldMatchJS() async throws {
+        let expectedTriggerRepaintJS = "\(MTBridge.mapObject).triggerRepaint();"
+
+        #expect(TriggerRepaint().toJS() == expectedTriggerRepaintJS)
+    }
+
     @Test func mapOptionsEncoding_includesPixelRatio() async throws {
         let pixelRatio = 1.5
         let options = MTMapOptions(pixelRatio: pixelRatio)

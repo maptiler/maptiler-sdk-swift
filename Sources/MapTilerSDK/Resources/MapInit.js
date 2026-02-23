@@ -15,6 +15,6 @@ function initializeMap(apiKey, style, options, session) {
     const mapOptions = {...baseOptions, ...options}
     const map = new maptilersdk.Map(mapOptions);
 
-    setUpMapEvents(map);
+    setUpMapEventsWithLevel(map, options.eventLevel, options.highFrequencyEventThrottleMs);
     window.map = map;
 }

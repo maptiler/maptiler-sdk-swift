@@ -213,6 +213,13 @@ public struct MTMapOptions: Sendable {
     /// Atmospheric glow (halo) configuration for globe.
     public private(set) var halo: MTHaloOption?
 
+    /// Controls which map events are sent from the map object.
+    public private(set) var eventLevel: MTEventLevel = .all
+
+    /// Optional throttle in milliseconds applied to high-frequency events when [eventLevel] is
+    /// [MTEventLevel.all] or [MTEventLevel.cameraOnly]. A value of 0 disables throttling.
+    public private(set) var highFrequencyEventThrottleMs: Int? = 10
+
     /// Initializes the map options with center and zoom.
     public init(center: CLLocationCoordinate2D?, zoom: Double?) {
         self.center = center
@@ -291,7 +298,9 @@ public struct MTMapOptions: Sendable {
         terrainControlIsVisible: Bool? = false,
         isSessionLogicEnabled: Bool = true,
         space: MTSpaceOption? = nil,
-        halo: MTHaloOption? = nil
+        halo: MTHaloOption? = nil,
+        eventLevel: MTEventLevel = .cameraOnly,
+        highFrequencyEventThrottleMs: Int? = 10
     ) {
         self.language = language
         self.center = center
@@ -341,6 +350,8 @@ public struct MTMapOptions: Sendable {
         self.isSessionLogicEnabled = isSessionLogicEnabled
         self.space = space
         self.halo = halo
+        self.eventLevel = eventLevel
+        self.highFrequencyEventThrottleMs = highFrequencyEventThrottleMs
     }
 }
 
@@ -393,6 +404,8 @@ extension MTMapOptions: Codable {
         case terrainControlIsVisible = "terrainControl"
         case space
         case halo
+        case eventLevel
+        case highFrequencyEventThrottleMs
     }
 }
 
@@ -583,5 +596,13 @@ extension MTMapOptions {
 
     package mutating func setTerrainControlIsVisible(_ terrainControlIsVisible: Bool) {
         self.terrainControlIsVisible = terrainControlIsVisible
+    }
+
+    package mutating func setEventLevel(_ eventLevel: MTEventLevel) {
+        self.eventLevel = eventLevel
+    }
+
+    package mutating func setHighFrequencyEventThrottleMs(_ highFrequencyEventThrottleMs: Int?) {
+        self.highFrequencyEventThrottleMs = highFrequencyEventThrottleMs
     }
 }

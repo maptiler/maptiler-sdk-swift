@@ -64,6 +64,14 @@ public protocol MTNavigable {
     ///    - coordinates: Coordinates to pan to.
     func panTo(_ coordinates: CLLocationCoordinate2D) async
 
+    /// Stops any ongoing animated transition.
+    func stop() async
+
+    /// Snaps the map so that north is up.
+    /// - Parameters:
+    ///    - animationOptions: Animation options.
+    func snapToNorth(animationOptions: MTAnimationOptions?) async
+
     /// Sets the padding in pixels around the viewport.
     /// - Parameters:
     ///    - options: Padding options.

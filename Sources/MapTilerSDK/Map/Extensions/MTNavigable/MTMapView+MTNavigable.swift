@@ -412,6 +412,25 @@ extension MTMapView: MTNavigable {
         runCommand(PanTo(coordinates: coordinates), completion: completionHandler)
     }
 
+    /// Stops any ongoing animated transition.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func stop(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(Stop(), completion: completionHandler)
+    }
+
+    /// Snaps the map so that north is up.
+    /// - Parameters:
+    ///   - animationOptions: Animation options.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func snapToNorth(
+        animationOptions: MTAnimationOptions? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SnapToNorth(animationOptions: animationOptions), completion: completionHandler)
+    }
+
     /// Returns the map's current center.
     ///
     /// The map's current geographical center.
@@ -874,6 +893,26 @@ extension MTMapView {
     public func panTo(_ coordinates: CLLocationCoordinate2D) async {
         await withCheckedContinuation { continuation in
             panTo(coordinates) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Stops any ongoing animated transition.
+    public func stop() async {
+        await withCheckedContinuation { continuation in
+            stop { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Snaps the map so that north is up.
+    /// - Parameters:
+    ///   - animationOptions: Animation options.
+    public func snapToNorth(animationOptions: MTAnimationOptions? = nil) async {
+        await withCheckedContinuation { continuation in
+            snapToNorth(animationOptions: animationOptions) { _ in
                 continuation.resume()
             }
         }

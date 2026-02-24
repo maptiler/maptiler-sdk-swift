@@ -57,7 +57,7 @@ struct MTNavigationTests {
             isEssential: false,
             easing: .cubic
         )
-        
+
         let options = ZoomToOptions(animationOptions: animationOptions)
         var optionsString: JSString = options.toJSON() ?? ""
         optionsString = optionsString.replaceEasing()
@@ -163,9 +163,37 @@ struct MTNavigationTests {
         #expect(JumpTo(center: centerCoordinate, options: cameraOptions).toJS() == jumpToJS)
     }
 
+    @Test func stopCommand_shouldMatchJS() async throws {
+        let stopJS = "\(MTBridge.mapObject).stop();"
+
+        #expect(Stop().toJS() == stopJS)
+    }
+
+    @Test func snapToNorthCommand_shouldMatchJS() async throws {
+        let snapToNorthJS = "\(MTBridge.mapObject).snapToNorth();"
+
+        #expect(SnapToNorth().toJS() == snapToNorthJS)
+
+        let animationOptions = MTAnimationOptions(
+            duration: 2500,
+            offset: MTPoint(x: 1.5, y: 2.5),
+            shouldAnimate: true,
+            isEssential: false,
+            easing: .cubic
+        )
+
+        let options = SnapToNorthOptions(animationOptions: animationOptions)
+        var optionsString: JSString = options.toJSON() ?? ""
+        optionsString = optionsString.replaceEasing()
+
+        let snapToNorthWithOptionsJS = "\(MTBridge.mapObject).snapToNorth(\(optionsString));"
+
+        #expect(SnapToNorth(animationOptions: animationOptions).toJS() == snapToNorthWithOptionsJS)
+    }
+
     @Test func setBearingCommand_shouldMatchJS() async throws {
         let setBearingJS = "\(MTBridge.mapObject).setBearing(\(bearing));"
-        
+
         #expect(SetBearing(bearing: bearing).toJS() == setBearingJS)
     }
 
@@ -404,6 +432,76 @@ struct MTNavigationTests {
         await mapView.zoomTo(10)
 
         #expect(executor.lastCommand is ZoomTo)
+    }
+
+    @MainActor
+    @Test func stopWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.stop { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected stop wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is Stop)
+    }
+
+    @MainActor
+    @Test func stopAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.stop()
+
+        #expect(executor.lastCommand is Stop)
+    }
+
+    @MainActor
+    @Test func snapToNorthWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.snapToNorth(animationOptions: nil) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected snapToNorth wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is SnapToNorth)
+    }
+
+    @MainActor
+    @Test func snapToNorthAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.snapToNorth(animationOptions: nil)
+
+        #expect(executor.lastCommand is SnapToNorth)
     }
 }
 

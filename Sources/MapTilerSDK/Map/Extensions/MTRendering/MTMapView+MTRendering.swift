@@ -39,6 +39,54 @@ extension MTMapView: MTRendering {
     ) {
         runCommand(TriggerRepaint(), completion: completionHandler)
     }
+
+    /// Displays tile boundaries on the map.
+    /// - Parameters:
+    ///   - show: A boolean value indicating whether to show tile boundaries.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setShowTileBoundaries(
+        _ show: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetShowTileBoundaries(show: show), completion: completionHandler)
+    }
+
+    /// Displays padding on the map.
+    /// - Parameters:
+    ///   - show: A boolean value indicating whether to show padding.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setShowPadding(
+        _ show: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetShowPadding(show: show), completion: completionHandler)
+    }
+
+    /// Displays the overdraw inspector on the map.
+    /// - Parameters:
+    ///   - show: A boolean value indicating whether to show the overdraw inspector.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setShowOverdrawInspector(
+        _ show: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetShowOverdrawInspector(show: show), completion: completionHandler)
+    }
+
+    /// Displays collision boxes on the map.
+    /// - Parameters:
+    ///   - show: A boolean value indicating whether to show collision boxes.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setShowCollisionBoxes(
+        _ show: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetShowCollisionBoxes(show: show), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -73,6 +121,46 @@ extension MTMapView {
     public func triggerRepaint() async {
         await withCheckedContinuation { continuation in
             triggerRepaint { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Displays tile boundaries on the map.
+    /// - Parameter show: A boolean value indicating whether to show tile boundaries.
+    public func setShowTileBoundaries(_ show: Bool) async {
+        await withCheckedContinuation { continuation in
+            setShowTileBoundaries(show) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Displays padding on the map.
+    /// - Parameter show: A boolean value indicating whether to show padding.
+    public func setShowPadding(_ show: Bool) async {
+        await withCheckedContinuation { continuation in
+            setShowPadding(show) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Displays the overdraw inspector on the map.
+    /// - Parameter show: A boolean value indicating whether to show the overdraw inspector.
+    public func setShowOverdrawInspector(_ show: Bool) async {
+        await withCheckedContinuation { continuation in
+            setShowOverdrawInspector(show) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Displays collision boxes on the map.
+    /// - Parameter show: A boolean value indicating whether to show collision boxes.
+    public func setShowCollisionBoxes(_ show: Bool) async {
+        await withCheckedContinuation { continuation in
+            setShowCollisionBoxes(show) { _ in
                 continuation.resume()
             }
         }

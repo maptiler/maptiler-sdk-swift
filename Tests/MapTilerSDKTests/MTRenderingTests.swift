@@ -25,6 +25,38 @@ struct MTRenderingTests {
         #expect(TriggerRepaint().toJS() == expectedTriggerRepaintJS)
     }
 
+    @Test func setShowTileBoundariesCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).showTileBoundaries = true;"
+        #expect(SetShowTileBoundaries(show: true).toJS() == expectedJS)
+        
+        let expectedFalseJS = "\(MTBridge.mapObject).showTileBoundaries = false;"
+        #expect(SetShowTileBoundaries(show: false).toJS() == expectedFalseJS)
+    }
+
+    @Test func setShowPaddingCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).showPadding = true;"
+        #expect(SetShowPadding(show: true).toJS() == expectedJS)
+        
+        let expectedFalseJS = "\(MTBridge.mapObject).showPadding = false;"
+        #expect(SetShowPadding(show: false).toJS() == expectedFalseJS)
+    }
+
+    @Test func setShowOverdrawInspectorCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).showOverdrawInspector = true;"
+        #expect(SetShowOverdrawInspector(show: true).toJS() == expectedJS)
+        
+        let expectedFalseJS = "\(MTBridge.mapObject).showOverdrawInspector = false;"
+        #expect(SetShowOverdrawInspector(show: false).toJS() == expectedFalseJS)
+    }
+
+    @Test func setShowCollisionBoxesCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).showCollisionBoxes = true;"
+        #expect(SetShowCollisionBoxes(show: true).toJS() == expectedJS)
+        
+        let expectedFalseJS = "\(MTBridge.mapObject).showCollisionBoxes = false;"
+        #expect(SetShowCollisionBoxes(show: false).toJS() == expectedFalseJS)
+    }
+
     @Test func mapOptionsEncoding_includesPixelRatio() async throws {
         let pixelRatio = 1.5
         let options = MTMapOptions(pixelRatio: pixelRatio)

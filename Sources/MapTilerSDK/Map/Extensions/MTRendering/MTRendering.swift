@@ -21,4 +21,20 @@ public protocol MTRendering {
     /// when the layer changes. Calling this multiple times before the next frame is rendered will still
     /// result in only a single frame being rendered.
     func triggerRepaint() async
+
+    /// Displays tile boundaries on the map.
+    /// - Parameter show: A boolean value indicating whether to show tile boundaries.
+    func setShowTileBoundaries(_ show: Bool) async
+
+    /// Displays padding on the map.
+    /// - Parameter show: A boolean value indicating whether to show padding.
+    func setShowPadding(_ show: Bool) async
+
+    /// Displays the overdraw inspector on the map.
+    /// - Parameter show: A boolean value indicating whether to show the overdraw inspector.
+    func setShowOverdrawInspector(_ show: Bool) async
+
+    /// Displays collision boxes on the map.
+    /// - Parameter show: A boolean value indicating whether to show collision boxes.
+    func setShowCollisionBoxes(_ show: Bool) async
 }

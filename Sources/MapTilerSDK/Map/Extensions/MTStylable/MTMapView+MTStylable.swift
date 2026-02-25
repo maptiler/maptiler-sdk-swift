@@ -315,6 +315,60 @@ extension MTMapView: MTStylable {
         options?.setTerrainIsEnabled(false)
     }
 
+    /// Sets the terrain exaggeration.
+    /// - Parameters:
+    ///    - exaggeration: The new exaggeration factor.
+    ///    - animate: Whether to animate the transition. Defaults to `true`.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setTerrainExaggeration(
+        _ exaggeration: Double,
+        animate: Bool = true,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetTerrainExaggeration(exaggeration: exaggeration, animate: animate), completion: completionHandler)
+        options?.setTerrainExaggeration(exaggeration)
+    }
+
+    /// Sets the animation duration of the terrain transitions.
+    /// - Parameters:
+    ///    - duration: The duration in milliseconds.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setTerrainAnimationDuration(
+        _ duration: Double,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetTerrainAnimationDuration(duration: duration), completion: completionHandler)
+    }
+
+    /// Sets the 3D terrain on the map.
+    /// - Parameters:
+    ///    - sourceId: The ID of the terrain source.
+    ///    - exaggeration: Factor for volume boosting.
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setTerrain(
+        sourceId: String,
+        exaggeration: Double? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetTerrain(sourceId: sourceId, exaggeration: exaggeration), completion: completionHandler)
+        options?.setTerrainIsEnabled(true)
+        if let exaggeration = exaggeration {
+            options?.setTerrainExaggeration(exaggeration)
+        }
+    }
+
+    /// Removes the 3D terrain from the map.
+    /// - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setTerrain(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetTerrain(), completion: completionHandler)
+        options?.setTerrainIsEnabled(false)
+    }
+
     /// Sets the map's vertical field of view, in degrees.
     ///
     /// The internal camera has a default vertical field of view of a wide ~36.86 degrees. In globe mode,
@@ -1018,6 +1072,50 @@ extension MTMapView {
     public func disableTerrain() async {
         await withCheckedContinuation { continuation in
             disableTerrain { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the terrain exaggeration.
+    /// - Parameters:
+    ///    - exaggeration: The new exaggeration factor.
+    ///    - animate: Whether to animate the transition. Defaults to `true`.
+    public func setTerrainExaggeration(_ exaggeration: Double, animate: Bool = true) async {
+        await withCheckedContinuation { continuation in
+            setTerrainExaggeration(exaggeration, animate: animate) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the animation duration of the terrain transitions.
+    /// - Parameters:
+    ///    - duration: The duration in milliseconds.
+    public func setTerrainAnimationDuration(_ duration: Double) async {
+        await withCheckedContinuation { continuation in
+            setTerrainAnimationDuration(duration) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the 3D terrain on the map.
+    /// - Parameters:
+    ///    - sourceId: The ID of the terrain source.
+    ///    - exaggeration: Factor for volume boosting.
+    public func setTerrain(sourceId: String, exaggeration: Double? = nil) async {
+        await withCheckedContinuation { continuation in
+            setTerrain(sourceId: sourceId, exaggeration: exaggeration) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Removes the 3D terrain from the map.
+    public func setTerrain() async {
+        await withCheckedContinuation { continuation in
+            setTerrain { _ in
                 continuation.resume()
             }
         }

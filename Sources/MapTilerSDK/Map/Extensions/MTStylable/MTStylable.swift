@@ -117,6 +117,26 @@ public protocol MTStylable {
     /// Disables  the 3D terrain visualization.
     func disableTerrain() async
 
+    /// Sets the terrain exaggeration.
+    /// - Parameters:
+    ///    - exaggeration: The new exaggeration factor.
+    ///    - animate: Whether to animate the transition. Defaults to `true`.
+    func setTerrainExaggeration(_ exaggeration: Double, animate: Bool) async
+
+    /// Sets the animation duration of the terrain transitions.
+    /// - Parameters:
+    ///    - duration: The duration in milliseconds.
+    func setTerrainAnimationDuration(_ duration: Double) async
+
+    /// Sets the 3D terrain on the map.
+    /// - Parameters:
+    ///    - sourceId: The ID of the terrain source.
+    ///    - exaggeration: Factor for volume boosting.
+    func setTerrain(sourceId: String, exaggeration: Double?) async
+
+    /// Removes the 3D terrain from the map.
+    func setTerrain() async
+
     /// Sets the map's vertical field of view, in degrees.
     ///
     /// The internal camera has a default vertical field of view of a wide ~36.86 degrees. In globe mode,

@@ -41,6 +41,19 @@ extension MTMapView: MTStylable {
         options?.setLanguage(language)
     }
 
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setSecondaryLanguage(
+        _ language: MTLanguage,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetSecondaryLanguage(language: language), completion: completionHandler)
+    }
+
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setSprite(_ url: URL, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(SetSprite(url: url), completion: completionHandler)
+    }
+
     /// Sets the any combination of light values.
     /// - Parameters:
     ///   - light: Light properties to set.
@@ -854,6 +867,22 @@ extension MTMapView {
     public func setLanguage(_ language: MTLanguage) async {
         await withCheckedContinuation { continuation in
             setLanguage(language) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    public func setSecondaryLanguage(_ language: MTLanguage) async {
+        await withCheckedContinuation { continuation in
+            setSecondaryLanguage(language) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    public func setSprite(_ url: URL) async {
+        await withCheckedContinuation { continuation in
+            setSprite(url) { _ in
                 continuation.resume()
             }
         }

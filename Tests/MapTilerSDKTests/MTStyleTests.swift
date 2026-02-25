@@ -349,6 +349,62 @@ struct MTStyleTests {
         #expect(isLoaded)
         #expect(executor.lastCommand is AreTilesLoaded)
     }
+
+    @Test func setTerrainCommand_shouldMatchJS() async throws {
+        let setTerrain = SetTerrain(sourceId: "maptiler-terrain", exaggeration: 1.5)
+        let expectedJS = "\(MTBridge.mapObject).setTerrain({\"exaggeration\":1.5,\"source\":\"maptiler-terrain\"});"
+        #expect(setTerrain.toJS() == expectedJS)
+        
+        let setTerrainWithoutExaggeration = SetTerrain(sourceId: "maptiler-terrain", exaggeration: nil)
+        let expectedJSWithoutExaggeration = "\(MTBridge.mapObject).setTerrain({\"source\":\"maptiler-terrain\"});"
+        #expect(setTerrainWithoutExaggeration.toJS() == expectedJSWithoutExaggeration)
+
+        let clearTerrain = SetTerrain()
+        let expectedClearJS = "\(MTBridge.mapObject).setTerrain();"
+        #expect(clearTerrain.toJS() == expectedClearJS)
+    }
+
+    @Test func setTerrainExaggerationCommand_shouldMatchJS() async throws {
+        let commandWithAnimate = SetTerrainExaggeration(exaggeration: 2.0, animate: true)
+        let expectedJSWithAnimate = "\(MTBridge.mapObject).setTerrainExaggeration(2.0, true);"
+        #expect(commandWithAnimate.toJS() == expectedJSWithAnimate)
+
+        let commandWithoutAnimateOpt = SetTerrainExaggeration(exaggeration: 1.5, animate: nil)
+        let expectedJSWithoutAnimateOpt = "\(MTBridge.mapObject).setTerrainExaggeration(1.5);"
+        #expect(commandWithoutAnimateOpt.toJS() == expectedJSWithoutAnimateOpt)
+    }
+
+    @Test func setTerrainAnimationDurationCommand_shouldMatchJS() async throws {
+        let command = SetTerrainAnimationDuration(duration: 500)
+        let expectedJS = "\(MTBridge.mapObject).setTerrainAnimationDuration(500.0);"
+        #expect(command.toJS() == expectedJS)
+    }
+
+    @MainActor
+    @Test func setTerrainWrappers_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        await mapView.setTerrain(sourceId: "maptiler-terrain", exaggeration: 1.5)
+        var command = executor.lastCommand as? SetTerrain
+        #expect(command?.sourceId == "maptiler-terrain")
+        #expect(command?.exaggeration == 1.5)
+
+        await mapView.setTerrainExaggeration(2.0, animate: false)
+        var exCommand = executor.lastCommand as? SetTerrainExaggeration
+        #expect(exCommand?.exaggeration == 2.0)
+        #expect(exCommand?.animate == false)
+
+        await mapView.setTerrainAnimationDuration(1000)
+        var durCommand = executor.lastCommand as? SetTerrainAnimationDuration
+        #expect(durCommand?.duration == 1000)
+
+        await mapView.setTerrain()
+        var clearCommand = executor.lastCommand as? SetTerrain
+        #expect(clearCommand?.sourceId == nil)
+        #expect(clearCommand?.exaggeration == nil)
+    }
 }
 
 private extension MTStyleTests {

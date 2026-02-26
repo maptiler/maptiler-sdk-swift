@@ -87,6 +87,35 @@ extension MTMapView: MTRendering {
     ) {
         runCommand(SetShowCollisionBoxes(show: show), completion: completionHandler)
     }
+
+    /// Sets the maximum number of images loaded in parallel.
+    /// - Parameters:
+    ///   - maxParallelImageRequests: The maximum number of images.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setMaxParallelImageRequests(
+        _ maxParallelImageRequests: Int,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            SetMaxParallelImageRequests(maxParallelImageRequests: maxParallelImageRequests),
+            completion: completionHandler
+        )
+    }
+
+    /// Sets the map's RTL text plugin.
+    /// - Parameters:
+    ///   - pluginURL: URL pointing to the Mapbox RTL text plugin source.
+    ///   - deferred: A boolean indicating if the plugin evaluation should be deferred.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setRTLTextPlugin(
+        pluginURL: String,
+        deferred: Bool = false,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetRTLTextPlugin(pluginURL: pluginURL, deferred: deferred), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -161,6 +190,28 @@ extension MTMapView {
     public func setShowCollisionBoxes(_ show: Bool) async {
         await withCheckedContinuation { continuation in
             setShowCollisionBoxes(show) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the maximum number of images loaded in parallel.
+    /// - Parameter maxParallelImageRequests: The maximum number of images.
+    public func setMaxParallelImageRequests(_ maxParallelImageRequests: Int) async {
+        await withCheckedContinuation { continuation in
+            setMaxParallelImageRequests(maxParallelImageRequests) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Sets the map's RTL text plugin.
+    /// - Parameters:
+    ///   - pluginURL: URL pointing to the Mapbox RTL text plugin source.
+    ///   - deferred: A boolean indicating if the plugin evaluation should be deferred.
+    public func setRTLTextPlugin(pluginURL: String, deferred: Bool = false) async {
+        await withCheckedContinuation { continuation in
+            setRTLTextPlugin(pluginURL: pluginURL, deferred: deferred) { _ in
                 continuation.resume()
             }
         }

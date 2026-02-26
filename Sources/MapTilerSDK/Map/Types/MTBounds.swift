@@ -39,4 +39,20 @@ public struct MTBounds: Sendable, Codable, Equatable {
         try container.encode(southWest)
         try container.encode(northEast)
     }
+
+    /// Checks if the bounds contain the coordinate.
+    /// - Parameter coordinate: The coordinate to check.
+    /// - Returns: True if the coordinate is inside the bounds.
+    public func contains(_ coordinate: CLLocationCoordinate2D) -> Bool {
+        let latContains = coordinate.latitude >= southWest.latitude && coordinate.latitude <= northEast.latitude
+        var lonContains = false
+
+        if southWest.longitude <= northEast.longitude {
+            lonContains = coordinate.longitude >= southWest.longitude && coordinate.longitude <= northEast.longitude
+        } else {
+            lonContains = coordinate.longitude >= southWest.longitude || coordinate.longitude <= northEast.longitude
+        }
+
+        return latContains && lonContains
+    }
 }

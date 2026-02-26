@@ -27,6 +27,16 @@ public protocol MTStylable {
     ///    - language: The language to be applied.
     func setLanguage(_ language: MTLanguage) async
 
+    /// Sets the map labels secondary language.
+    /// - Parameters:
+    ///    - language: The language to be applied.
+    func setSecondaryLanguage(_ language: MTLanguage) async
+
+    /// Sets the map sprite.
+    /// - Parameters:
+    ///    - url: The URL pointing to the sprite resource.
+    func setSprite(_ url: URL) async
+
     /// Sets the any combination of light values.
     /// - Parameters:
     ///    - light: Light options.

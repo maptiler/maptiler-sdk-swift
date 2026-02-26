@@ -193,6 +193,21 @@ struct MTStyleTests {
         #expect(command.toJS() == expectedJS)
     }
 
+    @Test func setSpriteCommand_shouldGenerateExpectedJS() async throws {
+        let spriteURL = URL(string: "https://example.com/sprite.png")!
+        let command = SetSprite(url: spriteURL)
+        let expectedJS = "\(MTBridge.mapObject).setSprite(\"\(spriteURL.absoluteString)\");"
+
+        #expect(command.toJS() == expectedJS)
+    }
+
+    @Test func setSecondaryLanguageCommand_shouldGenerateExpectedJS() async throws {
+        let command = SetSecondaryLanguage(language: .country(.english))
+        let expectedJS = "\(MTBridge.mapObject).setSecondaryLanguage(\"en\");"
+
+        #expect(command.toJS() == expectedJS)
+    }
+
     @Test func projectionValueParsing_shouldReturnExpectedType() async throws {
         let mercatorReturnType = try MTBridgeReturnType(from: "mercator")
         let globeReturnType = try MTBridgeReturnType(from: "globe")
@@ -312,6 +327,75 @@ struct MTStyleTests {
 
         #expect(command?.id == "async-sprite")
         #expect(command?.url == spriteURL)
+    }
+
+    @MainActor
+    @Test func setSpriteWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        let spriteURL = URL(string: "https://example.com/sprite.json")!
+
+        mapView.bridge.executor = executor
+
+        let _ = await withCheckedContinuation { continuation in
+            mapView.setSprite(spriteURL) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+        
+        let command = executor.lastCommand as? SetSprite
+        #expect(command?.url == spriteURL)
+    }
+
+    @MainActor
+    @Test func setSpriteAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        let spriteURL = URL(string: "https://example.com/sprite.json")!
+
+        mapView.bridge.executor = executor
+        await mapView.setSprite(spriteURL)
+        
+        let command = executor.lastCommand as? SetSprite
+        #expect(command?.url == spriteURL)
+    }
+
+    @MainActor
+    @Test func setSecondaryLanguageWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        let _ = await withCheckedContinuation { continuation in
+            mapView.setSecondaryLanguage(.country(.english)) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+        
+        let command = executor.lastCommand as? SetSecondaryLanguage
+        switch command?.language {
+        case .country(let country):
+            #expect(country == .english)
+        default:
+            Issue.record("Expected .country(.english)")
+        }
+    }
+
+    @MainActor
+    @Test func setSecondaryLanguageAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        await mapView.setSecondaryLanguage(.country(.english))
+        
+        let command = executor.lastCommand as? SetSecondaryLanguage
+        switch command?.language {
+        case .country(let country):
+            #expect(country == .english)
+        default:
+            Issue.record("Expected .country(.english)")
+        }
     }
 
     @MainActor

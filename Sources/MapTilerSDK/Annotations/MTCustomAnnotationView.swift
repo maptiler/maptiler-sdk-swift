@@ -84,13 +84,31 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation {
         self.coordinates = coordinates
 
         mapView.project(coordinates: coordinates) { [weak self] result in
+            guard let self = self else { return }
+
             switch result {
             case .success(let point):
-                self?.center = CGPoint(
-                    x: point.latitude + (self?.offset.x ?? 0.0),
-                    y: point.longitude + (self?.offset.y ?? 0.0)
+                self.center = CGPoint(
+                    x: point.latitude + self.offset.x,
+                    y: point.longitude + self.offset.y
                 )
-                completionHandler?(.success(()))
+
+                if mapView.options?.projection == .globe {
+                    mapView.getBounds { [weak self] boundsResult in
+                        guard let self = self else { return }
+
+                        switch boundsResult {
+                        case .success(let bounds):
+                            self.isHidden = !bounds.contains(coordinates)
+                            completionHandler?(.success(()))
+                        case .failure(let error):
+                            completionHandler?(.failure(error))
+                        }
+                    }
+                } else {
+                    self.isHidden = false
+                    completionHandler?(.success(()))
+                }
             case .failure(let error):
                 completionHandler?(.failure(error))
             }
@@ -114,7 +132,22 @@ open class MTCustomAnnotationView: UIView, @preconcurrency MTAnnotation {
                 mapView.addSubview(self)
                 mapView.bringSubviewToFront(self)
 
-                completionHandler?(.success(()))
+                if mapView.options?.projection == .globe {
+                    mapView.getBounds { [weak self] boundsResult in
+                        guard let self = self else { return }
+
+                        switch boundsResult {
+                        case .success(let bounds):
+                            self.isHidden = !bounds.contains(self.coordinates)
+                            completionHandler?(.success(()))
+                        case .failure(let error):
+                            completionHandler?(.failure(error))
+                        }
+                    }
+                } else {
+                    self.isHidden = false
+                    completionHandler?(.success(()))
+                }
             case .failure(let error):
                 completionHandler?(.failure(error))
             }

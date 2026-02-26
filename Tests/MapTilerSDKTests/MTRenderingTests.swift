@@ -57,6 +57,19 @@ struct MTRenderingTests {
         #expect(SetShowCollisionBoxes(show: false).toJS() == expectedFalseJS)
     }
 
+    @Test func setMaxParallelImageRequestsCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject)._setMaxParallelImageRequests(10);"
+        #expect(SetMaxParallelImageRequests(maxParallelImageRequests: 10).toJS() == expectedJS)
+    }
+
+    @Test func setRTLTextPluginCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).setRTLTextPlugin('https://example.com/plugin.js', true);"
+        #expect(SetRTLTextPlugin(pluginURL: "https://example.com/plugin.js", deferred: true).toJS() == expectedJS)
+
+        let expectedFalseJS = "\(MTBridge.mapObject).setRTLTextPlugin('https://example.com/plugin.js', false);"
+        #expect(SetRTLTextPlugin(pluginURL: "https://example.com/plugin.js", deferred: false).toJS() == expectedFalseJS)
+    }
+
     @Test func mapOptionsEncoding_includesPixelRatio() async throws {
         let pixelRatio = 1.5
         let options = MTMapOptions(pixelRatio: pixelRatio)

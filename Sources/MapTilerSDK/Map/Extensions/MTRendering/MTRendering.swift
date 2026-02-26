@@ -37,4 +37,14 @@ public protocol MTRendering {
     /// Displays collision boxes on the map.
     /// - Parameter show: A boolean value indicating whether to show collision boxes.
     func setShowCollisionBoxes(_ show: Bool) async
+
+    /// Sets the maximum number of images loaded in parallel.
+    /// - Parameter maxParallelImageRequests: The maximum number of images.
+    func setMaxParallelImageRequests(_ maxParallelImageRequests: Int) async
+
+    /// Sets the map's RTL text plugin.
+    /// - Parameters:
+    ///   - pluginURL: URL pointing to the Mapbox RTL text plugin source.
+    ///   - deferred: A boolean indicating if the plugin evaluation should be deferred.
+    func setRTLTextPlugin(pluginURL: String, deferred: Bool) async
 }

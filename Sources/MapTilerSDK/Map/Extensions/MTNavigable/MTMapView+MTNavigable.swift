@@ -156,6 +156,27 @@ extension MTMapView: MTNavigable {
         options?.setBounds(bounds)
     }
 
+    /// Pans, rotates and zooms the map to to fit the box made by points p0 and p1
+    /// once the map is rotated to the specified bearing.
+    /// To zoom without rotating, pass in the current map bearing.
+    /// - Parameters:
+    ///   - p0: First point on screen.
+    ///   - p1: Second point on screen.
+    ///   - bearing: Desired map bearing at end of animation.
+    ///   - fitOptions: Additional configuration that controls the fitting animation.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func fitScreenCoordinates(
+        _ p0: MTPoint,
+        _ p1: MTPoint,
+        _ bearing: Double,
+        options fitOptions: MTFitBoundsOptions? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        let command = FitScreenCoordinates(p0: p0, p1: p1, bearing: bearing, options: fitOptions)
+        runCommand(command, completion: completionHandler)
+    }
+
     /// Sets the padding in pixels around the viewport.
     /// - Parameters:
     ///   - options: Custom options to use.
@@ -617,6 +638,27 @@ extension MTMapView {
     public func fitBounds(_ bounds: MTBounds, options fitOptions: MTFitBoundsOptions? = nil) async {
         await withCheckedContinuation { continuation in
             fitBounds(bounds, options: fitOptions) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Pans, rotates and zooms the map to to fit the box made by points p0 and p1
+    /// once the map is rotated to the specified bearing.
+    /// To zoom without rotating, pass in the current map bearing.
+    /// - Parameters:
+    ///   - p0: First point on screen.
+    ///   - p1: Second point on screen.
+    ///   - bearing: Desired map bearing at end of animation.
+    ///   - fitOptions: Additional configuration that controls the fitting animation.
+    public func fitScreenCoordinates(
+        _ p0: MTPoint,
+        _ p1: MTPoint,
+        _ bearing: Double,
+        options fitOptions: MTFitBoundsOptions? = nil
+    ) async {
+        await withCheckedContinuation { continuation in
+            fitScreenCoordinates(p0, p1, bearing, options: fitOptions) { _ in
                 continuation.resume()
             }
         }

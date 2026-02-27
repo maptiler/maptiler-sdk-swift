@@ -280,6 +280,34 @@ struct MTNavigationTests {
         #expect(FitBounds(bounds: bounds, options: options).toJS() == fitBoundsJS)
     }
 
+    @Test func fitScreenCoordinatesCommand_shouldMatchJS() async throws {
+        let p0 = MTPoint(x: 10, y: 20)
+        let p1 = MTPoint(x: 100, y: 200)
+        let bearing = 45.0
+        let padding = MTFitBoundsPadding.directional(MTPaddingOptions(left: 12.0, top: 8.0, right: 6.0, bottom: 4.0))
+        let animationOptions = MTAnimationOptions(
+            duration: 2500,
+            offset: MTPoint(x: 1.5, y: 2.5),
+            shouldAnimate: true,
+            isEssential: false,
+            easing: .cubic
+        )
+        let options = MTFitBoundsOptions(
+            padding: padding,
+            maxZoom: 14.0,
+            linear: true,
+            bearing: 15.0,
+            pitch: 25.0,
+            animationOptions: animationOptions
+        )
+
+        var optionsString = options.toJSON() ?? ""
+        optionsString = optionsString.replaceEasing()
+        let fitScreenCoordinatesJS = "\(MTBridge.mapObject).fitScreenCoordinates([10.0, 20.0], [100.0, 200.0], 45.0, \(optionsString));"
+
+        #expect(FitScreenCoordinates(p0: p0, p1: p1, bearing: bearing, options: options).toJS() == fitScreenCoordinatesJS)
+    }
+
     @Test func getBoundsCommand_shouldMatchJS() async throws {
         let getBoundsJS = "JSON.stringify(\(MTBridge.mapObject).getBounds().toArray());"
 

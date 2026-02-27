@@ -54,6 +54,16 @@ public protocol MTNavigable {
     ///   - options: Additional fit configuration.
     func fitBounds(_ bounds: MTBounds, options: MTFitBoundsOptions?) async
 
+    /// Pans, rotates and zooms the map to to fit the box made by points p0 and p1
+    /// once the map is rotated to the specified bearing.
+    /// To zoom without rotating, pass in the current map bearing.
+    /// - Parameters:
+    ///   - p0: First point on screen.
+    ///   - p1: Second point on screen.
+    ///   - bearing: Desired map bearing at end of animation.
+    ///   - options: Additional fit configuration.
+    func fitScreenCoordinates(_ p0: MTPoint, _ p1: MTPoint, _ bearing: Double, options: MTFitBoundsOptions?) async
+
     /// Pans the map by the specified offset.
     /// - Parameters:
     ///    - offset: Offset to pan by.

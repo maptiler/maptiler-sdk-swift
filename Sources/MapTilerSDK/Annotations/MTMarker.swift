@@ -325,6 +325,19 @@ extension MTMarker {
     ) {
         mapView.togglePopup(for: self, completionHandler: completionHandler)
     }
+
+    /// Removes the marker from the map.
+    /// - Parameters:
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func remove(
+        from mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.removeMarker(self, completionHandler: completionHandler)
+    }
 }
 
 // Getters
@@ -551,6 +564,17 @@ extension MTMarker {
     public func togglePopup(in mapView: MTMapView) async {
         await withCheckedContinuation { continuation in
             togglePopup(in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Removes the marker from the map.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func remove(from mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            remove(from: mapView) { _ in
                 continuation.resume()
             }
         }

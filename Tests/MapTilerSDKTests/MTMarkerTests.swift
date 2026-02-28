@@ -191,4 +191,18 @@ struct MTMarkerTests {
         #expect(alignmentJS == "window.\(marker.identifier).setRotationAlignment('\(MTMarkerRotationAlignment.map.rawValue)');")
         #expect(togglePopupJS == "window.\(marker.identifier).togglePopup();")
     }
+
+    @Test func removeMarkerCommand_matchesExpectedJS() async throws {
+        let popup = MTTextPopup(coordinates: coordinate, text: "Hello World")
+        let marker = MTMarker(coordinates: coordinate, popup: popup)
+
+        let removeJS = RemoveMarker(marker: marker).toJS()
+
+        #expect(removeJS.contains("window['\(marker.identifier)'].remove()"))
+        #expect(removeJS.contains("delete window['postDragEvent_\(marker.identifier)']"))
+        #expect(removeJS.contains("delete window['\(marker.identifier)']"))
+        #expect(removeJS.contains("window['\(popup.identifier)'].remove()"))
+        #expect(removeJS.contains("delete window['postPopupEvent_\(popup.identifier)']"))
+        #expect(removeJS.contains("delete window['\(popup.identifier)']"))
+    }
 }

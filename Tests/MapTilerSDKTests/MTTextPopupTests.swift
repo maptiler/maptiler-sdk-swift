@@ -27,6 +27,18 @@ struct MTTextPopupTests {
         #expect(jsString.contains("\"maxWidth\":320"))
     }
 
+
+    @Test func addTextPopupCommand_includesAnchorWhenProvided() async throws {
+        let popup = MTTextPopup(
+            coordinates: coordinate,
+            text: "Hello World",
+            anchor: .top
+        )
+
+        let jsString = AddTextPopup(popup: popup).toJS()
+
+        #expect(jsString.contains("\"anchor\":\"top\""))
+    }
     @Test func addTextPopupCommand_omitsMaxWidthWhenNil() async throws {
         let popup = MTTextPopup(
             coordinates: coordinate,
@@ -50,6 +62,17 @@ struct MTTextPopupTests {
             })();
             """
         )
+        #expect(
+            GetTextPopupAnchor(popup: popup).toJS() == """
+            (() => {
+                const popup = window.\(popup.identifier);
+                if (!popup) return null;
+                if (popup.options.anchor) return popup.options.anchor;
+                const match = popup._container?.className.match(/maplibregl-popup-anchor-([a-z-]+)/);
+                return match ? match[1] : null;
+            })();
+            """
+        )
         #expect(IsTextPopupOpen(popup: popup).toJS() == "window.\(popup.identifier).isOpen();")
     }
 
@@ -64,6 +87,24 @@ struct MTTextPopupTests {
         let popup = MTTextPopup(coordinates: coordinate, text: "O'Brien")
 
         #expect(SetCoordinatesToTextPopup(popup: popup).toJS() == "window.\(popup.identifier).setLngLat([20.0, 10.0]);")
+        #expect(
+            SetAnchorToTextPopup(popup: popup, anchor: .bottomLeft).toJS()
+                == """
+                window.\(popup.identifier).options.anchor = 'bottom-left';
+                if (window.\(popup.identifier).isOpen()) {
+                    window.\(popup.identifier)._update();
+                }
+                """
+        )
+        #expect(
+            SetAnchorToTextPopup(popup: popup, anchor: nil).toJS()
+                == """
+                delete window.\(popup.identifier).options.anchor;
+                if (window.\(popup.identifier).isOpen()) {
+                    window.\(popup.identifier)._update();
+                }
+                """
+        )
         #expect(SetMaxWidthToTextPopup(popup: popup, maxWidth: 240).toJS() == "window.\(popup.identifier).setMaxWidth(240.0);")
         #expect(SetOffsetToTextPopup(popup: popup, offset: 8).toJS() == "window.\(popup.identifier).setOffset(8.0);")
         #expect(

@@ -341,6 +341,33 @@ extension MTMapView {
         }
     }
 
+    package func runCommandWithOptionalStringReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<String?, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
+
+                if case .string(let commandValue) = value {
+                    completion?(.success(commandValue))
+                } else if case .null = value {
+                    completion?(.success(nil))
+                } else {
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(.failure(MTError.unsupportedReturnType(description: "Expected string or null.")))
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
     package func runCommandWithStringReturnValue(
         _ command: MTCommand,
         completion: ((Result<String, MTError>) -> Void)? = nil

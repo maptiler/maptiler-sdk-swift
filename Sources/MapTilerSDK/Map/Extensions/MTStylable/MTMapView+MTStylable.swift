@@ -689,6 +689,14 @@ extension MTMapView: MTStylable {
         )
     }
 
+    package func setAnchor(
+        _ anchor: MTAnchor?,
+        to popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetAnchorToTextPopup(popup: popup, anchor: anchor), completion: completionHandler)
+    }
+
     package func setText(
         _ text: String,
         to popup: MTTextPopup,

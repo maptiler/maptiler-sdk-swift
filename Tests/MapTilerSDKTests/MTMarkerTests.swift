@@ -193,9 +193,8 @@ struct MTMarkerTests {
     }
 
     @Test func removeMarkerCommand_matchesExpectedJS() async throws {
-        let marker = MTMarker(coordinates: coordinate)
-        let popup = MTTextPopup(coordinates: coordinate)
-        marker.popup = popup
+        let popup = MTTextPopup(coordinates: coordinate, text: "Hello World")
+        let marker = MTMarker(coordinates: coordinate, popup: popup)
 
         let removeJS = RemoveMarker(marker: marker).toJS()
 

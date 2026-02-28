@@ -158,6 +158,16 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     ///   - completionHandler: A handler block to execute when function finishes.
     @MainActor
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setText(
+        _ text: String,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.text = text
+
+        mapView.setText(text, to: self, completionHandler: completionHandler)
+    }
+
     /// Sets anchor for the popup.
     /// - Parameters:
     ///   - anchor: Anchor of the popup.
@@ -173,16 +183,6 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.anchor = anchor
 
         mapView.setAnchor(anchor, to: self, completionHandler: completionHandler)
-    }
-
-    public func setText(
-        _ text: String,
-        in mapView: MTMapView,
-        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
-    ) {
-        self.text = text
-
-        mapView.setText(text, to: self, completionHandler: completionHandler)
     }
 
     /// Enables tracking the pointer position for the popup.
@@ -247,6 +247,19 @@ extension MTTextPopup {
     ///   - completionHandler: A handler block to execute when function finishes.
     @MainActor
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getCoordinates(
+        in mapView: MTMapView,
+        completionHandler: ((Result<CLLocationCoordinate2D, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommandWithCoordinateReturnValue(GetTextPopupCoordinates(popup: self)) { [weak self] result in
+            if case .success(let coordinates) = result {
+                self?.coordinates = coordinates
+            }
+
+            completionHandler?(result)
+        }
+    }
+
     /// Returns current anchor of the popup.
     /// - Parameters:
     ///   - mapView: Map view to query.
@@ -265,19 +278,6 @@ extension MTTextPopup {
             } else if case .failure(let error) = result {
                 completionHandler?(.failure(error))
             }
-        }
-    }
-
-    public func getCoordinates(
-        in mapView: MTMapView,
-        completionHandler: ((Result<CLLocationCoordinate2D, MTError>) -> Void)? = nil
-    ) {
-        mapView.runCommandWithCoordinateReturnValue(GetTextPopupCoordinates(popup: self)) { [weak self] result in
-            if case .success(let coordinates) = result {
-                self?.coordinates = coordinates
-            }
-
-            completionHandler?(result)
         }
     }
 
@@ -385,6 +385,16 @@ extension MTTextPopup {
     /// Updates the popup text content.
     /// - Parameter mapView: Map view to apply to.
     @MainActor
+    public func setText(_ text: String, in mapView: MTMapView) async {
+        self.text = text
+
+        await withCheckedContinuation { continuation in
+            setText(text, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
     /// Sets anchor for the popup.
     /// - Parameters:
     ///   - anchor: Anchor of the popup.
@@ -395,16 +405,6 @@ extension MTTextPopup {
 
         await withCheckedContinuation { continuation in
             setAnchor(anchor, in: mapView) { _ in
-                continuation.resume()
-            }
-        }
-    }
-
-    public func setText(_ text: String, in mapView: MTMapView) async {
-        self.text = text
-
-        await withCheckedContinuation { continuation in
-            setText(text, in: mapView) { _ in
                 continuation.resume()
             }
         }
@@ -448,6 +448,19 @@ extension MTTextPopup {
     /// Returns current coordinates of the popup.
     /// - Parameter mapView: Map view to query.
     @MainActor
+    public func getCoordinates(in mapView: MTMapView) async -> CLLocationCoordinate2D {
+        await withCheckedContinuation { continuation in
+            getCoordinates(in: mapView) { [weak self] result in
+                switch result {
+                case .success(let coordinates):
+                    continuation.resume(returning: coordinates)
+                case .failure:
+                    continuation.resume(returning: self?.coordinates ?? CLLocationCoordinate2D())
+                }
+            }
+        }
+    }
+
     /// Returns current anchor of the popup.
     /// - Parameter mapView: Map view to query.
     @MainActor
@@ -459,19 +472,6 @@ extension MTTextPopup {
                     continuation.resume(returning: anchor)
                 case .failure:
                     continuation.resume(returning: self?.anchor)
-                }
-            }
-        }
-    }
-
-    public func getCoordinates(in mapView: MTMapView) async -> CLLocationCoordinate2D {
-        await withCheckedContinuation { continuation in
-            getCoordinates(in: mapView) { [weak self] result in
-                switch result {
-                case .success(let coordinates):
-                    continuation.resume(returning: coordinates)
-                case .failure:
-                    continuation.resume(returning: self?.coordinates ?? CLLocationCoordinate2D())
                 }
             }
         }

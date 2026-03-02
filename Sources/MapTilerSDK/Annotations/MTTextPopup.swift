@@ -25,6 +25,9 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// The pixel distance from the popup's coordinates.
     public private(set) var offset: Double? = 0.0
 
+    /// Anchor of the popup.
+    public private(set) var anchor: MTAnchor?
+
     /// The maximum width of the popup in pixels.
     public private(set) var maxWidth: Double?
 
@@ -49,17 +52,20 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     ///    - text: Text content of the popup.
     ///  - offset: The pixel distance from the popup's coordinates.
     ///  - maxWidth: The maximum width of the popup.
+    ///  - anchor: Anchor of the popup.
     public init(
         coordinates: CLLocationCoordinate2D,
         text: String,
         offset: Double = 0.0,
-        maxWidth: Double? = nil
+        maxWidth: Double? = nil,
+        anchor: MTAnchor? = nil
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
         self.text = text
         self.offset = offset
         self.maxWidth = maxWidth
+        self.anchor = anchor
     }
 
     /// Sets coordinates for the popup.
@@ -162,6 +168,23 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         mapView.setText(text, to: self, completionHandler: completionHandler)
     }
 
+    /// Sets anchor for the popup.
+    /// - Parameters:
+    ///   - anchor: Anchor of the popup.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setAnchor(
+        _ anchor: MTAnchor?,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.anchor = anchor
+
+        mapView.setAnchor(anchor, to: self, completionHandler: completionHandler)
+    }
+
     /// Enables tracking the pointer position for the popup.
     /// - Parameters:
     ///   - mapView: Map view to apply to.
@@ -234,6 +257,27 @@ extension MTTextPopup {
             }
 
             completionHandler?(result)
+        }
+    }
+
+    /// Returns current anchor of the popup.
+    /// - Parameters:
+    ///   - mapView: Map view to query.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getAnchor(
+        in mapView: MTMapView,
+        completionHandler: ((Result<MTAnchor?, MTError>) -> Void)? = nil
+    ) {
+        mapView.runCommandWithOptionalStringReturnValue(GetTextPopupAnchor(popup: self)) { [weak self] result in
+            if case .success(let anchorString) = result {
+                let anchor = anchorString.flatMap { MTAnchor(rawValue: $0) }
+                self?.anchor = anchor
+                completionHandler?(.success(anchor))
+            } else if case .failure(let error) = result {
+                completionHandler?(.failure(error))
+            }
         }
     }
 
@@ -351,6 +395,21 @@ extension MTTextPopup {
         }
     }
 
+    /// Sets anchor for the popup.
+    /// - Parameters:
+    ///   - anchor: Anchor of the popup.
+    ///   - mapView: Map view to apply to.
+    @MainActor
+    public func setAnchor(_ anchor: MTAnchor?, in mapView: MTMapView) async {
+        self.anchor = anchor
+
+        await withCheckedContinuation { continuation in
+            setAnchor(anchor, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
     /// Enables tracking the pointer position for the popup.
     /// - Parameter mapView: Map view to apply to.
     @MainActor
@@ -397,6 +456,22 @@ extension MTTextPopup {
                     continuation.resume(returning: coordinates)
                 case .failure:
                     continuation.resume(returning: self?.coordinates ?? CLLocationCoordinate2D())
+                }
+            }
+        }
+    }
+
+    /// Returns current anchor of the popup.
+    /// - Parameter mapView: Map view to query.
+    @MainActor
+    public func getAnchor(in mapView: MTMapView) async -> MTAnchor? {
+        await withCheckedContinuation { continuation in
+            getAnchor(in: mapView) { [weak self] result in
+                switch result {
+                case .success(let anchor):
+                    continuation.resume(returning: anchor)
+                case .failure:
+                    continuation.resume(returning: self?.anchor)
                 }
             }
         }

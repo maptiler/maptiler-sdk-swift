@@ -237,6 +237,25 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
             completionHandler?(result)
         }
     }
+
+    /// Removes the popup from the map.
+    /// - Parameters:
+    ///   - mapView: Map view to remove the popup from.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func remove(
+        from mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.removeTextPopup(self) { [weak self] result in
+            if case .success = result {
+                self?.isOpen = false
+            }
+
+            completionHandler?(result)
+        }
+    }
 }
 
 // Getters
@@ -440,6 +459,17 @@ extension MTTextPopup {
     public func close(in mapView: MTMapView) async {
         await withCheckedContinuation { continuation in
             close(in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Removes the popup from the map.
+    /// - Parameter mapView: Map view to remove the popup from.
+    @MainActor
+    public func remove(from mapView: MTMapView) async {
+        await withCheckedContinuation { continuation in
+            remove(from: mapView) { _ in
                 continuation.resume()
             }
         }

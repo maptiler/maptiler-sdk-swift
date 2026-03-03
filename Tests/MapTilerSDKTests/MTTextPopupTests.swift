@@ -81,6 +81,19 @@ struct MTTextPopupTests {
 
         #expect(OpenTextPopup(popup: popup).toJS() == "window.\(popup.identifier).addTo(\(MTBridge.mapObject));")
         #expect(CloseTextPopup(popup: popup).toJS() == "window.\(popup.identifier).remove();")
+        
+        #expect(
+            RemoveTextPopup(popup: popup).toJS() == """
+            (() => {
+                if (window['\(popup.identifier)']) {
+                    try { window['\(popup.identifier)'].remove(); } catch (e) {}
+                    delete window['postPopupEvent_\(popup.identifier)'];
+                    delete window['\(popup.identifier)'];
+                }
+                return "";
+            })();
+            """
+        )
     }
 
     @Test func textPopupSetterCommands_matchExpectedJS() async throws {

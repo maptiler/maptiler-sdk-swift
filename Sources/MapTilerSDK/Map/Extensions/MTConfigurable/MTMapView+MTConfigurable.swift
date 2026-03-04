@@ -32,6 +32,13 @@ extension MTMapView: MTConfigurable {
     package func setTelemetry(_ isEnabled: Bool, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetTelemetry(shouldEnableTelemetry: isEnabled), completion: completionHandler)
     }
+
+    /// Returns the current SDK session UUID used for sessionized requests and telemetry.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getMaptilerSessionId(completionHandler: @escaping (Result<String, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetMaptilerSessionId(), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -72,6 +79,20 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             setTelemetry(isEnabled) { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns the current SDK session UUID used for sessionized requests and telemetry.
+    public func getMaptilerSessionId() async -> String {
+        await withCheckedContinuation { continuation in
+            getMaptilerSessionId { result in
+                switch result {
+                case .success(let sessionId):
+                    continuation.resume(returning: sessionId)
+                case .failure:
+                    continuation.resume(returning: "")
+                }
             }
         }
     }

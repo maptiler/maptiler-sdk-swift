@@ -382,6 +382,19 @@ extension MTMapView: MTStylable {
         options?.setTerrainIsEnabled(false)
     }
 
+    /// Returns boolean value indicating whether 3D terrain visualization is enabled.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func hasTerrain(
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(
+            HasTerrain(),
+            completion: completionHandler
+        )
+    }
+
     /// Sets the map's vertical field of view, in degrees.
     ///
     /// The internal camera has a default vertical field of view of a wide ~36.86 degrees. In globe mode,
@@ -1154,6 +1167,20 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             setTerrain { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns true if 3D terrain visualization is enabled.
+    public func hasTerrain() async -> Bool {
+        await withCheckedContinuation { continuation in
+            hasTerrain { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
             }
         }
     }

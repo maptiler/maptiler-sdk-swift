@@ -147,6 +147,9 @@ public protocol MTStylable {
     /// Removes the 3D terrain from the map.
     func setTerrain() async
 
+    /// Returns true if 3D terrain visualization is enabled.
+    func hasTerrain() async -> Bool
+
     /// Sets the map's vertical field of view, in degrees.
     ///
     /// The internal camera has a default vertical field of view of a wide ~36.86 degrees. In globe mode,

@@ -238,6 +238,12 @@ struct MTNavigationTests {
         #expect(SetPadding(paddingOptions: paddingOptions).toJS() == setPaddingJS)
     }
 
+    @Test func getPaddingCommand_shouldMatchJS() async throws {
+        let getPaddingJS = "\(MTBridge.mapObject).getPadding();"
+
+        #expect(GetPadding().toJS() == getPaddingJS)
+    }
+
     @Test func setPitchCommand_shouldMatchJS() async throws {
         let setPitchJS = "\(MTBridge.mapObject).setPitch(\(pitch));"
 
@@ -496,6 +502,44 @@ struct MTNavigationTests {
 
         #expect(executor.lastCommand is Stop)
     }
+    @MainActor
+    @Test func getPaddingWrapper_shouldDispatchCommand() async throws {
+        let expectedPadding = MTPaddingOptions(left: 10, top: 20, right: 30, bottom: 40)
+        let executor = MockExecutor(result: .stringDoubleDict(["left": 10, "top": 20, "right": 30, "bottom": 40]))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.getPadding { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let padding):
+            #expect(padding == expectedPadding)
+        case .failure(let error):
+            Issue.record("Expected getPadding wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is GetPadding)
+    }
+
+    @MainActor
+    @Test func getPaddingAsyncWrapper_shouldDispatchCommand() async throws {
+        let expectedPadding = MTPaddingOptions(left: 10, top: 20, right: 30, bottom: 40)
+        let executor = MockExecutor(result: .stringDoubleDict(["left": 10, "top": 20, "right": 30, "bottom": 40]))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let padding = try await mapView.getPadding()
+
+        #expect(padding == expectedPadding)
+        #expect(executor.lastCommand is GetPadding)
+    }
+
 
     @MainActor
     @Test func snapToNorthWrapper_shouldDispatchCommand() async throws {

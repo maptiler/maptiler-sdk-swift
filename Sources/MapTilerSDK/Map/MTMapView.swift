@@ -564,6 +564,43 @@ extension MTMapView {
         }
     }
 
+    package func runCommandWithPaddingReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<MTPaddingOptions, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
+                switch value {
+                case .stringDoubleDict(let dict):
+                    let padding = MTPaddingOptions(
+                        left: dict["left"],
+                        top: dict["top"],
+                        right: dict["right"],
+                        bottom: dict["bottom"]
+                    )
+                    completion?(.success(padding))
+                default:
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(
+                        .failure(
+                            MTError.unsupportedReturnType(
+                                description: "Expected dictionary with padding values, got invalid type."
+                            )
+                        )
+                    )
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
     private func decodeBounds(from string: String) -> MTBounds? {
         guard let data = string.data(using: .utf8) else {
             return nil

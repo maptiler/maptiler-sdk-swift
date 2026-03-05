@@ -87,6 +87,9 @@ public protocol MTNavigable {
     ///    - options: Padding options.
     func setPadding(_ options: MTPaddingOptions) async
 
+    /// Returns the current viewport padding as MTPaddingOptions.
+    func getPadding() async throws -> MTPaddingOptions
+
     /// Fits the map to the country-level bounds inferred from the current IP address.
     func fitToIpBounds() async
 

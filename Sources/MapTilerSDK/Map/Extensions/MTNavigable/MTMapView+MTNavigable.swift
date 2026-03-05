@@ -182,6 +182,13 @@ extension MTMapView: MTNavigable {
     ///   - options: Custom options to use.
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    /// Returns the current viewport padding.
+    /// - Parameter completionHandler: A handler block to execute when function finishes with result.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getPadding(completionHandler: ((Result<MTPaddingOptions, MTError>) -> Void)? = nil) {
+        runCommandWithPaddingReturnValue(GetPadding(), completion: completionHandler)
+    }
+
     public func setPadding(_ options: MTPaddingOptions, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(SetPadding(paddingOptions: options), completion: completionHandler)
     }
@@ -665,6 +672,16 @@ extension MTMapView {
     }
 
     /// Sets the padding in pixels around the viewport.
+    /// Returns the current viewport padding.
+    /// - Returns: Current padding as MTPaddingOptions
+    public func getPadding() async throws -> MTPaddingOptions {
+        try await withCheckedThrowingContinuation { continuation in
+            getPadding { result in
+                continuation.resume(with: result)
+            }
+        }
+    }
+
     public func setPadding(_ options: MTPaddingOptions) async {
         await withCheckedContinuation { continuation in
             setPadding(options) { _ in

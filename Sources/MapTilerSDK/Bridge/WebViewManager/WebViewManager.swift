@@ -64,10 +64,26 @@ package final class WebViewManager: NSObject {
             )
         controller.addUserScript(errorLoggingScript)
 
+        controller.addUserScript(getDisableCalloutsScript())
+
         controller.add(self, name: Constants.Error.handler)
         controller.add(self, name: Constants.Map.handler)
 
         return controller
+    }
+
+    private func getDisableCalloutsScript() -> WKUserScript {
+        // swiftlint:disable line_length
+        let disableCalloutsScript = """
+        var style = document.createElement('style'); \
+            style.type = 'text/css'; \
+            style.innerText = '*:not(input):not(textarea) { -webkit-user-select: none; -webkit-touch-callout: none; }'; \
+            var head = document.getElementsByTagName('head')[0];\
+            head.appendChild(style);
+        """
+        // swiftlint:enable line_length
+
+        return WKUserScript(source: disableCalloutsScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
 }
 

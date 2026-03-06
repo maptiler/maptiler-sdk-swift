@@ -92,6 +92,46 @@ struct MTStyleTests {
         #expect(AreTilesLoaded().toJS() == expectedJS)
     }
 
+    @Test func isGlobeProjectionCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).isGlobeProjection();"
+
+        #expect(IsGlobeProjection().toJS() == expectedJS)
+    }
+
+    @MainActor
+    @Test func isGlobeProjectionWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.isGlobeProjection { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let isGlobe):
+            #expect(isGlobe)
+        case .failure(let error):
+            Issue.record("Expected isGlobeProjection wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is IsGlobeProjection)
+    }
+
+    @MainActor
+    @Test func isGlobeProjectionAsyncWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        let isGlobe = await mapView.isGlobeProjection()
+
+        #expect(isGlobe)
+        #expect(executor.lastCommand is IsGlobeProjection)
+    }
+
     @Test func setSkyCommand_shouldMatchJS() async throws {
         let sky = MTSky(
             skyColor: .color(MTColor(hex: "#199EF3")),

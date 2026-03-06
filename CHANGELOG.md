@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.1](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/1.3.1)
+Released on 2026-03-06.
+### Fixed
+- MacOS via Catalyst double zoom to drag gesture now properly handles the drag event.
+
 ## [1.3.0](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/1.3.0)
 Released on 2026-02-27.
 ### Added

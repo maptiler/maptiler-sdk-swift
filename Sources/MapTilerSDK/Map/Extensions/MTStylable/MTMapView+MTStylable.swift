@@ -304,6 +304,19 @@ extension MTMapView: MTStylable {
         options?.setProjection(.mercator)
     }
 
+    /// Returns true if the current projection is globe; otherwise false.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isGlobeProjection(
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(
+            IsGlobeProjection(),
+            completion: completionHandler
+        )
+    }
+
     /// Enables the 3D terrain visualization.
     /// - Parameters:
     ///    - exaggerationFactor: Factor for volume boosting.
@@ -1102,6 +1115,20 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             enableMercatorProjection { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns true if the current projection is globe; otherwise false.
+    public func isGlobeProjection() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isGlobeProjection { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
             }
         }
     }

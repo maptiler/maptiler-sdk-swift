@@ -464,6 +464,45 @@ struct MTStyleTests {
         #expect(command.toJS() == expectedJS)
     }
 
+    @Test func hasTerrainCommand_shouldMatchJS() async throws {
+        let command = HasTerrain()
+        let expectedJS = "\(MTBridge.mapObject).hasTerrain();"
+        #expect(command.toJS() == expectedJS)
+    }
+
+    @MainActor
+    @Test func hasTerrainWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.hasTerrain { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let hasTerrain):
+            #expect(hasTerrain)
+        case .failure(let error):
+            Issue.record("Expected hasTerrain wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is HasTerrain)
+    }
+
+    @MainActor
+    @Test func hasTerrainAsyncWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        let hasTerrain = await mapView.hasTerrain()
+        #expect(hasTerrain)
+        #expect(executor.lastCommand is HasTerrain)
+    }
+
     @MainActor
     @Test func setTerrainWrappers_shouldDispatchCommand() async throws {
         let executor = MockExecutor()

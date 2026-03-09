@@ -183,4 +183,7 @@ public protocol MTNavigable {
 
     /// Returns true while any camera movement is active.
     func isMoving() async -> Bool
+
+    /// Returns true while the map is rotating.
+    func isRotating() async -> Bool
 }

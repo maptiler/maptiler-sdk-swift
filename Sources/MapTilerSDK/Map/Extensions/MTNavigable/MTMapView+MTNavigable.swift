@@ -562,6 +562,14 @@ extension MTMapView: MTNavigable {
     public func isMoving(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
         runCommandWithBoolReturnValue(IsMoving(), completion: completionHandler)
     }
+
+    /// Returns true while the map is rotating.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isRotating(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
+        runCommandWithBoolReturnValue(IsRotating(), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -1140,6 +1148,20 @@ extension MTMapView {
     public func isMoving() async -> Bool {
         await withCheckedContinuation { continuation in
             isMoving { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Returns true while the map is rotating.
+    public func isRotating() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isRotating { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

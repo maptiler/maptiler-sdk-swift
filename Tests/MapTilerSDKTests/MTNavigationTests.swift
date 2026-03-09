@@ -141,6 +141,12 @@ struct MTNavigationTests {
         #expect(IsMoving().toJS() == isMovingJS)
     }
 
+    @Test func isRotatingCommand_shouldMatchJS() async throws {
+        let isRotatingJS = "\(MTBridge.mapObject).isRotating();"
+
+        #expect(IsRotating().toJS() == isRotatingJS)
+    }
+
     @Test func boolValueParsingCoversStringAndNumericValues() async throws {
         let trueString = try MTBridgeReturnType(from: "true")
         let falseString = try MTBridgeReturnType(from: "false")
@@ -543,6 +549,42 @@ struct MTNavigationTests {
 
         #expect(result == true)
         #expect(executor.lastCommand is IsMoving)
+    }
+
+    @MainActor
+    @Test func isRotatingWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.isRotating { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let isRotating):
+            #expect(isRotating == true)
+        case .failure(let error):
+            Issue.record("Expected isRotating wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is IsRotating)
+    }
+
+    @MainActor
+    @Test func isRotatingAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await mapView.isRotating()
+
+        #expect(result == true)
+        #expect(executor.lastCommand is IsRotating)
     }
 
     @MainActor

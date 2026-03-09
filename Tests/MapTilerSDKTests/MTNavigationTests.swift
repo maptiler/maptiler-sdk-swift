@@ -135,6 +135,12 @@ struct MTNavigationTests {
         #expect(GetCameraTargetElevation().toJS() == getCameraTargetElevationJS)
     }
 
+    @Test func isMovingCommand_shouldMatchJS() async throws {
+        let isMovingJS = "\(MTBridge.mapObject).isMoving();"
+
+        #expect(IsMoving().toJS() == isMovingJS)
+    }
+
     @Test func boolValueParsingCoversStringAndNumericValues() async throws {
         let trueString = try MTBridgeReturnType(from: "true")
         let falseString = try MTBridgeReturnType(from: "false")
@@ -502,6 +508,43 @@ struct MTNavigationTests {
 
         #expect(executor.lastCommand is Stop)
     }
+
+    @MainActor
+    @Test func isMovingWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.isMoving { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let isMoving):
+            #expect(isMoving == true)
+        case .failure(let error):
+            Issue.record("Expected isMoving wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is IsMoving)
+    }
+
+    @MainActor
+    @Test func isMovingAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await mapView.isMoving()
+
+        #expect(result == true)
+        #expect(executor.lastCommand is IsMoving)
+    }
+
     @MainActor
     @Test func getPaddingWrapper_shouldDispatchCommand() async throws {
         let expectedPadding = MTPaddingOptions(left: 10, top: 20, right: 30, bottom: 40)

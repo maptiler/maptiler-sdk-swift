@@ -118,6 +118,9 @@ public protocol MTStylable {
     /// Enables the mercator projection visualization.
     func enableMercatorProjection() async
 
+    /// Returns true if the current projection is globe; otherwise false.
+    func isGlobeProjection() async -> Bool
+
     /// Enables the 3D terrain visualization.
     /// - Parameters:
     ///    - exaggerationFactor: Factor for volume boosting.

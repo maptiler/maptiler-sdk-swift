@@ -473,6 +473,21 @@ extension MTMapView: MTStylable {
         )
     }
 
+    /// Returns boolean value indicating whether the style is fully loaded.
+    ///
+    /// Use this method to check style readiness before manipulating layers or sources programmatically.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isStyleLoaded(
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(
+            IsStyleLoaded(),
+            completion: completionHandler
+        )
+    }
+
     /// Returns boolean value indicating whether the map renders world copies.
     ///  - Parameters:
     ///    - completionHandler: A handler block to execute when function finishes.
@@ -1292,6 +1307,22 @@ extension MTMapView {
     public func isMapLoaded() async -> Bool {
         await withCheckedContinuation { continuation in
             isMapLoaded { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Returns boolean value indicating whether the style is fully loaded.
+    ///
+    /// Use this method to check style readiness before manipulating layers or sources programmatically.
+    public func isStyleLoaded() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isStyleLoaded { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

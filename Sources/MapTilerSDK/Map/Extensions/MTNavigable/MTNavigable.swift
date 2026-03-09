@@ -180,4 +180,7 @@ public protocol MTNavigable {
 
     /// Returns the map's current roll.
     func getRoll() async -> Double
+
+    /// Returns true while any camera movement is active.
+    func isMoving() async -> Bool
 }

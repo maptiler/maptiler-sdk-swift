@@ -554,6 +554,14 @@ extension MTMapView: MTNavigable {
     public func getRoll(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
         runCommandWithDoubleReturnValue(GetRoll(), completion: completionHandler)
     }
+
+    /// Returns true while any camera movement is active.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isMoving(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
+        runCommandWithBoolReturnValue(IsMoving(), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -1123,6 +1131,20 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: .nan)
+                }
+            }
+        }
+    }
+
+    /// Returns true while any camera movement is active.
+    public func isMoving() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isMoving { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
                 }
             }
         }

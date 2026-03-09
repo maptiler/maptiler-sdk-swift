@@ -92,6 +92,48 @@ struct MTStyleTests {
         #expect(AreTilesLoaded().toJS() == expectedJS)
     }
 
+    @Test func isStyleLoadedCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).isStyleLoaded();"
+
+        #expect(IsStyleLoaded().toJS() == expectedJS)
+    }
+
+    @MainActor
+    @Test func isStyleLoadedWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.isStyleLoaded { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let isLoaded):
+            #expect(isLoaded)
+        case .failure(let error):
+            Issue.record("Expected isStyleLoaded wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is IsStyleLoaded)
+    }
+
+    @MainActor
+    @Test func isStyleLoadedAsyncWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let isLoaded = await mapView.isStyleLoaded()
+
+        #expect(isLoaded)
+        #expect(executor.lastCommand is IsStyleLoaded)
+    }
+
     @Test func isGlobeProjectionCommand_shouldMatchJS() async throws {
         let expectedJS = "\(MTBridge.mapObject).isGlobeProjection();"
 

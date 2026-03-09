@@ -186,4 +186,7 @@ public protocol MTNavigable {
 
     /// Returns true while the map is rotating.
     func isRotating() async -> Bool
+
+    /// Returns true while the map is zooming.
+    func isZooming() async -> Bool
 }

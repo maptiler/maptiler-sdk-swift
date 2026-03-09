@@ -570,6 +570,14 @@ extension MTMapView: MTNavigable {
     public func isRotating(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
         runCommandWithBoolReturnValue(IsRotating(), completion: completionHandler)
     }
+
+    /// Returns true while the map is zooming.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isZooming(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
+        runCommandWithBoolReturnValue(IsZooming(), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -1162,6 +1170,20 @@ extension MTMapView {
     public func isRotating() async -> Bool {
         await withCheckedContinuation { continuation in
             isRotating { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Returns true while the map is zooming.
+    public func isZooming() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isZooming { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

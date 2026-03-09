@@ -147,6 +147,12 @@ struct MTNavigationTests {
         #expect(IsRotating().toJS() == isRotatingJS)
     }
 
+    @Test func isZoomingCommand_shouldMatchJS() async throws {
+        let isZoomingJS = "\(MTBridge.mapObject).isZooming();"
+
+        #expect(IsZooming().toJS() == isZoomingJS)
+    }
+
     @Test func boolValueParsingCoversStringAndNumericValues() async throws {
         let trueString = try MTBridgeReturnType(from: "true")
         let falseString = try MTBridgeReturnType(from: "false")
@@ -585,6 +591,42 @@ struct MTNavigationTests {
 
         #expect(result == true)
         #expect(executor.lastCommand is IsRotating)
+    }
+
+    @MainActor
+    @Test func isZoomingWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.isZooming { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let isZooming):
+            #expect(isZooming == true)
+        case .failure(let error):
+            Issue.record("Expected isZooming wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is IsZooming)
+    }
+
+    @MainActor
+    @Test func isZoomingAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await mapView.isZooming()
+
+        #expect(result == true)
+        #expect(executor.lastCommand is IsZooming)
     }
 
     @MainActor

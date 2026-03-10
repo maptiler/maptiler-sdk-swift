@@ -580,6 +580,14 @@ extension MTMapView: MTStylable {
         runCommand(RemoveLayers(layers: layers), completion: completionHandler)
     }
 
+    package func moveLayer(
+        id: String,
+        beforeId: String? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(MoveLayer(id: id, beforeId: beforeId), completion: completionHandler)
+    }
+
     // MARK: - Style property setters
 
     package func setFilter(

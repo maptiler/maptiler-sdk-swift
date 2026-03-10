@@ -312,6 +312,22 @@ extension MTStyle {
         mapView.removeLayers(layers, completionHandler: completionHandler)
     }
 
+    /// Moves a layer to a different z-position.
+    ///
+    /// - Parameters:
+    ///   - id: The ID of the layer to move.
+    ///   - beforeId: The ID of an existing layer to insert the new layer before, resulting in the new layer appearing
+    ///               visually beneath the `beforeId` layer. If `nil`, the layer is appended to the end of the layers
+    ///               array and appears visually above all other layers.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func moveLayer(
+        id: String,
+        beforeId: String? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.moveLayer(id: id, beforeId: beforeId, completionHandler: completionHandler)
+    }
+
     /// Returns a boolean indicating whether a layer is already added to the map.
     public func layerExists(_ layer: MTLayer) -> Bool {
         return mapLayers[layer.identifier] != nil
@@ -570,6 +586,26 @@ extension MTStyle {
     public func removeLayers(_ layers: [MTLayer]) async throws {
         try await withCheckedThrowingContinuation { continuation in
             removeLayers(layers) { result in
+                switch result {
+                case .success:
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Moves a layer to a different z-position.
+    ///
+    /// - Parameters:
+    ///   - id: The ID of the layer to move.
+    ///   - beforeId: The ID of an existing layer to insert the new layer before, resulting in the new layer appearing
+    ///               visually beneath the `beforeId` layer. If `nil`, the layer is appended to the end of the layers
+    ///               array and appears visually above all other layers.
+    public func moveLayer(id: String, beforeId: String? = nil) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            moveLayer(id: id, beforeId: beforeId) { result in
                 switch result {
                 case .success:
                     continuation.resume()

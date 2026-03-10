@@ -98,6 +98,14 @@ struct MTStyleTests {
         #expect(Loaded().toJS() == expectedJS)
     }
 
+    @Test func moveLayerCommand_shouldMatchJS() async throws {
+        let expectedJS1 = "\(MTBridge.mapObject).moveLayer(\"my-layer\", \"other-layer\");"
+        #expect(MoveLayer(id: "my-layer", beforeId: "other-layer").toJS() == expectedJS1)
+
+        let expectedJS2 = "\(MTBridge.mapObject).moveLayer(\"my-layer\");"
+        #expect(MoveLayer(id: "my-layer", beforeId: nil).toJS() == expectedJS2)
+    }
+
     @MainActor
     @Test func loadedWrapper_shouldReturnBridgeValue() async throws {
         let executor = MockExecutor(result: .bool(true))

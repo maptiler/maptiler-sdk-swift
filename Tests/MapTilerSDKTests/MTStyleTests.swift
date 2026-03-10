@@ -92,6 +92,48 @@ struct MTStyleTests {
         #expect(AreTilesLoaded().toJS() == expectedJS)
     }
 
+    @Test func loadedCommand_shouldMatchJS() async throws {
+        let expectedJS = "\(MTBridge.mapObject).loaded();"
+
+        #expect(Loaded().toJS() == expectedJS)
+    }
+
+    @MainActor
+    @Test func loadedWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.loaded { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let isLoaded):
+            #expect(isLoaded)
+        case .failure(let error):
+            Issue.record("Expected loaded wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is Loaded)
+    }
+
+    @MainActor
+    @Test func loadedAsyncWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let isLoaded = await mapView.loaded()
+
+        #expect(isLoaded)
+        #expect(executor.lastCommand is Loaded)
+    }
+
     @Test func isStyleLoadedCommand_shouldMatchJS() async throws {
         let expectedJS = "\(MTBridge.mapObject).isStyleLoaded();"
 

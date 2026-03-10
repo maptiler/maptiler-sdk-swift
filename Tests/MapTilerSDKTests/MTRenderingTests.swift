@@ -25,6 +25,12 @@ struct MTRenderingTests {
         #expect(TriggerRepaint().toJS() == expectedTriggerRepaintJS)
     }
 
+    @Test func redrawCommand_shouldMatchJS() async throws {
+        let expectedRedrawJS = "\(MTBridge.mapObject).redraw();"
+
+        #expect(Redraw().toJS() == expectedRedrawJS)
+    }
+
     @Test func setShowTileBoundariesCommand_shouldMatchJS() async throws {
         let expectedJS = "\(MTBridge.mapObject).showTileBoundaries = true;"
         #expect(SetShowTileBoundaries(show: true).toJS() == expectedJS)

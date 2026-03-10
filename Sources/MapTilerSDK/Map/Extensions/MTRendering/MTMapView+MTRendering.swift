@@ -40,6 +40,15 @@ extension MTMapView: MTRendering {
         runCommand(TriggerRepaint(), completion: completionHandler)
     }
 
+    /// Schedules a re‑render of the map.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func redraw(
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(Redraw(), completion: completionHandler)
+    }
+
     /// Displays tile boundaries on the map.
     /// - Parameters:
     ///   - show: A boolean value indicating whether to show tile boundaries.
@@ -150,6 +159,15 @@ extension MTMapView {
     public func triggerRepaint() async {
         await withCheckedContinuation { continuation in
             triggerRepaint { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Schedules a re‑render of the map.
+    public func redraw() async {
+        await withCheckedContinuation { continuation in
+            redraw { _ in
                 continuation.resume()
             }
         }

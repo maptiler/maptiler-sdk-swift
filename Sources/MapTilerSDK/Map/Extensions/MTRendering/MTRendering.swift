@@ -22,6 +22,9 @@ public protocol MTRendering {
     /// result in only a single frame being rendered.
     func triggerRepaint() async
 
+    /// Schedules a re‑render of the map.
+    func redraw() async
+
     /// Displays tile boundaries on the map.
     /// - Parameter show: A boolean value indicating whether to show tile boundaries.
     func setShowTileBoundaries(_ show: Bool) async

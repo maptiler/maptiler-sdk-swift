@@ -209,6 +209,28 @@ struct MTNavigationTests {
         #expect(SnapToNorth(animationOptions: animationOptions).toJS() == snapToNorthWithOptionsJS)
     }
 
+    @Test func resetNorthCommand_shouldMatchJS() async throws {
+        let resetNorthJS = "\(MTBridge.mapObject).resetNorth();"
+
+        #expect(ResetNorth().toJS() == resetNorthJS)
+
+        let animationOptions = MTAnimationOptions(
+            duration: 2500,
+            offset: MTPoint(x: 1.5, y: 2.5),
+            shouldAnimate: true,
+            isEssential: false,
+            easing: .cubic
+        )
+
+        let options = ResetNorthOptions(animationOptions: animationOptions)
+        var optionsString: JSString = options.toJSON() ?? ""
+        optionsString = optionsString.replaceEasing()
+
+        let resetNorthWithOptionsJS = "\(MTBridge.mapObject).resetNorth(\(optionsString));"
+
+        #expect(ResetNorth(animationOptions: animationOptions).toJS() == resetNorthWithOptionsJS)
+    }
+
     @Test func setBearingCommand_shouldMatchJS() async throws {
         let setBearingJS = "\(MTBridge.mapObject).setBearing(\(bearing));"
 
@@ -701,6 +723,41 @@ struct MTNavigationTests {
         await mapView.snapToNorth(animationOptions: nil)
 
         #expect(executor.lastCommand is SnapToNorth)
+    }
+
+    @MainActor
+    @Test func resetNorthWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.resetNorth(animationOptions: nil) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected resetNorth wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is ResetNorth)
+    }
+
+    @MainActor
+    @Test func resetNorthAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.resetNorth(animationOptions: nil)
+
+        #expect(executor.lastCommand is ResetNorth)
     }
 }
 

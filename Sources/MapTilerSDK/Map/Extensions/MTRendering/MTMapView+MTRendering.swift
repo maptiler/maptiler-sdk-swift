@@ -40,6 +40,15 @@ extension MTMapView: MTRendering {
         runCommand(TriggerRepaint(), completion: completionHandler)
     }
 
+    /// Requests the map be repainted on the next animation frame.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func repaint(
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(Repaint(), completion: completionHandler)
+    }
+
     /// Schedules a re‑render of the map.
     /// - Parameter completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
@@ -159,6 +168,15 @@ extension MTMapView {
     public func triggerRepaint() async {
         await withCheckedContinuation { continuation in
             triggerRepaint { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Requests the map be repainted on the next animation frame.
+    public func repaint() async {
+        await withCheckedContinuation { continuation in
+            repaint { _ in
                 continuation.resume()
             }
         }

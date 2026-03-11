@@ -22,6 +22,9 @@ public protocol MTRendering {
     /// result in only a single frame being rendered.
     func triggerRepaint() async
 
+    /// Requests the map be repainted on the next animation frame.
+    func repaint() async
+
     /// Schedules a re‑render of the map.
     func redraw() async
 

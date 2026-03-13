@@ -67,6 +67,24 @@ struct MTNavigationTests {
         #expect(ZoomTo(zoom: zoom, animationOptions: animationOptions).toJS() == zoomToJS)
     }
 
+    @Test func rotateToCommand_shouldMatchJS() async throws {
+        let animationOptions = MTAnimationOptions(
+            duration: 2500,
+            offset: MTPoint(x: 1.5, y: 2.5),
+            shouldAnimate: true,
+            isEssential: false,
+            easing: .cubic
+        )
+
+        let options = RotateToOptions(animationOptions: animationOptions)
+        var optionsString: JSString = options.toJSON() ?? ""
+        optionsString = optionsString.replaceEasing()
+
+        let rotateToJS = "\(MTBridge.mapObject).rotateTo(\(bearing), \(optionsString));"
+
+        #expect(RotateTo(bearing: bearing, animationOptions: animationOptions).toJS() == rotateToJS)
+    }
+
     @Test func easeToCommand_shouldMatchJS() async throws {
         let cameraOptions = MTCameraOptions(zoom: zoom, bearing: bearing, pitch: pitch)
 
@@ -519,6 +537,29 @@ struct MTNavigationTests {
     }
 
     @MainActor
+    @Test func rotateToWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.rotateTo(90) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected rotateTo wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is RotateTo)
+    }
+
+    @MainActor
     @Test func zoomToAsyncWrapper_shouldDispatchCommand() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
@@ -528,6 +569,18 @@ struct MTNavigationTests {
         await mapView.zoomTo(10)
 
         #expect(executor.lastCommand is ZoomTo)
+    }
+
+    @MainActor
+    @Test func rotateToAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.rotateTo(90)
+
+        #expect(executor.lastCommand is RotateTo)
     }
 
     @MainActor

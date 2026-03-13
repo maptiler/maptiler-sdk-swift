@@ -471,6 +471,18 @@ extension MTMapView: MTNavigable {
         runCommand(ResetNorth(animationOptions: animationOptions), completion: completionHandler)
     }
 
+    /// Resets the map bearing to 0 and pitch to default.
+    /// - Parameters:
+    ///   - animationOptions: Animation options.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func resetNorthPitch(
+        animationOptions: MTAnimationOptions? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(ResetNorthPitch(animationOptions: animationOptions), completion: completionHandler)
+    }
+
     /// Returns the map's current center.
     ///
     /// The map's current geographical center.
@@ -1019,6 +1031,17 @@ extension MTMapView {
     public func resetNorth(animationOptions: MTAnimationOptions? = nil) async {
         await withCheckedContinuation { continuation in
             resetNorth(animationOptions: animationOptions) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Resets the map bearing to 0 and pitch to default.
+    /// - Parameters:
+    ///   - animationOptions: Animation options.
+    public func resetNorthPitch(animationOptions: MTAnimationOptions? = nil) async {
+        await withCheckedContinuation { continuation in
+            resetNorthPitch(animationOptions: animationOptions) { _ in
                 continuation.resume()
             }
         }

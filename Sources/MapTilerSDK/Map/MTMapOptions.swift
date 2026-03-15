@@ -17,6 +17,11 @@ public struct MTMapOptions: Sendable {
     /// This applies only for the map instance, supersedes the primaryLanguage from config.
     public private(set) var language: MTLanguage?
 
+    /// The secondary language of the map.
+    ///
+    /// This applies only for the map instance.
+    public private(set) var secondaryLanguage: MTLanguage?
+
     /// The geographical centerpoint of the map.
     ///
     /// If center is not specified, SDK will look for it in the map style object.
@@ -252,6 +257,7 @@ public struct MTMapOptions: Sendable {
     /// Initializes the map options.
     public init(
         language: MTLanguage? = nil,
+        secondaryLanguage: MTLanguage? = nil,
         center: CLLocationCoordinate2D? = nil,
         bounds: MTBounds? = nil,
         projection: MTProjectionType? = nil,
@@ -303,6 +309,7 @@ public struct MTMapOptions: Sendable {
         highFrequencyEventThrottleMs: Int? = 10
     ) {
         self.language = language
+        self.secondaryLanguage = secondaryLanguage
         self.center = center
         self.bounds = bounds
         self.projection = projection
@@ -358,6 +365,7 @@ public struct MTMapOptions: Sendable {
 extension MTMapOptions: Codable {
     package enum CodingKeys: String, CodingKey {
         case language
+        case secondaryLanguage
         case center
         case bounds
         case projection
@@ -412,6 +420,10 @@ extension MTMapOptions: Codable {
 extension MTMapOptions {
     package mutating func setLanguage(_ language: MTLanguage) {
         self.language = language
+    }
+
+    package mutating func setSecondaryLanguage(_ language: MTLanguage) {
+        self.secondaryLanguage = language
     }
 
     package mutating func setCenter(_ center: CLLocationCoordinate2D) {

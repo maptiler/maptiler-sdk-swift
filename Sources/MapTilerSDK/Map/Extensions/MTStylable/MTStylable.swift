@@ -87,6 +87,11 @@ public protocol MTStylable {
     ///   - url: URL pointing to the sprite resource.
     func addSprite(id: String, url: URL) async
 
+    /// Removes a sprite from the current style.
+    /// - Parameters:
+    ///   - id: Unique identifier for the sprite.
+    func removeSprite(id: String) async
+
     /// Adds the marker to the map.
     /// - Parameters:
     ///    - marker: Marker to add to the map.

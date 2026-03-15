@@ -210,6 +210,18 @@ extension MTMapView: MTStylable {
         runCommand(AddSprite(id: id, url: url), completion: completionHandler)
     }
 
+    /// Removes a sprite from the current style.
+    /// - Parameters:
+    ///   - id: Unique identifier for the sprite.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeSprite(
+        id: String,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(RemoveSprite(id: id), completion: completionHandler)
+    }
+
     /// Adds a marker to the map.
     /// - Parameters:
     ///    - marker: Marker to be added to the map.
@@ -1046,6 +1058,17 @@ extension MTMapView {
     public func addSprite(id: String, url: URL) async {
         await withCheckedContinuation { continuation in
             addSprite(id: id, url: url) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Removes a sprite from the current style.
+    /// - Parameters:
+    ///   - id: Unique identifier for the sprite.
+    public func removeSprite(id: String) async {
+        await withCheckedContinuation { continuation in
+            removeSprite(id: id) { _ in
                 continuation.resume()
             }
         }

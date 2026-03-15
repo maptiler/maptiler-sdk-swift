@@ -325,6 +325,13 @@ struct MTStyleTests {
         #expect(command.toJS() == expectedJS)
     }
 
+    @Test func removeSpriteCommand_shouldGenerateExpectedJS() async throws {
+        let command = RemoveSprite(id: "test-sprite")
+        let expectedJS = "\(MTBridge.mapObject).removeSprite(\"test-sprite\");"
+
+        #expect(command.toJS() == expectedJS)
+    }
+
     @Test func setSpriteCommand_shouldGenerateExpectedJS() async throws {
         let spriteURL = URL(string: "https://example.com/sprite.png")!
         let command = SetSprite(url: spriteURL)
@@ -459,6 +466,45 @@ struct MTStyleTests {
 
         #expect(command?.id == "async-sprite")
         #expect(command?.url == spriteURL)
+    }
+
+    @MainActor
+    @Test func removeSpriteWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.removeSprite(id: "sprite-wrapper") { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected removeSprite wrapper to succeed, but failed with \(error)")
+        }
+
+        let command = executor.lastCommand as? RemoveSprite
+
+        #expect(command?.id == "sprite-wrapper")
+    }
+
+    @MainActor
+    @Test func removeSpriteAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.removeSprite(id: "async-sprite")
+
+        let command = executor.lastCommand as? RemoveSprite
+
+        #expect(command?.id == "async-sprite")
     }
 
     @MainActor

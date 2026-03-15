@@ -17,6 +17,12 @@ public protocol MTNavigable {
     ///    - bearing: The bearing of the map, measured in degrees counter-clockwise from north.
     func setBearing(_ bearing: Double) async
 
+    /// Rotates the map to a given bearing with an optional animated transition.
+    /// - Parameters:
+    ///    - bearing: The desired bearing.
+    ///    - options: Animation options.
+    func rotateTo(_ bearing: Double, options: MTAnimationOptions?) async
+
     /// Sets the geographical center of the map.
     /// - Parameters:
     ///    - center: Geographical center of the map.

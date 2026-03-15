@@ -23,6 +23,21 @@ extension MTMapView: MTNavigable {
         options?.setBearing(bearing)
     }
 
+    /// Rotates the map to a given bearing with an optional animated transition.
+    /// - Parameters:
+    ///   - bearing: The desired bearing.
+    ///   - options: Animation options.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func rotateTo(
+        _ bearing: Double,
+        options: MTAnimationOptions? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(RotateTo(bearing: bearing, animationOptions: options), completion: completionHandler)
+        self.options?.setBearing(bearing)
+    }
+
     /// Sets the map's geographical centerpoint.
     /// - Parameters:
     ///   - center: The desired center coordinate.
@@ -615,6 +630,18 @@ extension MTMapView {
     public func setBearing(_ bearing: Double) async {
         await withCheckedContinuation { continuation in
             setBearing(bearing) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Rotates the map to a given bearing with an optional animated transition.
+    /// - Parameters:
+    ///   - bearing: The desired bearing.
+    ///   - options: Animation options.
+    public func rotateTo(_ bearing: Double, options: MTAnimationOptions? = nil) async {
+        await withCheckedContinuation { continuation in
+            rotateTo(bearing, options: options) { _ in
                 continuation.resume()
             }
         }

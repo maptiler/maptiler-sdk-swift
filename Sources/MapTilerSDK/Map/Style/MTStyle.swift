@@ -619,6 +619,27 @@ extension MTStyle {
 
 // MARK: - Style property setters
 extension MTStyle {
+    /// Sets min/max zoom levels at which a layer is rendered.
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - minzoom: The minimum zoom level.
+    ///   - maxzoom: The maximum zoom level.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setLayerZoomRange(
+        layerId: String,
+        minzoom: Double,
+        maxzoom: Double,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        mapView.setLayerZoomRange(
+            forLayerId: layerId,
+            minzoom: minzoom,
+            maxzoom: maxzoom,
+            completionHandler: completionHandler
+        )
+    }
+
     /// Sets a filter expression on a layer.
     /// - Parameters:
     ///   - layerId: Target layer identifier.
@@ -726,6 +747,19 @@ extension MTStyle {
 
 // Concurrency: style property setters
 extension MTStyle {
+    /// Sets min/max zoom levels at which a layer is rendered.
+    /// - Parameters:
+    ///   - layerId: Target layer identifier.
+    ///   - minzoom: The minimum zoom level.
+    ///   - maxzoom: The maximum zoom level.
+    public func setLayerZoomRange(layerId: String, minzoom: Double, maxzoom: Double) async {
+        await withCheckedContinuation { continuation in
+            setLayerZoomRange(layerId: layerId, minzoom: minzoom, maxzoom: maxzoom) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
     public func setFilter(layerId: String, filter: MTPropertyValue) async {
         await withCheckedContinuation { continuation in
             setFilter(layerId: layerId, filter: filter) { _ in

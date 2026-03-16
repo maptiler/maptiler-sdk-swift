@@ -16,7 +16,6 @@ let package = Package(
     targets: [
         .target(
             name: "MapTilerSDK",
-            dependencies: [],
             path: "Sources/MapTilerSDK",
             resources: [
                 .process("Resources")
@@ -25,10 +24,7 @@ let package = Package(
         .testTarget(
             name: "MapTilerSDKTests",
             dependencies: ["MapTilerSDK"],
-            path: "Tests",
-            linkerSettings: [
-                .linkedFramework("WebKit")
-            ]
+            path: "Tests"
         )
     ]
 )

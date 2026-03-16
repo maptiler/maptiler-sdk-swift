@@ -16,14 +16,19 @@ let package = Package(
     targets: [
         .target(
             name: "MapTilerSDK",
+            dependencies: [],
             path: "Sources/MapTilerSDK",
             resources: [
                 .process("Resources")
-            ]),
+            ]
+        ),
         .testTarget(
             name: "MapTilerSDKTests",
             dependencies: ["MapTilerSDK"],
-            path: "Tests"
+            path: "Tests",
+            linkerSettings: [
+                .linkedFramework("WebKit")
+            ]
         )
     ]
 )

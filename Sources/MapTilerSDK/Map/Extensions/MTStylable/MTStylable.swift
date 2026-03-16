@@ -81,6 +81,12 @@ public protocol MTStylable {
     ///   - options: Additional configuration that controls how the image is rendered.
     func addImage(name: String, image: UIImage, options: MTStyleImageOptions?) async
 
+    /// Removes a previously added image by name.
+    /// Use to clean up icons no longer referenced by layers.
+    /// - Parameters:
+    ///   - name: Unique identifier for the image to remove.
+    func removeImage(name: String) async
+
     /// Registers a sprite with the current style so it can be referenced by layers and annotations.
     /// - Parameters:
     ///   - id: Unique identifier for the sprite.

@@ -41,12 +41,18 @@ extension MTMapView: MTStylable {
         options?.setLanguage(language)
     }
 
+    /// Sets the map labels secondary language.
+    ///
+    /// - Parameters:
+    ///   - language: The language to be applied.
+    ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func setSecondaryLanguage(
         _ language: MTLanguage,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(SetSecondaryLanguage(language: language), completion: completionHandler)
+        options?.setSecondaryLanguage(language)
     }
 
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
@@ -954,6 +960,10 @@ extension MTMapView {
         }
     }
 
+    /// Sets the map labels secondary language.
+    ///
+    /// - Parameters:
+    ///   - language: The language to be applied.
     public func setSecondaryLanguage(_ language: MTLanguage) async {
         await withCheckedContinuation { continuation in
             setSecondaryLanguage(language) { _ in

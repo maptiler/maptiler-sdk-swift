@@ -217,6 +217,7 @@ extension MTMapView: MTStylable {
     }
 
     /// Removes a sprite from the current style.
+    /// Use to detach a sprite and free related resources.
     /// - Parameters:
     ///   - id: Unique identifier for the sprite.
     ///   - completionHandler: A handler block to execute when function finishes.
@@ -1106,6 +1107,7 @@ extension MTMapView {
     }
 
     /// Removes a sprite from the current style.
+    /// Use to detach a sprite and free related resources.
     /// - Parameters:
     ///   - id: Unique identifier for the sprite.
     public func removeSprite(id: String) async {

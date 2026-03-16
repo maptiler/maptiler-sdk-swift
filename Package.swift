@@ -19,7 +19,8 @@ let package = Package(
             path: "Sources/MapTilerSDK",
             resources: [
                 .process("Resources")
-            ]),
+            ]
+        ),
         .testTarget(
             name: "MapTilerSDKTests",
             dependencies: ["MapTilerSDK"],

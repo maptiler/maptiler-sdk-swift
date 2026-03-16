@@ -606,6 +606,25 @@ extension MTMapView: MTStylable {
         runCommand(MoveLayer(id: id, beforeId: beforeId), completion: completionHandler)
     }
 
+    /// Sets min/max zoom levels at which a layer is rendered.
+    /// - Parameters:
+    ///   - layerId: Identifier of the target layer.
+    ///   - minzoom: The minimum zoom level.
+    ///   - maxzoom: The maximum zoom level.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setLayerZoomRange(
+        forLayerId layerId: String,
+        minzoom: Double,
+        maxzoom: Double,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            SetLayerZoomRange(layerId: layerId, minzoom: minzoom, maxzoom: maxzoom),
+            completion: completionHandler
+        )
+    }
+
     // MARK: - Style property setters
 
     package func setFilter(
@@ -867,6 +886,19 @@ extension MTMapView: MTStylable {
 
 // Concurrency: style property setters
 extension MTMapView {
+    /// Sets min/max zoom levels at which a layer is rendered.
+    /// - Parameters:
+    ///   - layerId: Identifier of the target layer.
+    ///   - minzoom: The minimum zoom level.
+    ///   - maxzoom: The maximum zoom level.
+    public func setLayerZoomRange(forLayerId layerId: String, minzoom: Double, maxzoom: Double) async {
+        await withCheckedContinuation { continuation in
+            setLayerZoomRange(forLayerId: layerId, minzoom: minzoom, maxzoom: maxzoom) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
     public func setFilter(forLayerId layerId: String, filter: MTPropertyValue) async {
         await withCheckedContinuation { continuation in
             setFilter(forLayerId: layerId, filter: filter) { _ in

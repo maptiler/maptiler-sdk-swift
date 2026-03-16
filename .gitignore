@@ -37,6 +37,6 @@ GEMINI.md
 gemini-artifacts
 .geminiignore
 patch.txt
-‎patch_mtrendering.sh‎
-xcodebuild-test.log‎
+patch_mtrendering.sh
+xcodebuild-test.log
 update_tests.swift

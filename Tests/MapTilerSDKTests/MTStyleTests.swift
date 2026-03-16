@@ -340,6 +340,13 @@ struct MTStyleTests {
         #expect(command.toJS() == expectedJS)
     }
 
+    @Test func setLayerZoomRangeCommand_shouldGenerateExpectedJS() async throws {
+        let command = SetLayerZoomRange(layerId: "my-layer", minzoom: 2.0, maxzoom: 10.5)
+        let expectedJS = "\(MTBridge.mapObject).setLayerZoomRange('my-layer', 2.0, 10.5);"
+
+        #expect(command.toJS() == expectedJS)
+    }
+
     @Test func setSecondaryLanguageCommand_shouldGenerateExpectedJS() async throws {
         let command = SetSecondaryLanguage(language: .country(.english))
         let expectedJS = "\(MTBridge.mapObject).setSecondaryLanguage(\"en\");"

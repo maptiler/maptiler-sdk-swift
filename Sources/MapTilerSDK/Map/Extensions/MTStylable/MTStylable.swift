@@ -88,6 +88,7 @@ public protocol MTStylable {
     func addSprite(id: String, url: URL) async
 
     /// Removes a sprite from the current style.
+    /// Use to detach a sprite and free related resources.
     /// - Parameters:
     ///   - id: Unique identifier for the sprite.
     func removeSprite(id: String) async

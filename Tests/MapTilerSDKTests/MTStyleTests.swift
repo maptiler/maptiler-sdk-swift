@@ -255,6 +255,60 @@ struct MTStyleTests {
         #expect(command.toJS() == expectedJS)
     }
 
+    @MainActor
+    @Test func setSkyWrappers_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        let sky = MTSky(skyColor: .color(MTColor(hex: "#FF0000")))
+        let options = MTStyleSetterOptions(shouldValidate: false)
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.setSky(sky, options: options) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected setSky wrapper to succeed, but failed with \(error)")
+        }
+
+        let command = executor.lastCommand as? SetSky
+        
+        let expectedColor = try #require(command?.sky.skyColor)
+        guard case .color(let color) = expectedColor else {
+            Issue.record("Expected .color")
+            return
+        }
+        #expect(color.hex == "#FF0000" || color.hex == "#ff0000")
+        #expect(command?.options?.shouldValidate == false)
+    }
+
+    @MainActor
+    @Test func setSkyAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+
+        let sky = MTSky(skyColor: .color(MTColor(hex: "#00FF00")))
+
+        await mapView.setSky(sky, options: nil)
+
+        let command = executor.lastCommand as? SetSky
+        
+        let expectedColor = try #require(command?.sky.skyColor)
+        guard case .color(let color) = expectedColor else {
+            Issue.record("Expected .color")
+            return
+        }
+        #expect(color.hex == "#00FF00" || color.hex == "#00ff00")
+        #expect(command?.options == nil)
+    }
+
     @Test func mtSky_shouldClampNumericValues() async throws {
         let sky = MTSky(
             skyHorizonBlend: .number(2.2),

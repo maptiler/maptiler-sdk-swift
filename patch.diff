@@ -1,0 +1,40 @@
+--- Tests/MapTilerSDKTests/MTStyleTests.swift
++++ Tests/MapTilerSDKTests/MTStyleTests.swift
+@@ -453,6 +453,19 @@
+         #expect(command?.options == nil)
+     }
+ 
++    @MainActor
++    @Test func addImageAsyncWrapper_shouldDispatchCommand() async throws {
++        let image = Self.makeTestImage()
++        let executor = MockExecutor()
++        let mapView = MTMapView(frame: .zero)
++
++        mapView.bridge.executor = executor
++        await mapView.addImage(name: "async-wrapper-icon", image: image)
++        
++        let command = executor.lastCommand as? AddImage
++        #expect(command?.name == "async-wrapper-icon")
++    }
++
+     @MainActor
+     @Test func removeImageWrapper_shouldDispatchCommand() async throws {
+         let executor = MockExecutor()
+@@ -477,6 +490,17 @@
+         #expect(command?.name == "wrapper-icon")
+     }
+ 
++    @MainActor
++    @Test func removeImageAsyncWrapper_shouldDispatchCommand() async throws {
++        let executor = MockExecutor()
++        let mapView = MTMapView(frame: .zero)
++
++        mapView.bridge.executor = executor
++        await mapView.removeImage(name: "async-wrapper-icon")
++        
++        let command = executor.lastCommand as? RemoveImage
++        #expect(command?.name == "async-wrapper-icon")
++    }
++
+     @MainActor
+     @Test func updateImageWrapper_shouldDispatchCommand() async throws {

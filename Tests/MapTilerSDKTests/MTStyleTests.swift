@@ -453,6 +453,62 @@ struct MTStyleTests {
     }
 
     @MainActor
+    @Test func addImageAsyncWrapper_shouldDispatchCommand() async throws {
+        let image = Self.makeTestImage()
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.addImage(name: "wrapper-icon-async", image: image)
+
+        let command = executor.lastCommand as? AddImage
+
+        #expect(command?.name == "wrapper-icon-async")
+        #expect(command?.options == nil)
+    }
+
+
+    @Test func addImageCommand_shouldFailWithInvalidImage() async throws {
+        let command = AddImage(name: "invalid-icon", image: UIImage(), options: nil)
+        #expect(command == nil)
+    }
+
+    @Test func addImageCommand_shouldHandleSpecialCharactersInName() async throws {
+        let image = Self.makeTestImage()
+        let command = AddImage(name: "---!@#", image: image, options: nil)
+        
+        #expect(command != nil)
+        
+        let js = command?.toJS() ?? ""
+        #expect(js.contains("\(MTBridge.mapObject).style.addImage(\"---!@#\","))
+    }
+
+    @MainActor
+    @Test func addImageWrapper_shouldFailWithInvalidImage() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge.executor = executor
+        
+        let result = await withCheckedContinuation { continuation in
+            mapView.addImage(name: "invalid-icon", image: UIImage()) { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+        
+        switch result {
+        case .success:
+            Issue.record("Expected addImage wrapper to fail")
+        case .failure(let error):
+            if case .unknown(let desc) = error {
+                #expect(desc == "Failed to encode image for addImage command.")
+            } else {
+                Issue.record("Expected unknown error, got \(error)")
+            }
+        }
+    }
+
+    @MainActor
     @Test func removeImageWrapper_shouldDispatchCommand() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
@@ -475,6 +531,20 @@ struct MTStyleTests {
         let command = executor.lastCommand as? RemoveImage
 
         #expect(command?.name == "wrapper-icon")
+    }
+
+    @MainActor
+    @Test func removeImageAsyncWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        await mapView.removeImage(name: "wrapper-icon-async")
+
+        let command = executor.lastCommand as? RemoveImage
+
+        #expect(command?.name == "wrapper-icon-async")
     }
 
     @MainActor

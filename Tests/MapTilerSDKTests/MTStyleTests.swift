@@ -358,6 +358,13 @@ struct MTStyleTests {
         #expect(js.contains(optionsJSON))
     }
 
+    @Test func removeImageCommand_shouldGenerateExpectedJS() async throws {
+        let command = RemoveImage(name: "poi-icon")
+
+        let js = command.toJS()
+        #expect(js == "\(MTBridge.mapObject).style.removeImage(\"poi-icon\");")
+    }
+
     @Test func updateImageCommand_shouldGenerateExpectedJS() async throws {
         let image = Self.makeTestImage()
         let command = UpdateImage(name: "updated-icon", image: image)
@@ -443,6 +450,31 @@ struct MTStyleTests {
 
         #expect(command?.name == "wrapper-icon")
         #expect(command?.options == nil)
+    }
+
+    @MainActor
+    @Test func removeImageWrapper_shouldDispatchCommand() async throws {
+        let executor = MockExecutor()
+        let mapView = MTMapView(frame: .zero)
+
+        mapView.bridge.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.removeImage(name: "wrapper-icon") { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            Issue.record("Expected removeImage wrapper to succeed, but failed with \(error)")
+        }
+
+        let command = executor.lastCommand as? RemoveImage
+
+        #expect(command?.name == "wrapper-icon")
     }
 
     @MainActor

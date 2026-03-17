@@ -183,6 +183,19 @@ extension MTMapView: MTStylable {
         runCommand(command, completion: completionHandler)
     }
 
+    /// Removes a previously added image by name.
+    /// Use to clean up icons no longer referenced by layers.
+    /// - Parameters:
+    ///   - name: Unique identifier for the image to remove.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeImage(
+        name: String,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(RemoveImage(name: name), completion: completionHandler)
+    }
+
     /// Updates an image in a style.
     /// - Parameters:
     ///   - name: Unique identifier for the image to update.
@@ -1077,6 +1090,18 @@ extension MTMapView {
     public func addImage(name: String, image: UIImage, options: MTStyleImageOptions? = nil) async {
         await withCheckedContinuation { continuation in
             addImage(name: name, image: image, options: options) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Removes a previously added image by name.
+    /// Use to clean up icons no longer referenced by layers.
+    /// - Parameters:
+    ///   - name: Unique identifier for the image to remove.
+    public func removeImage(name: String) async {
+        await withCheckedContinuation { continuation in
+            removeImage(name: name) { _ in
                 continuation.resume()
             }
         }

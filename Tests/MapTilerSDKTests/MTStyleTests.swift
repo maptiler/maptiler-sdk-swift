@@ -418,7 +418,7 @@ struct MTStyleTests {
 
     @Test func removeSpriteCommand_shouldHandleQuotesInId() async throws {
         let command = RemoveSprite(id: "my\"id")
-        let expectedJS = "\(MTBridge.mapObject).removeSprite(\"my\\\"id\"\);"
+        let expectedJS = "\(MTBridge.mapObject).removeSprite(\"my\\\"id\");"
 
         #expect(command.toJS() == expectedJS)
     }

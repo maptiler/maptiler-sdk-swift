@@ -1,4 +1,6 @@
 name: Automated PR v3
+run-name: "${{ inputs.issue_key }} Auto PR"
+
 on:
   workflow_dispatch:
     inputs:

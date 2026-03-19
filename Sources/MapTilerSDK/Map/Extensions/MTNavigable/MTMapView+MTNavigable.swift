@@ -304,6 +304,47 @@ extension MTMapView: MTNavigable {
         }
     }
 
+    /// Sets or clears the pitch limits.
+    /// - Parameters:
+    ///   - pitchLimitHelper: Helper to use for setting the limits.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setPitchLimits(
+        with pitchLimitHelper: MTPitchLimitHelper,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        let dispatchGroup = DispatchGroup()
+        var lastError: MTError?
+
+        if let maxPitch = pitchLimitHelper.maxPitch {
+            dispatchGroup.enter()
+            setMaxPitch(maxPitch) { result in
+                if case .failure(let error) = result {
+                    lastError = error
+                }
+                dispatchGroup.leave()
+            }
+        }
+
+        if let minPitch = pitchLimitHelper.minPitch {
+            dispatchGroup.enter()
+            setMinPitch(minPitch) { result in
+                if case .failure(let error) = result {
+                    lastError = error
+                }
+                dispatchGroup.leave()
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            if let error = lastError {
+                completionHandler?(.failure(error))
+            } else {
+                completionHandler?(.success(()))
+            }
+        }
+    }
+
     /// Sets or clears the map's minimum zoom.
     ///
     /// If the map's current zoom level is lower than the new minimum, the map will zoom to the new minimum.
@@ -862,6 +903,23 @@ extension MTMapView {
     public func setMinPitch(_ minPitch: Double?) async throws {
         try await withCheckedThrowingContinuation { continuation in
             setMinPitch(minPitch) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Sets or clears the pitch limits.
+    /// - Parameters:
+    ///   - pitchLimitHelper: Helper to use for setting the limits.
+    /// - Throws: A ``MTError`` if limits are out of bounds.
+    public func setPitchLimits(with pitchLimitHelper: MTPitchLimitHelper) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            setPitchLimits(with: pitchLimitHelper) { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

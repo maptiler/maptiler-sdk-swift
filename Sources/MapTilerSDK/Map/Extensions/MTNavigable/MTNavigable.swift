@@ -138,6 +138,11 @@ public protocol MTNavigable {
     ///    - minPitch: Desired pitch.
     func setMinPitch(_ minPitch: Double?) async throws
 
+    /// Sets the pitch limits.
+    /// - Parameters:
+    ///    - pitchLimitHelper: Helper to use for setting the limits.
+    func setPitchLimits(with pitchLimitHelper: MTPitchLimitHelper) async throws
+
     /// Sets the map's minimum zoom.
     /// - Parameters:
     ///    - minZoom: Desired zoom.

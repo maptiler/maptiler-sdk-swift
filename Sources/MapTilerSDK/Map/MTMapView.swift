@@ -170,10 +170,37 @@ open class MTMapView: UIView, Sendable {
     package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {
+                let errorMessage = "Map Init Failed - API key not set! Call MTConfig.shared.setAPIKey first."
                 MTLogger.log(
-                    "Map Init Failed - API key not set! Call MTConfig.shared.setAPIKey first.",
+                    errorMessage,
                     type: .criticalError
                 )
+
+                await MainActor.run {
+                    guard self.viewWithTag(9999) == nil else { return }
+
+                    let overlayView = UIView(frame: self.bounds)
+                    overlayView.tag = 9999
+                    overlayView.backgroundColor = UIColor.white
+                    overlayView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+                    let label = UILabel()
+                    label.text = errorMessage
+                    label.textColor = UIColor.black
+                    label.textAlignment = .center
+                    label.numberOfLines = 0
+                    label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+                    label.translatesAutoresizingMaskIntoConstraints = false
+
+                    overlayView.addSubview(label)
+                    NSLayoutConstraint.activate([
+                        label.leadingAnchor.constraint(equalTo: overlayView.leadingAnchor, constant: 16),
+                        label.trailingAnchor.constraint(equalTo: overlayView.trailingAnchor, constant: -16),
+                        label.centerYAnchor.constraint(equalTo: overlayView.centerYAnchor)
+                    ])
+
+                    self.addSubview(overlayView)
+                }
 
                 return
             }

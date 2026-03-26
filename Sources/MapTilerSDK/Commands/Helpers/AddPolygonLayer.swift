@@ -19,7 +19,11 @@ package struct AddPolygonLayer: MTValueCommand {
 
         return """
         (() => {
-            const result = \(MTBridge.sdkObject).helpers.addPolygon(\(MTBridge.mapObject), \(optionsString));
+            const opts = \(optionsString);
+            if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                try { opts.data = JSON.parse(opts.data); } catch (e) {}
+            }
+            const result = \(MTBridge.sdkObject).helpers.addPolygon(\(MTBridge.mapObject), opts);
             return JSON.stringify(result);
         })();
         """

@@ -22,6 +22,9 @@ package struct AddHeatmapLayer: MTValueCommand {
             return """
             (() => {
                 const opts = \(optionsString);
+                if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                    try { opts.data = JSON.parse(opts.data); } catch (e) {}
+                }
                 opts.colorRamp = window.\(colorRampIdentifier) ?? opts.colorRamp;
                 const result = \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), opts);
                 return JSON.stringify(result);
@@ -30,7 +33,11 @@ package struct AddHeatmapLayer: MTValueCommand {
         } else {
             return """
             (() => {
-                const result = \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), \(optionsString));
+                const opts = \(optionsString);
+                if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                    try { opts.data = JSON.parse(opts.data); } catch (e) {}
+                }
+                const result = \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), opts);
                 return JSON.stringify(result);
             })();
             """

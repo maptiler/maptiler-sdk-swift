@@ -18,8 +18,12 @@ package struct AddPolylineLayer: MTValueCommand {
         }
 
         return """
-        (() => {
-            const result = \(MTBridge.sdkObject).helpers.addPolyline(\(MTBridge.mapObject), \(optionsString));
+        (async () => {
+            const opts = \(optionsString);
+            if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                try { opts.data = JSON.parse(opts.data); } catch (e) {}
+            }
+            const result = await \(MTBridge.sdkObject).helpers.addPolyline(\(MTBridge.mapObject), opts);
             return JSON.stringify(result);
         })();
         """

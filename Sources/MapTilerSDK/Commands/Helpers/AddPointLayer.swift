@@ -22,6 +22,9 @@ package struct AddPointLayer: MTValueCommand {
             return """
             (() => {
                 const opts = \(optionsString);
+                if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                    try { opts.data = JSON.parse(opts.data); } catch (e) {}
+                }
                 opts.pointColor = window.\(colorRampIdentifier) ?? opts.pointColor;
                 const result = \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), opts);
                 return JSON.stringify(result);
@@ -30,7 +33,11 @@ package struct AddPointLayer: MTValueCommand {
         } else {
             return """
             (() => {
-                const result = \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), \(optionsString));
+                const opts = \(optionsString);
+                if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                    try { opts.data = JSON.parse(opts.data); } catch (e) {}
+                }
+                const result = \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), opts);
                 return JSON.stringify(result);
             })();
             """

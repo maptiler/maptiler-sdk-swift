@@ -500,10 +500,6 @@ extension MTStyle {
     ///     - source: Source to be removed.
     /// - Throws: A ``MTStyleError.sourceNotFound`` if source does not exist on the map.
     public func removeSource(_ source: MTSource) async throws {
-        guard mapSources[source.identifier] != nil else {
-            throw MTStyleError.sourceNotFound
-        }
-
         try await withCheckedThrowingContinuation { continuation in
             removeSource(source) { result in
                 switch result {
@@ -563,10 +559,6 @@ extension MTStyle {
     ///     - layer: Layer to be removed.
     /// - Throws: A ``MTStyleError.layerNotFound`` if layer does not exist on the map.
     public func removeLayer(_ layer: MTLayer) async throws {
-        guard mapLayers[layer.identifier] != nil else {
-            throw MTStyleError.layerNotFound
-        }
-
         try await withCheckedThrowingContinuation { continuation in
             removeLayer(layer) { result in
                 switch result {

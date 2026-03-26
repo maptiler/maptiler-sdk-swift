@@ -47,6 +47,7 @@ public final class MTPolygonLayerHelper: MTVectorLayerHelper, @unchecked Sendabl
     }
 
     /// Adds a polygon layer based on the provided options (async).
+    @MainActor
     public func addPolygon(
         _ options: MTPolygonLayerOptions
     ) async throws -> MTPolygonLayerResult {
@@ -55,6 +56,7 @@ public final class MTPolygonLayerHelper: MTVectorLayerHelper, @unchecked Sendabl
     }
 
     /// Removes the layers and source created by the `addPolygon` helper
+    @MainActor
     public func removePolygon(
         result: MTPolygonLayerResult,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
@@ -67,6 +69,7 @@ public final class MTPolygonLayerHelper: MTVectorLayerHelper, @unchecked Sendabl
     }
 
     /// Removes the layers and source created by the `addPolygon` helper
+    @MainActor
     public func removePolygon(result: MTPolygonLayerResult) async throws {
         try await withCheckedThrowingContinuation { continuation in
             removePolygon(result: result) { res in

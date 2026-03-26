@@ -22,7 +22,8 @@ public final class MTPointLayerHelper: MTVectorLayerHelper, @unchecked Sendable 
     }
 
     /// Adds a point layer based on the provided options.
-    @MainActor @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addPoint(
         _ options: MTPointLayerOptions,
         completionHandler: ((Result<MTPointLayerResult, MTError>) -> Void)? = nil
@@ -32,6 +33,7 @@ public final class MTPointLayerHelper: MTVectorLayerHelper, @unchecked Sendable 
     }
 
     /// Adds a point layer based on the provided options.
+    @MainActor
     public func addPoint(
         _ options: MTPointLayerOptions
     ) async throws -> MTPointLayerResult {
@@ -63,6 +65,7 @@ public final class MTPointLayerHelper: MTVectorLayerHelper, @unchecked Sendable 
     }
 
     /// Removes the layers and source created by the `addPoint` helper
+    @MainActor
     public func removePoint(
         result: MTPointLayerResult,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
@@ -75,6 +78,7 @@ public final class MTPointLayerHelper: MTVectorLayerHelper, @unchecked Sendable 
     }
 
     /// Removes the layers and source created by the `addPoint` helper
+    @MainActor
     public func removePoint(result: MTPointLayerResult) async throws {
         try await withCheckedThrowingContinuation { continuation in
             removePoint(result: result) { res in

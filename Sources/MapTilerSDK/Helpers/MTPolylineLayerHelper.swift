@@ -47,6 +47,7 @@ public final class MTPolylineLayerHelper: MTVectorLayerHelper, @unchecked Sendab
     }
 
     /// Adds a polyline layer based on the provided options (async).
+    @MainActor
     public func addPolyline(
         _ options: MTPolylineLayerOptions
     ) async throws -> MTPolylineLayerResult {
@@ -55,6 +56,7 @@ public final class MTPolylineLayerHelper: MTVectorLayerHelper, @unchecked Sendab
     }
 
     /// Removes the layers and source created by the `addPolyline` helper
+    @MainActor
     public func removePolyline(
         result: MTPolylineLayerResult,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
@@ -67,6 +69,7 @@ public final class MTPolylineLayerHelper: MTVectorLayerHelper, @unchecked Sendab
     }
 
     /// Removes the layers and source created by the `addPolyline` helper
+    @MainActor
     public func removePolyline(result: MTPolylineLayerResult) async throws {
         try await withCheckedThrowingContinuation { continuation in
             removePolyline(result: result) { res in

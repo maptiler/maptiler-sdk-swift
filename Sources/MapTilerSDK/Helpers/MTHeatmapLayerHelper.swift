@@ -31,6 +31,7 @@ public final class MTHeatmapLayerHelper: MTVectorLayerHelper, @unchecked Sendabl
     }
 
     /// Adds a heatmap layer based on the provided options (async).
+    @MainActor
     public func addHeatmap(
         _ options: MTHeatmapLayerOptions
     ) async throws -> MTHeatmapLayerResult {
@@ -39,6 +40,7 @@ public final class MTHeatmapLayerHelper: MTVectorLayerHelper, @unchecked Sendabl
     }
 
     /// Adds a heatmap layer using a ColorRamp for styling (async).
+    @MainActor
     public func addHeatmap(
         _ options: MTHeatmapLayerOptions,
         colorRamp: MTColorRamp? = nil,
@@ -49,6 +51,7 @@ public final class MTHeatmapLayerHelper: MTVectorLayerHelper, @unchecked Sendabl
     }
 
     /// Removes the layers and source created by the `addHeatmap` helper
+    @MainActor
     public func removeHeatmap(
         result: MTHeatmapLayerResult,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
@@ -61,6 +64,7 @@ public final class MTHeatmapLayerHelper: MTVectorLayerHelper, @unchecked Sendabl
     }
 
     /// Removes the layers and source created by the `addHeatmap` helper
+    @MainActor
     public func removeHeatmap(result: MTHeatmapLayerResult) async throws {
         try await withCheckedThrowingContinuation { continuation in
             removeHeatmap(result: result) { res in

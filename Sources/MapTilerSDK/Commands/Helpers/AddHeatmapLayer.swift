@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct AddHeatmapLayer: MTCommand {
+package struct AddHeatmapLayer: MTValueCommand {
     var options: MTHeatmapLayerOptions
     var colorRampIdentifier: String?
 

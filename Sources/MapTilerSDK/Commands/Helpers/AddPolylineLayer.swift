@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct AddPolylineLayer: MTCommand {
+package struct AddPolylineLayer: MTValueCommand {
     var options: MTPolylineLayerOptions
 
     package func toJS() -> JSString {

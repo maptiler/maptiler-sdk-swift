@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct AddPolygonLayer: MTCommand {
+package struct AddPolygonLayer: MTValueCommand {
     var options: MTPolygonLayerOptions
 
     package func toJS() -> JSString {

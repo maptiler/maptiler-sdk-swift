@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct AddPointLayer: MTCommand {
+package struct AddPointLayer: MTValueCommand {
     var options: MTPointLayerOptions
     var colorRampIdentifier: String?
 

@@ -27,7 +27,7 @@ public class MTStyle {
     /// Current style variant of the map object.
     public private(set) var styleVariant: MTMapStyleVariant?
 
-    private unowned var mapView: MTMapView!
+    internal unowned var mapView: MTMapView!
     private var mapSources: [String: MTWeakSource] = [:]
     private var mapLayers: [String: MTWeakLayer] = [:]
 
@@ -486,7 +486,12 @@ extension MTStyle {
             addSource(source) { result in
                 switch result {
                 case .success:
-                    continuation.resume()
+                    switch result {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -500,15 +505,16 @@ extension MTStyle {
     ///     - source: Source to be removed.
     /// - Throws: A ``MTStyleError.sourceNotFound`` if source does not exist on the map.
     public func removeSource(_ source: MTSource) async throws {
-        guard mapSources[source.identifier] != nil else {
-            throw MTStyleError.sourceNotFound
-        }
-
         try await withCheckedThrowingContinuation { continuation in
             removeSource(source) { result in
                 switch result {
                 case .success:
-                    continuation.resume()
+                    switch result {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -531,7 +537,12 @@ extension MTStyle {
             addLayer(layer) { result in
                 switch result {
                 case .success:
-                    continuation.resume()
+                    switch result {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -549,7 +560,12 @@ extension MTStyle {
             addLayers(layers) { result in
                 switch result {
                 case .success:
-                    continuation.resume()
+                    switch result {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -563,15 +579,16 @@ extension MTStyle {
     ///     - layer: Layer to be removed.
     /// - Throws: A ``MTStyleError.layerNotFound`` if layer does not exist on the map.
     public func removeLayer(_ layer: MTLayer) async throws {
-        guard mapLayers[layer.identifier] != nil else {
-            throw MTStyleError.layerNotFound
-        }
-
         try await withCheckedThrowingContinuation { continuation in
             removeLayer(layer) { result in
                 switch result {
                 case .success:
-                    continuation.resume()
+                    switch result {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -588,7 +605,12 @@ extension MTStyle {
             removeLayers(layers) { result in
                 switch result {
                 case .success:
-                    continuation.resume()
+                    switch result {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -608,7 +630,12 @@ extension MTStyle {
             moveLayer(id: id, beforeId: beforeId) { result in
                 switch result {
                 case .success:
-                    continuation.resume()
+                    switch result {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -819,18 +846,38 @@ extension MTStyle {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     internal func addPointLayer(
         _ options: MTPointLayerOptions,
-        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+        completionHandler: ((Result<MTPointLayerResult, MTError>) -> Void)? = nil
     ) {
-        mapView.runCommand(AddPointLayer(options: options, colorRampIdentifier: nil), completion: completionHandler)
+        mapView.runCommandWithStringReturnValue(AddPointLayer(options: options, colorRampIdentifier: nil)) { result in
+            switch result {
+            case .success(let jsonString):
+                do {
+                    let data = Data(jsonString.utf8)
+                    let decodedResult = try JSONDecoder().decode(MTPointLayerResult.self, from: data)
+                    completionHandler?(.success(decodedResult))
+                } catch {
+                    completionHandler?(.failure(
+                        MTError.invalidResultType(description: "Failed to decode JSON result.")
+                    ))
+                }
+            case .failure(let error):
+                completionHandler?(.failure(error))
+            }
+        }
     }
 }
 
 extension MTStyle {
     // Adds a point visualization layer using the helper with the provided options (async).
-    internal func addPointLayer(_ options: MTPointLayerOptions) async {
-        await withCheckedContinuation { continuation in
-            addPointLayer(options) { _ in
-                continuation.resume()
+    internal func addPointLayer(_ options: MTPointLayerOptions) async throws -> MTPointLayerResult {
+        return try await withCheckedThrowingContinuation { continuation in
+            addPointLayer(options) { res in
+                switch res {
+                case .success(let r):
+                    continuation.resume(returning: r)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
             }
         }
     }
@@ -844,26 +891,49 @@ extension MTStyle {
         _ options: MTPointLayerOptions,
         colorRamp: MTColorRamp,
         in mapView: MTMapView,
-        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+        completionHandler: ((Result<MTPointLayerResult, MTError>) -> Void)? = nil
     ) {
         Task { @MainActor in
             _ = try? await colorRamp.getBounds(in: mapView) // ensure ramp is initialized
-            mapView.runCommand(
+            mapView.runCommandWithStringReturnValue(
                 AddPointLayer(
                     options: options,
                     colorRampIdentifier: colorRamp.identifier
-                ),
-                completion: completionHandler
-            )
+                )
+            ) { result in
+                switch result {
+                case .success(let jsonString):
+                    do {
+                        let data = Data(jsonString.utf8)
+                        let decodedResult = try JSONDecoder().decode(MTPointLayerResult.self, from: data)
+                        completionHandler?(.success(decodedResult))
+                    } catch {
+                        completionHandler?(.failure(
+                        MTError.invalidResultType(description: "Failed to decode JSON result.")
+                    ))
+                    }
+                case .failure(let error):
+                    completionHandler?(.failure(error))
+                }
+            }
         }
     }
 
     // Async variant that sets a ColorRamp as pointColor
-    internal func addPointLayer(_ options: MTPointLayerOptions, colorRamp: MTColorRamp, in mapView: MTMapView) async {
+    internal func addPointLayer(
+        _ options: MTPointLayerOptions,
+        colorRamp: MTColorRamp,
+        in mapView: MTMapView
+    ) async throws -> MTPointLayerResult {
         _ = try? await colorRamp.getBounds(in: mapView) // ensure ramp is initialized
-        await withCheckedContinuation { continuation in
-            self.addPointLayer(options, colorRamp: colorRamp, in: mapView) { _ in
-                continuation.resume()
+        return try await withCheckedThrowingContinuation { continuation in
+            self.addPointLayer(options, colorRamp: colorRamp, in: mapView) { res in
+                switch res {
+                case .success(let r):
+                    continuation.resume(returning: r)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
             }
         }
     }
@@ -877,26 +947,54 @@ extension MTStyle {
         _ options: MTHeatmapLayerOptions,
         colorRamp: MTColorRamp? = nil,
         in mapView: MTMapView,
-        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+        completionHandler: ((Result<MTHeatmapLayerResult, MTError>) -> Void)? = nil
     ) {
         Task { @MainActor in
             if let colorRamp {
                 _ = try? await colorRamp.getBounds(in: mapView)
-                mapView.runCommand(
+                mapView.runCommandWithStringReturnValue(
                     AddHeatmapLayer(
                         options: options,
                         colorRampIdentifier: colorRamp.identifier
-                    ),
-                    completion: completionHandler
-                )
+                    )
+                ) { result in
+                    switch result {
+                    case .success(let jsonString):
+                        do {
+                            let data = Data(jsonString.utf8)
+                            let decodedResult = try JSONDecoder().decode(MTHeatmapLayerResult.self, from: data)
+                            completionHandler?(.success(decodedResult))
+                        } catch {
+                            completionHandler?(.failure(
+                        MTError.invalidResultType(description: "Failed to decode JSON result.")
+                    ))
+                        }
+                    case .failure(let error):
+                        completionHandler?(.failure(error))
+                    }
+                }
             } else {
-                mapView.runCommand(
+                mapView.runCommandWithStringReturnValue(
                     AddHeatmapLayer(
                         options: options,
                         colorRampIdentifier: nil
-                    ),
-                    completion: completionHandler
-                )
+                    )
+                ) { result in
+                    switch result {
+                    case .success(let jsonString):
+                        do {
+                            let data = Data(jsonString.utf8)
+                            let decodedResult = try JSONDecoder().decode(MTHeatmapLayerResult.self, from: data)
+                            completionHandler?(.success(decodedResult))
+                        } catch {
+                            completionHandler?(.failure(
+                        MTError.invalidResultType(description: "Failed to decode JSON result.")
+                    ))
+                        }
+                    case .failure(let error):
+                        completionHandler?(.failure(error))
+                    }
+                }
             }
         }
     }
@@ -906,14 +1004,19 @@ extension MTStyle {
         _ options: MTHeatmapLayerOptions,
         colorRamp: MTColorRamp? = nil,
         in mapView: MTMapView
-    ) async {
+    ) async throws -> MTHeatmapLayerResult {
         if let colorRamp {
             _ = try? await colorRamp.getBounds(in: mapView)
         }
 
-        await withCheckedContinuation { continuation in
-            self.addHeatmapLayer(options, colorRamp: colorRamp, in: mapView) { _ in
-                continuation.resume()
+        return try await withCheckedThrowingContinuation { continuation in
+            self.addHeatmapLayer(options, colorRamp: colorRamp, in: mapView) { res in
+                switch res {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
             }
         }
     }
@@ -925,18 +1028,38 @@ extension MTStyle {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     internal func addPolylineLayer(
         _ options: MTPolylineLayerOptions,
-        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+        completionHandler: ((Result<MTPolylineLayerResult, MTError>) -> Void)? = nil
     ) {
-        mapView.runCommand(AddPolylineLayer(options: options), completion: completionHandler)
+        mapView.runCommandWithStringReturnValue(AddPolylineLayer(options: options)) { result in
+            switch result {
+            case .success(let jsonString):
+                do {
+                    let data = Data(jsonString.utf8)
+                    let decodedResult = try JSONDecoder().decode(MTPolylineLayerResult.self, from: data)
+                    completionHandler?(.success(decodedResult))
+                } catch {
+                    completionHandler?(.failure(
+                        MTError.invalidResultType(description: "Failed to decode JSON result.")
+                    ))
+                }
+            case .failure(let error):
+                completionHandler?(.failure(error))
+            }
+        }
     }
 }
 
 extension MTStyle {
     // Async variant
-    internal func addPolylineLayer(_ options: MTPolylineLayerOptions) async {
-        await withCheckedContinuation { continuation in
-            addPolylineLayer(options) { _ in
-                continuation.resume()
+    internal func addPolylineLayer(_ options: MTPolylineLayerOptions) async throws -> MTPolylineLayerResult {
+        return try await withCheckedThrowingContinuation { continuation in
+            addPolylineLayer(options) { res in
+                switch res {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
             }
         }
     }
@@ -948,18 +1071,38 @@ extension MTStyle {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     internal func addPolygonLayer(
         _ options: MTPolygonLayerOptions,
-        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+        completionHandler: ((Result<MTPolygonLayerResult, MTError>) -> Void)? = nil
     ) {
-        mapView.runCommand(AddPolygonLayer(options: options), completion: completionHandler)
+        mapView.runCommandWithStringReturnValue(AddPolygonLayer(options: options)) { result in
+            switch result {
+            case .success(let jsonString):
+                do {
+                    let data = Data(jsonString.utf8)
+                    let decodedResult = try JSONDecoder().decode(MTPolygonLayerResult.self, from: data)
+                    completionHandler?(.success(decodedResult))
+                } catch {
+                    completionHandler?(.failure(
+                        MTError.invalidResultType(description: "Failed to decode JSON result.")
+                    ))
+                }
+            case .failure(let error):
+                completionHandler?(.failure(error))
+            }
+        }
     }
 }
 
 extension MTStyle {
     // Async variant
-    internal func addPolygonLayer(_ options: MTPolygonLayerOptions) async {
-        await withCheckedContinuation { continuation in
-            addPolygonLayer(options) { _ in
-                continuation.resume()
+    internal func addPolygonLayer(_ options: MTPolygonLayerOptions) async throws -> MTPolygonLayerResult {
+        return try await withCheckedThrowingContinuation { continuation in
+            addPolygonLayer(options) { res in
+                switch res {
+                case .success(let res):
+                    continuation.resume(returning: res)
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
             }
         }
     }

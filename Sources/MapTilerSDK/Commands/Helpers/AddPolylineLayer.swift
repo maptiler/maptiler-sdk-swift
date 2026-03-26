@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct AddPolylineLayer: MTCommand {
+package struct AddPolylineLayer: MTValueCommand {
     var options: MTPolylineLayerOptions
 
     package func toJS() -> JSString {
@@ -18,9 +18,13 @@ package struct AddPolylineLayer: MTCommand {
         }
 
         return """
-        (() => {
-            \(MTBridge.sdkObject).helpers.addPolyline(\(MTBridge.mapObject), \(optionsString));
-            return "";
+        (async () => {
+            const opts = \(optionsString);
+            if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                try { opts.data = JSON.parse(opts.data); } catch (e) {}
+            }
+            const result = await \(MTBridge.sdkObject).helpers.addPolyline(\(MTBridge.mapObject), opts);
+            return JSON.stringify(result);
         })();
         """
     }

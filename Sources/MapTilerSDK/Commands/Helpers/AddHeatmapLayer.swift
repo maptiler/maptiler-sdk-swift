@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct AddHeatmapLayer: MTCommand {
+package struct AddHeatmapLayer: MTValueCommand {
     var options: MTHeatmapLayerOptions
     var colorRampIdentifier: String?
 
@@ -22,16 +22,23 @@ package struct AddHeatmapLayer: MTCommand {
             return """
             (() => {
                 const opts = \(optionsString);
+                if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                    try { opts.data = JSON.parse(opts.data); } catch (e) {}
+                }
                 opts.colorRamp = window.\(colorRampIdentifier) ?? opts.colorRamp;
-                \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), opts);
-                return "";
+                const result = \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), opts);
+                return JSON.stringify(result);
             })();
             """
         } else {
             return """
             (() => {
-                \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), \(optionsString));
-                return "";
+                const opts = \(optionsString);
+                if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                    try { opts.data = JSON.parse(opts.data); } catch (e) {}
+                }
+                const result = \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), opts);
+                return JSON.stringify(result);
             })();
             """
         }

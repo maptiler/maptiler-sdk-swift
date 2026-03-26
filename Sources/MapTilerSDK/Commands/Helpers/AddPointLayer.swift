@@ -9,7 +9,7 @@
 
 import Foundation
 
-package struct AddPointLayer: MTCommand {
+package struct AddPointLayer: MTValueCommand {
     var options: MTPointLayerOptions
     var colorRampIdentifier: String?
 
@@ -22,16 +22,23 @@ package struct AddPointLayer: MTCommand {
             return """
             (() => {
                 const opts = \(optionsString);
+                if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                    try { opts.data = JSON.parse(opts.data); } catch (e) {}
+                }
                 opts.pointColor = window.\(colorRampIdentifier) ?? opts.pointColor;
-                \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), opts);
-                return "";
+                const result = \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), opts);
+                return JSON.stringify(result);
             })();
             """
         } else {
             return """
             (() => {
-                \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), \(optionsString));
-                return "";
+                const opts = \(optionsString);
+                if (typeof opts.data === 'string' && opts.data.trim().startsWith('{')) {
+                    try { opts.data = JSON.parse(opts.data); } catch (e) {}
+                }
+                const result = \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), opts);
+                return JSON.stringify(result);
             })();
             """
         }

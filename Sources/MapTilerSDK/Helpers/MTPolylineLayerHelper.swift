@@ -40,15 +40,46 @@ public final class MTPolylineLayerHelper: MTVectorLayerHelper, @unchecked Sendab
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addPolyline(
         _ options: MTPolylineLayerOptions,
-        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+        completionHandler: ((Result<MTPolylineLayerResult, MTError>) -> Void)? = nil
     ) {
         let normalized = applyCommonDefaults(to: options)
         style.addPolylineLayer(normalized, completionHandler: completionHandler)
     }
 
     /// Adds a polyline layer based on the provided options (async).
-    public func addPolyline(_ options: MTPolylineLayerOptions) async {
+    @MainActor
+    public func addPolyline(
+        _ options: MTPolylineLayerOptions
+    ) async throws -> MTPolylineLayerResult {
         let normalized = applyCommonDefaults(to: options)
-        await style.addPolylineLayer(normalized)
+        return try await style.addPolylineLayer(normalized)
+    }
+
+    /// Removes the layers and source created by the `addPolyline` helper
+    @MainActor
+    public func removePolyline(
+        result: MTPolylineLayerResult,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        let layersToRemove = [result.polylineLayerId, result.polylineOutlineLayerId].compactMap { $0 }
+        style.mapView.runCommand(
+            RemoveHelperResult(layerIds: layersToRemove, sourceId: result.polylineSourceId),
+            completion: completionHandler
+        )
+    }
+
+    /// Removes the layers and source created by the `addPolyline` helper
+    @MainActor
+    public func removePolyline(result: MTPolylineLayerResult) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            removePolyline(result: result) { res in
+                switch res {
+                case .success:
+                    continuation.resume()
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
+            }
+        }
     }
 }

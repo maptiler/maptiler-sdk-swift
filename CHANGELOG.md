@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.2](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/1.3.2)
+Released on 2026-03-26.
+### Fixed
+- MTVectorHelpers now properly remove source and layers.
+
 ## [1.3.1](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/1.3.1)
 Released on 2026-03-06.
 ### Fixed

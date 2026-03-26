@@ -23,15 +23,15 @@ package struct AddHeatmapLayer: MTCommand {
             (() => {
                 const opts = \(optionsString);
                 opts.colorRamp = window.\(colorRampIdentifier) ?? opts.colorRamp;
-                \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), opts);
-                return "";
+                const result = \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), opts);
+                return JSON.stringify(result);
             })();
             """
         } else {
             return """
             (() => {
-                \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), \(optionsString));
-                return "";
+                const result = \(MTBridge.sdkObject).helpers.addHeatmap(\(MTBridge.mapObject), \(optionsString));
+                return JSON.stringify(result);
             })();
             """
         }

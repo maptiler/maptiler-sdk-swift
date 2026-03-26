@@ -23,15 +23,15 @@ package struct AddPointLayer: MTCommand {
             (() => {
                 const opts = \(optionsString);
                 opts.pointColor = window.\(colorRampIdentifier) ?? opts.pointColor;
-                \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), opts);
-                return "";
+                const result = \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), opts);
+                return JSON.stringify(result);
             })();
             """
         } else {
             return """
             (() => {
-                \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), \(optionsString));
-                return "";
+                const result = \(MTBridge.sdkObject).helpers.addPoint(\(MTBridge.mapObject), \(optionsString));
+                return JSON.stringify(result);
             })();
             """
         }

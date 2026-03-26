@@ -19,8 +19,8 @@ package struct AddPolygonLayer: MTCommand {
 
         return """
         (() => {
-            \(MTBridge.sdkObject).helpers.addPolygon(\(MTBridge.mapObject), \(optionsString));
-            return "";
+            const result = \(MTBridge.sdkObject).helpers.addPolygon(\(MTBridge.mapObject), \(optionsString));
+            return JSON.stringify(result);
         })();
         """
     }

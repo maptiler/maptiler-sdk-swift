@@ -19,8 +19,8 @@ package struct AddPolylineLayer: MTCommand {
 
         return """
         (() => {
-            \(MTBridge.sdkObject).helpers.addPolyline(\(MTBridge.mapObject), \(optionsString));
-            return "";
+            const result = \(MTBridge.sdkObject).helpers.addPolyline(\(MTBridge.mapObject), \(optionsString));
+            return JSON.stringify(result);
         })();
         """
     }

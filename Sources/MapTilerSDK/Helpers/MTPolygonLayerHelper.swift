@@ -40,15 +40,43 @@ public final class MTPolygonLayerHelper: MTVectorLayerHelper, @unchecked Sendabl
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addPolygon(
         _ options: MTPolygonLayerOptions,
-        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+        completionHandler: ((Result<MTPolygonLayerResult, MTError>) -> Void)? = nil
     ) {
         let normalized = applyCommonDefaults(to: options)
         style.addPolygonLayer(normalized, completionHandler: completionHandler)
     }
 
     /// Adds a polygon layer based on the provided options (async).
-    public func addPolygon(_ options: MTPolygonLayerOptions) async {
+    public func addPolygon(
+        _ options: MTPolygonLayerOptions
+    ) async throws -> MTPolygonLayerResult {
         let normalized = applyCommonDefaults(to: options)
-        await style.addPolygonLayer(normalized)
+        return try await style.addPolygonLayer(normalized)
+    }
+
+    /// Removes the layers and source created by the `addPolygon` helper
+    public func removePolygon(
+        result: MTPolygonLayerResult,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        let layersToRemove = [result.polygonLayerId, result.polygonOutlineLayerId].compactMap { $0 }
+        style.mapView.runCommand(
+            RemoveHelperResult(layerIds: layersToRemove, sourceId: result.polygonSourceId),
+            completion: completionHandler
+        )
+    }
+
+    /// Removes the layers and source created by the `addPolygon` helper
+    public func removePolygon(result: MTPolygonLayerResult) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            removePolygon(result: result) { res in
+                switch res {
+                case .success:
+                    continuation.resume()
+                case .failure(let err):
+                    continuation.resume(throwing: err)
+                }
+            }
+        }
     }
 }

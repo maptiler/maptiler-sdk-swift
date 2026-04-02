@@ -89,7 +89,7 @@ internal class MTLocalPlanner: MTOfflinePlanner {
     // Validates the initial parameters to fail fast if they are malformed or invalid.
     private func validate(bbox: MTBoundingBox, minZoom: Int, maxZoom: Int) throws {
         guard minZoom >= 0, maxZoom <= 22, minZoom <= maxZoom else {
-            throw MTOfflinePlanningError.invalidZoomRange
+            throw MTOfflinePackError.invalidZoomRange
         }
 
         // swiftlint:disable all
@@ -99,7 +99,7 @@ internal class MTLocalPlanner: MTOfflinePlanner {
              bbox.minLon >= -180,
              bbox.maxLon <= 180,
              bbox.minLat <= bbox.maxLat else {
-            throw MTOfflinePlanningError.invalidBoundingBox
+            throw MTOfflinePackError.invalidBoundingBox
         }
         // swiftlint:enable all
     }

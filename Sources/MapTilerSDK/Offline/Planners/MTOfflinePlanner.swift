@@ -11,21 +11,9 @@ import Foundation
 
 // Protocol defining the core interface for planning an offline download.
 internal protocol MTOfflinePlanner {
-    // Generates a manifest detailing all resources required for an offline region.
-    func generateManifest(
-        styleURL: URL,
-        bbox: MTBoundingBox,
-        minZoom: Int,
-        maxZoom: Int,
-        pixelRatio: Float
-    ) async throws -> MTManifest
+    // Estimates the size and resources required for an offline region.
+    func estimate(for definition: MTOfflineRegionDefinition) async throws -> MTTileEstimate
 
     // Generates a manifest detailing all resources required for an offline region.
-    func generateManifest(
-        mapId: String,
-        bbox: MTBoundingBox,
-        minZoom: Int,
-        maxZoom: Int,
-        pixelRatio: Float
-    ) async throws -> MTManifest
+    func generateManifest(for definition: MTOfflineRegionDefinition) async throws -> MTManifest
 }

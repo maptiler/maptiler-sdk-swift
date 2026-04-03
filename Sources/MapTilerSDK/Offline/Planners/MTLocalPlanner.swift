@@ -16,64 +16,42 @@ internal class MTLocalPlanner: MTOfflinePlanner {
     private let session: URLSession
 
     // Initializes a new planner with dependency injection.
-    internal init(session: URLSession = .shared) {
+    internal init(session: URLSession = MTConfig.sharedURLSession) {
         self.session = session
     }
 
-    // Generates a stub manifest detailing all resources required for an offline region.
-    internal func generateManifest(
-        styleURL: URL,
-        bbox: MTBoundingBox,
-        minZoom: Int,
-        maxZoom: Int,
-        pixelRatio: Float
-    ) async throws -> MTManifest {
-        try validate(bbox: bbox, minZoom: minZoom, maxZoom: maxZoom)
-
-        let metadata = MTManifestMetadata(
-            styleURL: styleURL,
-            bbox: bbox,
-            minZoom: minZoom,
-            maxZoom: maxZoom,
-            pixelRatio: pixelRatio
-        )
-
-        let styleResource = try await resolveStyle(url: styleURL)
-
-        let tileResources = try await generateTileResources(bbox: bbox, minZoom: minZoom, maxZoom: maxZoom)
-        let glyphResources = try await generateGlyphResources(style: styleResource)
-        let spriteResources = try await generateSpriteResources(style: styleResource)
-
-        return MTManifest(
-            metadata: metadata,
-            style: styleResource,
-            tiles: tileResources,
-            glyphs: glyphResources,
-            sprites: spriteResources
-        )
+    internal func estimate(for definition: MTOfflineRegionDefinition) async throws -> MTTileEstimate {
+        try validate(definition: definition)
+        throw MTOfflinePackError.notImplemented
     }
 
-    // Generates a stub manifest detailing all resources required for an offline region.
-    internal func generateManifest(
-        mapId: String,
-        bbox: MTBoundingBox,
-        minZoom: Int,
-        maxZoom: Int,
-        pixelRatio: Float
-    ) async throws -> MTManifest {
-        try validate(bbox: bbox, minZoom: minZoom, maxZoom: maxZoom)
+    internal func generateManifest(for definition: MTOfflineRegionDefinition) async throws -> MTManifest {
+        try validate(definition: definition)
 
         let metadata = MTManifestMetadata(
-            mapId: mapId,
-            bbox: bbox,
-            minZoom: minZoom,
-            maxZoom: maxZoom,
-            pixelRatio: pixelRatio
+            mapId: definition.mapId,
+            styleURL: definition.styleURL,
+            bbox: definition.bbox,
+            minZoom: definition.minZoom,
+            maxZoom: definition.maxZoom,
+            pixelRatio: definition.pixelRatio
         )
 
-        let styleResource = try await resolveStyle(mapId: mapId)
+        let styleResource: MTMapResource?
+        if let styleURL = definition.styleURL {
+            styleResource = try await resolveStyle(url: styleURL)
+        } else if let mapId = definition.mapId {
+            styleResource = try await resolveStyle(mapId: mapId)
+        } else {
+            styleResource = nil
+        }
 
-        let tileResources = try await generateTileResources(bbox: bbox, minZoom: minZoom, maxZoom: maxZoom)
+        let tileResources = try await generateTileResources(
+            bbox: definition.bbox,
+            minZoom: definition.minZoom,
+            maxZoom: definition.maxZoom
+        )
+
         let glyphResources = try await generateGlyphResources(style: styleResource)
         let spriteResources = try await generateSpriteResources(style: styleResource)
 
@@ -87,13 +65,14 @@ internal class MTLocalPlanner: MTOfflinePlanner {
     }
 
     // Validates the initial parameters to fail fast if they are malformed or invalid.
-    private func validate(bbox: MTBoundingBox, minZoom: Int, maxZoom: Int) throws {
-        guard minZoom >= 0, maxZoom <= 22, minZoom <= maxZoom else {
+    private func validate(definition: MTOfflineRegionDefinition) throws {
+        guard definition.minZoom >= 0, definition.maxZoom <= 22, definition.minZoom <= definition.maxZoom else {
             throw MTOfflinePackError.invalidZoomRange
         }
 
         // swiftlint:disable all
         // Ensure coordinates are within standard WGS84 bounds and min <= max
+        let bbox = definition.bbox
         guard bbox.minLat >= -90,
              bbox.maxLat <= 90,
              bbox.minLon >= -180,

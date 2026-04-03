@@ -15,7 +15,7 @@ internal class MTServerPlanner: MTOfflinePlanner {
     // The URLSession used for network requests.
     private let session: URLSession
 
-    internal init(session: URLSession = .shared) {
+    internal init(session: URLSession = MTConfig.sharedURLSession) {
         self.session = session
     }
 
@@ -24,23 +24,7 @@ internal class MTServerPlanner: MTOfflinePlanner {
         throw MTOfflinePackError.notImplemented
     }
 
-    internal func generateManifest(
-        styleURL: URL,
-        bbox: MTBoundingBox,
-        minZoom: Int,
-        maxZoom: Int,
-        pixelRatio: Float
-    ) async throws -> MTManifest {
-        throw MTOfflinePackError.notImplemented
-    }
-
-    internal func generateManifest(
-        mapId: String,
-        bbox: MTBoundingBox,
-        minZoom: Int,
-        maxZoom: Int,
-        pixelRatio: Float
-    ) async throws -> MTManifest {
+    internal func generateManifest(for definition: MTOfflineRegionDefinition) async throws -> MTManifest {
         throw MTOfflinePackError.notImplemented
     }
 

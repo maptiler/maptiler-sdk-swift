@@ -42,6 +42,7 @@ package final class WebViewManager: NSObject {
             let request = URLRequest(url: url)
 
             let configuration = WKWebViewConfiguration()
+            configuration.applicationNameForUserAgent = MTConfig.customUserAgent
             configuration.userContentController = makeUserContentController()
             configuration.allowsInlineMediaPlayback = true
 

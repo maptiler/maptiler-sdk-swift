@@ -7,6 +7,8 @@
 //  MapTilerSDK
 //
 
+import Foundation
+
 /// Object representing the SDK global settings.
 ///
 /// Exposes properties and options such as API Key and caching preferences.
@@ -16,6 +18,19 @@ public actor MTConfig {
 
     private var apiKey: String?
     private var unit: MTUnit = .metric
+
+    /// SDK version
+    public static let version = "1.3.2"
+
+    // Custom User-Agent string for the SDK
+    internal static let customUserAgent = "MapTiler-Mobile-SDK-iOS/\(version)"
+
+    // A configured URLSession that includes the SDK's User-Agent
+    internal static let sharedURLSession: URLSession = {
+        let configuration = URLSessionConfiguration.default
+        configuration.httpAdditionalHeaders = ["User-Agent": customUserAgent]
+        return URLSession(configuration: configuration)
+    }()
 
     /// SDK log level.
     public private(set) var logLevel: MTLogLevel = .none

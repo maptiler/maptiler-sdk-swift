@@ -22,4 +22,14 @@ public struct MTBoundingBox: Codable {
         self.maxLon = maxLon
         self.maxLat = maxLat
     }
+
+    /// Checks if this bounding box intersects with another bounding box.
+    /// - Parameter other: The other bounding box to check against.
+    /// - Returns: `true` if the bounding boxes intersect, otherwise `false`.
+    public func intersects(with other: MTBoundingBox) -> Bool {
+        return !(self.minLon > other.maxLon ||
+            self.maxLon < other.minLon ||
+            self.minLat > other.maxLat ||
+            self.maxLat < other.minLat)
+    }
 }

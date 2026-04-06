@@ -8,7 +8,7 @@
 //
 
 /// A scheme used for tiles.
-public enum MTTileScheme: String {
+public enum MTTileScheme: String, Codable, Sendable {
     /// XYZ Format.
     case xyz
 

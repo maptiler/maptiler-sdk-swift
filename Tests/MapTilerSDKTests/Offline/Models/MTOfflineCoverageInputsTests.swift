@@ -42,6 +42,39 @@ struct MTOfflineCoverageInputsTests {
         }
     }
     
+    @Test("Zoom range clamps correctly to source limits")
+    func testZoomRangeClampingToSource() throws {
+        let requested = try MTOfflineZoomRange(minZoom: 0, maxZoom: 14)
+        
+        // Fully within limits
+        let clamped1 = requested.clamped(toSourceMin: 0, sourceMax: 14)
+        #expect(clamped1?.minZoom == 0)
+        #expect(clamped1?.maxZoom == 14)
+        
+        // Clamped at both ends
+        let clamped2 = requested.clamped(toSourceMin: 5, sourceMax: 10)
+        #expect(clamped2?.minZoom == 5)
+        #expect(clamped2?.maxZoom == 10)
+        
+        // Clamped only min
+        let clamped3 = requested.clamped(toSourceMin: 2, sourceMax: 20)
+        #expect(clamped3?.minZoom == 2)
+        #expect(clamped3?.maxZoom == 14)
+        
+        // Clamped only max
+        let clamped4 = requested.clamped(toSourceMin: 0, sourceMax: 8)
+        #expect(clamped4?.minZoom == 0)
+        #expect(clamped4?.maxZoom == 8)
+        
+        // Outside range (requested is below source min)
+        let requestedLow = try MTOfflineZoomRange(minZoom: 0, maxZoom: 2)
+        #expect(requestedLow.clamped(toSourceMin: 5, sourceMax: 10) == nil)
+        
+        // Outside range (requested is above source max)
+        let requestedHigh = try MTOfflineZoomRange(minZoom: 15, maxZoom: 20)
+        #expect(requestedHigh.clamped(toSourceMin: 0, sourceMax: 10) == nil)
+    }
+    
     @Test("Valid tile sizes are accepted")
     func testValidTileSizes() throws {
         let size256 = try MTOfflineTileSize(validating: 256)
@@ -79,6 +112,18 @@ struct MTOfflineCoverageInputsTests {
         #expect(inputs4.scheme == .xyz)
     }
     
+    @Test("Scheme can be inferred from URL templates")
+    func testSchemeInferredFromURL() {
+        let xyzURL = "https://example.com/tiles/{z}/{x}/{y}.png"
+        #expect(MTOfflineTileScheme.inferred(from: xyzURL) == .xyz)
+        
+        let tmsURL = "https://example.com/tiles/{z}/{x}/{-y}.png"
+        #expect(MTOfflineTileScheme.inferred(from: tmsURL) == .tms)
+        
+        let invalidURL = "https://example.com/tiles/"
+        #expect(MTOfflineTileScheme.inferred(from: invalidURL) == .xyz) // default
+    }
+    
     @Test("Invalid schemes throw error")
     func testInvalidSchemes() throws {
         #expect(throws: MTOfflineCoverageInputError.invalidScheme("Invalid scheme string: quadkey")) {
@@ -93,5 +138,15 @@ struct MTOfflineCoverageInputsTests {
         #expect(inputs.zoomRange.minZoom == 1)
         #expect(inputs.zoomRange.maxZoom == 10)
         #expect(inputs.tileSize == .size256)
+        
+        let inputs512 = try MTOfflineCoverageInputs(scheme: "xyz", minZoom: 0, maxZoom: 22, tileSize: 512)
+        #expect(inputs512.scheme == .xyz)
+        #expect(inputs512.tileSize == .size512)
+    }
+
+    @Test("Tile size defaults to 512")
+    func testTileSizeDefault() throws {
+        let inputs = try MTOfflineCoverageInputs(minZoom: 0, maxZoom: 5)
+        #expect(inputs.tileSize == .size512)
     }
 }

@@ -15,6 +15,19 @@ public enum MTOfflineTileScheme: String, Equatable {
     case xyz
     /// OSGeo Tile Map Service scheme, where Y=0 is at the bottom.
     case tms
+
+    /// Attempts to infer the tile scheme based on common patterns in a tile URL template.
+    ///
+    /// Many tile providers and MapLibre standard styles use `{-y}` to indicate an inverted Y-axis (TMS),
+    /// whereas `{y}` usually implies the standard XYZ scheme.
+    /// - Parameter urlTemplate: A URL template containing coordinate variables.
+    /// - Returns: `.tms` if the template implies an inverted Y coordinate, otherwise `.xyz`.
+    public static func inferred(from urlTemplate: String) -> MTOfflineTileScheme {
+        if urlTemplate.contains("{-y}") {
+            return .tms
+        }
+        return .xyz
+    }
 }
 
 /// Defines a standardized size for tiles.
@@ -62,6 +75,26 @@ public struct MTOfflineZoomRange: Equatable {
 
         self.minZoom = Swift.min(minZoom, 22)
         self.maxZoom = Swift.min(maxZoom, 22)
+    }
+
+    /// Clamps the zoom range to the limits provided by a source (e.g., from TileJSON).
+    ///
+    /// - Parameters:
+    ///   - sourceMin: The minimum zoom level supported by the source.
+    ///   - sourceMax: The maximum zoom level supported by the source.
+    /// - Returns: A new `MTOfflineZoomRange` clamped to the source limits, or `nil` if the requested range
+    ///   falls completely outside the source limits (e.g., requesting zoom 12-14 from
+    ///   a source that only provides 0-10).
+    public func clamped(toSourceMin sourceMin: Int, sourceMax: Int) -> MTOfflineZoomRange? {
+        let clampedMin = Swift.max(self.minZoom, sourceMin)
+        let clampedMax = Swift.min(self.maxZoom, sourceMax)
+
+        if clampedMin > clampedMax {
+            return nil
+        }
+
+        // This won't throw because we already ensured clampedMin <= clampedMax and minZoom/sourceMin are non-negative.
+        return try? MTOfflineZoomRange(minZoom: clampedMin, maxZoom: clampedMax)
     }
 }
 

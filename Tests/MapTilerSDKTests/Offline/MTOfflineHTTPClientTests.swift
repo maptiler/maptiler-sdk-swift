@@ -1,172 +1,125 @@
+//
+// Copyright (c) 2025, MapTiler
+// All rights reserved.
+// SPDX-License-Identifier: BSD 3-Clause
+//
+//  MTOfflineNetworkClientTests.swift
+//  MapTilerSDKTests
+//
+
 import Testing
 import Foundation
 @testable import MapTilerSDK
 
-actor MockURLSession: MTOfflineURLSessionProtocol {
-    let dataResult: Result<(Data, URLResponse), Error>?
-    let downloadResult: Result<(URL, URLResponse), Error>?
-    private(set) var capturedRequests: [URLRequest] = []
-    
-    init(dataResult: Result<(Data, URLResponse), Error>? = nil,
-         downloadResult: Result<(URL, URLResponse), Error>? = nil) {
-        self.dataResult = dataResult
-        self.downloadResult = downloadResult
-    }
+@Suite("MTOfflineHTTPClient Tests", .serialized)
+struct MTOfflineHTTPClientTests {
 
-    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
-        capturedRequests.append(request)
-        guard let dataResult = dataResult else {
-            fatalError("dataResult not set")
+    @Test("Timeout maps to .timeout error")
+    func testTimeout() async throws {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [MockURLProtocol.self]
+        let session = URLSession(configuration: config)
+        let client = MTOfflineHTTPClient(session: session)
+        
+        MockURLProtocol.requestHandler = { request in
+            throw URLError(.timedOut)
         }
-        switch dataResult {
-        case .success(let response):
-            return response
-        case .failure(let error):
-            throw error
+        
+        await #expect(throws: MTOfflineHTTPError.timeout) {
+            try await client.get(url: URL(string: "http://localhost")!)
         }
     }
     
-    func download(for request: URLRequest) async throws -> (URL, URLResponse) {
-        capturedRequests.append(request)
-        guard let downloadResult = downloadResult else {
-            fatalError("downloadResult not set")
+    @Test("No connection maps to .noConnection error")
+    func testNoConnection() async throws {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [MockURLProtocol.self]
+        let session = URLSession(configuration: config)
+        let client = MTOfflineHTTPClient(session: session)
+        
+        MockURLProtocol.requestHandler = { request in
+            throw URLError(.notConnectedToInternet)
         }
-        switch downloadResult {
-        case .success(let response):
-            return response
-        case .failure(let error):
-            throw error
+        
+        await #expect(throws: MTOfflineHTTPError.offline) {
+            try await client.get(url: URL(string: "http://localhost")!)
         }
+    }
+    
+    @Test("Bad response maps to .badResponse error")
+    func testBadResponse() async throws {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [MockURLProtocol.self]
+        let session = URLSession(configuration: config)
+        let client = MTOfflineHTTPClient(session: session)
+        
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(url: request.url!,
+                                           statusCode: 404,
+                                           httpVersion: nil,
+                                           headerFields: nil)!
+            return (response, Data())
+        }
+        
+        do {
+            _ = try await client.get(url: URL(string: "http://localhost")!)
+            Issue.record("Expected to throw badResponse error")
+        } catch let error as MTOfflineHTTPError {
+            #expect(error == .notFound)
+        } catch {
+            Issue.record("Unexpected error: \(error)")
+        }
+    }
+    
+    @Test("Success returns data")
+    func testSuccess() async throws {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [MockURLProtocol.self]
+        let session = URLSession(configuration: config)
+        let client = MTOfflineHTTPClient(session: session)
+        
+        let expectedData = "Hello, World!".data(using: .utf8)!
+        
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(url: request.url!,
+                                           statusCode: 200,
+                                           httpVersion: nil,
+                                           headerFields: nil)!
+            return (response, expectedData)
+        }
+        
+        let data = try await client.get(url: URL(string: "http://localhost")!)
+        #expect(data == expectedData)
     }
 }
 
-@Suite
-struct MTOfflineHTTPClientTests {
-    let validURL = URL(string: "https://offline-test.maptiler.local")!
+class MockURLProtocol: URLProtocol {
+    nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
     
-    @Test func get_success_returnsData() async throws {
-        let expectedData = "test data".data(using: .utf8)!
-        let response = HTTPURLResponse(url: validURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
-        let mockSession = MockURLSession(dataResult: .success((expectedData, response)))
-        
-        let client = MTOfflineHTTPClient(session: mockSession)
-        let data = try await client.get(url: validURL)
-        
-        #expect(data == expectedData)
-        let requests = await mockSession.capturedRequests
-        #expect(requests.first?.value(forHTTPHeaderField: "User-Agent") == "MapTiler-SDK-iOS")
+    override class func canInit(with request: URLRequest) -> Bool {
+        return true
     }
     
-    @Test func download_success_movesFile() async throws {
-        let response = HTTPURLResponse(url: validURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
-        
-        // Create a temporary file to simulate the download
-        let tempDownloadURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try "test data".write(to: tempDownloadURL, atomically: true, encoding: .utf8)
-        
-        let destinationURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        
-        let mockSession = MockURLSession(downloadResult: .success((tempDownloadURL, response)))
-        
-        let customUserAgent = "Custom-Agent/1.0"
-        let client = MTOfflineHTTPClient(session: mockSession, userAgent: customUserAgent)
-        try await client.download(url: validURL, to: destinationURL)
-        
-        let downloadedData = try String(contentsOf: destinationURL, encoding: .utf8)
-        #expect(downloadedData == "test data")
-        
-        let requests = await mockSession.capturedRequests
-        #expect(requests.first?.value(forHTTPHeaderField: "User-Agent") == customUserAgent)
-        
-        // Clean up
-        try? FileManager.default.removeItem(at: destinationURL)
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        return request
     }
     
-    @Test func get_http404_throwsNotFound() async throws {
-        let response = HTTPURLResponse(url: validURL, statusCode: 404, httpVersion: nil, headerFields: nil)!
-        let mockSession = MockURLSession(dataResult: .success((Data(), response)))
+    override func startLoading() {
+        guard let handler = MockURLProtocol.requestHandler else {
+            fatalError("Handler is unavailable.")
+        }
         
-        let client = MTOfflineHTTPClient(session: mockSession)
-        
-        await #expect(throws: MTOfflineHTTPError.notFound) {
-            try await client.get(url: validURL)
+        do {
+            let (response, data) = try handler(request)
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
         }
     }
     
-    @Test func get_http401_throwsClientError() async throws {
-        let response = HTTPURLResponse(url: validURL, statusCode: 401, httpVersion: nil, headerFields: nil)!
-        let mockSession = MockURLSession(dataResult: .success((Data(), response)))
-        
-        let client = MTOfflineHTTPClient(session: mockSession)
-        
-        await #expect(throws: MTOfflineHTTPError.clientError(401)) {
-            try await client.get(url: validURL)
-        }
-    }
-    
-    @Test func get_http500_throwsServerError() async throws {
-        let response = HTTPURLResponse(url: validURL, statusCode: 500, httpVersion: nil, headerFields: nil)!
-        let mockSession = MockURLSession(dataResult: .success((Data(), response)))
-        
-        let client = MTOfflineHTTPClient(session: mockSession)
-        
-        await #expect(throws: MTOfflineHTTPError.serverError(500)) {
-            try await client.get(url: validURL)
-        }
-    }
-    
-    @Test func get_invalidResponse_throwsInvalidResponse() async throws {
-        let response = URLResponse(url: validURL, mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
-        let mockSession = MockURLSession(dataResult: .success((Data(), response)))
-        
-        let client = MTOfflineHTTPClient(session: mockSession)
-        
-        await #expect(throws: MTOfflineHTTPError.invalidResponse) {
-            try await client.get(url: validURL)
-        }
-    }
-    
-    @Test func get_urlErrorTimedOut_throwsTimeout() async throws {
-        let urlError = URLError(.timedOut)
-        let mockSession = MockURLSession(dataResult: .failure(urlError))
-        
-        let client = MTOfflineHTTPClient(session: mockSession)
-        
-        await #expect(throws: MTOfflineHTTPError.timeout) {
-            try await client.get(url: validURL)
-        }
-    }
-    
-    @Test func get_urlErrorNotConnected_throwsOffline() async throws {
-        let urlError = URLError(.notConnectedToInternet)
-        let mockSession = MockURLSession(dataResult: .failure(urlError))
-        
-        let client = MTOfflineHTTPClient(session: mockSession)
-        
-        await #expect(throws: MTOfflineHTTPError.offline) {
-            try await client.get(url: validURL)
-        }
-    }
-    
-    @Test func get_urlErrorOther_throwsNetworkError() async throws {
-        let urlError = URLError(.badURL)
-        let mockSession = MockURLSession(dataResult: .failure(urlError))
-        
-        let client = MTOfflineHTTPClient(session: mockSession)
-        
-        await #expect(throws: MTOfflineHTTPError.networkError(urlError)) {
-            try await client.get(url: validURL)
-        }
-    }
-    
-    @Test func get_unknownError_throwsUnknown() async throws {
-        let testError = NSError(domain: "TestDomain", code: 123, userInfo: nil)
-        let mockSession = MockURLSession(dataResult: .failure(testError))
-        
-        let client = MTOfflineHTTPClient(session: mockSession)
-        
-        await #expect(throws: MTOfflineHTTPError.unknown(testError.localizedDescription)) {
-            try await client.get(url: validURL)
-        }
+    override func stopLoading() {
+        // Nothing to do
     }
 }

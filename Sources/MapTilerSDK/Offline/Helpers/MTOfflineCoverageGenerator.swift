@@ -12,19 +12,38 @@ import Foundation
 // A sequence that lazily generates tile coordinates required to cover a bounding box
 // based on the provided normalized inputs (zoom range, scheme).
 internal struct MTOfflineCoverageGenerator: Sequence {
-    internal let boundingBox: MTBoundingBox
+    internal let boundingBoxes: [MTBoundingBox]
     internal let inputs: MTOfflineCoverageInputs
 
+    internal init(boundingBox: MTBoundingBox, inputs: MTOfflineCoverageInputs) {
+        if boundingBox.crossesAntimeridian {
+            self.boundingBoxes = [
+                MTBoundingBox(
+                    minLon: boundingBox.minLon, minLat: boundingBox.minLat,
+                    maxLon: 180, maxLat: boundingBox.maxLat
+                ),
+                MTBoundingBox(
+                    minLon: -180, minLat: boundingBox.minLat,
+                    maxLon: boundingBox.maxLon, maxLat: boundingBox.maxLat
+                )
+            ]
+        } else {
+            self.boundingBoxes = [boundingBox]
+        }
+        self.inputs = inputs
+    }
+
     internal func makeIterator() -> MTOfflineCoverageIterator {
-        return MTOfflineCoverageIterator(boundingBox: boundingBox, inputs: inputs)
+        return MTOfflineCoverageIterator(boundingBoxes: boundingBoxes, inputs: inputs)
     }
 }
 
 // An iterator that generates tiles within the specified bounding box and zoom range.
 internal struct MTOfflineCoverageIterator: IteratorProtocol {
-    private let boundingBox: MTBoundingBox
+    private let boundingBoxes: [MTBoundingBox]
     private let inputs: MTOfflineCoverageInputs
 
+    private var currentBoxIndex: Int = 0
     private var currentZoom: Int
     private var boundsX: ClosedRange<Int>
     private var boundsY: ClosedRange<Int>
@@ -33,19 +52,23 @@ internal struct MTOfflineCoverageIterator: IteratorProtocol {
     private var currentY: Int
     private var isCompleted: Bool = false
 
-    internal init(boundingBox: MTBoundingBox, inputs: MTOfflineCoverageInputs) {
-        self.boundingBox = boundingBox
+    internal init(boundingBoxes: [MTBoundingBox], inputs: MTOfflineCoverageInputs) {
+        self.boundingBoxes = boundingBoxes
         self.inputs = inputs
         self.currentZoom = inputs.zoomRange.minZoom
 
-        let bounds = MTOfflineTileCalculator.tileBounds(for: boundingBox, zoom: currentZoom)
-        self.boundsX = bounds.minX...bounds.maxX
-        self.boundsY = bounds.minY...bounds.maxY
-        self.currentX = bounds.minX
-        self.currentY = bounds.minY
-
-        if inputs.zoomRange.minZoom > inputs.zoomRange.maxZoom {
+        if boundingBoxes.isEmpty || inputs.zoomRange.minZoom > inputs.zoomRange.maxZoom {
             self.isCompleted = true
+            self.boundsX = 0...0
+            self.boundsY = 0...0
+            self.currentX = 0
+            self.currentY = 0
+        } else {
+            let bounds = MTOfflineTileCalculator.tileBounds(for: boundingBoxes[0], zoom: currentZoom)
+            self.boundsX = bounds.minX...bounds.maxX
+            self.boundsY = bounds.minY...bounds.maxY
+            self.currentX = bounds.minX
+            self.currentY = bounds.minY
         }
     }
 
@@ -67,9 +90,25 @@ internal struct MTOfflineCoverageIterator: IteratorProtocol {
             if currentY > boundsY.upperBound {
                 currentZoom += 1
                 if currentZoom > inputs.zoomRange.maxZoom {
-                    isCompleted = true
+                    currentBoxIndex += 1
+                    if currentBoxIndex < boundingBoxes.count {
+                        currentZoom = inputs.zoomRange.minZoom
+                        let bounds = MTOfflineTileCalculator.tileBounds(
+                            for: boundingBoxes[currentBoxIndex],
+                            zoom: currentZoom
+                        )
+                        self.boundsX = bounds.minX...bounds.maxX
+                        self.boundsY = bounds.minY...bounds.maxY
+                        self.currentX = bounds.minX
+                        self.currentY = bounds.minY
+                    } else {
+                        isCompleted = true
+                    }
                 } else {
-                    let bounds = MTOfflineTileCalculator.tileBounds(for: boundingBox, zoom: currentZoom)
+                    let bounds = MTOfflineTileCalculator.tileBounds(
+                        for: boundingBoxes[currentBoxIndex],
+                        zoom: currentZoom
+                    )
                     self.boundsX = bounds.minX...bounds.maxX
                     self.boundsY = bounds.minY...bounds.maxY
                     self.currentX = bounds.minX

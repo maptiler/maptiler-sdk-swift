@@ -71,10 +71,10 @@ internal class MTLocalPlanner: MTOfflinePlanner {
         }
 
         // swiftlint:disable all
-        // Ensure coordinates are within standard WGS84 bounds and min <= max
+        // Ensure coordinates are within standard WGS84 bounds (longitude -180..180, latitude within Web Mercator limits)
         let bbox = definition.bbox
-        guard bbox.minLat >= -90,
-             bbox.maxLat <= 90,
+        guard bbox.minLat >= -85.051129,
+             bbox.maxLat <= 85.051129,
              bbox.minLon >= -180,
              bbox.maxLon <= 180,
              bbox.minLat <= bbox.maxLat else {

@@ -16,6 +16,11 @@ public struct MTBoundingBox: Codable {
     public let maxLon: Double
     public let maxLat: Double
 
+    /// Returns `true` if the bounding box spans across the antimeridian (180th meridian).
+    public var crossesAntimeridian: Bool {
+        return minLon > maxLon
+    }
+
     public init(minLon: Double, minLat: Double, maxLon: Double, maxLat: Double) {
         self.minLon = minLon
         self.minLat = minLat
@@ -27,9 +32,19 @@ public struct MTBoundingBox: Codable {
     /// - Parameter other: The other bounding box to check against.
     /// - Returns: `true` if the bounding boxes intersect, otherwise `false`.
     public func intersects(with other: MTBoundingBox) -> Bool {
-        return !(self.minLon > other.maxLon ||
-            self.maxLon < other.minLon ||
-            self.minLat > other.maxLat ||
-            self.maxLat < other.minLat)
+        let lonIntersects: Bool
+        if self.crossesAntimeridian {
+            if other.crossesAntimeridian {
+                lonIntersects = true
+            } else {
+                lonIntersects = other.minLon <= self.maxLon || other.maxLon >= self.minLon
+            }
+        } else if other.crossesAntimeridian {
+            lonIntersects = self.minLon <= other.maxLon || self.maxLon >= other.minLon
+        } else {
+            lonIntersects = !(self.minLon > other.maxLon || self.maxLon < other.minLon)
+        }
+        let latIntersects = !(self.minLat > other.maxLat || self.maxLat < other.minLat)
+        return lonIntersects && latIntersects
     }
 }

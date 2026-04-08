@@ -65,6 +65,75 @@ struct MTTileJSONTests {
         
         #expect(tileJSON.tileSize == 1024)
     }
+
+    @Test func decodeTileJSONWithNoUnderscoreTileSize() throws {
+        let json = """
+        {
+            "tiles": ["https://example.com/{z}/{x}/{y}.pbf"],
+            "tilesize": 512
+        }
+        """
+        
+        let data = Data(json.utf8)
+        let tileJSON = try JSONDecoder().decode(MTTileJSON.self, from: data)
+        
+        #expect(tileJSON.tileSize == 512)
+    }
+
+    @Test func decodeTileJSONWithMissingTileSizeDefaultsTo256() throws {
+        let json = """
+        {
+            "tiles": ["https://example.com/{z}/{x}/{y}.pbf"]
+        }
+        """
+        
+        let data = Data(json.utf8)
+        let tileJSON = try JSONDecoder().decode(MTTileJSON.self, from: data)
+        
+        #expect(tileJSON.tileSize == 256)
+    }
+
+    @Test func decodeTileJSONWithTMSSchemeMixedCase() throws {
+        let json = """
+        {
+            "tiles": ["https://example.com/{z}/{x}/{y}.pbf"],
+            "scheme": "tMs"
+        }
+        """
+        
+        let data = Data(json.utf8)
+        let tileJSON = try JSONDecoder().decode(MTTileJSON.self, from: data)
+        
+        #expect(tileJSON.scheme == .tms)
+    }
+
+    @Test func decodeTileJSONWithXYZSchemeMixedCase() throws {
+        let json = """
+        {
+            "tiles": ["https://example.com/{z}/{x}/{y}.pbf"],
+            "scheme": "XyZ"
+        }
+        """
+        
+        let data = Data(json.utf8)
+        let tileJSON = try JSONDecoder().decode(MTTileJSON.self, from: data)
+        
+        #expect(tileJSON.scheme == .xyz)
+    }
+
+    @Test func decodeTileJSONWithInvalidSchemeDefaultsToXYZ() throws {
+        let json = """
+        {
+            "tiles": ["https://example.com/{z}/{x}/{y}.pbf"],
+            "scheme": "invalid-scheme"
+        }
+        """
+        
+        let data = Data(json.utf8)
+        let tileJSON = try JSONDecoder().decode(MTTileJSON.self, from: data)
+        
+        #expect(tileJSON.scheme == .xyz)
+    }
     
     @Test func encodeTileJSON() throws {
         let tileJSON = MTTileJSON(

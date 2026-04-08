@@ -47,15 +47,14 @@ internal class MTOfflineResourceLoader {
             .appendingPathComponent("\(z)")
             .appendingPathComponent("\(x)")
 
-        // Since we don't know the exact extension yet,
-        // we can look it up in the directory or rely on standard extensions.
-        guard let files = try? FileManager.default.contentsOfDirectory(atPath: sourceDir.path) else {
-            return nil
-        }
+        // Common extensions used for map tiles
+        let possibleExtensions = ["pbf", "png", "jpg", "jpeg", "webp"]
 
-        if let matchingFile = files.first(where: { $0.hasPrefix("\(y).") }) {
-            let fileURL = sourceDir.appendingPathComponent(matchingFile)
-            return try? Data(contentsOf: fileURL)
+        for ext in possibleExtensions {
+            let fileURL = sourceDir.appendingPathComponent("\(y).\(ext)")
+            if FileManager.default.fileExists(atPath: fileURL.path) {
+                return try? Data(contentsOf: fileURL)
+            }
         }
 
         return nil

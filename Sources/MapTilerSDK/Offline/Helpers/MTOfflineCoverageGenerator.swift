@@ -16,20 +16,7 @@ internal struct MTOfflineCoverageGenerator: Sequence {
     internal let inputs: MTOfflineCoverageInputs
 
     internal init(boundingBox: MTBoundingBox, inputs: MTOfflineCoverageInputs) {
-        if boundingBox.crossesAntimeridian {
-            self.boundingBoxes = [
-                MTBoundingBox(
-                    minLon: boundingBox.minLon, minLat: boundingBox.minLat,
-                    maxLon: 180, maxLat: boundingBox.maxLat
-                ),
-                MTBoundingBox(
-                    minLon: -180, minLat: boundingBox.minLat,
-                    maxLon: boundingBox.maxLon, maxLat: boundingBox.maxLat
-                )
-            ]
-        } else {
-            self.boundingBoxes = [boundingBox]
-        }
+        self.boundingBoxes = boundingBox.normalizedAndSplit()
         self.inputs = inputs
     }
 

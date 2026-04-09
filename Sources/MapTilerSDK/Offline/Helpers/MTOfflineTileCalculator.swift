@@ -61,19 +61,16 @@ internal enum MTOfflineTileCalculator {
 
     // Computes the exact total number of tiles required to cover a bounding box over a range of zooms.
     internal static func estimateTileCount(for bbox: MTBoundingBox, zoomRange: MTOfflineZoomRange) -> Int {
-        if bbox.crossesAntimeridian {
-            let bbox1 = MTBoundingBox(minLon: bbox.minLon, minLat: bbox.minLat, maxLon: 180, maxLat: bbox.maxLat)
-            let bbox2 = MTBoundingBox(minLon: -180, minLat: bbox.minLat, maxLon: bbox.maxLon, maxLat: bbox.maxLat)
-            return estimateTileCount(for: bbox1, zoomRange: zoomRange) +
-                estimateTileCount(for: bbox2, zoomRange: zoomRange)
-        }
-
+        let normalizedBoxes = bbox.normalizedAndSplit()
         var totalTiles = 0
-        for zoom in zoomRange.minZoom...zoomRange.maxZoom {
-            let bounds = tileBounds(for: bbox, zoom: zoom)
-            let countX = bounds.maxX - bounds.minX + 1
-            let countY = bounds.maxY - bounds.minY + 1
-            totalTiles += countX * countY
+
+        for box in normalizedBoxes {
+            for zoom in zoomRange.minZoom...zoomRange.maxZoom {
+                let bounds = tileBounds(for: box, zoom: zoom)
+                let countX = bounds.maxX - bounds.minX + 1
+                let countY = bounds.maxY - bounds.minY + 1
+                totalTiles += countX * countY
+            }
         }
         return totalTiles
     }

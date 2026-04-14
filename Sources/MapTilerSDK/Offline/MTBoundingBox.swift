@@ -186,6 +186,13 @@ extension MTBoundingBox {
     /// - Parameter zoomRange: The min and max zoom levels.
     /// - Returns: The total tile count.
     public func estimatedTileCount(zoomRange: MTOfflineZoomRange) -> Int {
-        return MTOfflineTileCalculator.estimateTileCount(for: self, zoomRange: zoomRange)
+        return MTTileMath.estimateTileCount(for: self, zoomRange: zoomRange)
+    }
+
+    /// Estimates the number of tiles required per zoom level for this bounding box.
+    /// - Parameter zoomRange: The min and max zoom levels.
+    /// - Returns: A dictionary mapping each zoom level to its tile count.
+    public func estimatedTileCountPerZoom(zoomRange: MTOfflineZoomRange) -> [Int: Int] {
+        return MTTileMath.estimateTileCountPerZoom(for: self, zoomRange: zoomRange)
     }
 }

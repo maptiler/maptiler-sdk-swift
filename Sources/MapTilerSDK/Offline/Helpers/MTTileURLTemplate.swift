@@ -44,7 +44,7 @@ public struct MTTileURLTemplate {
         let needsFlip = template.contains("{-y}") || (scheme == .tms && template.contains("{y}"))
 
         if needsFlip {
-            finalY = MTOfflineTileCalculator.flipYCoordinate(y: y, zoom: z)
+            finalY = MTTileMath.flipYCoordinate(y: y, zoom: z)
         }
 
         var urlString = template

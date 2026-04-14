@@ -69,7 +69,7 @@ struct MTOfflineCoverageGeneratorTests {
         let zoomRange = try MTOfflineZoomRange(minZoom: 1, maxZoom: 3)
         let inputs = try MTOfflineCoverageInputs(scheme: "xyz", minZoom: 1, maxZoom: 3)
         
-        let estimatedCount = MTOfflineTileCalculator.estimateTileCount(for: bbox, zoomRange: zoomRange)
+        let estimatedCount = MTTileMath.estimateTileCount(for: bbox, zoomRange: zoomRange)
         
         let generator = MTOfflineCoverageGenerator(boundingBox: bbox, inputs: inputs)
         let tiles = Array(generator)

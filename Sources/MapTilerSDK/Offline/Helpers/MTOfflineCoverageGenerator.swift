@@ -51,7 +51,7 @@ internal struct MTOfflineCoverageIterator: IteratorProtocol {
             self.currentX = 0
             self.currentY = 0
         } else {
-            let bounds = MTOfflineTileCalculator.tileBounds(for: boundingBoxes[0], zoom: currentZoom)
+            let bounds = MTTileMath.tileBounds(for: boundingBoxes[0], zoom: currentZoom)
             self.boundsX = bounds.minX...bounds.maxX
             self.boundsY = bounds.minY...bounds.maxY
             self.currentX = bounds.minX
@@ -64,7 +64,7 @@ internal struct MTOfflineCoverageIterator: IteratorProtocol {
 
         // Transform the Y coordinate if the target scheme requires it.
         let effectiveY = inputs.scheme == .tms
-            ? MTOfflineTileCalculator.flipYCoordinate(y: currentY, zoom: currentZoom)
+            ? MTTileMath.flipYCoordinate(y: currentY, zoom: currentZoom)
             : currentY
         let tile = MTOfflineTile(x: currentX, y: effectiveY, z: currentZoom)
 
@@ -80,7 +80,7 @@ internal struct MTOfflineCoverageIterator: IteratorProtocol {
                     currentBoxIndex += 1
                     if currentBoxIndex < boundingBoxes.count {
                         currentZoom = inputs.zoomRange.minZoom
-                        let bounds = MTOfflineTileCalculator.tileBounds(
+                        let bounds = MTTileMath.tileBounds(
                             for: boundingBoxes[currentBoxIndex],
                             zoom: currentZoom
                         )
@@ -92,7 +92,7 @@ internal struct MTOfflineCoverageIterator: IteratorProtocol {
                         isCompleted = true
                     }
                 } else {
-                    let bounds = MTOfflineTileCalculator.tileBounds(
+                    let bounds = MTTileMath.tileBounds(
                         for: boundingBoxes[currentBoxIndex],
                         zoom: currentZoom
                     )

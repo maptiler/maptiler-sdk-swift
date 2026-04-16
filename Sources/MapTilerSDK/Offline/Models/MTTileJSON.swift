@@ -101,9 +101,17 @@ extension MTTileJSON {
         return MTBoundingBox(minLon: b[0], minLat: b[1], maxLon: b[2], maxLat: b[3])
     }
 
+    // The preferred tile URL template, prioritizing `https://` if available.
+    internal var preferredTileURLTemplate: String? {
+        if let httpsTemplate = tiles.first(where: { $0.hasPrefix("https://") }) {
+            return httpsTemplate
+        }
+        return tiles.first
+    }
+
     // Generates a valid URL for a given tile coordinate using the first available template.
     internal func resolveURL(z: Int, x: Int, y: Int) -> URL? {
-        guard let template = tiles.first else { return nil }
+        guard let template = preferredTileURLTemplate else { return nil }
 
         var yCoord = y
         // If the scheme is TMS, the Y axis needs to be flipped.

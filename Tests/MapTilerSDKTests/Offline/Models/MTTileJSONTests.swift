@@ -158,4 +158,31 @@ struct MTTileJSONTests {
             Issue.record("Failed to serialize encoded JSON")
         }
     }
+    
+    // MARK: - URL Prioritization Tests
+    
+    @Test func preferredTileURLTemplateSelectsHTTPS() {
+        let tileJSON = MTTileJSON(tiles: [
+            "http://example.com/a/{z}/{x}/{y}.pbf",
+            "https://example.com/b/{z}/{x}/{y}.pbf",
+            "http://example.com/c/{z}/{x}/{y}.pbf"
+        ])
+        
+        #expect(tileJSON.preferredTileURLTemplate == "https://example.com/b/{z}/{x}/{y}.pbf")
+    }
+    
+    @Test func preferredTileURLTemplateFallsBackToHTTP() {
+        let tileJSON = MTTileJSON(tiles: [
+            "http://example.com/a/{z}/{x}/{y}.pbf",
+            "http://example.com/b/{z}/{x}/{y}.pbf"
+        ])
+        
+        #expect(tileJSON.preferredTileURLTemplate == "http://example.com/a/{z}/{x}/{y}.pbf")
+    }
+    
+    @Test func preferredTileURLTemplateHandlesEmptyArray() {
+        let tileJSON = MTTileJSON(tiles: [])
+        
+        #expect(tileJSON.preferredTileURLTemplate == nil)
+    }
 }

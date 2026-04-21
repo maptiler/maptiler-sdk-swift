@@ -29,6 +29,36 @@ internal struct MTGlyphSet: Codable, Equatable {
 internal struct MTSyntheticTileSource: Codable, Equatable {
     internal var type: MTSyntheticTileSourceType
     internal var tileKeys: [String]
+    internal var scheme: String
+    internal var tileSize: Int
+
+    internal init(type: MTSyntheticTileSourceType, tileKeys: [String], scheme: String? = nil, tileSize: Int? = nil) {
+        self.type = type
+        self.tileKeys = tileKeys
+        self.scheme = scheme ?? "xyz"
+        self.tileSize = tileSize ?? (type == .vector ? 512 : 256)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case type, tileKeys, scheme, tileSize
+    }
+
+    internal init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.type = try container.decode(MTSyntheticTileSourceType.self, forKey: .type)
+        self.tileKeys = try container.decode([String].self, forKey: .tileKeys)
+        self.scheme = try container.decodeIfPresent(String.self, forKey: .scheme) ?? "xyz"
+        let defaultTileSize = (self.type == .vector) ? 512 : 256
+        self.tileSize = try container.decodeIfPresent(Int.self, forKey: .tileSize) ?? defaultTileSize
+    }
+
+    internal func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
+        try container.encode(tileKeys, forKey: .tileKeys)
+        try container.encode(scheme, forKey: .scheme)
+        try container.encode(tileSize, forKey: .tileSize)
+    }
 }
 
 // The Manifest v1 schema defining the bill of materials for an offline region.

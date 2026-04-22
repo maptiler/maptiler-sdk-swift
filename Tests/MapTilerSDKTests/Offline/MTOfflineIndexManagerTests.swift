@@ -63,4 +63,77 @@ struct MTOfflineIndexManagerTests {
         #expect(reloadedIndex.assets[tileAssetId] == .pending)
         #expect(reloadedIndex.assets[styleAssetId] == .verified)
     }
+
+    @Test("Test recovery: dangling 'downloading' states are reset to 'pending' on load")
+    func testRecoveryResetsDownloadingStates() async throws {
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: tempDir) }
+        
+        let indexURL = tempDir.appendingPathComponent("index.json")
+        
+        // Setup initial manager and index with dangling states
+        let initialManager = MTOfflineIndexManager(fileURL: indexURL)
+        try await initialManager.load()
+        
+        await initialManager.updateState(for: "asset_pending", to: .pending)
+        await initialManager.updateState(for: "asset_downloading", to: .downloading)
+        await initialManager.updateState(for: "asset_verified", to: .verified)
+        await initialManager.updateState(for: "asset_failed", to: .failed)
+        
+        try await initialManager.save()
+        
+        // Load with a new manager to simulate startup recovery
+        let newManager = MTOfflineIndexManager(fileURL: indexURL)
+        try await newManager.load()
+        
+        let recoveredIndex = await newManager.currentIndex
+        
+        #expect(recoveredIndex.assets["asset_pending"] == .pending)
+        #expect(recoveredIndex.assets["asset_downloading"] == .pending, "Downloading state should be recovered to pending")
+        #expect(recoveredIndex.assets["asset_verified"] == .verified)
+        #expect(recoveredIndex.assets["asset_failed"] == .failed)
+        
+        // Verify that the recovered state was saved to disk
+        let diskData = try Data(contentsOf: indexURL)
+        let jsonObject = try JSONSerialization.jsonObject(with: diskData) as? [String: Any]
+        let assetsDict = jsonObject?["assets"] as? [String: String]
+        #expect(assetsDict?["asset_downloading"] == "pending")
+    }
+
+    @Test("Test missing file handling: Initializes empty index")
+    func testMissingFile() async throws {
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: tempDir) }
+        
+        let indexURL = tempDir.appendingPathComponent("missing_index.json")
+        let manager = MTOfflineIndexManager(fileURL: indexURL)
+        
+        // This should not throw, it should initialize an empty index
+        try await manager.load()
+        let index = await manager.currentIndex
+        #expect(index.version == 1)
+        #expect(index.assets.isEmpty)
+    }
+
+    @Test("Test corrupt file handling: Throws error on malformed JSON")
+    func testCorruptFile() async throws {
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: tempDir) }
+        
+        let indexURL = tempDir.appendingPathComponent("corrupt_index.json")
+        let corruptData = "This is not valid JSON".data(using: .utf8)!
+        try corruptData.write(to: indexURL)
+        
+        let manager = MTOfflineIndexManager(fileURL: indexURL)
+        
+        do {
+            try await manager.load()
+            Issue.record("Load should have failed with corrupt JSON")
+        } catch {
+            #expect(error is DecodingError)
+        }
+    }
 }

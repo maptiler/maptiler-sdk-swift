@@ -23,7 +23,13 @@ internal enum MTOfflineStorage {
     internal static func write(_ data: Data, to destination: URL) async throws {
         try await Task.detached(priority: .userInitiated) {
             let fileManager = FileManager.default
-            let tempURL = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            let tempDir = MTOfflineStoragePaths.tempDirectory
+
+            if !fileManager.fileExists(atPath: tempDir.path) {
+                try? fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: nil)
+            }
+
+            let tempURL = tempDir.appendingPathComponent(UUID().uuidString)
 
             do {
                 try data.write(to: tempURL)
@@ -39,6 +45,24 @@ internal enum MTOfflineStorage {
     internal static func moveFile(from source: URL, to destination: URL) async throws {
         try await Task.detached(priority: .userInitiated) {
             try moveAtomically(from: source, to: destination, fileManager: FileManager.default)
+        }.value
+    }
+
+    // Cleans up any stale temporary files in the designated offline temporary directory.
+    internal static func cleanStaleTempFiles() async {
+        await Task.detached(priority: .utility) {
+            let tempDir = MTOfflineStoragePaths.tempDirectory
+            let fileManager = FileManager.default
+            guard fileManager.fileExists(atPath: tempDir.path) else { return }
+
+            do {
+                let contents = try fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
+                for file in contents {
+                    try? fileManager.removeItem(at: file)
+                }
+            } catch {
+                // Ignore cleanup errors
+            }
         }.value
     }
 

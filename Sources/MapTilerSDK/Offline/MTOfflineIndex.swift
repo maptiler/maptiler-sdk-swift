@@ -3,6 +3,7 @@ import Foundation
 // Represents the download state of an individual offline asset.
 internal enum MTOfflineAssetState: String, Codable, Equatable, Sendable {
     case pending
+    case downloading
     case verified
     case failed
 }
@@ -31,28 +32,38 @@ internal actor MTOfflineIndexManager {
         self.index = MTOfflineIndex()
     }
 
-    // Loads the index from disk.
+    // Loads the index from disk and performs recovery.
     // If the file does not exist, it initializes an empty index.
-    internal func load() throws {
+    internal func load() async throws {
         let fileManager = FileManager.default
-        guard fileManager.fileExists(atPath: fileURL.path) else {
+        if !fileManager.fileExists(atPath: fileURL.path) {
             self.index = MTOfflineIndex()
-            return
+        } else {
+            let data = try Data(contentsOf: fileURL)
+            let decoder = JSONDecoder()
+
+            // --- Migration Placeholder ---
+            // To handle future migrations, we could decode just the version first:
+            // struct VersionOnly: Codable { let version: Int }
+            // if let parsed = try? decoder.decode(VersionOnly.self, from: data),
+            //    parsed.version < MTOfflineIndex().version {
+            //     // Perform migration steps here...
+            // }
+            // -----------------------------
+
+            self.index = try decoder.decode(MTOfflineIndex.self, from: data)
         }
 
-        let data = try Data(contentsOf: fileURL)
-        let decoder = JSONDecoder()
+        // Recover dangling states
+        var stateChanged = false
+        for (assetId, state) in index.assets where state == .downloading {
+            index.assets[assetId] = .pending
+            stateChanged = true
+        }
 
-        // --- Migration Placeholder ---
-        // To handle future migrations, we could decode just the version first:
-        // struct VersionOnly: Codable { let version: Int }
-        // if let parsed = try? decoder.decode(VersionOnly.self, from: data),
-        //    parsed.version < MTOfflineIndex().version {
-        //     // Perform migration steps here...
-        // }
-        // -----------------------------
-
-        self.index = try decoder.decode(MTOfflineIndex.self, from: data)
+        if stateChanged {
+            try await save()
+        }
     }
 
     // Atomically saves the current index state to disk.

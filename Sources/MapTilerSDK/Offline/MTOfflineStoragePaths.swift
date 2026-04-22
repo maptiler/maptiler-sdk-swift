@@ -9,6 +9,12 @@ internal enum MTOfflineStoragePaths {
         return paths[0].appendingPathComponent("MTOffline", isDirectory: true)
     }
 
+    // The dedicated temporary directory for offline downloads.
+    internal static var tempDirectory: URL {
+        let tempDir = FileManager.default.temporaryDirectory
+        return tempDir.appendingPathComponent("MTOfflineTemp", isDirectory: true)
+    }
+
     // The root directory for a specific offline pack: `Documents/MTOffline/<packID>/`
     internal static func packDirectory(for packID: String) -> URL {
         return rootDirectory.appendingPathComponent(packID, isDirectory: true)

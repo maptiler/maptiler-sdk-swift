@@ -60,4 +60,25 @@ struct MTOfflineStorageTests {
         // Verify no partial file exists at the final destination
         #expect(!fileManager.fileExists(atPath: destinationURL.path))
     }
+
+    @Test("Test clean stale temp files")
+    func testCleanStaleTempFiles() async throws {
+        let tempDir = MTOfflineStoragePaths.tempDirectory
+        
+        if !fileManager.fileExists(atPath: tempDir.path) {
+            try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: nil)
+        }
+        
+        let staleFileURL = tempDir.appendingPathComponent(UUID().uuidString)
+        let staleData = "Stale temporary data".data(using: .utf8)!
+        try staleData.write(to: staleFileURL)
+        
+        #expect(fileManager.fileExists(atPath: staleFileURL.path))
+        
+        await MTOfflineStorage.cleanStaleTempFiles()
+        
+        #expect(!fileManager.fileExists(atPath: staleFileURL.path), "Stale temporary file should be deleted")
+        // The directory itself can remain
+        #expect(fileManager.fileExists(atPath: tempDir.path))
+    }
 }

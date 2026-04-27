@@ -41,6 +41,11 @@ package struct InitializeMap: MTCommand {
             )
         }
 
-        return "initializeMap('\(apiKey)', \(styleString), \(optionsString), \(shouldEnableSessionLogic));"
+        return """
+        initializeMap('\(apiKey)', \(styleString), \(optionsString), \(shouldEnableSessionLogic));
+        if (typeof map !== 'undefined' && map.telemetry) {
+            map.telemetry.registerModule('maptiler-sdk-ios', '\(MTConfig.version)');
+        }
+        """
     }
 }

@@ -9,24 +9,19 @@
 
 import Foundation
 
-/// A combined representation of an offline tile and its storage destination.
-public struct MTOfflineTileResource: Equatable, Hashable, Comparable {
-    /// The source ID this tile belongs to.
-    public let sourceId: String
+// A combined representation of an offline tile and its storage destination.
+internal struct MTOfflineTileResource: Equatable, Hashable, Comparable {
+    // The source ID this tile belongs to.
+    internal let sourceId: String
 
-    /// The tile coordinate.
-    public let tile: MTOfflineTile
+    // The tile coordinate.
+    internal let tile: MTOfflineTile
 
-    /// The relative storage path for this tile.
-    public let storagePath: MTStoragePath
+    // The relative storage path for this tile.
+    internal let storagePath: MTStoragePath
 
     /// Initializes a new tile resource.
-    ///
-    /// - Parameters:
-    ///   - sourceId: The map source ID.
-    ///   - tile: The tile coordinate.
-    ///   - extensionName: The file extension for the stored tile.
-    public init(sourceId: String, tile: MTOfflineTile, extensionName: String) {
+    internal init(sourceId: String, tile: MTOfflineTile, extensionName: String) {
         self.sourceId = sourceId
         self.tile = tile
         self.storagePath = MTStoragePath(path: "sources/\(sourceId)/\(tile.z)/\(tile.x)/\(tile.y).\(extensionName)")

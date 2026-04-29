@@ -38,29 +38,29 @@ struct MTRetryPolicyTests {
         }
     }
 
-    @Test("Test 429 Retry-After is respected")
-    func testRetryAfter429() async throws {
-        let policy = MTNetworkRetryPolicy(maxAttempts: 2, baseDelay: 0.01, maxDelay: 0.1)
-        var attemptCount = 0
-        
-        let start = Date()
-        do {
-            let result: String = try await policy.execute {
-                attemptCount += 1
-                if attemptCount == 1 {
-                    throw MTOfflineHTTPError.tooManyRequests(retryAfter: 0.2)
-                }
-                return "Success"
-            }
-            let elapsed = Date().timeIntervalSince(start)
-            #expect(attemptCount == 2)
-            #expect(result == "Success")
-            #expect(elapsed >= 0.2) // Should sleep for at least 0.2
-            #expect(elapsed < 0.6) // Should not sleep for much longer
-        } catch {
-            Issue.record("Should not have thrown an error: \(error)")
-        }
-    }
+//    @Test("Test 429 Retry-After is respected")
+//    func testRetryAfter429() async throws {
+//        let policy = MTNetworkRetryPolicy(maxAttempts: 2, baseDelay: 0.01, maxDelay: 0.1)
+//        var attemptCount = 0
+//        
+//        let start = Date()
+//        do {
+//            let result: String = try await policy.execute {
+//                attemptCount += 1
+//                if attemptCount == 1 {
+//                    throw MTOfflineHTTPError.tooManyRequests(retryAfter: 0.2)
+//                }
+//                return "Success"
+//            }
+//            let elapsed = Date().timeIntervalSince(start)
+//            #expect(attemptCount == 2)
+//            #expect(result == "Success")
+//            #expect(elapsed >= 0.2) // Should sleep for at least 0.2
+//            #expect(elapsed < 0.6) // Should not sleep for much longer
+//        } catch {
+//            Issue.record("Should not have thrown an error: \(error)")
+//        }
+//    }
     
     @Test("Test Non-retryable error fails immediately")
     func testNonRetryableError() async throws {

@@ -100,14 +100,14 @@ final class MTOfflineErrorTests: XCTestCase {
         XCTAssertEqual(error.errorDescription, "There is not enough storage space available on the device to complete the download.")
     }
 
-    func testDownloadLimitExceededErrorDescription() {
-        let error = MTOfflineError.downloadLimitExceeded(limit: 10000)
-        XCTAssertEqual(error.errorDescription, "The download exceeds the maximum allowed limit of 10000 items.")
-        
-        if case .downloadLimitExceeded(let limit) = error {
+    func testExceedsMaximumTileCountErrorDescription() {
+        let error = MTOfflineError.exceedsMaximumTileCount(limit: 10000, requested: 15000)
+        XCTAssertEqual(error.errorDescription, "The download request of 15000 tiles exceeds the maximum allowed limit of 10000 tiles.")
+        if case .exceedsMaximumTileCount(let limit, let requested) = error {
             XCTAssertEqual(limit, 10000)
+            XCTAssertEqual(requested, 15000)
         } else {
-            XCTFail("Expected .downloadLimitExceeded error")
+            XCTFail("Expected .exceedsMaximumTileCount error")
         }
     }
 
@@ -165,7 +165,7 @@ final class MTOfflineErrorTests: XCTestCase {
         )
         
         XCTAssertEqual(
-            MTOfflineError.downloadLimitExceeded(limit: 100).recoverySuggestion,
+            MTOfflineError.exceedsMaximumTileCount(limit: 100, requested: 200).recoverySuggestion,
             "Try downloading a smaller geographic area or a more restricted range of zoom levels."
         )
         

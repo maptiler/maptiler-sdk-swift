@@ -22,11 +22,30 @@ internal class MTLocalPlanner: MTOfflinePlanner {
 
     internal func estimate(for definition: MTOfflineRegionDefinition) async throws -> MTTileEstimate {
         try validate(definition: definition)
-        throw MTOfflinePackError.notImplemented
+
+        let zoomRange = try MTOfflineZoomRange(minZoom: definition.minZoom, maxZoom: definition.maxZoom)
+        let tileCount = definition.bbox.estimatedTileCount(zoomRange: zoomRange)
+
+        let limit = MTOfflineConfiguration.shared.maxTileCount
+        if tileCount > limit {
+            throw MTOfflineError.exceedsMaximumTileCount(limit: limit, requested: tileCount)
+        }
+
+        // Return a basic estimate. Size calculation is a stub for now.
+        let stats = MTPackStats(expectedSize: 0, resourceCount: tileCount)
+        return MTTileEstimate(stats: stats)
     }
 
     internal func generateManifest(for definition: MTOfflineRegionDefinition) async throws -> MTManifest {
         try validate(definition: definition)
+
+        let zoomRange = try MTOfflineZoomRange(minZoom: definition.minZoom, maxZoom: definition.maxZoom)
+        let tileCount = definition.bbox.estimatedTileCount(zoomRange: zoomRange)
+
+        let limit = MTOfflineConfiguration.shared.maxTileCount
+        if tileCount > limit {
+            throw MTOfflineError.exceedsMaximumTileCount(limit: limit, requested: tileCount)
+        }
 
         let metadata = MTManifestMetadata(
             mapId: definition.mapId,

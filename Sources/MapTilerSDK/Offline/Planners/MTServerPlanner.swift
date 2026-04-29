@@ -21,6 +21,14 @@ internal class MTServerPlanner: MTOfflinePlanner {
 
     // Estimates the size and resources required for an offline region.
     internal func estimate(for definition: MTOfflineRegionDefinition) async throws -> MTTileEstimate {
+        let zoomRange = try MTOfflineZoomRange(minZoom: definition.minZoom, maxZoom: definition.maxZoom)
+        let tileCount = definition.bbox.estimatedTileCount(zoomRange: zoomRange)
+
+        let limit = MTOfflineConfiguration.shared.maxTileCount
+        if tileCount > limit {
+            throw MTOfflineError.exceedsMaximumTileCount(limit: limit, requested: tileCount)
+        }
+
         throw MTOfflinePackError.notImplemented
     }
 

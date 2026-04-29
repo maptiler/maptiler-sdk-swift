@@ -16,6 +16,7 @@ internal enum MTOfflineHTTPError: Error, Equatable {
     case offline
     case invalidResponse
     case notFound // HTTP 404
+    case tooManyRequests(retryAfter: TimeInterval?) // HTTP 429
     case serverError(Int) // HTTP 5xx
     case clientError(Int) // HTTP 4xx other than 404
     case networkError(URLError)
@@ -29,6 +30,8 @@ internal enum MTOfflineHTTPError: Error, Equatable {
             (.invalidResponse, .invalidResponse),
             (.notFound, .notFound):
             return true
+        case (.tooManyRequests(let lhsRetry), .tooManyRequests(let rhsRetry)):
+            return lhsRetry == rhsRetry
         case (.serverError(let lhsCode), .serverError(let rhsCode)):
             return lhsCode == rhsCode
         case (.clientError(let lhsCode), .clientError(let rhsCode)):

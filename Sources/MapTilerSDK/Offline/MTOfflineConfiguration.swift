@@ -19,6 +19,7 @@ internal class MTOfflineConfiguration: @unchecked Sendable {
 
     private let lock = NSLock()
     private var _plannerType: MTOfflinePlannerType = .local
+    private var _maxTileCount: Int = 15000
 
     internal var plannerType: MTOfflinePlannerType {
         get {
@@ -30,6 +31,19 @@ internal class MTOfflineConfiguration: @unchecked Sendable {
             lock.lock()
             defer { lock.unlock() }
             _plannerType = newValue
+        }
+    }
+
+    internal var maxTileCount: Int {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return _maxTileCount
+        }
+        set {
+            lock.lock()
+            defer { lock.unlock() }
+            _maxTileCount = newValue
         }
     }
 

@@ -47,7 +47,7 @@ public enum MTOfflineError: Error, LocalizedError {
     case insufficientStorage
 
     /// The requested offline region exceeds the maximum allowed tile count or size.
-    case downloadLimitExceeded(limit: Int)
+    case exceedsMaximumTileCount(limit: Int, requested: Int)
 
     /// A file system error occurred while attempting to save or read offline data.
     case fileSystemError(Error)
@@ -77,8 +77,8 @@ public enum MTOfflineError: Error, LocalizedError {
             return "The MapTiler API key is missing. Please configure the SDK with a valid API key."
         case .insufficientStorage:
             return "There is not enough storage space available on the device to complete the download."
-        case .downloadLimitExceeded(let limit):
-            return "The download exceeds the maximum allowed limit of \(limit) items."
+        case .exceedsMaximumTileCount(let limit, let requested):
+            return "The download request of \(requested) tiles exceeds the maximum allowed limit of \(limit) tiles."
         case .fileSystemError(let error):
             return "A file system error occurred: \(error.localizedDescription)."
         case .cancelled:
@@ -101,7 +101,7 @@ public enum MTOfflineError: Error, LocalizedError {
             return "Ensure you set up the API key before starting a download."
         case .insufficientStorage:
             return "Free up some space on your device before attempting to download this offline region."
-        case .downloadLimitExceeded:
+        case .exceedsMaximumTileCount:
             return "Try downloading a smaller geographic area or a more restricted range of zoom levels."
         case .invalidBoundingBox:
             return "Ensure that min/max longitudes are between -180 and 180, and " +

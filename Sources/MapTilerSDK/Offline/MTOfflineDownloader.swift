@@ -10,7 +10,10 @@ internal protocol MTDownloadTask: Sendable {
 // An actor responsible for managing offline downloads
 internal actor MTOfflineDownloader {
     internal let maxInFlight: Int
-    private var downloadTask: Task<Void, Never>?
+    private var isPackCancelled: Bool = false
+
+    // Track active child tasks by their asset ID
+    private var activeTasks: [String: Task<(String, Error?), Error>] = [:]
 
     // Initializes a new downloader.
     internal init(maxInFlight: Int = 5) {
@@ -19,63 +22,86 @@ internal actor MTOfflineDownloader {
     }
 
     internal func download(_ tasks: [any MTDownloadTask]) async throws {
-        // Cancel any existing download task first
-        cancel()
+        isPackCancelled = false
+        activeTasks.removeAll()
 
-        let task = Task {
-            await withTaskGroup(of: Void.self) { group in
-                var activeCount = 0
-                var iterator = tasks.makeIterator()
+        try await withThrowingTaskGroup(of: (String, Error?).self) { group in
+            var activeCount = 0
+            var iterator = tasks.makeIterator()
 
-                while activeCount < maxInFlight, let nextTask = iterator.next() {
-                    activeCount += 1
-                    group.addTask {
-                        guard !Task.isCancelled else { return }
-                        do {
-                            try await nextTask.execute()
-                        } catch {
-                            // Retry
-                        }
+            while activeCount < maxInFlight, let nextTask = iterator.next() {
+                guard !isPackCancelled else { break }
+                activeCount += 1
+                startChildTask(for: nextTask, in: &group)
+            }
+
+            while let result = try await group.next() {
+                activeTasks.removeValue(forKey: result.0)
+                activeCount -= 1
+
+                if let error = result.1 {
+                    if error is CancellationError {
+                        // Task was cancelled, depending on implementation we might break or continue
+                        // For a pack cancellation, isPackCancelled will be true
+                    } else {
+                        // Throw the error to fail the entire group
+                        throw error
                     }
                 }
 
-                while await group.next() != nil {
-                    activeCount -= 1
+                if isPackCancelled || Task.isCancelled {
+                    group.cancelAll()
+                    break
+                }
 
-                    if Task.isCancelled {
-                        group.cancelAll()
-                        break
-                    }
-
-                    if let nextTask = iterator.next() {
-                        activeCount += 1
-                        group.addTask {
-                            guard !Task.isCancelled else { return }
-                            do {
-                                try await nextTask.execute()
-                            } catch {
-                                // Retry
-                            }
-                        }
-                    }
+                if let nextTask = iterator.next() {
+                    activeCount += 1
+                    startChildTask(for: nextTask, in: &group)
                 }
             }
         }
 
-        self.downloadTask = task
-
-        await task.value
-
-        if task.isCancelled {
+        if isPackCancelled || Task.isCancelled {
             throw CancellationError()
         }
+    }
 
-        self.downloadTask = nil
+    private func startChildTask(
+        for assetTask: any MTDownloadTask,
+        in group: inout ThrowingTaskGroup<(String, Error?), Error>
+    ) {
+        let childTask = Task { () -> (String, Error?) in
+            try Task.checkCancellation()
+            do {
+                try await assetTask.execute()
+                return (assetTask.id, nil)
+            } catch is CancellationError {
+                return (assetTask.id, CancellationError())
+            } catch {
+                return (assetTask.id, error)
+            }
+        }
+
+        activeTasks[assetTask.id] = childTask
+
+        group.addTask {
+            return try await childTask.value
+        }
     }
 
     // Cancels the ongoing download process
-    func cancel() {
-        downloadTask?.cancel()
-        downloadTask = nil
+    internal func cancel() {
+        isPackCancelled = true
+        for task in activeTasks.values {
+            task.cancel()
+        }
+    }
+
+    // Cancels a specific asset
+    internal func cancelAsset(id: String) {
+        if let task = activeTasks[id] {
+            task.cancel()
+            activeTasks.removeValue(forKey: id)
+        }
     }
 }

@@ -3,18 +3,19 @@ import XCTest
 
 final class MockDownloadTask: MTDownloadTask, @unchecked Sendable {
     let id: String
+    let destinationURL: URL?
     private let executeBlock: () async throws -> Void
-    
-    init(id: String, executeBlock: @escaping () async throws -> Void) {
+
+    init(id: String, destinationURL: URL? = nil, executeBlock: @escaping () async throws -> Void) {
         self.id = id
+        self.destinationURL = destinationURL
         self.executeBlock = executeBlock
     }
-    
+
     func execute() async throws {
         try await executeBlock()
     }
 }
-
 final class MTOfflineDownloaderTests: XCTestCase {
     
     func testConcurrencyLimitIsRespected() async throws {

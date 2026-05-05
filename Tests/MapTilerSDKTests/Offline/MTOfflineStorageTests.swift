@@ -81,4 +81,72 @@ struct MTOfflineStorageTests {
         // The directory itself can remain
         #expect(fileManager.fileExists(atPath: tempDir.path))
     }
+
+    @Test("Zero-byte files are identified as invalid and should be re-downloaded")
+    func testZeroByteFileVerification() async throws {
+        let tempFile = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        
+        // Create an empty file (zero bytes)
+        fileManager.createFile(atPath: tempFile.path, contents: Data(), attributes: nil)
+        defer { try? fileManager.removeItem(at: tempFile) }
+        
+        let isVerified = MTOfflineStorage.isFileVerified(at: tempFile)
+        #expect(!isVerified, "Zero-byte file should not be verified")
+        
+        // Create a non-empty file
+        try "data".data(using: .utf8)?.write(to: tempFile)
+        let isVerifiedValid = MTOfflineStorage.isFileVerified(at: tempFile)
+        #expect(isVerifiedValid, "Non-empty file should be verified")
+    }
+
+    @Test("Stale temporary files in the pack directory are removed upon initialization")
+    func testPackTempFileCleanup() async throws {
+        let packID = "test-pack-\(UUID().uuidString)"
+        let packURL = MTOfflineStoragePaths.packDirectory(for: packID)
+        
+        try fileManager.createDirectory(at: packURL, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: packURL) }
+        
+        // Create some "real" files
+        let realFile = packURL.appendingPathComponent("style.json")
+        try "{}".data(using: .utf8)?.write(to: realFile)
+        
+        // Create some "temp" files
+        let dotFile = packURL.appendingPathComponent(".temp-file")
+        try "temp".data(using: .utf8)?.write(to: dotFile)
+        
+        let uuidTempFile = packURL.appendingPathComponent(UUID().uuidString)
+        try "temp".data(using: .utf8)?.write(to: uuidTempFile)
+        
+        // Verify they exist
+        #expect(fileManager.fileExists(atPath: realFile.path))
+        #expect(fileManager.fileExists(atPath: dotFile.path))
+        #expect(fileManager.fileExists(atPath: uuidTempFile.path))
+        
+        // Run cleanup
+        await MTOfflineStorage.cleanStaleTempFiles(for: packURL)
+        
+        // Verify results
+        #expect(fileManager.fileExists(atPath: realFile.path), "Real files should remain")
+        #expect(!fileManager.fileExists(atPath: dotFile.path), "Dot files should be removed")
+        #expect(!fileManager.fileExists(atPath: uuidTempFile.path), "UUID-style temp files should be removed")
+    }
+    
+    @Test("Downloader skips verified files")
+    func testDownloaderSkipsVerifiedFiles() async throws {
+        let tempURL = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try "already here".data(using: .utf8)?.write(to: tempURL)
+        defer { try? fileManager.removeItem(at: tempURL) }
+        
+        let downloader = MTOfflineDownloader()
+        
+        var executed = false
+        let task = MockDownloadTask(id: "test", destinationURL: tempURL) {
+            executed = true
+        }
+        
+        try await downloader.download([task])
+        
+        #expect(!executed, "Task should have been skipped because file is already verified")
+    }
 }

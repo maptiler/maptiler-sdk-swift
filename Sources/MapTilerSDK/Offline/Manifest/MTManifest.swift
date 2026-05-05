@@ -10,7 +10,7 @@
 import Foundation
 
 // Manifest v1 representing the planned offline region download.
-internal struct MTManifest: Codable {
+internal struct MTManifest: Codable, Sendable {
     /// The format version identifier.
     internal let version: String = "1"
 

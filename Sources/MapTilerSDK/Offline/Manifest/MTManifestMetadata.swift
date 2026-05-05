@@ -10,7 +10,7 @@
 import Foundation
 
 // Metadata storing the original request parameters for the manifest.
-internal struct MTManifestMetadata: Codable {
+internal struct MTManifestMetadata: Codable, Sendable {
     public let mapId: String?
     public let styleURL: URL?
     public let bbox: MTBoundingBox

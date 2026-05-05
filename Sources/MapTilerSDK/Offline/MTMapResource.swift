@@ -10,7 +10,7 @@
 import Foundation
 
 // Represents a downloadable resource.
-internal struct MTMapResource: Codable {
+internal struct MTMapResource: Codable, Sendable {
     public let url: URL
     public let destinationPath: String
     public let size: Int64?

@@ -11,7 +11,7 @@ import Foundation
 import CoreLocation
 
 /// A bounding box in WGS84 coordinates.
-public struct MTBoundingBox: Codable, Equatable {
+public struct MTBoundingBox: Codable, Equatable, Sendable {
     public let minLon: Double
     public let minLat: Double
     public let maxLon: Double

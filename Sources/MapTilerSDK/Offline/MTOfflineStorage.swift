@@ -84,7 +84,7 @@ internal enum MTOfflineStorage {
                 guard let enumerator = fileManager.enumerator(
                     at: packURL,
                     includingPropertiesForKeys: resourceKeys,
-                    options: [.skipsHiddenFiles]
+                    options: []
                 ) else { return }
 
                 var toRemove: [URL] = []
@@ -131,8 +131,8 @@ internal enum MTOfflineStorage {
         guard fileManager.fileExists(atPath: url.path) else { return false }
 
         do {
-            let resourceValues = try url.resourceValues(forKeys: [.fileSizeKey])
-            if let fileSize = resourceValues.fileSize, fileSize > 0 {
+            let attributes = try fileManager.attributesOfItem(atPath: url.path)
+            if let fileSize = attributes[.size] as? Int64, fileSize > 0 {
                 return true
             }
         } catch {

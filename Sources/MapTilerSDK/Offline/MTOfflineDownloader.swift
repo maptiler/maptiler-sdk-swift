@@ -14,7 +14,7 @@ internal actor MTOfflineDownloader {
     private var isPackCancelled: Bool = false
 
     // Track active child tasks by their asset ID
-    private var activeTasks: [String: Task<(String, Error?), Error>] = [:]
+    private var activeTasks: [String: Task<(String, Error?), Never>] = [:]
 
     // Initializes a new downloader.
     internal init(maxInFlight: Int = 5) {
@@ -130,7 +130,10 @@ internal actor MTOfflineDownloader {
         in group: inout ThrowingTaskGroup<(String, Error?), Error>
     ) {
         let childTask = Task { () -> (String, Error?) in
-            try Task.checkCancellation()
+            if Task.isCancelled {
+                return (assetTask.id, CancellationError())
+            }
+
             do {
                 try await assetTask.execute()
                 return (assetTask.id, nil)
@@ -144,7 +147,11 @@ internal actor MTOfflineDownloader {
         activeTasks[assetTask.id] = childTask
 
         group.addTask {
-            return try await childTask.value
+            try await withTaskCancellationHandler {
+                return try await childTask.value
+            } onCancel: {
+                childTask.cancel()
+            }
         }
     }
 

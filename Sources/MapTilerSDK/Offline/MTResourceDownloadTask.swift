@@ -55,6 +55,8 @@ internal struct MTResourceDownloadTask: MTDownloadTask {
             }
         } catch let error as MTOfflineError {
             throw error
+        } catch let error as MTOfflinePackError {
+            throw error
         } catch let error as URLError {
             throw MTOfflineError.networkError(error)
         } catch is CancellationError {

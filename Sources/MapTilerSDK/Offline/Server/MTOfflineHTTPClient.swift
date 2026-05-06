@@ -46,6 +46,8 @@ internal actor MTOfflineHTTPClient {
                 return data
             } catch let error as MTOfflineHTTPError {
                 throw error
+            } catch let error as MTOfflinePackError {
+                throw error
             } catch let urlError as URLError {
                 throw mapURLError(urlError)
             } catch {
@@ -75,6 +77,8 @@ internal actor MTOfflineHTTPClient {
                 }
                 try FileManager.default.moveItem(at: tempURL, to: destinationURL)
             } catch let error as MTOfflineHTTPError {
+                throw error
+            } catch let error as MTOfflinePackError {
                 throw error
             } catch let urlError as URLError {
                 throw mapURLError(urlError)

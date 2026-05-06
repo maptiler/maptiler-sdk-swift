@@ -9,7 +9,7 @@ import Foundation
 extension URLResponse {
     /// Validates the received data size against the `Content-Length` header if present.
     /// - Parameter dataCount: The actual number of bytes received.
-    /// - Throws: `MTOfflineError.contentMismatch` if the sizes don't match.
+    /// - Throws: `MTOfflinePackError.sizeMismatch` if the sizes don't match.
     internal func validateContentLength(dataCount: Int) throws {
         guard let httpResponse = self as? HTTPURLResponse else { return }
 
@@ -18,9 +18,9 @@ extension URLResponse {
             let expectedSize = Int64(contentLengthString) {
             let actualSize = Int64(dataCount)
             if expectedSize != actualSize {
-                throw MTOfflineError.contentMismatch(
-                    expected: "\(expectedSize) bytes",
-                    actual: "\(actualSize) bytes"
+                throw MTOfflinePackError.sizeMismatch(
+                    expected: expectedSize,
+                    actual: actualSize
                 )
             }
         }

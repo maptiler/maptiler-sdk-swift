@@ -1,5 +1,18 @@
 import Foundation
 
+/// Delegate protocol for receiving offline download events.
+public protocol MTOfflineDownloadDelegate: AnyObject, Sendable {
+    /// Called when a resource download fails.
+    /// - Parameters:
+    ///   - error: The error that occurred.
+    ///   - context: The context of the failure (e.g. URL).
+    func offlineDownloadDidFail(error: MTOfflineError, context: MTOfflineContext)
+
+    /// Called when a resource download succeeds.
+    /// - Parameter context: The context of the success (e.g. URL).
+    func offlineDownloadDidSucceed(context: MTOfflineContext)
+}
+
 // A protocol representing an asset to be downloaded
 internal protocol MTDownloadTask: Sendable {
     var id: String { get }
@@ -12,14 +25,20 @@ internal protocol MTDownloadTask: Sendable {
 internal actor MTOfflineDownloader {
     internal let maxInFlight: Int
     private var isPackCancelled: Bool = false
+    private weak var delegate: MTOfflineDownloadDelegate?
 
     // Track active child tasks by their asset ID
     private var activeTasks: [String: Task<(String, Error?), Never>] = [:]
 
     // Initializes a new downloader.
-    internal init(maxInFlight: Int = 5) {
+    internal init(maxInFlight: Int = 5, delegate: MTOfflineDownloadDelegate? = nil) {
         precondition(maxInFlight > 0, "maxInFlight must be greater than 0")
         self.maxInFlight = maxInFlight
+        self.delegate = delegate
+    }
+
+    internal func setDelegate(_ delegate: MTOfflineDownloadDelegate?) {
+        self.delegate = delegate
     }
 
     internal func download(
@@ -117,10 +136,17 @@ internal actor MTOfflineDownloader {
         progressHandler: (@Sendable (_ completed: Int, _ skipped: Int) -> Void)?
     ) throws {
         if let error = result.1 {
+            if let offlineError = error as? MTOfflineError {
+                let context = MTOfflineContext(url: URL(string: result.0) ?? URL(string: "about:blank")!)
+                delegate?.offlineDownloadDidFail(error: offlineError, context: context)
+            }
+
             if !(error is CancellationError) {
                 throw error
             }
         } else {
+            let context = MTOfflineContext(url: URL(string: result.0) ?? URL(string: "about:blank")!)
+            delegate?.offlineDownloadDidSucceed(context: context)
             progressHandler?(1, 0)
         }
     }

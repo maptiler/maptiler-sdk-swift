@@ -10,7 +10,7 @@
 import Foundation
 
 internal protocol MTRetryPolicy {
-    func execute<T>(operation: @escaping () async throws -> T) async throws -> T
+    func execute<T>(operation: @escaping @Sendable () async throws -> T) async throws -> T
 }
 
 internal struct MTNetworkRetryPolicy: MTRetryPolicy {
@@ -24,7 +24,7 @@ internal struct MTNetworkRetryPolicy: MTRetryPolicy {
         self.maxDelay = maxDelay
     }
 
-    func execute<T>(operation: @escaping () async throws -> T) async throws -> T {
+    func execute<T>(operation: @escaping @Sendable () async throws -> T) async throws -> T {
         var attempt = 1
         while true {
             do {
@@ -61,6 +61,15 @@ internal struct MTNetworkRetryPolicy: MTRetryPolicy {
     }
 
     private func isRetryable(error: Error) -> Bool {
+        if let packError = error as? MTOfflinePackError {
+            switch packError {
+            case .networkError, .serverError, .rateLimitExceeded, .sizeMismatch:
+                return true
+            default:
+                return false
+            }
+        }
+
         if let httpError = error as? MTOfflineHTTPError {
             switch httpError {
             case .timeout, .offline, .networkError, .serverError, .tooManyRequests:

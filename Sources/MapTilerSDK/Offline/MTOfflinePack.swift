@@ -29,6 +29,11 @@ public actor MTOfflinePack {
 
     private let downloader: MTOfflineDownloader
 
+    /// An optional delegate to receive download notifications.
+    public func setDelegate(_ delegate: MTOfflineDownloadDelegate?) async {
+        await downloader.setDelegate(delegate)
+    }
+
     private var progressContinuations: [UUID: AsyncStream<MTOfflinePackProgress>.Continuation] = [:]
 
     internal init(

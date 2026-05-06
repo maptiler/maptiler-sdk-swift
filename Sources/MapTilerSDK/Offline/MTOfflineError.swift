@@ -6,8 +6,22 @@
 
 import Foundation
 
+/// Provides additional context for an offline error.
+public struct MTOfflineContext: Sendable, Equatable {
+    /// The URL of the resource that failed to download.
+    public let url: URL
+
+    /// An optional identifier for the resource (e.g., Tile ID, Source ID).
+    public let resourceId: String?
+
+    public init(url: URL, resourceId: String? = nil) {
+        self.url = url
+        self.resourceId = resourceId
+    }
+}
+
 /// Represents errors that can occur during the offline planning and downloading process.
-public enum MTOfflineError: Error, LocalizedError {
+public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
     // MARK: - HTTP Failures
 
     /// The provided URL was invalid.
@@ -18,6 +32,12 @@ public enum MTOfflineError: Error, LocalizedError {
 
     /// A general network connectivity issue or URLSession error occurred.
     case networkError(URLError)
+
+    /// The server returned a 204 No Content response, which is unexpected for this resource.
+    case noContent
+
+    /// The received content format or type does not match the expected format.
+    case contentMismatch(expected: String, actual: String)
 
     // MARK: - JSON Failures
 
@@ -50,7 +70,7 @@ public enum MTOfflineError: Error, LocalizedError {
     case exceedsMaximumTileCount(limit: Int, requested: Int)
 
     /// A file system error occurred while attempting to save or read offline data.
-    case fileSystemError(Error)
+    case fileSystemError(String)
 
     /// The offline download or operation was cancelled by the user or system.
     case cancelled
@@ -63,6 +83,10 @@ public enum MTOfflineError: Error, LocalizedError {
             return "The server returned a bad response with status code: \(statusCode)."
         case .networkError(let error):
             return "A network error occurred: \(error.localizedDescription)."
+        case .noContent:
+            return "The server returned no content (204) for a required resource."
+        case .contentMismatch(let expected, let actual):
+            return "Content mismatch: expected \(expected), but received \(actual)."
         case .malformedJSON:
             return "The JSON data is malformed or invalid."
         case .missingKey(let key):
@@ -79,8 +103,8 @@ public enum MTOfflineError: Error, LocalizedError {
             return "There is not enough storage space available on the device to complete the download."
         case .exceedsMaximumTileCount(let limit, let requested):
             return "The download request of \(requested) tiles exceeds the maximum allowed limit of \(limit) tiles."
-        case .fileSystemError(let error):
-            return "A file system error occurred: \(error.localizedDescription)."
+        case .fileSystemError(let message):
+            return "A file system error occurred: \(message)."
         case .cancelled:
             return "The offline operation was cancelled."
         }
@@ -97,6 +121,11 @@ public enum MTOfflineError: Error, LocalizedError {
             return "Try again later. If the problem persists, check the server status."
         case .networkError:
             return "Check your internet connection and try again."
+        case .noContent:
+            return "Check if the resource is available for the requested region and zoom level."
+        case .contentMismatch:
+            return "The server might be returning an error page instead of the requested resource. " +
+                "Check your API key and parameters."
         case .missingAPIKey:
             return "Ensure you set up the API key before starting a download."
         case .insufficientStorage:
@@ -110,6 +139,30 @@ public enum MTOfflineError: Error, LocalizedError {
             return "Ensure that the minimum zoom level is less than or equal to the maximum zoom level."
         default:
             return nil
+        }
+    }
+
+    public static func == (lhs: MTOfflineError, rhs: MTOfflineError) -> Bool {
+        switch (lhs, rhs) {
+        case (.invalidURL(let l), .invalidURL(let r)): return l == r
+        case (.badResponse(let l), .badResponse(let r)): return l == r
+        case (.networkError(let l), .networkError(let r)): return l == r
+        case (.noContent, .noContent): return true
+        case (.contentMismatch(let le, let la), .contentMismatch(let re, let ra)): return le == re && la == ra
+        case (.malformedJSON, .malformedJSON): return true
+        case (.missingKey(let l), .missingKey(let r)): return l == r
+        case (.decodingError, .decodingError): return true
+        case (.invalidBoundingBox, .invalidBoundingBox): return true
+        case (.reversedZoomLevels(let lmin, let lmax),
+            .reversedZoomLevels(let rmin, let rmax)):
+            return lmin == rmin && lmax == rmax
+        case (.missingAPIKey, .missingAPIKey): return true
+        case (.insufficientStorage, .insufficientStorage): return true
+        case (.exceedsMaximumTileCount(let ll, let lr), .exceedsMaximumTileCount(let rl, let rr)):
+            return ll == rl && lr == rr
+        case (.fileSystemError(let l), .fileSystemError(let r)): return l == r
+        case (.cancelled, .cancelled): return true
+        default: return false
         }
     }
 }

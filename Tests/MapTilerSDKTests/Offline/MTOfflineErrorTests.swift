@@ -32,6 +32,10 @@ struct MTOfflineErrorTests {
             _lastError = error
             _lastContext = context
         }
+
+        func offlineDownloadDidSucceed(context: MTOfflineContext) {
+            // No-op for this test captor
+        }
     }
     
     // Mock URLProtocol to simulate various network responses

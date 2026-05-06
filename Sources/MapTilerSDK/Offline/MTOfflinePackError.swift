@@ -10,7 +10,7 @@
 import Foundation
 
 /// Errors that can occur during the offline pack download process.
-public enum MTOfflinePackError: LocalizedError {
+public enum MTOfflinePackError: LocalizedError, Equatable {
     /// The bounding box has invalid coordinates.
     case invalidBoundingBox
     /// The provided zoom range is invalid (e.g., min > max, or out of bounds).
@@ -33,6 +33,8 @@ public enum MTOfflinePackError: LocalizedError {
     case rateLimitExceeded
     /// An unexpected server-side error occurred.
     case serverError(statusCode: Int)
+    /// The received data size does not match the expected size from the Content-Length header.
+    case sizeMismatch(expected: Int64, actual: Int64)
 
     public var errorDescription: String? {
         switch self {
@@ -58,6 +60,32 @@ public enum MTOfflinePackError: LocalizedError {
             return "MapTiler API rate limit exceeded."
         case .serverError(let statusCode):
             return "Server returned an unexpected status code: \(statusCode)."
+        case .sizeMismatch(let expected, let actual):
+            return "Resource size mismatch. Expected \(expected) bytes, but received \(actual) bytes."
+        }
+    }
+
+    public static func == (lhs: MTOfflinePackError, rhs: MTOfflinePackError) -> Bool {
+        switch (lhs, rhs) {
+        case (.invalidBoundingBox, .invalidBoundingBox),
+            (.invalidZoomRange, .invalidZoomRange),
+            (.styleResolutionFailed, .styleResolutionFailed),
+            (.regionTooLarge, .regionTooLarge),
+            (.notImplemented, .notImplemented),
+            (.missingAPIKey, .missingAPIKey),
+            (.unauthorized, .unauthorized),
+            (.resourceNotFound, .resourceNotFound),
+            (.rateLimitExceeded, .rateLimitExceeded):
+            return true
+        case (.networkError(let lhsErr), .networkError(let rhsErr)):
+            return (lhsErr as NSError).code == (rhsErr as NSError).code &&
+                (lhsErr as NSError).domain == (rhsErr as NSError).domain
+        case (.serverError(let lhsCode), .serverError(let rhsCode)):
+            return lhsCode == rhsCode
+        case (.sizeMismatch(let lhsExp, let lhsAct), .sizeMismatch(let rhsExp, let rhsAct)):
+            return lhsExp == rhsExp && lhsAct == rhsAct
+        default:
+            return false
         }
     }
 }

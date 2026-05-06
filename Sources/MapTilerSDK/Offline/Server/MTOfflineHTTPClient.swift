@@ -36,42 +36,55 @@ internal actor MTOfflineHTTPClient {
     // Fetches the contents of the URL and returns it as Data.
     func get(url: URL) async throws -> Data {
         let request = createRequest(for: url)
+        let retryPolicy = MTNetworkRetryPolicy(maxAttempts: 3)
 
-        do {
-            let (data, response) = try await session.data(for: request)
-            try validate(response: response)
-            return data
-        } catch let error as MTOfflineHTTPError {
-            throw error
-        } catch let urlError as URLError {
-            throw mapURLError(urlError)
-        } catch {
-            throw MTOfflineHTTPError.unknown(error.localizedDescription)
+        return try await retryPolicy.execute { [self] in
+            do {
+                let (data, response) = try await session.data(for: request)
+                try validate(response: response)
+                try response.validateContentLength(dataCount: data.count)
+                return data
+            } catch let error as MTOfflineHTTPError {
+                throw error
+            } catch let urlError as URLError {
+                throw mapURLError(urlError)
+            } catch {
+                throw MTOfflineHTTPError.unknown(error.localizedDescription)
+            }
         }
     }
 
     // Downloads the contents of the URL directly to a specified file URL.
     func download(url: URL, to destinationURL: URL) async throws {
         let request = createRequest(for: url)
+        let retryPolicy = MTNetworkRetryPolicy(maxAttempts: 3)
 
-        do {
-            let (tempURL, response) = try await session.download(for: request)
-            try validate(response: response)
+        try await retryPolicy.execute { [self] in
+            do {
+                let (tempURL, response) = try await session.download(for: request)
+                try validate(response: response)
 
-            if FileManager.default.fileExists(atPath: destinationURL.path) {
-                try FileManager.default.removeItem(at: destinationURL)
+                // Validate downloaded file size
+                let attributes = try FileManager.default.attributesOfItem(atPath: tempURL.path)
+                if let fileSize = attributes[.size] as? Int64 {
+                    try response.validateContentLength(dataCount: Int(fileSize))
+                }
+
+                if FileManager.default.fileExists(atPath: destinationURL.path) {
+                    try FileManager.default.removeItem(at: destinationURL)
+                }
+                try FileManager.default.moveItem(at: tempURL, to: destinationURL)
+            } catch let error as MTOfflineHTTPError {
+                throw error
+            } catch let urlError as URLError {
+                throw mapURLError(urlError)
+            } catch {
+                throw MTOfflineHTTPError.unknown(error.localizedDescription)
             }
-            try FileManager.default.moveItem(at: tempURL, to: destinationURL)
-        } catch let error as MTOfflineHTTPError {
-            throw error
-        } catch let urlError as URLError {
-            throw mapURLError(urlError)
-        } catch {
-            throw MTOfflineHTTPError.unknown(error.localizedDescription)
         }
     }
 
-    private func validate(response: URLResponse) throws {
+    private nonisolated func validate(response: URLResponse) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
             throw MTOfflineHTTPError.invalidResponse
         }
@@ -107,7 +120,7 @@ internal actor MTOfflineHTTPClient {
         }
     }
 
-    private func mapURLError(_ urlError: URLError) -> MTOfflineHTTPError {
+    private nonisolated func mapURLError(_ urlError: URLError) -> MTOfflineHTTPError {
         switch urlError.code {
         case .timedOut:
             return .timeout

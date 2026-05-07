@@ -110,6 +110,8 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
         }
     }
 
+    private let router = MTOfflineRouter()
+
     private func processData(_ data: Data, on connection: NWConnection) {
         // Simple manual HTTP parser
         guard let requestString = String(data: data, encoding: .utf8) else {
@@ -130,28 +132,58 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
         }
 
         let method = parts[0]
-        let path = parts[1]
+        let path = (parts[1] as NSString).removingPercentEncoding ?? parts[1]
 
-        if method == "GET" && (path == "/health" || path == "/health/") {
-            sendResponse(statusCode: 200, body: "OK", on: connection)
+        if method == "GET" {
+            if path == "/health" || path == "/health/" {
+                sendResponse(
+                    statusCode: 200,
+                    body: Data("OK".utf8),
+                    mimeType: "text/plain",
+                    on: connection
+                )
+            } else if let resolved = router.resolve(path: path) {
+                if let fileData = try? Data(contentsOf: resolved.url) {
+                    sendResponse(statusCode: 200, body: fileData, mimeType: resolved.mimeType, on: connection)
+                } else {
+                    sendResponse(
+                        statusCode: 404,
+                        body: Data("Not Found".utf8),
+                        mimeType: "text/plain",
+                        on: connection
+                    )
+                }
+            } else {
+                sendResponse(
+                    statusCode: 404,
+                    body: Data("Not Found".utf8),
+                    mimeType: "text/plain",
+                    on: connection
+                )
+            }
         } else {
-            sendResponse(statusCode: 404, body: "Not Found", on: connection)
+            sendResponse(
+                statusCode: 405,
+                body: Data("Method Not Allowed".utf8),
+                mimeType: "text/plain",
+                on: connection
+            )
         }
     }
 
-    private func sendResponse(statusCode: Int, body: String, on connection: NWConnection) {
-        let responseBody = body.data(using: .utf8) ?? Data()
+    private func sendResponse(statusCode: Int, body: Data, mimeType: String, on connection: NWConnection) {
         let statusText = self.statusText(for: statusCode)
 
         var headerString = ""
         headerString += "HTTP/1.1 \(statusCode) \(statusText)\r\n"
-        headerString += "Content-Type: text/plain\r\n"
-        headerString += "Content-Length: \(responseBody.count)\r\n"
+        headerString += "Content-Type: \(mimeType)\r\n"
+        headerString += "Content-Length: \(body.count)\r\n"
+        headerString += "Access-Control-Allow-Origin: *\r\n"
         headerString += "Connection: close\r\n"
         headerString += "\r\n"
 
         var responseData = headerString.data(using: .utf8) ?? Data()
-        responseData.append(responseBody)
+        responseData.append(body)
 
         connection.send(content: responseData, completion: .contentProcessed { error in
             if let error = error {
@@ -165,6 +197,7 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
         switch statusCode {
         case 200: return "OK"
         case 404: return "Not Found"
+        case 405: return "Method Not Allowed"
         default: return "Internal Server Error"
         }
     }

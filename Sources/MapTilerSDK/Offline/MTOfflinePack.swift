@@ -149,13 +149,16 @@ public actor MTOfflinePack {
         await downloader.cancelAsset(id: id)
     }
 
-    private func buildTasks(from manifest: MTManifest) -> [MTResourceDownloadTask] {
-        var resources: [MTMapResource] = []
-        if let style = manifest.style { resources.append(style) }
-        resources.append(contentsOf: manifest.tiles)
-        resources.append(contentsOf: manifest.glyphs)
-        resources.append(contentsOf: manifest.sprites)
+    private func buildTasks(from manifest: MTManifest) -> [any MTDownloadTask] {
+        var tasks: [any MTDownloadTask] = []
 
-        return resources.map { MTResourceDownloadTask(resource: $0) }
+        if let style = manifest.style {
+            tasks.append(MTStyleDownloadTask(resource: style, packId: id))
+        }
+
+        let otherResources = manifest.tiles + manifest.glyphs + manifest.sprites
+        tasks.append(contentsOf: otherResources.map { MTResourceDownloadTask(resource: $0) })
+
+        return tasks
     }
 }

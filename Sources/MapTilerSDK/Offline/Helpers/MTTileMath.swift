@@ -51,29 +51,40 @@ internal struct MTTileMath {
     }
 
     // Calculates the discrete tile bounds (min/max X and Y) intersecting a bounding box at a given zoom level.
-    internal static func tileBounds(for bbox: MTBoundingBox, zoom: Int) -> MTTileBounds {
+    internal static func tileBounds(for bbox: MTBoundingBox, zoom: Int, buffer: Int = 1) -> MTTileBounds {
         let minXRaw = longitudeToTileX(lon: bbox.minLon, zoom: zoom)
         let maxXRaw = longitudeToTileX(lon: bbox.maxLon, zoom: zoom)
         // Latitude is inverted in Web Mercator XYZ: maximum latitude maps to minimum Y.
         let minYRaw = latitudeToTileY(lat: bbox.maxLat, zoom: zoom)
         let maxYRaw = latitudeToTileY(lat: bbox.minLat, zoom: zoom)
 
+        let minX = Swift.min(minXRaw, maxXRaw)
+        let minY = Swift.min(minYRaw, maxYRaw)
+        let maxX = Swift.max(minXRaw, maxXRaw)
+        let maxY = Swift.max(minYRaw, maxYRaw)
+
+        let maxIdx = safeMaxTile(for: zoom)
+
         return MTTileBounds(
-            minX: Swift.min(minXRaw, maxXRaw),
-            minY: Swift.min(minYRaw, maxYRaw),
-            maxX: Swift.max(minXRaw, maxXRaw),
-            maxY: Swift.max(minYRaw, maxYRaw)
+            minX: Swift.max(0, minX - buffer),
+            minY: Swift.max(0, minY - buffer),
+            maxX: Swift.min(maxIdx, maxX + buffer),
+            maxY: Swift.min(maxIdx, maxY + buffer)
         )
     }
 
     // Computes the exact total number of tiles required to cover a bounding box over a range of zooms.
-    internal static func estimateTileCount(for bbox: MTBoundingBox, zoomRange: MTOfflineZoomRange) -> Int {
+    internal static func estimateTileCount(
+        for bbox: MTBoundingBox,
+        zoomRange: MTOfflineZoomRange,
+        buffer: Int = 1
+    ) -> Int {
         let normalizedBoxes = bbox.normalizedAndSplit()
         var totalTiles = 0
 
         for box in normalizedBoxes {
             for zoom in zoomRange.minZoom...zoomRange.maxZoom {
-                let bounds = tileBounds(for: box, zoom: zoom)
+                let bounds = tileBounds(for: box, zoom: zoom, buffer: buffer)
                 let countX = bounds.maxX - bounds.minX + 1
                 let countY = bounds.maxY - bounds.minY + 1
                 totalTiles += countX * countY
@@ -85,14 +96,15 @@ internal struct MTTileMath {
     // Computes the exact number of tiles required per zoom level.
     internal static func estimateTileCountPerZoom(
         for bbox: MTBoundingBox,
-        zoomRange: MTOfflineZoomRange
+        zoomRange: MTOfflineZoomRange,
+        buffer: Int = 1
     ) -> [Int: Int] {
         let normalizedBoxes = bbox.normalizedAndSplit()
         var counts: [Int: Int] = [:]
 
         for box in normalizedBoxes {
             for zoom in zoomRange.minZoom...zoomRange.maxZoom {
-                let bounds = tileBounds(for: box, zoom: zoom)
+                let bounds = tileBounds(for: box, zoom: zoom, buffer: buffer)
                 let countX = bounds.maxX - bounds.minX + 1
                 let countY = bounds.maxY - bounds.minY + 1
                 counts[zoom, default: 0] += countX * countY
@@ -102,19 +114,24 @@ internal struct MTTileMath {
     }
 
     // Calculates the closed ranges of X and Y tile coordinates for a given bounding box and zoom level.
-    internal static func tileRanges(for bbox: MTBoundingBox, zoom: Int) -> (x: ClosedRange<Int>, y: ClosedRange<Int>) {
-        let bounds = tileBounds(for: bbox, zoom: zoom)
+    internal static func tileRanges(
+        for bbox: MTBoundingBox,
+        zoom: Int,
+        buffer: Int = 1
+    ) -> (x: ClosedRange<Int>, y: ClosedRange<Int>) {
+        let bounds = tileBounds(for: bbox, zoom: zoom, buffer: buffer)
         return (x: bounds.minX...bounds.maxX, y: bounds.minY...bounds.maxY)
     }
 
     // Calculates the closed ranges of X and Y tile coordinates for a given bounding box and a range of zoom levels.
     internal static func tileRanges(
         for bbox: MTBoundingBox,
-        zoomRange: ClosedRange<Int>
+        zoomRange: ClosedRange<Int>,
+        buffer: Int = 1
     ) -> [Int: (x: ClosedRange<Int>, y: ClosedRange<Int>)] {
         var result = [Int: (x: ClosedRange<Int>, y: ClosedRange<Int>)]()
         for z in zoomRange {
-            result[z] = tileRanges(for: bbox, zoom: z)
+            result[z] = tileRanges(for: bbox, zoom: z, buffer: buffer)
         }
         return result
     }

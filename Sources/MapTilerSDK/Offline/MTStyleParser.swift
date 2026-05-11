@@ -53,6 +53,23 @@ public enum MTSpriteDecodable: Decodable, Equatable {
     }
 }
 
+/// Represents a tile source extracted from a style JSON.
+public struct MTStyleSource: Equatable {
+    public let id: String
+    public let url: String?
+    public let tiles: [String]?
+    public let minZoom: Int?
+    public let maxZoom: Int?
+
+    public init(id: String, url: String? = nil, tiles: [String]? = nil, minZoom: Int? = nil, maxZoom: Int? = nil) {
+        self.id = id
+        self.url = url
+        self.tiles = tiles
+        self.minZoom = minZoom
+        self.maxZoom = maxZoom
+    }
+}
+
 /// Represents the non-tile dependencies extracted from a style JSON.
 public struct MTStyleDependencies: Equatable {
     /// The sprites required by the style.
@@ -61,9 +78,22 @@ public struct MTStyleDependencies: Equatable {
     /// The glyphs template URL required by the style.
     public let glyphsTemplate: String?
 
-    public init(sprites: [MTStyleSprite], glyphsTemplate: String?) {
+    /// The tile sources required by the style.
+    public let sources: [MTStyleSource]
+
+    /// The unique font stacks required by the style layers.
+    public let fontStacks: [[String]]
+
+    public init(
+        sprites: [MTStyleSprite],
+        glyphsTemplate: String?,
+        sources: [MTStyleSource] = [],
+        fontStacks: [[String]] = []
+    ) {
         self.sprites = sprites
         self.glyphsTemplate = glyphsTemplate
+        self.sources = sources
+        self.fontStacks = fontStacks
     }
 }
 
@@ -71,6 +101,28 @@ public struct MTStyleDependencies: Equatable {
 internal struct MTStyleRoot: Decodable {
     let sprite: MTSpriteDecodable?
     let glyphs: String?
+    let sources: [String: MTStyleSourceRaw]?
+    let layers: [MTStyleLayerRaw]?
+}
+
+internal struct MTStyleSourceRaw: Decodable {
+    let type: String?
+    let url: String?
+    let tiles: [String]?
+    let minzoom: Int?
+    let maxzoom: Int?
+}
+
+internal struct MTStyleLayerRaw: Decodable {
+    let layout: MTStyleLayerLayoutRaw?
+}
+
+internal struct MTStyleLayerLayoutRaw: Decodable {
+    let textFont: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case textFont = "text-font"
+    }
 }
 
 /// A parser responsible for extracting offline dependencies (sprites and glyphs) from a style JSON payload.
@@ -87,9 +139,39 @@ public struct MTStyleParser {
         let styleRoot = try decoder.decode(MTStyleRoot.self, from: data)
 
         let sprites = styleRoot.sprite?.sprites ?? []
+
+        var sources: [MTStyleSource] = []
+        if let rawSources = styleRoot.sources {
+            for (id, rawSource) in rawSources {
+                // Only process vector or raster sources that have either a url or tiles array
+                if let type = rawSource.type, type == "vector" || type == "raster" || type == "raster-dem" {
+                    if rawSource.url != nil || rawSource.tiles != nil {
+                        sources.append(MTStyleSource(
+                            id: id,
+                            url: rawSource.url,
+                            tiles: rawSource.tiles,
+                            minZoom: rawSource.minzoom,
+                            maxZoom: rawSource.maxzoom
+                        ))
+                    }
+                }
+            }
+        }
+
+        var uniqueFontStacks: Set<[String]> = []
+        if let rawLayers = styleRoot.layers {
+            for layer in rawLayers {
+                if let font = layer.layout?.textFont {
+                    uniqueFontStacks.insert(font)
+                }
+            }
+        }
+
         return MTStyleDependencies(
             sprites: sprites,
-            glyphsTemplate: styleRoot.glyphs
+            glyphsTemplate: styleRoot.glyphs,
+            sources: sources,
+            fontStacks: Array(uniqueFontStacks)
         )
     }
 }

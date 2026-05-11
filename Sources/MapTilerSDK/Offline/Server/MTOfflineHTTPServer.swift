@@ -33,12 +33,25 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
             let nwPort = NWEndpoint.Port(rawValue: port)!
             let parameters = NWParameters.tcp
 
-            let listener = try NWListener(using: parameters, on: nwPort)
+            var targetPort = nwPort
+            var listener: NWListener?
 
-            listener.stateUpdateHandler = { state in
+            do {
+                listener = try NWListener(using: parameters, on: targetPort)
+            } catch {
+                MTLogger.log("Port \(port) is in use, falling back to any available port", type: .info)
+                targetPort = .any
+                listener = try NWListener(using: parameters, on: targetPort)
+            }
+
+            guard let validListener = listener else { return }
+
+            validListener.stateUpdateHandler = { [weak self] state in
                 switch state {
                 case .ready:
-                    MTLogger.log("Offline server ready on port \(port)", type: .info)
+                    let actualPort = validListener.port?.rawValue ?? 0
+                    MTLogger.log("Offline server ready on port \(actualPort)", type: .info)
+                    self?.port = validListener.port
                 case .failed(let error):
                     MTLogger.log("Offline server failed: \(error)", type: .error)
                 default:
@@ -46,13 +59,13 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
                 }
             }
 
-            listener.newConnectionHandler = { [weak self] connection in
+            validListener.newConnectionHandler = { [weak self] connection in
                 self?.handleNewConnection(connection)
             }
 
-            listener.start(queue: queue)
-            self.listener = listener
-            self.port = nwPort
+            validListener.start(queue: queue)
+            self.listener = validListener
+            self.port = targetPort
             self.isRunning = true
         }
     }

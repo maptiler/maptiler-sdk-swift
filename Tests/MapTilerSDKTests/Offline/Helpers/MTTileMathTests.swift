@@ -17,7 +17,7 @@ struct MTTileMathTests {
     func testTileBoundsZoom0() throws {
         // Global bounds
         let bbox = MTBoundingBox(minLon: -180, minLat: -85.0511, maxLon: 180, maxLat: 85.0511)
-        let bounds = MTTileMath.tileBounds(for: bbox, zoom: 0)
+        let bounds = MTTileMath.tileBounds(for: bbox, zoom: 0, buffer: 0)
         
         #expect(bounds.minX == 0)
         #expect(bounds.maxX == 0)
@@ -28,7 +28,7 @@ struct MTTileMathTests {
     @Test("Tile bounds calculation at zoom 1")
     func testTileBoundsZoom1() throws {
         let bbox = MTBoundingBox(minLon: -180, minLat: -85.0511, maxLon: 180, maxLat: 85.0511)
-        let bounds = MTTileMath.tileBounds(for: bbox, zoom: 1)
+        let bounds = MTTileMath.tileBounds(for: bbox, zoom: 1, buffer: 0)
         
         #expect(bounds.minX == 0)
         #expect(bounds.maxX == 1)
@@ -42,7 +42,7 @@ struct MTTileMathTests {
         let bbox = MTBoundingBox(minLon: -180, minLat: -85.0511, maxLon: 180, maxLat: 85.0511)
         let zoomRange = try MTOfflineZoomRange(minZoom: 0, maxZoom: 3)
         
-        let totalTiles = MTTileMath.estimateTileCount(for: bbox, zoomRange: zoomRange)
+        let totalTiles = MTTileMath.estimateTileCount(for: bbox, zoomRange: zoomRange, buffer: 0)
         // Zoom 0 = 1, Zoom 1 = 4, Zoom 2 = 16, Zoom 3 = 64. Total = 85
         #expect(totalTiles == 85)
     }
@@ -91,14 +91,35 @@ struct MTTileMathTests {
     @Test("Tile Ranges Calculation")
     func testTileRanges() {
         let bboxGlobe = MTBoundingBox(minLon: -180.0, minLat: -85.05112878, maxLon: 180.0, maxLat: 85.05112878)
-        let rangesZ0 = MTTileMath.tileRanges(for: bboxGlobe, zoom: 0)
+        let rangesZ0 = MTTileMath.tileRanges(for: bboxGlobe, zoom: 0, buffer: 0)
         #expect(rangesZ0.x == 0...0)
         #expect(rangesZ0.y == 0...0)
         
         let bbox = MTBoundingBox(minLon: -90.0, minLat: 0.0, maxLon: 0.0, maxLat: 45.0)
-        let rangesZ2 = MTTileMath.tileRanges(for: bbox, zoom: 2)
+        let rangesZ2 = MTTileMath.tileRanges(for: bbox, zoom: 2, buffer: 0)
         
         #expect(rangesZ2.x == 1...2)
         #expect(rangesZ2.y == 1...2)
+    }
+
+    @Test("Tile bounds calculation with buffer")
+    func testTileBoundsWithBuffer() throws {
+        let bbox = MTBoundingBox(minLon: -90.0, minLat: 0.0, maxLon: 0.0, maxLat: 45.0)
+        
+        // Zoom 2 (4x4 tiles)
+        // Without buffer: x: 1...2, y: 1...2
+        // With buffer 1: x: 0...3, y: 0...3
+        let bounds = MTTileMath.tileBounds(for: bbox, zoom: 2, buffer: 1)
+        
+        #expect(bounds.minX == 0)
+        #expect(bounds.maxX == 3)
+        #expect(bounds.minY == 0)
+        #expect(bounds.maxY == 3)
+
+        // Ensure we don't exceed global bounds
+        let bboxGlobe = MTBoundingBox(minLon: -180, minLat: -85.0511, maxLon: 180, maxLat: 85.0511)
+        let boundsZ0 = MTTileMath.tileBounds(for: bboxGlobe, zoom: 0, buffer: 5)
+        #expect(boundsZ0.minX == 0)
+        #expect(boundsZ0.maxX == 0)
     }
 }

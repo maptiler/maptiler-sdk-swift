@@ -10,7 +10,7 @@
 import Foundation
 
 /// Defines a region for offline download.
-public struct MTOfflineRegionDefinition {
+public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
     /// The bounding box of the region.
     public let bbox: MTBoundingBox
     /// The minimum zoom level.

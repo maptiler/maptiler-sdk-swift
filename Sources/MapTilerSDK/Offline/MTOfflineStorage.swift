@@ -62,6 +62,73 @@ internal enum MTOfflineStorage {
         return try JSONDecoder().decode(MTManifest.self, from: data)
     }
 
+    // MARK: - Metadata CRUD
+
+    // Saves the metadata to the pack directory.
+    internal static func saveMetadata(_ metadata: MTOfflinePackMetadata) async throws {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(metadata)
+        let destination = MTOfflineStoragePaths.metadataURL(for: metadata.id.uuidString)
+        try await write(data, to: destination)
+    }
+
+    // Loads the metadata from the pack directory.
+    internal static func loadMetadata(for packID: String) throws -> MTOfflinePackMetadata {
+        let fileURL = MTOfflineStoragePaths.metadataURL(for: packID)
+        let data = try Data(contentsOf: fileURL)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode(MTOfflinePackMetadata.self, from: data)
+    }
+
+    // Deletes the metadata and the entire pack directory.
+    internal static func deletePack(for packID: String) async throws {
+        try await Task.detached(priority: .userInitiated) {
+            let directory = MTOfflineStoragePaths.packDirectory(for: packID)
+            let fileManager = FileManager.default
+            if fileManager.fileExists(atPath: directory.path) {
+                try fileManager.removeItem(at: directory)
+            }
+        }.value
+    }
+
+    // Lists all metadata files saved on disk.
+    internal static func listMetadata() async throws -> [MTOfflinePackMetadata] {
+        try await Task.detached(priority: .userInitiated) {
+            let rootDir = MTOfflineStoragePaths.rootDirectory
+            let fileManager = FileManager.default
+
+            guard fileManager.fileExists(atPath: rootDir.path) else {
+                return []
+            }
+
+            let contents = try fileManager.contentsOfDirectory(
+                at: rootDir,
+                includingPropertiesForKeys: [.isDirectoryKey]
+            )
+
+            var packs: [MTOfflinePackMetadata] = []
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+
+            for folderURL in contents {
+                guard (try? folderURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true else {
+                    continue
+                }
+
+                let metadataURL = folderURL.appendingPathComponent("metadata.json", isDirectory: false)
+                if fileManager.fileExists(atPath: metadataURL.path), let data = try? Data(contentsOf: metadataURL) {
+                    if let metadata = try? decoder.decode(MTOfflinePackMetadata.self, from: data) {
+                        packs.append(metadata)
+                    }
+                }
+            }
+
+            return packs
+        }.value
+    }
+
     // Cleans up any stale temporary files in the designated offline temporary directory
     // and within a specific pack directory if provided.
     internal static func cleanStaleTempFiles(for packURL: URL? = nil) async {

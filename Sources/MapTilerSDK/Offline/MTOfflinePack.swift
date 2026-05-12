@@ -1,21 +1,5 @@
 import Foundation
 
-/// Represents the current state of an offline pack download.
-public enum MTOfflinePackState: String, Sendable, Codable, Equatable {
-    /// The pack has been created but download has not started.
-    case idle
-    /// The pack is currently downloading.
-    case downloading
-    /// The pack download was paused.
-    case paused
-    /// The pack download was cancelled.
-    case cancelled
-    /// The pack download completed successfully.
-    case completed
-    /// The pack download failed.
-    case failed
-}
-
 /// Represents a downloadable offline region.
 public actor MTOfflinePack {
     /// The unique identifier of the pack.
@@ -23,9 +7,18 @@ public actor MTOfflinePack {
     /// The region definition of the pack.
     public let region: MTOfflineRegionDefinition
     /// The current state of the pack download.
-    public private(set) var state: MTOfflinePackState = .idle
+    public private(set) var state: MTOfflinePackState = .pending {
+        didSet {
+            Task { [weak self] in
+                await self?.syncMetadataToDisk()
+            }
+        }
+    }
     /// The current progress of the pack download.
     public private(set) var progress: MTOfflinePackProgress = .init(totalResources: 0, downloadedResources: 0)
+
+    /// The metadata object linking state and region.
+    public private(set) var metadata: MTOfflinePackMetadata
 
     private let downloader: MTOfflineDownloader
 
@@ -36,6 +29,7 @@ public actor MTOfflinePack {
 
     private var progressContinuations: [UUID: AsyncStream<MTOfflinePackProgress>.Continuation] = [:]
 
+    /// Initializes a new pack to begin downloading.
     internal init(
         id: String,
         region: MTOfflineRegionDefinition,
@@ -44,6 +38,47 @@ public actor MTOfflinePack {
         self.id = id
         self.region = region
         self.downloader = downloader
+
+        // Initialize new metadata
+        self.metadata = MTOfflinePackMetadata(
+            id: UUID(uuidString: id) ?? UUID(),
+            region: region,
+            state: .pending,
+            size: 0,
+            createdAt: Date()
+        )
+        // Initial state sync will happen because we set state below
+        self.state = .pending
+    }
+
+    /// Initializes an existing pack from disk metadata.
+    internal init(
+        metadata: MTOfflinePackMetadata,
+        downloader: MTOfflineDownloader = MTOfflineDownloader()
+    ) {
+        self.id = metadata.id.uuidString
+        self.region = metadata.region
+        self.downloader = downloader
+        self.metadata = metadata
+
+        // If a pack was "downloading" when the app was closed, it should be marked as paused or failed now.
+        if metadata.state == .downloading {
+            self.state = .paused
+        } else {
+            self.state = metadata.state
+        }
+    }
+
+    /// Synchronizes the current in-memory metadata to disk.
+    private func syncMetadataToDisk() async {
+        // Update the struct before saving
+        metadata.state = state
+
+        do {
+            try await MTOfflineStorage.saveMetadata(metadata)
+        } catch {
+            print("Failed to sync MTOfflinePack metadata to disk for \(id): \(error)")
+        }
     }
 
     /// A stream that yields progress updates as the pack downloads.
@@ -105,7 +140,7 @@ public actor MTOfflinePack {
             }
         } catch is CancellationError {
             if state != .paused {
-                state = .cancelled
+                state = .canceled
             }
             throw CancellationError()
         } catch {
@@ -131,7 +166,7 @@ public actor MTOfflinePack {
     /// Cancels the ongoing download of the entire pack.
     public func cancel() async {
         if state == .downloading {
-            state = .cancelled
+            state = .canceled
             await downloader.cancel()
         }
     }

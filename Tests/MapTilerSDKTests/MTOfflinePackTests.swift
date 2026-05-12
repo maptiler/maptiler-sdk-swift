@@ -60,7 +60,7 @@ final class MTOfflinePackTests: XCTestCase {
         
         // Check state after cancellation
         state = await pack.state
-        XCTAssertEqual(state, MTOfflinePackState.cancelled, "State should be updated to cancelled.")
+        XCTAssertEqual(state, MTOfflinePackState.canceled, "State should be updated to canceled.")
         
         let started = await tracker.startedCount
         let completed = await tracker.completedCount

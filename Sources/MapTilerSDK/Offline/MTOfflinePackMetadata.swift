@@ -42,6 +42,9 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
     /// The date when the pack was created.
     public let createdAt: Date
 
+    /// Optional custom data, typically used to store application-specific context (e.g. JSON data).
+    public let context: Data?
+
     /// The region definition specifying the bounding box, zoom levels, and style.
     public let region: MTOfflineRegionDefinition
 
@@ -53,17 +56,20 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
     ///   - state: The initial state of the pack. Defaults to `.pending`.
     ///   - size: The initial size of the pack in bytes. Defaults to 0.
     ///   - createdAt: The creation date of the pack. Defaults to the current date.
+    ///   - context: Optional custom context data. Defaults to nil.
     public init(
         id: UUID = UUID(),
         region: MTOfflineRegionDefinition,
         state: MTOfflinePackState = .pending,
         size: Int64 = 0,
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        context: Data? = nil
     ) {
         self.id = id
         self.region = region
         self.state = state
         self.size = size
         self.createdAt = createdAt
+        self.context = context
     }
 }

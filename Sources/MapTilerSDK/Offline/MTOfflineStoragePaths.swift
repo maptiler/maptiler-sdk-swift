@@ -30,6 +30,11 @@ internal enum MTOfflineStoragePaths {
         return packDirectory(for: packID).appendingPathComponent("metadata.json", isDirectory: false)
     }
 
+    // The index file path for a specific pack: `Documents/MTOffline/<packID>/index.json`
+    internal static func indexURL(for packID: String) -> URL {
+        return packDirectory(for: packID).appendingPathComponent("index.json", isDirectory: false)
+    }
+
     // The style file path for a specific pack: `Documents/MTOffline/<packID>/style.json`
     internal static func styleURL(for packID: String) -> URL {
         return packDirectory(for: packID).appendingPathComponent("style.json", isDirectory: false)

@@ -2,15 +2,83 @@ import Foundation
 
 /// Represents a downloadable offline region.
 public actor MTOfflinePack {
+    /// Creates a new offline pack and initializes its on-disk storage and metadata.
+    ///
+    /// - Parameters:
+    ///   - region: The definition of the region to be downloaded.
+    ///   - context: Optional custom data (e.g., JSON) to attach to the pack metadata.
+    /// - Returns: A newly initialized `MTOfflinePack`.
+    /// - Throws: An error if directory creation or metadata persistence fails.
+    public static func createPack(
+        region: MTOfflineRegionDefinition,
+        context: Data? = nil
+    ) async throws -> MTOfflinePack {
+        let packId = UUID().uuidString
+        let pack = MTOfflinePack(id: packId, region: region, context: context)
+
+        // Ensure the pack directory and its initial subdirectories are created securely.
+        let packURL = MTOfflineStoragePaths.packDirectory(for: packId)
+        let tilesURL = packURL.appendingPathComponent("tiles", isDirectory: true)
+
+        try await Task.detached(priority: .userInitiated) {
+            let fileManager = FileManager.default
+            try MTOfflineStorage.secureCreateDirectory(
+                at: MTOfflineStoragePaths.rootDirectory,
+                fileManager: fileManager
+            )
+            try MTOfflineStorage.secureCreateDirectory(at: packURL, fileManager: fileManager)
+            try MTOfflineStorage.secureCreateDirectory(at: tilesURL, fileManager: fileManager)
+        }.value
+
+        // Save initial metadata to disk
+        try await MTOfflineStorage.saveMetadata(pack.metadata)
+
+        return pack
+    }
+
+    /// Retrieves all offline packs currently stored on disk.
+    /// The packs are stably sorted by their creation date (oldest first).
+    ///
+    /// - Returns: An array of `MTOfflinePack` instances.
+    public static func packs() async throws -> [MTOfflinePack] {
+        let metadataList = try await MTOfflineStorage.listMetadata()
+        let sortedMetadata = metadataList.sorted {
+            if $0.createdAt == $1.createdAt {
+                return $0.id.uuidString < $1.id.uuidString
+            }
+            return $0.createdAt < $1.createdAt
+        }
+        return sortedMetadata.map { MTOfflinePack(metadata: $0) }
+    }
+
+    /// Deletes all offline packs currently stored on disk.
+    public static func removeAll() async throws {
+        let allPacks = try await packs()
+        for pack in allPacks {
+            await pack.cancel()
+        }
+
+        try await Task.detached(priority: .userInitiated) {
+            let rootDir = MTOfflineStoragePaths.rootDirectory
+            let fileManager = FileManager.default
+            if fileManager.fileExists(atPath: rootDir.path) {
+                try fileManager.removeItem(at: rootDir)
+            }
+        }.value
+    }
+
     /// The unique identifier of the pack.
-    public let id: String
+    public nonisolated let id: String
     /// The region definition of the pack.
-    public let region: MTOfflineRegionDefinition
+    public nonisolated let region: MTOfflineRegionDefinition
     /// The current state of the pack download.
     public private(set) var state: MTOfflinePackState = .pending {
         didSet {
             Task { [weak self] in
                 await self?.syncMetadataToDisk()
+            }
+            for continuation in stateContinuations.values {
+                continuation.yield(state)
             }
         }
     }
@@ -28,11 +96,38 @@ public actor MTOfflinePack {
     }
 
     private var progressContinuations: [UUID: AsyncStream<MTOfflinePackProgress>.Continuation] = [:]
+    private var stateContinuations: [UUID: AsyncStream<MTOfflinePackState>.Continuation] = [:]
+
+    /// A stream that yields state updates as the pack state changes.
+    public var stateStream: AsyncStream<MTOfflinePackState> {
+        AsyncStream { continuation in
+            let id = UUID()
+            Task {
+                await self.addStateContinuation(id: id, continuation: continuation)
+            }
+            continuation.onTermination = { _ in
+                Task {
+                    await self.removeStateContinuation(id: id)
+                }
+            }
+        }
+    }
+
+    private func addStateContinuation(id: UUID, continuation: AsyncStream<MTOfflinePackState>.Continuation) {
+        stateContinuations[id] = continuation
+        // Yield the current state immediately to new listeners
+        continuation.yield(state)
+    }
+
+    private func removeStateContinuation(id: UUID) {
+        stateContinuations.removeValue(forKey: id)
+    }
 
     /// Initializes a new pack to begin downloading.
     internal init(
         id: String,
         region: MTOfflineRegionDefinition,
+        context: Data? = nil,
         downloader: MTOfflineDownloader = MTOfflineDownloader()
     ) {
         self.id = id
@@ -45,7 +140,8 @@ public actor MTOfflinePack {
             region: region,
             state: .pending,
             size: 0,
-            createdAt: Date()
+            createdAt: Date(),
+            context: context
         )
         // Initial state sync will happen because we set state below
         self.state = .pending
@@ -71,6 +167,8 @@ public actor MTOfflinePack {
 
     /// Synchronizes the current in-memory metadata to disk.
     private func syncMetadataToDisk() async {
+        guard state != .canceled else { return }
+
         // Update the struct before saving
         metadata.state = state
 
@@ -182,6 +280,19 @@ public actor MTOfflinePack {
     /// Cancels the download of a specific asset within the pack.
     public func cancelAsset(id: String) async {
         await downloader.cancelAsset(id: id)
+    }
+
+    /// Deletes the offline pack.
+    /// This stops any ongoing downloads and removes all associated files and metadata from disk.
+    public func remove() async throws {
+        // Stop any active downloads first.
+        await cancel()
+
+        // Update state to canceled before deleting files to prevent any pending tasks from recreating them
+        state = .canceled
+
+        // Remove the pack folder and all its contents from disk.
+        try await MTOfflineStorage.deletePack(for: id)
     }
 
     private func buildTasks(from manifest: MTManifest) -> [any MTDownloadTask] {

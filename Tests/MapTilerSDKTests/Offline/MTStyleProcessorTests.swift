@@ -8,7 +8,7 @@ import Testing
 import Foundation
 @testable import MapTilerSDK
 
-@Suite("MTStyleProcessor Tests")
+@Suite("MTStyleProcessor Tests", .serialized)
 struct MTStyleProcessorTests {
     
     let baseURL = "http://127.0.0.1:18080"

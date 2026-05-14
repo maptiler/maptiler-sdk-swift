@@ -23,6 +23,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
     public let styleURL: URL?
     /// The device pixel ratio.
     public let pixelRatio: Float
+    /// The maximum number of tiles allowed for this region.
+    public let maxTileCount: Int?
 
     public init(
         bbox: MTBoundingBox,
@@ -30,7 +32,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         maxZoom: Int,
         mapId: String? = nil,
         styleURL: URL? = nil,
-        pixelRatio: Float = 1.0
+        pixelRatio: Float = 1.0,
+        maxTileCount: Int? = nil
     ) {
         self.bbox = bbox
         self.minZoom = minZoom
@@ -38,5 +41,6 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         self.mapId = mapId
         self.styleURL = styleURL
         self.pixelRatio = pixelRatio
+        self.maxTileCount = maxTileCount
     }
 }

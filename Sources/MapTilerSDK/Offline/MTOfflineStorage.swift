@@ -25,9 +25,7 @@ internal enum MTOfflineStorage {
             let fileManager = FileManager.default
             let tempDir = MTOfflineStoragePaths.tempDirectory
 
-            if !fileManager.fileExists(atPath: tempDir.path) {
-                try? fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: nil)
-            }
+            try secureCreateDirectory(at: tempDir, fileManager: fileManager)
 
             let tempURL = tempDir.appendingPathComponent(UUID().uuidString)
 
@@ -46,6 +44,21 @@ internal enum MTOfflineStorage {
         try await Task.detached(priority: .userInitiated) {
             try moveAtomically(from: source, to: destination, fileManager: FileManager.default)
         }.value
+    }
+
+    // Helper to create a directory securely (excluded from backup and protected until authentication).
+    internal static func secureCreateDirectory(at url: URL, fileManager: FileManager = .default) throws {
+        if !fileManager.fileExists(atPath: url.path) {
+            try fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: [
+                .posixPermissions: 0o700,
+                .protectionKey: FileProtectionType.completeUntilFirstUserAuthentication
+            ])
+
+            var resourceValues = URLResourceValues()
+            resourceValues.isExcludedFromBackup = true
+            var mutableURL = url
+            try mutableURL.setResourceValues(resourceValues)
+        }
     }
 
     // Saves the manifest to the pack directory.
@@ -217,9 +230,7 @@ internal enum MTOfflineStorage {
 
         do {
             let destinationDir = destination.deletingLastPathComponent()
-            if !fileManager.fileExists(atPath: destinationDir.path) {
-                try fileManager.createDirectory(at: destinationDir, withIntermediateDirectories: true, attributes: nil)
-            }
+            try secureCreateDirectory(at: destinationDir, fileManager: fileManager)
 
             if fileManager.fileExists(atPath: destination.path) {
                 _ = try fileManager.replaceItemAt(

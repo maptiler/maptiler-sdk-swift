@@ -11,7 +11,7 @@ import Foundation
 import CoreLocation
 import UIKit
 
-@Suite
+@Suite(.serialized)
 struct MTStyleTests {
     @Test func mtFillLayer_shouldEncodeAndDecodeCorrectly() async throws {
         let layer = MTFillLayer(

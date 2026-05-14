@@ -8,7 +8,7 @@ import Foundation
 import Testing
 @testable import MapTilerSDK
 
-@Suite("Offline Pack Metadata Tests")
+@Suite("Offline Pack Metadata Tests", .serialized)
 struct MTOfflinePackMetadataTests {
 
     @Test("Default values are set correctly on init")

@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import MapTilerSDK
 
-@Suite("MTOfflineIndexManager Tests")
+@Suite("MTOfflineIndexManager Tests", .serialized)
 struct MTOfflineIndexManagerTests {
     
     let fileManager = FileManager.default

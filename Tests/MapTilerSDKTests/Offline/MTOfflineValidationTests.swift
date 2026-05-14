@@ -8,7 +8,7 @@ import Testing
 import Foundation
 @testable import MapTilerSDK
 
-@Suite("Offline Validation Tests")
+@Suite("Offline Validation Tests", .serialized)
 struct MTOfflineValidationTests {
 
     @Test("Content-Length mismatch should throw sizeMismatch error")

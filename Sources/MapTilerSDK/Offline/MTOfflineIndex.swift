@@ -90,4 +90,10 @@ internal actor MTOfflineIndexManager {
     internal var currentIndex: MTOfflineIndex {
         return index
     }
+
+    // Clears all assets from the index and saves it to disk.
+    internal func clear() async throws {
+        index.assets.removeAll()
+        try await save()
+    }
 }

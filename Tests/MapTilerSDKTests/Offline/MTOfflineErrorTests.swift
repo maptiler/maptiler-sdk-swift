@@ -27,13 +27,16 @@ struct MTOfflineErrorTests {
             return _lastContext
         }
         
-        func offlineDownloadDidFail(error: MTOfflineError, context: MTOfflineContext) {
+        func offlinePack(_ pack: String, didChangeState state: MTOfflinePackState) {}
+        func offlinePack(_ pack: String, didUpdateProgress progress: MTOfflinePackProgress) {}
+
+        func offlinePack(_ pack: String, didFailResource error: MTOfflineError, context: MTOfflineContext) {
             lock.lock(); defer { lock.unlock() }
             _lastError = error
             _lastContext = context
         }
 
-        func offlineDownloadDidSucceed(context: MTOfflineContext) {
+        func offlinePack(_ pack: String, didSucceedResource context: MTOfflineContext) {
             // No-op for this test captor
         }
     }

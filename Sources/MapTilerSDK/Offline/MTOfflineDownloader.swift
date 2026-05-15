@@ -2,15 +2,30 @@ import Foundation
 
 /// Delegate protocol for receiving offline download events.
 public protocol MTOfflineDownloadDelegate: AnyObject, Sendable {
-    /// Called when a resource download fails.
+    /// Called when the pack's state changes.
     /// - Parameters:
+    ///   - pack: The ID of the offline pack.
+    ///   - state: The new state of the pack.
+    func offlinePack(_ pack: String, didChangeState state: MTOfflinePackState)
+
+    /// Called when the pack's download progress updates.
+    /// - Parameters:
+    ///   - pack: The ID of the offline pack.
+    ///   - progress: The current progress of the download.
+    func offlinePack(_ pack: String, didUpdateProgress progress: MTOfflinePackProgress)
+
+    /// Called when a single resource download fails.
+    /// - Parameters:
+    ///   - pack: The ID of the offline pack.
     ///   - error: The error that occurred.
     ///   - context: The context of the failure (e.g. URL).
-    func offlineDownloadDidFail(error: MTOfflineError, context: MTOfflineContext)
+    func offlinePack(_ pack: String, didFailResource error: MTOfflineError, context: MTOfflineContext)
 
-    /// Called when a resource download succeeds.
-    /// - Parameter context: The context of the success (e.g. URL).
-    func offlineDownloadDidSucceed(context: MTOfflineContext)
+    /// Called when a single resource download succeeds.
+    /// - Parameters:
+    ///   - pack: The ID of the offline pack.
+    ///   - context: The context of the success (e.g. URL).
+    func offlinePack(_ pack: String, didSucceedResource context: MTOfflineContext)
 }
 
 // A protocol representing an asset to be downloaded
@@ -117,7 +132,7 @@ internal actor MTOfflineDownloader {
             activeTasks.removeValue(forKey: result.0)
             activeCount -= 1
 
-            try handleDownloadResult(result, progressHandler: progressHandler)
+            try handleTaskResult(result, progressHandler: progressHandler)
 
             if isPackCancelled || Task.isCancelled {
                 group.cancelAll()
@@ -131,14 +146,16 @@ internal actor MTOfflineDownloader {
         }
     }
 
-    private func handleDownloadResult(
+    private func handleTaskResult(
         _ result: (String, Error?),
         progressHandler: (@Sendable (_ completed: Int, _ skipped: Int) -> Void)?
     ) throws {
         if let error = result.1 {
             if let offlineError = error as? MTOfflineError {
                 let context = MTOfflineContext(url: URL(string: result.0) ?? URL(string: "about:blank")!)
-                delegate?.offlineDownloadDidFail(error: offlineError, context: context)
+                // NOTE: We don't have packId here natively,
+                // but MTOfflineDownloader is usually tightly coupled to a single pack.
+                delegate?.offlinePack("", didFailResource: offlineError, context: context)
             }
 
             if !(error is CancellationError) {
@@ -146,7 +163,7 @@ internal actor MTOfflineDownloader {
             }
         } else {
             let context = MTOfflineContext(url: URL(string: result.0) ?? URL(string: "about:blank")!)
-            delegate?.offlineDownloadDidSucceed(context: context)
+            delegate?.offlinePack("", didSucceedResource: context)
             progressHandler?(1, 0)
         }
     }

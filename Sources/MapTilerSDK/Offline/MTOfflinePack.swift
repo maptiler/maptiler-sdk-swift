@@ -36,6 +36,16 @@ public actor MTOfflinePack {
         return pack
     }
 
+    /// Estimates the pack size for a given region definition.
+    ///
+    /// - Parameter region: The definition of the region to estimate.
+    /// - Returns: An `MTPackStats` object containing the estimates.
+    /// - Throws: An error if style fetching or parsing fails.
+    public static func estimateSize(region: MTOfflineRegionDefinition) async throws -> MTPackStats {
+        let estimator = MTOfflineEstimator()
+        return try await estimator.estimatePack(region: region)
+    }
+
     /// Retrieves all offline packs currently stored on disk.
     /// The packs are stably sorted by their creation date (oldest first).
     ///
@@ -71,17 +81,6 @@ public actor MTOfflinePack {
     public nonisolated let id: String
     /// The region definition of the pack.
     public nonisolated let region: MTOfflineRegionDefinition
-    /// The current state of the pack download.
-    public private(set) var state: MTOfflinePackState = .pending {
-        didSet {
-            Task { [weak self] in
-                await self?.syncMetadataToDisk()
-            }
-            for continuation in stateContinuations.values {
-                continuation.yield(state)
-            }
-        }
-    }
     /// The current progress of the pack download.
     public private(set) var progress: MTOfflinePackProgress = .init(totalResources: 0, downloadedResources: 0)
 
@@ -91,36 +90,24 @@ public actor MTOfflinePack {
     private let downloader: MTOfflineDownloader
 
     /// An optional delegate to receive download notifications.
-    public func setDelegate(_ delegate: MTOfflineDownloadDelegate?) async {
-        await downloader.setDelegate(delegate)
-    }
+    public weak var delegate: MTOfflineDownloadDelegate?
 
-    private var progressContinuations: [UUID: AsyncStream<MTOfflinePackProgress>.Continuation] = [:]
-    private var stateContinuations: [UUID: AsyncStream<MTOfflinePackState>.Continuation] = [:]
+    /// If true, download progress updates will be reported to the delegate. Defaults to false.
+    public var isProgressReportingEnabled: Bool = false
 
-    /// A stream that yields state updates as the pack state changes.
-    public var stateStream: AsyncStream<MTOfflinePackState> {
-        AsyncStream { continuation in
-            let id = UUID()
-            Task {
-                await self.addStateContinuation(id: id, continuation: continuation)
-            }
-            continuation.onTermination = { _ in
-                Task {
-                    await self.removeStateContinuation(id: id)
-                }
+    private var lastProgressEventTime: Date = .distantPast
+
+    /// The current state of the pack download.
+    public private(set) var state: MTOfflinePackState = .pending {
+        didSet {
+            let newState = state
+            let currentDelegate = delegate
+            Task { [weak self, currentDelegate] in
+                guard let self = self else { return }
+                await self.syncMetadataToDisk()
+                currentDelegate?.offlinePack(self.id, didChangeState: newState)
             }
         }
-    }
-
-    private func addStateContinuation(id: UUID, continuation: AsyncStream<MTOfflinePackState>.Continuation) {
-        stateContinuations[id] = continuation
-        // Yield the current state immediately to new listeners
-        continuation.yield(state)
-    }
-
-    private func removeStateContinuation(id: UUID) {
-        stateContinuations.removeValue(forKey: id)
     }
 
     /// Initializes a new pack to begin downloading.
@@ -179,35 +166,19 @@ public actor MTOfflinePack {
         }
     }
 
-    /// A stream that yields progress updates as the pack downloads.
-    public var progressStream: AsyncStream<MTOfflinePackProgress> {
-        AsyncStream { continuation in
-            let id = UUID()
-            Task {
-                await self.addProgressContinuation(id: id, continuation: continuation)
-            }
-            continuation.onTermination = { _ in
-                Task {
-                    await self.removeProgressContinuation(id: id)
-                }
-            }
-        }
-    }
-
-    private func addProgressContinuation(id: UUID, continuation: AsyncStream<MTOfflinePackProgress>.Continuation) {
-        progressContinuations[id] = continuation
-        // Yield the current progress immediately to new listeners
-        continuation.yield(progress)
-    }
-
-    private func removeProgressContinuation(id: UUID) {
-        progressContinuations.removeValue(forKey: id)
-    }
-
     private func updateProgress(completed: Int, skipped: Int) {
         progress.downloadedResources += (completed + skipped)
-        for continuation in progressContinuations.values {
-            continuation.yield(progress)
+
+        guard isProgressReportingEnabled else { return }
+
+        let now = Date()
+        // Throttle progress events to at most 10 per second
+        let shouldYield = now.timeIntervalSince(lastProgressEventTime) >= 0.1 ||
+            progress.downloadedResources == progress.totalResources
+
+        if shouldYield {
+            lastProgressEventTime = now
+            delegate?.offlinePack(id, didUpdateProgress: progress)
         }
     }
 
@@ -232,8 +203,8 @@ public actor MTOfflinePack {
                 state = .completed
                 // Ensure UI sees 100% on completion
                 progress.downloadedResources = progress.totalResources
-                for continuation in progressContinuations.values {
-                    continuation.yield(progress)
+                if isProgressReportingEnabled {
+                    delegate?.offlinePack(id, didUpdateProgress: progress)
                 }
             }
         } catch is CancellationError {

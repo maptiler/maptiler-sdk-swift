@@ -115,4 +115,37 @@ struct MTStyleParserTests {
             _ = try parser.extractDependencies(from: data)
         }
     }
+
+    @Test("Parse style with sources")
+    func testParseSources() throws {
+        let json = """
+        {
+            "version": 8,
+            "sources": {
+                "vector-source": {
+                    "type": "vector",
+                    "url": "https://api.maptiler.com/tiles/v1.json"
+                },
+                "raster-source": {
+                    "type": "raster",
+                    "tiles": ["https://api.maptiler.com/tiles/{z}/{x}/{y}.png"]
+                }
+            },
+            "layers": []
+        }
+        """
+        let data = json.data(using: .utf8)!
+        
+        let dependencies = try parser.extractDependencies(from: data)
+        
+        #expect(dependencies.sources.count == 2)
+        
+        let vectorSource = dependencies.sources.first { $0.id == "vector-source" }
+        #expect(vectorSource?.type == "vector")
+        #expect(vectorSource?.url == "https://api.maptiler.com/tiles/v1.json")
+        
+        let rasterSource = dependencies.sources.first { $0.id == "raster-source" }
+        #expect(rasterSource?.type == "raster")
+        #expect(rasterSource?.tiles?.first == "https://api.maptiler.com/tiles/{z}/{x}/{y}.png")
+    }
 }

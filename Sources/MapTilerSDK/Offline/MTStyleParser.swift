@@ -56,13 +56,22 @@ public enum MTSpriteDecodable: Decodable, Equatable {
 /// Represents a tile source extracted from a style JSON.
 public struct MTStyleSource: Equatable {
     public let id: String
+    public let type: String?
     public let url: String?
     public let tiles: [String]?
     public let minZoom: Int?
     public let maxZoom: Int?
 
-    public init(id: String, url: String? = nil, tiles: [String]? = nil, minZoom: Int? = nil, maxZoom: Int? = nil) {
+    public init(
+        id: String,
+        type: String? = nil,
+        url: String? = nil,
+        tiles: [String]? = nil,
+        minZoom: Int? = nil,
+        maxZoom: Int? = nil
+    ) {
         self.id = id
+        self.type = type
         self.url = url
         self.tiles = tiles
         self.minZoom = minZoom
@@ -148,6 +157,7 @@ public struct MTStyleParser {
                     if rawSource.url != nil || rawSource.tiles != nil {
                         sources.append(MTStyleSource(
                             id: id,
+                            type: type,
                             url: rawSource.url,
                             tiles: rawSource.tiles,
                             minZoom: rawSource.minzoom,

@@ -23,63 +23,14 @@ internal class MTLocalPlanner: MTOfflinePlanner {
     internal func estimate(for definition: MTOfflineRegionDefinition) async throws -> MTTileEstimate {
         try validate(definition: definition)
 
-        let resolvedStyle: (resource: MTMapResource, dependencies: MTStyleDependencies)?
-        if let styleURL = definition.styleURL {
-            resolvedStyle = try await resolveStyle(url: styleURL)
-        } else if let mapId = definition.mapId {
-            resolvedStyle = try await resolveStyle(mapId: mapId)
-        } else {
-            resolvedStyle = nil
-        }
-
-        var totalResourceCount = 0
-
-        // 1. Style resource
-        if resolvedStyle != nil {
-            totalResourceCount += 1
-        }
-
-        // 2. Tile resources for each source
-        if let sources = resolvedStyle?.dependencies.sources {
-            for source in sources {
-                // We need the source zoom limits.
-                // NOTE: We might not want to fetch all TileJSONs during estimation for performance,
-                // but for accuracy we should at least use the Style's source limits.
-                let sMin = source.minZoom ?? 0
-                let sMax = source.maxZoom ?? 22
-
-                let effMin = Swift.max(definition.minZoom, sMin)
-                let effMax = Swift.min(definition.maxZoom, sMax)
-
-                if effMin <= effMax {
-                    let zoomRange = try MTOfflineZoomRange(minZoom: effMin, maxZoom: effMax)
-                    // We use the default buffer=1 as implemented in MTTileMath
-                    let sourceTileCount = definition.bbox.estimatedTileCount(zoomRange: zoomRange)
-                    totalResourceCount += sourceTileCount
-                }
-            }
-        } else {
-            // Fallback if no style/sources (shouldn't happen for valid offline packs)
-            let zoomRange = try MTOfflineZoomRange(minZoom: definition.minZoom, maxZoom: definition.maxZoom)
-            totalResourceCount += definition.bbox.estimatedTileCount(zoomRange: zoomRange)
-        }
-
-        // 3. Sprites (rough estimate: 4 files per sprite object: json, png, @2x json, @2x png)
-        if let sprites = resolvedStyle?.dependencies.sprites {
-            totalResourceCount += sprites.count * 4
-        }
-
-        // 4. Glyphs (rough estimate: 1 stack * 256 ranges = 256 files)
-        if let stacks = resolvedStyle?.dependencies.fontStacks, !stacks.isEmpty {
-            totalResourceCount += stacks.count * 256
-        }
+        let estimator = MTOfflineEstimator()
+        let stats = try await estimator.estimatePack(region: definition)
 
         let limit = MTOfflineConfiguration.shared.maxTileCount
-        if totalResourceCount > limit {
-            throw MTOfflineError.exceedsMaximumTileCount(limit: limit, requested: totalResourceCount)
+        if stats.resourceCount > limit {
+            throw MTOfflineError.exceedsMaximumTileCount(limit: limit, requested: stats.resourceCount)
         }
 
-        let stats = MTPackStats(expectedSize: 0, resourceCount: totalResourceCount)
         return MTTileEstimate(stats: stats)
     }
 

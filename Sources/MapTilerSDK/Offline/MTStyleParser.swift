@@ -12,6 +12,26 @@ public struct MTStyleSprite: Decodable, Equatable {
         self.id = id
         self.url = url
     }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        let urlString = try container.decode(String.self, forKey: .url)
+        if let decodedURL = URL(string: urlString) {
+            self.url = decodedURL
+        } else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .url,
+                in: container,
+                debugDescription: "Invalid URL string for sprite: \(urlString)"
+            )
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case url
+    }
 }
 
 /// A custom decoder for the `sprite` field in the style JSON, which can be either a single string (URL)
@@ -21,25 +41,27 @@ public enum MTSpriteDecodable: Decodable, Equatable {
     case multiple([MTStyleSprite])
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        if let stringValue = try? container.decode(String.self) {
-            guard let url = URL(string: stringValue) else {
-                throw DecodingError
-                    .dataCorruptedError(in: container, debugDescription: "Invalid URL string for sprite.")
+        if let container = try? decoder.singleValueContainer() {
+            if let stringValue = try? container.decode(String.self) {
+                guard let url = URL(string: stringValue) else {
+                    throw DecodingError
+                        .dataCorruptedError(in: container, debugDescription: "Invalid URL string for sprite.")
+                }
+                self = .single(url)
+                return
+            } else if let arrayValue = try? container.decode([MTStyleSprite].self) {
+                self = .multiple(arrayValue)
+                return
             }
-            self = .single(url)
-        } else if let arrayValue = try? container.decode([MTStyleSprite].self) {
-            self = .multiple(arrayValue)
-        } else {
-            throw DecodingError.typeMismatch(
-                MTSpriteDecodable.self,
-                DecodingError.Context(
-                    codingPath: decoder.codingPath,
-                    debugDescription: "Expected a string or an array of sprite objects."
-                )
-            )
         }
+
+        throw DecodingError.typeMismatch(
+            MTSpriteDecodable.self,
+            DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: "Expected a string or an array of sprite objects."
+            )
+        )
     }
 
     /// Flattens the parsed sprites into a uniform array of `MTStyleSprite`.
@@ -112,14 +134,26 @@ internal struct MTStyleRoot: Decodable {
     let glyphs: String?
     let sources: [String: MTStyleSourceRaw]?
     let layers: [MTStyleLayerRaw]?
+
+    enum CodingKeys: String, CodingKey {
+        case sprite, glyphs, sources, layers
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.sprite = try? container.decodeIfPresent(MTSpriteDecodable.self, forKey: .sprite)
+        self.glyphs = try? container.decodeIfPresent(String.self, forKey: .glyphs)
+        self.sources = try? container.decodeIfPresent([String: MTStyleSourceRaw].self, forKey: .sources)
+        self.layers = try? container.decodeIfPresent([MTStyleLayerRaw].self, forKey: .layers)
+    }
 }
 
 internal struct MTStyleSourceRaw: Decodable {
     let type: String?
     let url: String?
     let tiles: [String]?
-    let minzoom: Int?
-    let maxzoom: Int?
+    let minzoom: Double?
+    let maxzoom: Double?
 }
 
 internal struct MTStyleLayerRaw: Decodable {
@@ -131,6 +165,12 @@ internal struct MTStyleLayerLayoutRaw: Decodable {
 
     enum CodingKeys: String, CodingKey {
         case textFont = "text-font"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // Safely decode text-font. If it's an expression or something else, it will be nil.
+        self.textFont = try? container.decode([String].self, forKey: .textFont)
     }
 }
 
@@ -160,8 +200,8 @@ public struct MTStyleParser {
                             type: type,
                             url: rawSource.url,
                             tiles: rawSource.tiles,
-                            minZoom: rawSource.minzoom,
-                            maxZoom: rawSource.maxzoom
+                            minZoom: rawSource.minzoom.map { Int($0) },
+                            maxZoom: rawSource.maxzoom.map { Int($0) }
                         ))
                     }
                 }

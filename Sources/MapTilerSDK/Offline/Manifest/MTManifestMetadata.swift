@@ -11,23 +11,23 @@ import Foundation
 
 // Metadata storing the original request parameters for the manifest.
 internal struct MTManifestMetadata: Codable, Sendable {
-    public let mapId: String?
-    public let styleURL: URL?
+    public let referenceStyle: MTMapReferenceStyle
+    public let styleVariant: MTMapStyleVariant?
     public let bbox: MTBoundingBox
     public let minZoom: Int
     public let maxZoom: Int
     public let pixelRatio: Float
 
     public init(
-        mapId: String? = nil,
-        styleURL: URL? = nil,
+        referenceStyle: MTMapReferenceStyle,
+        styleVariant: MTMapStyleVariant? = nil,
         bbox: MTBoundingBox,
         minZoom: Int,
         maxZoom: Int,
         pixelRatio: Float
     ) {
-        self.mapId = mapId
-        self.styleURL = styleURL
+        self.referenceStyle = referenceStyle
+        self.styleVariant = styleVariant
         self.bbox = bbox
         self.minZoom = minZoom
         self.maxZoom = maxZoom

@@ -3,10 +3,12 @@ import Foundation
 // Centralizes path resolution for offline packs.
 internal enum MTOfflineStoragePaths {
 
-    // The root offline directory: `Documents/MTOffline/`
+    // The root offline directory: `Library/Caches/MapTilerSDK/Offline/`
     internal static var rootDirectory: URL {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return paths[0].appendingPathComponent("MTOffline", isDirectory: true)
+        let paths = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
+        return paths[0]
+            .appendingPathComponent("MapTilerSDK", isDirectory: true)
+            .appendingPathComponent("Offline", isDirectory: true)
     }
 
     // The dedicated temporary directory for offline downloads.
@@ -58,14 +60,8 @@ internal enum MTOfflineStoragePaths {
             .appendingPathComponent("\(range).pbf", isDirectory: false)
     }
 
-    // The tile path for a specific pack, source, and Z, X, Y coordinates:
-    // `Documents/MTOffline/<packID>/tiles/<sourceId>/<z>/<x>/<y>.pbf`
-    internal static func tileURL(for packID: String, sourceId: String, z: Int, x: Int, y: Int) -> URL {
-        return packDirectory(for: packID)
-            .appendingPathComponent("tiles", isDirectory: true)
-            .appendingPathComponent(sourceId, isDirectory: true)
-            .appendingPathComponent("\(z)", isDirectory: true)
-            .appendingPathComponent("\(x)", isDirectory: true)
-            .appendingPathComponent("\(y).pbf", isDirectory: false)
+    // Returns the absolute URL for a relative path within a specific pack's directory.
+    internal static func absoluteURL(for packID: String, relativePath: String) -> URL {
+        return packDirectory(for: packID).appendingPathComponent(relativePath)
     }
 }

@@ -37,6 +37,9 @@ public enum MTError: Error {
     /// Method execution failed due to missing parent entity.
     case missingParent
 
+    /// Offline server failed to start or is not running.
+    case offlineServerFailed
+
     /// Numerical code of the exception.
     public var code: Int {
         switch self {
@@ -52,6 +55,8 @@ public enum MTError: Error {
             return 93
         case .missingParent:
             return 95
+        case .offlineServerFailed:
+            return 96
         }
     }
 
@@ -70,6 +75,8 @@ public enum MTError: Error {
             return "Bridge and/or Map are not loaded."
         case .missingParent:
             return "Missing parent entity."
+        case .offlineServerFailed:
+            return "Offline server failed to start or is not running."
         }
     }
 }

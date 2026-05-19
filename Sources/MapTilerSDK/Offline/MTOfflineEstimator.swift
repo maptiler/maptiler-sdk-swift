@@ -31,7 +31,8 @@ public struct MTOfflineEstimator: Sendable {
     public func estimatePack(region: MTOfflineRegionDefinition) async throws -> MTPackStats {
         let zoomRange = try MTOfflineZoomRange(minZoom: region.minZoom, maxZoom: region.maxZoom)
 
-        guard let styleURL = region.styleURL else {
+        guard let key = await MTConfig.shared.getAPIKey(),
+            let styleURL = region.referenceStyle.fetchStyleURL(variant: region.styleVariant, apiKey: key) else {
             // If no style URL, we can only estimate based on tile count if we assume a single vector source
             let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: zoomRange)
             return MTPackStats(

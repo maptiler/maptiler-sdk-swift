@@ -110,7 +110,39 @@ public actor MTOfflinePack {
         }
     }
 
+    /// Sets the delegate to receive download notifications.
+    public func setDelegate(_ delegate: MTOfflineDownloadDelegate?) {
+        self.delegate = delegate
+    }
+
+    /// Enables or disables progress reporting.
+    public func setProgressReportingEnabled(_ isEnabled: Bool) {
+        self.isProgressReportingEnabled = isEnabled
+    }
+
     /// Initializes a new pack to begin downloading.
+    public init(
+        region: MTOfflineRegionDefinition,
+        context: Data? = nil
+    ) {
+        let newId = UUID().uuidString
+        self.id = newId
+        self.region = region
+        self.downloader = MTOfflineDownloader()
+
+        // Initialize new metadata
+        self.metadata = MTOfflinePackMetadata(
+            id: UUID(uuidString: newId) ?? UUID(),
+            region: region,
+            state: .pending,
+            size: 0,
+            createdAt: Date(),
+            context: context
+        )
+        // Initial state sync will happen because we set state below
+        self.state = .pending
+    }
+
     internal init(
         id: String,
         region: MTOfflineRegionDefinition,
@@ -206,6 +238,7 @@ public actor MTOfflinePack {
                 if isProgressReportingEnabled {
                     delegate?.offlinePack(id, didUpdateProgress: progress)
                 }
+                await syncMetadataToDisk()
             }
         } catch is CancellationError {
             if state != .paused {
@@ -223,6 +256,15 @@ public actor MTOfflinePack {
         try await MTOfflineStorage.saveManifest(manifest, for: id)
         let tasks = buildTasks(from: manifest)
         try await startDownload(tasks: tasks)
+    }
+
+    /// Starts the download process for this pack.
+    /// This generates the necessary manifest based on the pack's region definition
+    /// and then begins downloading all required resources.
+    public func download() async throws {
+        let planner = MTOfflinePlannerFactory.createPlanner()
+        let manifest = try await planner.generateManifest(for: self.region)
+        try await self.startDownload(manifest: manifest)
     }
 
     /// Resumes a previously paused or failed download.
@@ -274,7 +316,7 @@ public actor MTOfflinePack {
         }
 
         let otherResources = manifest.tiles + manifest.glyphs + manifest.sprites
-        tasks.append(contentsOf: otherResources.map { MTResourceDownloadTask(resource: $0) })
+        tasks.append(contentsOf: otherResources.map { MTResourceDownloadTask(resource: $0, packId: id) })
 
         return tasks
     }

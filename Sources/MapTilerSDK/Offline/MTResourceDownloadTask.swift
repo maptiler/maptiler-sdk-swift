@@ -13,13 +13,17 @@ import Foundation
 internal struct MTResourceDownloadTask: MTDownloadTask {
     internal let id: String
     internal let resource: MTMapResource
-    internal var destinationURL: URL? { URL(fileURLWithPath: resource.destinationPath) }
+    internal let packId: String
+    internal var destinationURL: URL? {
+        MTOfflineStoragePaths.absoluteURL(for: packId, relativePath: resource.destinationPath)
+    }
 
     private let session: URLSession
 
-    internal init(resource: MTMapResource, session: URLSession = MTConfig.sharedURLSession) {
+    internal init(resource: MTMapResource, packId: String, session: URLSession = MTConfig.sharedURLSession) {
         self.id = resource.url.absoluteString
         self.resource = resource
+        self.packId = packId
         self.session = session
     }
 

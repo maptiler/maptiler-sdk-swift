@@ -137,6 +137,13 @@ public actor MTConfig {
         return unit
     }
 
+    /// Sets the maximum number of tiles allowed for a single offline region download.
+    /// This prevents users from accidentally downloading massive areas that consume too much storage.
+    /// - Parameter maxTileCount: The maximum allowed tiles (default is 15,000).
+    public func setOfflineMaxTileCount(_ maxTileCount: Int) {
+        MTOfflineConfiguration.shared.maxTileCount = maxTileCount
+    }
+
     /// Sets the telemetry.
     /// - Parameters:
     ///   - isEnabled:  Boolean indicating whether telemetry is enabled.

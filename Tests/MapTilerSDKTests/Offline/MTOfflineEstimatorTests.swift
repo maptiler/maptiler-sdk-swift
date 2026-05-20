@@ -10,7 +10,7 @@ struct MTOfflineEstimatorTests {
     @Test("Estimate pack without style URL")
     func testEstimateNoStyle() async throws {
         let bbox = MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1)
-        let region = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 2)
+        let region = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 2, referenceStyle: .basic)
         
         // Zoom 0: 1 tile
         // Zoom 1: 1 tile (0,0 to 1,1 fits in one tile at zoom 1 too? Wait...)

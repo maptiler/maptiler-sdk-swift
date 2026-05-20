@@ -17,7 +17,9 @@ extension URLResponse {
         if let contentLengthString = httpResponse.value(forHTTPHeaderField: "Content-Length"),
             let expectedSize = Int64(contentLengthString) {
             let actualSize = Int64(dataCount)
-            if expectedSize != actualSize {
+            // Allow actual size to be larger than expected (common with automatic decompression)
+            // but fail if it is smaller (indicating a truncated download).
+            if actualSize < expectedSize {
                 throw MTOfflinePackError.sizeMismatch(
                     expected: expectedSize,
                     actual: actualSize

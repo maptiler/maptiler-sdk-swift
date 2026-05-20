@@ -4,7 +4,9 @@ internal struct MTStyleDownloadTask: MTDownloadTask {
     internal let id: String
     internal let resource: MTMapResource
     internal let packId: String
-    internal var destinationURL: URL? { URL(fileURLWithPath: resource.destinationPath) }
+    internal var destinationURL: URL? {
+        MTOfflineStoragePaths.absoluteURL(for: packId, relativePath: resource.destinationPath)
+    }
 
     private let session: URLSession
 

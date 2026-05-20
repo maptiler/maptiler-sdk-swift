@@ -10,7 +10,7 @@
 import Foundation
 
 /// Defines purpose and guidelines on what information is displayed.
-public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable {
+public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
     /// Unique id of the style.
     public var id: String { getName() }
 
@@ -60,6 +60,72 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable {
     ///
     /// Custom style does not have variants.
     case custom(URL)
+
+    // MARK: - Codable
+
+    enum CodingKeys: String, CodingKey {
+        case base
+        case customUrl
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let baseStr = try container.decodeIfPresent(String.self, forKey: .base) {
+            switch baseStr {
+            case "streets": self = .streets
+            case "satellite": self = .satellite
+            case "outdoor": self = .outdoor
+            case "winter": self = .winter
+            case "dataviz": self = .dataviz
+            case "basic": self = .basic
+            case "bright": self = .bright
+            case "topo": self = .topo
+            case "toner": self = .toner
+            case "backdrop": self = .backdrop
+            case "openStreetMap": self = .openStreetMap
+            case "aquarelle": self = .aquarelle
+            case "landscape": self = .landscape
+            case "ocean": self = .ocean
+            default:
+                throw DecodingError.dataCorruptedError(
+                    forKey: .base,
+                    in: container,
+                    debugDescription: "Unknown base style"
+                )
+            }
+        } else if let urlStr = try container.decodeIfPresent(String.self, forKey: .customUrl),
+            let url = URL(string: urlStr) {
+            self = .custom(url)
+        } else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Invalid MTMapReferenceStyle encoding"
+                )
+            )
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .streets: try container.encode("streets", forKey: .base)
+        case .satellite: try container.encode("satellite", forKey: .base)
+        case .outdoor: try container.encode("outdoor", forKey: .base)
+        case .winter: try container.encode("winter", forKey: .base)
+        case .dataviz: try container.encode("dataviz", forKey: .base)
+        case .basic: try container.encode("basic", forKey: .base)
+        case .bright: try container.encode("bright", forKey: .base)
+        case .topo: try container.encode("topo", forKey: .base)
+        case .toner: try container.encode("toner", forKey: .base)
+        case .backdrop: try container.encode("backdrop", forKey: .base)
+        case .openStreetMap: try container.encode("openStreetMap", forKey: .base)
+        case .aquarelle: try container.encode("aquarelle", forKey: .base)
+        case .landscape: try container.encode("landscape", forKey: .base)
+        case .ocean: try container.encode("ocean", forKey: .base)
+        case .custom(let url): try container.encode(url.absoluteString, forKey: .customUrl)
+        }
+    }
 
     /// Returns all child variants.
     public func getVariants() -> [MTMapStyleVariant]? {
@@ -141,6 +207,25 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable {
         case .custom(let url):
             return url.absoluteString
         }
+    }
+
+    /// Resolves the concrete MapTiler Cloud style URL for this reference style and optional variant.
+    /// Returns `nil` if the configuration is invalid or the custom URL is malformed.
+    public func fetchStyleURL(variant: MTMapStyleVariant? = nil, apiKey: String) -> URL? {
+        if case let .custom(url) = self {
+            return url
+        }
+
+        let styleName = self.getName().lowercased()
+
+        var mapId: String
+        if let variant = variant, variant != .defaultVariant {
+            mapId = "\(styleName)-v2-\(variant.rawValue)"
+        } else {
+            mapId = "\(styleName)-v2"
+        }
+
+        return URL(string: "https://api.maptiler.com/maps/\(mapId)/style.json?key=\(apiKey)")
     }
 
     /// Returns all pre-made styles.

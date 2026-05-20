@@ -17,10 +17,10 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
     public let minZoom: Int
     /// The maximum zoom level.
     public let maxZoom: Int
-    /// The map ID.
-    public let mapId: String?
-    /// The style URL for the region.
-    public let styleURL: URL?
+    /// The reference style for the map.
+    public let referenceStyle: MTMapReferenceStyle
+    /// The optional style variant.
+    public let styleVariant: MTMapStyleVariant?
     /// The device pixel ratio.
     public let pixelRatio: Float
     /// The maximum number of tiles allowed for this region.
@@ -30,16 +30,16 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         bbox: MTBoundingBox,
         minZoom: Int,
         maxZoom: Int,
-        mapId: String? = nil,
-        styleURL: URL? = nil,
+        referenceStyle: MTMapReferenceStyle,
+        styleVariant: MTMapStyleVariant? = nil,
         pixelRatio: Float = 1.0,
         maxTileCount: Int? = nil
     ) {
         self.bbox = bbox
         self.minZoom = minZoom
         self.maxZoom = maxZoom
-        self.mapId = mapId
-        self.styleURL = styleURL
+        self.referenceStyle = referenceStyle
+        self.styleVariant = styleVariant
         self.pixelRatio = pixelRatio
         self.maxTileCount = maxTileCount
     }

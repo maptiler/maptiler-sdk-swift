@@ -167,6 +167,70 @@ open class MTMapView: UIView, Sendable {
         }
     }
 
+    /// Loads an offline pack onto the map view.
+    /// - Parameter pack: The `MTOfflinePack` to load.
+    @MainActor
+    public func loadOfflinePack(_ pack: MTOfflinePack) async throws {
+        let server = MTOfflineHTTPServer.shared
+        if !server.isRunning {
+            try server.start()
+        }
+
+        guard server.isRunning else {
+            throw MTError.offlineServerFailed
+        }
+
+        let baseURL = server.baseURLString()
+        // Ensure there are no double slashes if baseURL ends with /
+        let cleanBaseURL = baseURL.hasSuffix("/") ? String(baseURL.dropLast()) : baseURL
+        let localStyleURLString = "\(cleanBaseURL)/offline/\(pack.id)/style.json"
+
+        guard let url = URL(string: localStyleURLString) else { return }
+
+        // Update the proxy so that if 'didLoad' fires after this, it uses the offline style
+        // instead of reverting to the initial (online) style.
+        self.setProxy(referenceStyle: .custom(url), styleVariant: nil)
+
+        if self.style == nil {
+            self.style = MTStyle(for: self, with: .custom(url), and: nil)
+        }
+
+        await self.style?.setStyle(.custom(url), styleVariant: nil)
+
+        // Nudge camera to force fresh tile requests and avoid visual mixing,
+        // especially required when switching styles while completely offline.
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        await self.panBy(MTPoint(x: 1, y: 1))
+        await self.panBy(MTPoint(x: -1, y: -1))
+    }
+
+    /// Creates an offline region definition using the map's current reference style and variant.
+    /// - Parameters:
+    ///   - bbox: The bounding box of the region.
+    ///   - minZoom: The minimum zoom level.
+    ///   - maxZoom: The maximum zoom level.
+    ///   - pixelRatio: The pixel ratio (defaults to 1.0).
+    /// - Returns: A region definition configured with the current map's style configuration.
+    @MainActor
+    public func createOfflineRegion(
+        bbox: MTBoundingBox,
+        minZoom: Int,
+        maxZoom: Int,
+        pixelRatio: Float = 1.0
+    ) -> MTOfflineRegionDefinition {
+        let currentRefStyle = style?.referenceStyle ?? referenceStyleProxy
+        let currentVariant = style?.styleVariant ?? styleVariantProxy
+
+        return MTOfflineRegionDefinition(
+            bbox: bbox,
+            minZoom: minZoom,
+            maxZoom: maxZoom,
+            referenceStyle: currentRefStyle,
+            styleVariant: currentVariant,
+            pixelRatio: pixelRatio
+        )
+    }
+
     package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {

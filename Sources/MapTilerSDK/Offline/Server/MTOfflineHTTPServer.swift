@@ -16,85 +16,104 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
     internal static let shared = MTOfflineHTTPServer()
 
     private var listener: NWListener?
-    private var port: NWEndpoint.Port?
+    private var _port: NWEndpoint.Port?
     private let queue = DispatchQueue(label: "com.maptiler.offline.server", qos: .userInitiated)
+    private let lock = NSLock()
 
-    // Indicates if the server is currently running.
-    public private(set) var isRunning = false
+    private var _isRunning = false
+    public var isRunning: Bool {
+        lock.lock(); defer { lock.unlock() }
+        return _isRunning
+    }
 
     private init() {}
 
     // Starts the server on the specified port.
     // The port number to listen on defaults to 18080.
     internal func start(port: UInt16 = 18080) throws {
-        try queue.sync {
-            guard !isRunning else { return }
-
-            let nwPort = NWEndpoint.Port(rawValue: port)!
-            let parameters = NWParameters.tcp
-
-            var targetPort = nwPort
-            var listener: NWListener?
-
-            do {
-                listener = try NWListener(using: parameters, on: targetPort)
-            } catch {
-                MTLogger.log("Port \(port) is in use, falling back to any available port", type: .info)
-                targetPort = .any
-                listener = try NWListener(using: parameters, on: targetPort)
-            }
-
-            guard let validListener = listener else { return }
-
-            validListener.stateUpdateHandler = { [weak self] state in
-                switch state {
-                case .ready:
-                    let actualPort = validListener.port?.rawValue ?? 0
-                    MTLogger.log("Offline server ready on port \(actualPort)", type: .info)
-                    self?.port = validListener.port
-                case .failed(let error):
-                    MTLogger.log("Offline server failed: \(error)", type: .error)
-                default:
-                    break
-                }
-            }
-
-            validListener.newConnectionHandler = { [weak self] connection in
-                self?.handleNewConnection(connection)
-            }
-
-            validListener.start(queue: queue)
-            self.listener = validListener
-            self.port = targetPort
-            self.isRunning = true
+        lock.lock()
+        guard !_isRunning else {
+            lock.unlock()
+            return
         }
+        lock.unlock()
+
+        let nwPort = NWEndpoint.Port(rawValue: port)!
+        let parameters = NWParameters.tcp
+
+        var targetPort = nwPort
+        var listener: NWListener?
+
+        do {
+            listener = try NWListener(using: parameters, on: targetPort)
+        } catch {
+            MTLogger.log("Port \(port) is in use, falling back to any available port", type: .info)
+            targetPort = .any
+            listener = try NWListener(using: parameters, on: targetPort)
+        }
+
+        guard let validListener = listener else { return }
+
+        validListener.stateUpdateHandler = { [weak self] state in
+            switch state {
+            case .ready:
+                let actualPort = validListener.port?.rawValue ?? 0
+                MTLogger.log("Offline server ready on port \(actualPort)", type: .info)
+                self?.lock.lock()
+                self?._port = validListener.port
+                self?.lock.unlock()
+            case .failed(let error):
+                MTLogger.log("Offline server failed: \(error)", type: .error)
+                self?.lock.lock()
+                self?._isRunning = false
+                self?.lock.unlock()
+            case .cancelled:
+                MTLogger.log("Offline server cancelled", type: .info)
+                self?.lock.lock()
+                self?._isRunning = false
+                self?.lock.unlock()
+            default:
+                break
+            }
+        }
+
+        validListener.newConnectionHandler = { [weak self] connection in
+            self?.handleNewConnection(connection)
+        }
+
+        validListener.start(queue: queue)
+
+        lock.lock()
+        self.listener = validListener
+        self._port = targetPort
+        self._isRunning = true
+        lock.unlock()
     }
 
     // Stops the server and cancels all active connections.
     internal func stop() {
-        queue.sync {
-            listener?.cancel()
-            listener = nil
-            port = nil
-            isRunning = false
-            MTLogger.log("Offline server stopped", type: .info)
-        }
+        lock.lock()
+        listener?.cancel()
+        listener = nil
+        _port = nil
+        _isRunning = false
+        lock.unlock()
+        MTLogger.log("Offline server stopped", type: .info)
     }
 
     // Returns the base URL string for the server.
     internal func baseURLString() -> String {
-        return queue.sync {
-            guard let port = port else { return "" }
-            return "http://127.0.0.1:\(port.rawValue)"
-        }
+        lock.lock(); defer { lock.unlock() }
+        guard let port = _port else { return "" }
+        return "http://127.0.0.1:\(port.rawValue)"
     }
 
     private func handleNewConnection(_ connection: NWConnection) {
         connection.start(queue: queue)
-        receiveData(from: connection)
+        receiveData(from: connection, buffer: Data())
     }
 
-    private func receiveData(from connection: NWConnection) {
+    private func receiveData(from connection: NWConnection, buffer: Data) {
         connection.receive(
             minimumIncompleteLength: 1,
             maximumLength: 65536
@@ -111,14 +130,20 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
                 return
             }
 
+            var currentBuffer = buffer
             if let data = content, !data.isEmpty {
-                self.processData(data, on: connection)
+                currentBuffer.append(data)
             }
 
-            if isComplete {
+            // Check if we have received the full HTTP headers
+            if let range = currentBuffer.range(of: Data("\r\n\r\n".utf8)) {
+                let headerData = currentBuffer.prefix(upTo: range.lowerBound)
+                self.processData(headerData, on: connection)
+            } else if isComplete {
                 connection.cancel()
-            } else if error == nil {
-                self.receiveData(from: connection)
+            } else {
+                // Continue reading from the socket until we get the full headers
+                self.receiveData(from: connection, buffer: currentBuffer)
             }
         }
     }
@@ -147,6 +172,8 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
         let method = parts[0]
         let path = (parts[1] as NSString).removingPercentEncoding ?? parts[1]
 
+        MTLogger.log("Offline server GET \(path)", type: .info)
+
         if method == "GET" {
             if path == "/health" || path == "/health/" {
                 sendResponse(
@@ -156,6 +183,26 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
                     on: connection
                 )
             } else if let resolved = router.resolve(path: path) {
+                // Dynamically transform style.json to inject the correct baseURL with the current port
+                if resolved.url.lastPathComponent == "style.json",
+                    let fileData = try? Data(contentsOf: resolved.url),
+                    let jsonObject = try? JSONSerialization.jsonObject(with: fileData) as? [String: Any] {
+
+                    let packID = resolved.url.deletingLastPathComponent().lastPathComponent
+                    let processor = MTStyleProcessor(baseURL: self.baseURLString(), packName: packID)
+                    let transformed = processor.transform(style: jsonObject)
+
+                    if let transformedData = try? JSONSerialization.data(withJSONObject: transformed, options: []) {
+                        sendResponse(
+                            statusCode: 200,
+                            body: transformedData,
+                            mimeType: "application/json",
+                            on: connection
+                        )
+                        return
+                    }
+                }
+
                 if let fileData = try? Data(contentsOf: resolved.url) {
                     sendResponse(statusCode: 200, body: fileData, mimeType: resolved.mimeType, on: connection)
                 } else {

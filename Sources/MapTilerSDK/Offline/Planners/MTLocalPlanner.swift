@@ -38,8 +38,8 @@ internal class MTLocalPlanner: MTOfflinePlanner {
         try validate(definition: definition)
 
         let metadata = MTManifestMetadata(
-            mapId: definition.mapId,
-            styleURL: definition.styleURL,
+            referenceStyle: definition.referenceStyle,
+            styleVariant: definition.styleVariant,
             bbox: definition.bbox,
             minZoom: definition.minZoom,
             maxZoom: definition.maxZoom,
@@ -47,12 +47,20 @@ internal class MTLocalPlanner: MTOfflinePlanner {
         )
 
         let resolvedStyle: (resource: MTMapResource, dependencies: MTStyleDependencies)?
-        if let styleURL = definition.styleURL {
-            resolvedStyle = try await resolveStyle(url: styleURL)
-        } else if let mapId = definition.mapId {
-            resolvedStyle = try await resolveStyle(mapId: mapId)
+        if case .custom(let customURL) = definition.referenceStyle {
+            // For custom styles we still just use the URL
+            resolvedStyle = try await resolveStyle(url: customURL)
         } else {
-            resolvedStyle = nil
+            guard let key = await MTConfig.shared.getAPIKey() else {
+                throw MTOfflinePackError.unauthorized
+            }
+            guard let styleURL = definition.referenceStyle.fetchStyleURL(
+                variant: definition.styleVariant,
+                apiKey: key
+            ) else {
+                throw MTOfflinePackError.invalidZoomRange // Generic mapId failure fallback
+            }
+            resolvedStyle = try await resolveStyle(url: styleURL)
         }
 
         let tileResources = try await generateTileResources(
@@ -116,17 +124,6 @@ extension MTLocalPlanner {
         let parser = MTStyleParser()
         let dependencies = try parser.extractDependencies(from: data)
         return (resource, dependencies)
-    }
-
-    private func resolveStyle(mapId: String) async throws -> (MTMapResource, MTStyleDependencies) {
-        guard let key = await MTConfig.shared.getAPIKey() else {
-            throw MTOfflinePackError.unauthorized
-        }
-        let urlString = "https://api.maptiler.com/maps/\(mapId)/style.json?key=\(key)"
-        guard let url = URL(string: urlString) else {
-            throw MTOfflinePackError.invalidZoomRange // generic error
-        }
-        return try await resolveStyle(url: url)
     }
 
     private func generateTileResources(

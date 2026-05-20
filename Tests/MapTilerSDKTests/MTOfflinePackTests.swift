@@ -6,7 +6,7 @@ final class MTOfflinePackTests: XCTestCase {
     func testPackCancellationUpdatesStateAndStopsDownloads() async throws {
         let downloader = MTOfflineDownloader(maxInFlight: 2)
         let bbox = MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1)
-        let region = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 1, mapId: "basic")
+        let region = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 1, referenceStyle: .basic)
         let pack = MTOfflinePack(id: "test-pack", region: region, downloader: downloader)
         
         actor CancellationTracker {

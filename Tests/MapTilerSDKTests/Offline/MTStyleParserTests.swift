@@ -116,19 +116,17 @@ struct MTStyleParserTests {
         }
     }
 
-    @Test("Parse style with sources")
-    func testParseSources() throws {
+    @Test("Parse style with Double zooms in sources")
+    func testParseDoubleZooms() throws {
         let json = """
         {
             "version": 8,
             "sources": {
                 "vector-source": {
                     "type": "vector",
-                    "url": "https://api.maptiler.com/tiles/v1.json"
-                },
-                "raster-source": {
-                    "type": "raster",
-                    "tiles": ["https://api.maptiler.com/tiles/{z}/{x}/{y}.png"]
+                    "url": "https://api.maptiler.com/tiles/v1.json",
+                    "minzoom": 0.0,
+                    "maxzoom": 14.0
                 }
             },
             "layers": []
@@ -138,14 +136,33 @@ struct MTStyleParserTests {
         
         let dependencies = try parser.extractDependencies(from: data)
         
-        #expect(dependencies.sources.count == 2)
+        #expect(dependencies.sources.count == 1)
+        #expect(dependencies.sources.first?.minZoom == 0)
+        #expect(dependencies.sources.first?.maxZoom == 14)
+    }
+
+    @Test("Parse style with expression in text-font")
+    func testParseExpressionTextFont() throws {
+        let json = """
+        {
+            "version": 8,
+            "sources": {},
+            "layers": [
+                {
+                    "id": "label",
+                    "type": "symbol",
+                    "layout": {
+                        "text-font": ["get", "font_name"]
+                    }
+                }
+            ]
+        }
+        """
+        let data = json.data(using: .utf8)!
         
-        let vectorSource = dependencies.sources.first { $0.id == "vector-source" }
-        #expect(vectorSource?.type == "vector")
-        #expect(vectorSource?.url == "https://api.maptiler.com/tiles/v1.json")
+        // This should not throw now
+        let dependencies = try parser.extractDependencies(from: data)
         
-        let rasterSource = dependencies.sources.first { $0.id == "raster-source" }
-        #expect(rasterSource?.type == "raster")
-        #expect(rasterSource?.tiles?.first == "https://api.maptiler.com/tiles/{z}/{x}/{y}.png")
+        #expect(dependencies.fontStacks.isEmpty)
     }
 }

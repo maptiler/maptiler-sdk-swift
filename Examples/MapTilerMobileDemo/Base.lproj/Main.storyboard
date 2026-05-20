@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="a6j-nn-Qnz">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="a6j-nn-Qnz">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -25,6 +25,7 @@
                     <connections>
                         <segue destination="BYZ-38-t0r" kind="relationship" relationship="viewControllers" id="AQG-Qz-rM6"/>
                         <segue destination="ym7-yT-SK7" kind="relationship" relationship="viewControllers" id="3cL-oE-Fur"/>
+                        <segue destination="Offline-VC-ID" kind="relationship" relationship="viewControllers" id="Offline-Segue-ID"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9oR-79-o8x" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -198,6 +199,26 @@
             </objects>
             <point key="canvasLocation" x="148" y="349"/>
         </scene>
+        <!--Offline-->
+        <scene sceneID="Offline-Scene-ID">
+            <objects>
+                <viewController id="Offline-VC-ID" customClass="OfflineViewController" customModule="MapTilerMobileDemo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Offline-View-ID">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="QqU-10-B97"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Offline" id="Offline-Tab-ID">
+                        <imageReference key="image" image="network.slash" catalog="system" symbolScale="large"/>
+                        <color key="badgeColor" red="0.0" green="0.63137254899999995" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                        <imageReference key="selectedImage" image="network.slash" catalog="system" symbolScale="large"/>
+                    </tabBarItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Offline-Responder-ID" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-550" y="1180"/>
+        </scene>
         <!--Styles-->
         <scene sceneID="Nlb-BW-3eu">
             <objects>
@@ -255,6 +276,7 @@
     <resources>
         <image name="arrow.up.left.and.arrow.down.right" catalog="system" width="128" height="115"/>
         <image name="map" catalog="system" width="128" height="112"/>
+        <image name="network.slash" catalog="system" width="123" height="128"/>
         <image name="square.3.layers.3d.down.left" catalog="system" width="122" height="128"/>
         <image name="uiwindow.split.2x1" catalog="system" width="128" height="93"/>
         <systemColor name="systemBackgroundColor">

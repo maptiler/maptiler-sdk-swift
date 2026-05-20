@@ -97,7 +97,7 @@ struct MTOfflineErrorTests {
         }
         
         let resource = MTMapResource(url: url, destinationPath: "/tmp/tile404.pbf")
-        let task = MTResourceDownloadTask(resource: resource, session: session)
+        let task = MTResourceDownloadTask(resource: resource, packId: "test-pack", session: session)
         
         _ = try? await downloader.download([task])
         
@@ -118,7 +118,7 @@ struct MTOfflineErrorTests {
         }
         
         let resource = MTMapResource(url: url, destinationPath: "/tmp/tile204.pbf")
-        let task = MTResourceDownloadTask(resource: resource, session: session)
+        let task = MTResourceDownloadTask(resource: resource, packId: "test-pack", session: session)
         
         _ = try? await downloader.download([task])
         
@@ -138,7 +138,7 @@ struct MTOfflineErrorTests {
         }
         
         let resource = MTMapResource(url: url, destinationPath: "/tmp/tileMismatch.pbf")
-        let task = MTResourceDownloadTask(resource: resource, session: session)
+        let task = MTResourceDownloadTask(resource: resource, packId: "test-pack", session: session)
         
         _ = try? await downloader.download([task])
         

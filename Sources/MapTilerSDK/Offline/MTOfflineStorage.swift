@@ -41,7 +41,12 @@ internal enum MTOfflineStorage {
             if fileManager.fileExists(atPath: destination.path) {
                 try fileManager.removeItem(at: destination)
             }
-            try fileManager.moveItem(at: source, to: destination)
+
+            do {
+                try fileManager.moveItem(at: source, to: destination)
+            } catch {
+                throw MTOfflineStorageError.writeFailed(error)
+            }
         }.value
     }
 
@@ -138,7 +143,35 @@ internal enum MTOfflineStorage {
 
     // Cleans up any stale temporary files.
     internal static func cleanStaleTempFiles(for packURL: URL? = nil) async {
-        // No-op for now as we are using atomic writes which manage their own temp files.
+        try? await Task.detached(priority: .background) {
+            let fileManager = FileManager.default
+
+            if let url = packURL {
+                // Clean up specific pack directory (e.g. from interrupted downloads)
+                let contents = (try? fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)) ?? []
+                for item in contents {
+                    let name = item.lastPathComponent
+                    // Remove hidden files or UUID-style temp files
+                    if name.hasPrefix(".") || UUID(uuidString: name) != nil {
+                        try? fileManager.removeItem(at: item)
+                    }
+                }
+            } else {
+                // Clean up the global temp directory
+                let tempDir = MTOfflineStoragePaths.tempDirectory
+                if fileManager.fileExists(atPath: tempDir.path) {
+                    let contents = (
+                        try? fileManager.contentsOfDirectory(
+                            at: tempDir,
+                            includingPropertiesForKeys: nil
+                        )
+                    ) ?? []
+                    for item in contents {
+                        try? fileManager.removeItem(at: item)
+                    }
+                }
+            }
+        }.value
     }
 
     /// Verifies if a file exists and is valid (size > 0).

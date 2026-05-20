@@ -44,51 +44,61 @@ public struct MTOfflineEstimator: Sendable {
 
         let (data, _) = try await URLSession.shared.data(from: styleURL)
 
-        let parser = MTStyleParser()
-        let dependencies = try parser.extractDependencies(from: data)
+        do {
+            let parser = MTStyleParser()
+            let dependencies = try parser.extractDependencies(from: data)
 
-        var totalSize: Int64 = MTOfflineEstimator.averageStyleSize
-        var totalResourceCount = 1 // Style itself
+            var totalSize: Int64 = MTOfflineEstimator.averageStyleSize
+            var totalResourceCount = 1 // Style itself
 
-        let spriteCount = dependencies.sprites.count * 2 // JSON + PNG
-        totalResourceCount += spriteCount
-        totalSize += Int64(spriteCount) * MTOfflineEstimator.averageSpriteSize
+            let spriteCount = dependencies.sprites.count * 2 // JSON + PNG
+            totalResourceCount += spriteCount
+            totalSize += Int64(spriteCount) * MTOfflineEstimator.averageSpriteSize
 
-        // Rough estimate: we download common glyph ranges for each font stack
-        // Common ranges are 0-255 (Basic Latin) and maybe a few others.
-        // Let's assume 4 ranges per font stack for estimation.
-        let glyphRangesPerFontStack = 4
-        let glyphCount = dependencies.fontStacks.count * glyphRangesPerFontStack
-        totalResourceCount += glyphCount
-        totalSize += Int64(glyphCount) * MTOfflineEstimator.averageGlyphRangeSize
+            // Rough estimate: we download common glyph ranges for each font stack
+            // Common ranges are 0-255 (Basic Latin) and maybe a few others.
+            // Let's assume 4 ranges per font stack for estimation.
+            let glyphRangesPerFontStack = 4
+            let glyphCount = dependencies.fontStacks.count * glyphRangesPerFontStack
+            totalResourceCount += glyphCount
+            totalSize += Int64(glyphCount) * MTOfflineEstimator.averageGlyphRangeSize
 
-        var tilesPerSource: [String: Int] = [:]
+            var tilesPerSource: [String: Int] = [:]
 
-        for source in dependencies.sources {
-            // Source-specific zoom range constraints
-            let sourceMinZoom = max(region.minZoom, source.minZoom ?? 0)
-            let sourceMaxZoom = min(region.maxZoom, source.maxZoom ?? 22)
+            for source in dependencies.sources {
+                // Source-specific zoom range constraints
+                let sourceMinZoom = max(region.minZoom, source.minZoom ?? 0)
+                let sourceMaxZoom = min(region.maxZoom, source.maxZoom ?? 22)
 
-            if sourceMinZoom <= sourceMaxZoom {
-                if let sourceZoomRange = try? MTOfflineZoomRange(minZoom: sourceMinZoom, maxZoom: sourceMaxZoom) {
-                    let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: sourceZoomRange)
-                    tilesPerSource[source.id] = tileCount
-                    totalResourceCount += tileCount
+                if sourceMinZoom <= sourceMaxZoom {
+                    if let sourceZoomRange = try? MTOfflineZoomRange(minZoom: sourceMinZoom, maxZoom: sourceMaxZoom) {
+                        let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: sourceZoomRange)
+                        tilesPerSource[source.id] = tileCount
+                        totalResourceCount += tileCount
 
-                    if let type = source.type, type.contains("raster") {
-                        totalSize += Int64(tileCount) * MTOfflineEstimator.averageTileSizeRaster
-                    } else {
-                        // Default to vector
-                        totalSize += Int64(tileCount) * MTOfflineEstimator.averageTileSizeVector
+                        if let type = source.type, type.contains("raster") {
+                            totalSize += Int64(tileCount) * MTOfflineEstimator.averageTileSizeRaster
+                        } else {
+                            // Default to vector
+                            totalSize += Int64(tileCount) * MTOfflineEstimator.averageTileSizeVector
+                        }
                     }
                 }
             }
-        }
 
-        return MTPackStats(
-            expectedSize: totalSize,
-            resourceCount: totalResourceCount,
-            tilesPerSource: tilesPerSource
-        )
+            return MTPackStats(
+                expectedSize: totalSize,
+                resourceCount: totalResourceCount,
+                tilesPerSource: tilesPerSource
+            )
+        } catch {
+            // Fallback to basic estimation if parsing fails
+            let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: zoomRange)
+            return MTPackStats(
+                expectedSize: Int64(tileCount) * MTOfflineEstimator.averageTileSizeVector,
+                resourceCount: tileCount,
+                tilesPerSource: ["default": tileCount]
+            )
+        }
     }
 }

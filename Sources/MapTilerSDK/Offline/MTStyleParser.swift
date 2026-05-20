@@ -141,10 +141,10 @@ internal struct MTStyleRoot: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.sprite = try? container.decodeIfPresent(MTSpriteDecodable.self, forKey: .sprite)
-        self.glyphs = try? container.decodeIfPresent(String.self, forKey: .glyphs)
-        self.sources = try? container.decodeIfPresent([String: MTStyleSourceRaw].self, forKey: .sources)
-        self.layers = try? container.decodeIfPresent([MTStyleLayerRaw].self, forKey: .layers)
+        self.sprite = try container.decodeIfPresent(MTSpriteDecodable.self, forKey: .sprite)
+        self.glyphs = try container.decodeIfPresent(String.self, forKey: .glyphs)
+        self.sources = try container.decodeIfPresent([String: MTStyleSourceRaw].self, forKey: .sources)
+        self.layers = try container.decodeIfPresent([MTStyleLayerRaw].self, forKey: .layers)
     }
 }
 
@@ -212,7 +212,12 @@ public struct MTStyleParser {
         if let rawLayers = styleRoot.layers {
             for layer in rawLayers {
                 if let font = layer.layout?.textFont {
-                    uniqueFontStacks.insert(font)
+                    // Simple check to filter out expressions:
+                    // If it's an expression, the first element is usually an operator (e.g. "get", "match", etc.)
+                    // Static font stacks are typically just an array of font names.
+                    if !isExpression(font) {
+                        uniqueFontStacks.insert(font)
+                    }
                 }
             }
         }
@@ -223,5 +228,16 @@ public struct MTStyleParser {
             sources: sources,
             fontStacks: Array(uniqueFontStacks)
         )
+    }
+
+    private func isExpression(_ fontStack: [String]) -> Bool {
+        guard let first = fontStack.first else { return false }
+
+        // A non-exhaustive list of common operators that indicate an expression
+        let operators: Set<String> = [
+            "get", "has", "at", "in", "match", "case", "step", "interpolate", "coalesce", "let", "var", "literal"
+        ]
+
+        return operators.contains(first)
     }
 }

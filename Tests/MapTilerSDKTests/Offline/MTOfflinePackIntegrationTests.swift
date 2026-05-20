@@ -17,7 +17,7 @@ struct MTOfflinePackIntegrationTests {
             bbox: bbox,
             minZoom: 0,
             maxZoom: 10,
-            mapId: "test-map",
+            referenceStyle: .basic,
             maxTileCount: 1000
         )
         
@@ -63,7 +63,8 @@ struct MTOfflinePackIntegrationTests {
         let region = MTOfflineRegionDefinition(
             bbox: bbox,
             minZoom: 0,
-            maxZoom: 10
+            maxZoom: 10,
+            referenceStyle: .basic
         )
         
         // Create packs with delays to ensure different creation dates after ISO8601 truncation
@@ -103,7 +104,8 @@ struct MTOfflinePackIntegrationTests {
         let region = MTOfflineRegionDefinition(
             bbox: MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1),
             minZoom: 0,
-            maxZoom: 1
+            maxZoom: 1,
+            referenceStyle: .basic
         )
         
         let packURL = MTOfflineStoragePaths.packDirectory(for: packId)
@@ -140,7 +142,8 @@ struct MTOfflinePackIntegrationTests {
         let region = MTOfflineRegionDefinition(
             bbox: MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1),
             minZoom: 0,
-            maxZoom: 1
+            maxZoom: 1,
+            referenceStyle: .basic
         )
         
         let pack = try await MTOfflinePack.createPack(region: region)
@@ -191,7 +194,8 @@ struct MTOfflinePackIntegrationTests {
         let region = MTOfflineRegionDefinition(
             bbox: MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1),
             minZoom: 0,
-            maxZoom: 1
+            maxZoom: 1,
+            referenceStyle: .basic
         )
         
         let _ = try await MTOfflinePack.createPack(region: region)

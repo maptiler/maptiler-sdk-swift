@@ -60,6 +60,17 @@ internal enum MTOfflineStoragePaths {
             .appendingPathComponent("\(range).pbf", isDirectory: false)
     }
 
+    // The tile path for a specific pack, source, and tile coordinates:
+    // `<packDirectory>/tiles/<sourceId>/<z>/<x>/<y>.pbf`
+    internal static func tileURL(for packID: String, sourceId: String, z: Int, x: Int, y: Int) -> URL {
+        return packDirectory(for: packID)
+            .appendingPathComponent("tiles", isDirectory: true)
+            .appendingPathComponent(sourceId, isDirectory: true)
+            .appendingPathComponent("\(z)", isDirectory: true)
+            .appendingPathComponent("\(x)", isDirectory: true)
+            .appendingPathComponent("\(y).pbf", isDirectory: false)
+    }
+
     // Returns the absolute URL for a relative path within a specific pack's directory.
     internal static func absoluteURL(for packID: String, relativePath: String) -> URL {
         return packDirectory(for: packID).appendingPathComponent(relativePath)

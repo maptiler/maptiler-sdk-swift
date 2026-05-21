@@ -136,7 +136,9 @@ internal actor MTOfflineDownloader {
 
             if isPackCancelled || Task.isCancelled {
                 group.cancelAll()
-                break
+                // We continue the loop to ensure we process remaining results
+                // and clear activeTasks, but we don't start new tasks.
+                continue
             }
 
             if let nextTask = iterator.next() {

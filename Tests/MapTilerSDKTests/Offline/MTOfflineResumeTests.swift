@@ -60,30 +60,26 @@ struct MTOfflineResumeTests {
         
         let downloader = MTOfflineDownloader()
         
-        actor Counter {
+        class SafeCounter: @unchecked Sendable {
+            private let lock = NSLock()
             var completed = 0
             var skipped = 0
             func add(completed: Int, skipped: Int) {
+                lock.lock()
+                defer { lock.unlock() }
                 self.completed += completed
                 self.skipped += skipped
             }
         }
         
-        let counter = Counter()
+        let counter = SafeCounter()
         
         try? await downloader.download([task1, task2]) { completed, skipped in
-            let c = completed
-            let s = skipped
-            Task {
-                await counter.add(completed: c, skipped: s)
-            }
+            counter.add(completed: completed, skipped: skipped)
         }
         
-        // Give some time for progress events to fire
-        try await Task.sleep(nanoseconds: 100_000_000)
-        
-        let finalSkipped = await counter.skipped
-        let finalCompleted = await counter.completed
+        let finalSkipped = counter.skipped
+        let finalCompleted = counter.completed
         
         #expect(finalSkipped == 1, "One task should have been skipped")
         #expect(finalCompleted == 1, "One task should have been completed")

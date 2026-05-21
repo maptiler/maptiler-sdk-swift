@@ -168,9 +168,11 @@ open class MTMapView: UIView, Sendable {
     }
 
     /// Loads an offline pack onto the map view.
-    /// - Parameter pack: The `MTOfflinePack` to load.
+    /// - Parameters:
+    ///   - pack: The `MTOfflinePack` to load.
+    ///   - limitToRegion: Default `true` limits max bounds and zoom range to the pack's region.
     @MainActor
-    public func loadOfflinePack(_ pack: MTOfflinePack) async throws {
+    public func loadOfflinePack(_ pack: MTOfflinePack, limitToRegion: Bool = true) async throws {
         let server = MTOfflineHTTPServer.shared
         if !server.isRunning {
             try server.start()
@@ -196,6 +198,12 @@ open class MTMapView: UIView, Sendable {
         }
 
         await self.style?.setStyle(.custom(url), styleVariant: nil)
+
+        if limitToRegion {
+            try await self.setMaxBounds(pack.region.bbox.bounds)
+            try await self.setMinZoom(Double(pack.region.minZoom))
+            try await self.setMaxZoom(Double(pack.region.maxZoom))
+        }
 
         // Nudge camera to force fresh tile requests and avoid visual mixing,
         // especially required when switching styles while completely offline.

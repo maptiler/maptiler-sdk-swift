@@ -190,6 +190,7 @@ public actor MTOfflinePack {
 
         // Update the struct before saving
         metadata.state = state
+        metadata.size = await MTOfflineStorage.calculatePackSize(for: id)
 
         do {
             try await MTOfflineStorage.saveMetadata(metadata)

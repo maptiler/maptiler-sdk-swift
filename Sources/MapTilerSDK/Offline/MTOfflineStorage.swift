@@ -174,6 +174,25 @@ internal enum MTOfflineStorage {
         }.value
     }
 
+    /// Calculates the total size of all files in the pack directory.
+    internal static func calculatePackSize(for packID: String) async -> Int64 {
+        let packURL = MTOfflineStoragePaths.packDirectory(for: packID)
+        let fileManager = FileManager.default
+
+        return await Task.detached(priority: .userInitiated) {
+            var totalSize: Int64 = 0
+            let enumerator = fileManager.enumerator(at: packURL, includingPropertiesForKeys: [.fileSizeKey])
+
+            while let fileURL = enumerator?.nextObject() as? URL {
+                if let resources = try? fileURL.resourceValues(forKeys: [.fileSizeKey]),
+                    let fileSize = resources.fileSize {
+                    totalSize += Int64(fileSize)
+                }
+            }
+            return totalSize
+        }.value
+    }
+
     /// Verifies if a file exists and is valid (size > 0).
     internal static func isFileVerified(at url: URL) -> Bool {
         let fileManager = FileManager.default

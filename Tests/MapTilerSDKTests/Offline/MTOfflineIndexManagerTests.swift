@@ -136,4 +136,67 @@ struct MTOfflineIndexManagerTests {
             #expect(error is DecodingError)
         }
     }
+
+    @Test("Concurrent state updates on IndexManager (Actor Reentrancy & Data Races)")
+    func testConcurrentStateUpdates() async throws {
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: tempDir) }
+        
+        let indexURL = tempDir.appendingPathComponent("concurrent_index.json")
+        let manager = MTOfflineIndexManager(fileURL: indexURL)
+        try await manager.load()
+        
+        // Concurrently update states for a large number of assets
+        await withTaskGroup(of: Void.self) { group in
+            for i in 0..<1000 {
+                group.addTask {
+                    let assetId = "asset_\(i)"
+                    // Alternating states for variety
+                    let state: MTOfflineAssetState = (i % 2 == 0) ? .downloading : .verified
+                    await manager.updateState(for: assetId, to: state)
+                }
+            }
+        }
+        
+        // Assert all states were successfully recorded
+        let finalIndex = await manager.currentIndex
+        #expect(finalIndex.assets.count == 1000)
+        
+        // Verify a specific one
+        #expect(finalIndex.assets["asset_500"] == .downloading)
+        #expect(finalIndex.assets["asset_501"] == .verified)
+        
+        try await manager.save()
+        let diskData = try Data(contentsOf: indexURL)
+        #expect(diskData.count > 0, "Saved index should not be empty")
+    }
+
+    @Test("Test index clear removes all tracked assets")
+    func testIndexClear() async throws {
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: tempDir) }
+        
+        let indexURL = tempDir.appendingPathComponent("clear_index.json")
+        let manager = MTOfflineIndexManager(fileURL: indexURL)
+        try await manager.load()
+        
+        await manager.updateState(for: "test_asset", to: .verified)
+        try await manager.save()
+        
+        var index = await manager.currentIndex
+        #expect(!index.assets.isEmpty)
+        
+        try await manager.clear()
+        
+        index = await manager.currentIndex
+        #expect(index.assets.isEmpty)
+        
+        // Verify disk was also cleared
+        let diskData = try Data(contentsOf: indexURL)
+        let jsonObject = try JSONSerialization.jsonObject(with: diskData) as? [String: Any]
+        let assetsDict = jsonObject?["assets"] as? [String: String]
+        #expect(assetsDict?.isEmpty == true)
+    }
 }

@@ -135,6 +135,8 @@ extension MTLocalPlanner {
         guard let sources = dependencies?.sources else { return [] }
         var resources: [MTMapResource] = []
 
+        let splitBoxes = bbox.normalizedAndSplit()
+
         for source in sources {
             guard let resolved = await resolveTemplateURL(for: source) else { continue }
             let template = resolved.template
@@ -147,16 +149,19 @@ extension MTLocalPlanner {
 
             let ext = detectExtension(from: template)
             let effRange = effMin...effMax
-            let rangesByZoom = MTTileMath.tileRanges(for: bbox, zoomRange: effRange)
 
-            let sourceResources = createResources(
-                for: source,
-                template: template,
-                ext: ext,
-                rangesByZoom: rangesByZoom,
-                zoomRange: effRange
-            )
-            resources.append(contentsOf: sourceResources)
+            for box in splitBoxes {
+                let rangesByZoom = MTTileMath.tileRanges(for: box, zoomRange: effRange)
+
+                let sourceResources = createResources(
+                    for: source,
+                    template: template,
+                    ext: ext,
+                    rangesByZoom: rangesByZoom,
+                    zoomRange: effRange
+                )
+                resources.append(contentsOf: sourceResources)
+            }
         }
         return resources
     }

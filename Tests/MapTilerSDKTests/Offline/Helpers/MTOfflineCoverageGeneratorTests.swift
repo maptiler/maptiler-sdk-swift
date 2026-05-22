@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2025, MapTiler
+// Copyright (c) 2026, MapTiler
 // All rights reserved.
 // SPDX-License-Identifier: BSD 3-Clause
 //
@@ -10,7 +10,7 @@
 import Testing
 @testable import MapTilerSDK
 
-@Suite("MTOfflineCoverageGenerator Tests")
+@Suite("MTOfflineCoverageGenerator Robust Tests")
 struct MTOfflineCoverageGeneratorTests {
     
     @Test("Generates exactly 1 tile for global zoom 0")
@@ -63,13 +63,37 @@ struct MTOfflineCoverageGeneratorTests {
         #expect(Set(tiles) == expectedTiles)
     }
     
+    @Test("Antimeridian crossing handling")
+    func testAntimeridianCrossing() throws {
+        // Box crossing antimeridian: 170..-170 (20 degrees span)
+        // Latitude 0..10.
+        let bbox = MTBoundingBox(minLon: 170, minLat: 0, maxLon: -170, maxLat: 10)
+        let inputs = try MTOfflineCoverageInputs(scheme: "xyz", minZoom: 10, maxZoom: 10)
+        let generator = MTOfflineCoverageGenerator(boundingBox: bbox, inputs: inputs)
+        
+        let tiles = Array(generator)
+        
+        // At zoom 10, world is 1024 tiles wide.
+        // Left split (170..180) is at the far right of the X range.
+        // Right split (-180..-170) is at the far left of the X range.
+        // It SHOULD NOT include tiles from the middle (e.g., X=512).
+        
+        for tile in tiles {
+            // X should be near 0 or near 1023
+            #expect(tile.x < 100 || tile.x > 900)
+            #expect(tile.x != 512)
+        }
+        
+        #expect(tiles.count > 0)
+    }
+
     @Test("Tile generation count matches math estimation")
     func testGenerationMatchesEstimation() throws {
         let bbox = MTBoundingBox(minLon: -10, minLat: -10, maxLon: 10, maxLat: 10)
         let zoomRange = try MTOfflineZoomRange(minZoom: 1, maxZoom: 3)
         let inputs = try MTOfflineCoverageInputs(scheme: "xyz", minZoom: 1, maxZoom: 3)
         
-        let estimatedCount = MTTileMath.estimateTileCount(for: bbox, zoomRange: zoomRange)
+        let estimatedCount = MTTileMath.estimateTileCount(for: bbox, zoomRange: zoomRange, buffer: 1)
         
         let generator = MTOfflineCoverageGenerator(boundingBox: bbox, inputs: inputs)
         let tiles = Array(generator)

@@ -170,6 +170,68 @@ struct MTStyleProcessorTests {
         #expect(pngURL2x == "\(baseURL)/offline/\(packName)/sprite@2x.png")
     }
 
+    @Test("Purging maptiler_attribution source and its layers")
+    func testPurgingAttributionSourceAndLayers() {
+        let transformer = MTStyleProcessor(baseURL: baseURL, packName: packName)
+        
+        let style: [String: Any] = [
+            "version": 8,
+            "sources": [
+                "maptiler_attribution": [
+                    "type": "vector",
+                    "url": "https://api.maptiler.com/tiles/v3/tiles.json"
+                ],
+                "valid-source": [
+                    "type": "raster",
+                    "tiles": ["https://api.maptiler.com/raster"]
+                ]
+            ],
+            "layers": [
+                [
+                    "id": "attribution-layer",
+                    "type": "symbol",
+                    "source": "maptiler_attribution"
+                ],
+                [
+                    "id": "background",
+                    "type": "background" // No source
+                ],
+                [
+                    "id": "valid-layer",
+                    "type": "raster",
+                    "source": "valid-source"
+                ]
+            ]
+        ]
+        
+        let transformed = transformer.transform(style: style)
+        
+        let sources = transformed["sources"] as? [String: Any]
+        #expect(sources != nil)
+        #expect(sources?["maptiler_attribution"] == nil)
+        #expect(sources?["valid-source"] != nil)
+        
+        let layers = transformed["layers"] as? [[String: Any]]
+        #expect(layers?.count == 2)
+        #expect(layers?[0]["id"] as? String == "background")
+        #expect(layers?[1]["id"] as? String == "valid-layer")
+    }
+    
+    @Test("Processor handles empty or minimal style gracefully")
+    func testEmptyStyle() {
+        let transformer = MTStyleProcessor(baseURL: baseURL, packName: packName)
+        
+        let style: [String: Any] = [:]
+        let transformed = transformer.transform(style: style)
+        
+        #expect(transformed.isEmpty)
+        
+        let minimalStyle: [String: Any] = ["version": 8, "name": "Minimal"]
+        let transformedMinimal = transformer.transform(style: minimalStyle)
+        #expect(transformedMinimal["version"] as? Int == 8)
+        #expect(transformedMinimal["name"] as? String == "Minimal")
+    }
+
     @Test("Glyphs URL template is correctly rewritten preserving placeholders")
     func testGlyphsURLRewriting() {
         let transformer = MTStyleProcessor(baseURL: baseURL, packName: packName)

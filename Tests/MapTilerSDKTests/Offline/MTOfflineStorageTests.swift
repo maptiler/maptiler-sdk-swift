@@ -149,4 +149,108 @@ struct MTOfflineStorageTests {
         
         #expect(!executed, "Task should have been skipped because file is already verified")
     }
+
+    @Test("Concurrent atomic writes to the same file are thread-safe and don't corrupt")
+    func testConcurrentAtomicWrites() async throws {
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: tempDir) }
+        
+        let destinationURL = tempDir.appendingPathComponent("concurrent.txt")
+        
+        await withTaskGroup(of: Void.self) { group in
+            for i in 0..<100 {
+                group.addTask {
+                    let data = "Concurrent write \(i)".data(using: .utf8)!
+                    try? await MTOfflineStorage.write(data, to: destinationURL)
+                }
+            }
+        }
+        
+        #expect(fileManager.fileExists(atPath: destinationURL.path))
+        
+        let finalData = try Data(contentsOf: destinationURL)
+        let finalString = String(data: finalData, encoding: .utf8)!
+        #expect(finalString.hasPrefix("Concurrent write "))
+    }
+
+    @Test("Atomic write fails gracefully on read-only directory")
+    func testAtomicWriteToReadOnlyDirectory() async throws {
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        
+        // Make directory read-only
+        try fileManager.setAttributes([.posixPermissions: 0o444], ofItemAtPath: tempDir.path)
+        
+        defer {
+            // Restore permissions to allow cleanup
+            try? fileManager.setAttributes([.posixPermissions: 0o777], ofItemAtPath: tempDir.path)
+            try? fileManager.removeItem(at: tempDir)
+        }
+        
+        let destinationURL = tempDir.appendingPathComponent("readonly.txt")
+        let data = "Test".data(using: .utf8)!
+        
+        do {
+            try await MTOfflineStorage.write(data, to: destinationURL)
+            Issue.record("Write to read-only directory should have failed")
+        } catch let error as MTOfflineStorageError {
+            // Success: caught the expected enum type
+            #expect(error.errorDescription?.contains("A file system error occurred") == true)
+        } catch {
+            Issue.record("Caught unexpected error type: \(error)")
+        }
+    }
+
+    @Test("Calculate pack size tallies all valid files in a directory")
+    func testCalculatePackSize() async throws {
+        let packID = "test-size-\(UUID().uuidString)"
+        let packURL = MTOfflineStoragePaths.packDirectory(for: packID)
+        
+        try fileManager.createDirectory(at: packURL, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: packURL) }
+        
+        let data1 = Data(repeating: 1, count: 1024) // 1 KB
+        let data2 = Data(repeating: 2, count: 2048) // 2 KB
+        
+        try data1.write(to: packURL.appendingPathComponent("file1.dat"))
+        try data2.write(to: packURL.appendingPathComponent("file2.dat"))
+        
+        let size = await MTOfflineStorage.calculatePackSize(for: packID)
+        #expect(size == 3072, "Pack size should be the sum of all files (3 KB)")
+    }
+
+    @Test("List metadata discovers correctly saved packs")
+    func testListMetadata() async throws {
+        let packID1 = UUID().uuidString
+        let packID2 = UUID().uuidString
+        
+        let bbox = MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1)
+        let region = MTOfflineRegionDefinition(
+            bbox: bbox,
+            minZoom: 0,
+            maxZoom: 1,
+            referenceStyle: .streets
+        )
+        
+        let meta1 = MTOfflinePackMetadata(id: UUID(uuidString: packID1)!, region: region)
+        let meta2 = MTOfflinePackMetadata(id: UUID(uuidString: packID2)!, region: region)
+        
+        // Save them to their respective pack directories
+        try await MTOfflineStorage.saveMetadata(meta1)
+        try await MTOfflineStorage.saveMetadata(meta2)
+        
+        defer {
+            Task {
+                try? await MTOfflineStorage.deletePack(for: packID1)
+                try? await MTOfflineStorage.deletePack(for: packID2)
+            }
+        }
+        
+        let packs = try await MTOfflineStorage.listMetadata()
+        let packIDs = packs.map { $0.id.uuidString }
+        
+        #expect(packIDs.contains(packID1))
+        #expect(packIDs.contains(packID2))
+    }
 }

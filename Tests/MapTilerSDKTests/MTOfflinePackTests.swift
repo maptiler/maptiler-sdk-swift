@@ -28,7 +28,7 @@ final class MTOfflinePackTests: XCTestCase {
                     taskReadyToCancel.fulfill()
                 }
                 
-                try await Task.sleep(nanoseconds: 5_000_000_000) // 5 seconds
+                try await Task.sleep(nanoseconds: 100_000_000) // 100ms
                 await tracker.endTask()
             }
             tasks.append(task)

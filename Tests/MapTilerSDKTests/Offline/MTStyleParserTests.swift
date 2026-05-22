@@ -165,4 +165,84 @@ struct MTStyleParserTests {
         
         #expect(dependencies.fontStacks.isEmpty)
     }
+
+    @Test("Parse style with duplicate font stacks across multiple layers")
+    func testParseDuplicateFontStacks() throws {
+        let json = """
+        {
+            "version": 8,
+            "sources": {},
+            "layers": [
+                {
+                    "id": "label-1",
+                    "type": "symbol",
+                    "layout": {
+                        "text-font": ["Noto Sans Regular", "Arial"]
+                    }
+                },
+                {
+                    "id": "label-2",
+                    "type": "symbol",
+                    "layout": {
+                        "text-font": ["Noto Sans Regular", "Arial"]
+                    }
+                },
+                {
+                    "id": "label-3",
+                    "type": "symbol",
+                    "layout": {
+                        "text-font": ["Roboto Bold"]
+                    }
+                }
+            ]
+        }
+        """
+        let data = json.data(using: .utf8)!
+        
+        let dependencies = try parser.extractDependencies(from: data)
+        
+        // Should deduplicate ["Noto Sans Regular", "Arial"]
+        #expect(dependencies.fontStacks.count == 2)
+        #expect(dependencies.fontStacks.contains(["Noto Sans Regular", "Arial"]))
+        #expect(dependencies.fontStacks.contains(["Roboto Bold"]))
+    }
+
+    @Test("Parse style ignores sources without URL or tiles")
+    func testParseIgnoresSourcesWithoutURLOrTiles() throws {
+        let json = """
+        {
+            "version": 8,
+            "sources": {
+                "valid-vector": {
+                    "type": "vector",
+                    "url": "https://api.maptiler.com/tiles/v1.json"
+                },
+                "valid-raster": {
+                    "type": "raster",
+                    "tiles": ["https://api.maptiler.com/raster/{z}/{x}/{y}.png"]
+                },
+                "invalid-vector": {
+                    "type": "vector"
+                },
+                "invalid-geojson": {
+                    "type": "geojson",
+                    "data": "https://example.com/data.geojson"
+                }
+            },
+            "layers": []
+        }
+        """
+        let data = json.data(using: .utf8)!
+        
+        let dependencies = try parser.extractDependencies(from: data)
+        
+        // GeoJSON sources are ignored, vector sources missing URL/tiles are ignored
+        #expect(dependencies.sources.count == 2)
+        
+        let sourceIds = dependencies.sources.map { $0.id }
+        #expect(sourceIds.contains("valid-vector"))
+        #expect(sourceIds.contains("valid-raster"))
+        #expect(!sourceIds.contains("invalid-vector"))
+        #expect(!sourceIds.contains("invalid-geojson"))
+    }
 }

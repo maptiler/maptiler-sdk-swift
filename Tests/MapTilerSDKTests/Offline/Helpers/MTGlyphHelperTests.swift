@@ -72,4 +72,24 @@ struct MTGlyphHelperTests {
         #expect(formatted.contains("Open%20Sans%20Bold,%20Arial%20Unicode%20MS%20Regular"))
         #expect(formatted.contains("256-511.pbf"))
     }
+
+    @Test("Format glyph URL with empty font stack")
+    func formatEmptyTemplate() {
+        let template = "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf"
+        let formatted = MTGlyphHelper.format(template: template, fonts: [], range: MTGlyphRange(start: 0, end: 255))
+        
+        // Joined empty array is an empty string
+        #expect(formatted == "https://api.maptiler.com/fonts//0-255.pbf")
+    }
+    
+    @Test("Format glyph URL with special characters requiring URL encoding")
+    func formatUrlEncodedTemplate() {
+        let template = "https://example.com/{fontstack}/{range}.pbf"
+        let fontStack = "A/B Font&Co., C+D"
+        
+        let formatted = MTGlyphHelper.format(template: template, fontStack: fontStack, range: "0-255")
+        
+        #expect(!formatted.contains(" ")) // Spaces should be %20
+        #expect(formatted.contains("A/B%20Font&Co.,%20C+D")) // urlPathAllowed allows / and & and + and ,
+    }
 }

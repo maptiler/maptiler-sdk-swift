@@ -232,7 +232,7 @@ public actor MTOfflinePack {
                 }
             }
 
-            if !Task.isCancelled && state != .paused {
+            if !Task.isCancelled && state != .paused && state != .canceled {
                 state = .completed
                 // Ensure UI sees 100% on completion
                 progress.downloadedResources = progress.totalResources

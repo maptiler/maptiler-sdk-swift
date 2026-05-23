@@ -15,19 +15,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation) {
+        static func lockOrientation(
+            _ orientation: UIInterfaceOrientationMask,
+            andRotateTo rotateOrientation: UIInterfaceOrientation
+        ) {
             self.lockOrientation(orientation)
             UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
         }
     }
-    
+
     var orientationLock = UIInterfaceOrientationMask.all
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
         let placeholderKey = "YOUR_API_KEY_HERE"
 
-        guard let mapTilerAPIKey = Bundle.main.object(forInfoDictionaryKey: "MapTilerAPIKey") as? String, mapTilerAPIKey != placeholderKey else {
-            assertionFailure("API Key not entered in Info.plist file. Enter your API Key in Info.plist file under the key 'MapTilerAPIKey' field.")
+        guard
+            let mapTilerAPIKey = Bundle.main.object(forInfoDictionaryKey: "MapTilerAPIKey") as? String,
+            mapTilerAPIKey != placeholderKey
+        else {
+            assertionFailure(
+                "API Key not entered in Info.plist file. " +
+                "Enter your API Key in Info.plist file under the key 'MapTilerAPIKey' field."
+            )
 
             return true
         }
@@ -42,13 +54,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // MARK: UISceneSession Lifecycle
 
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    func application(
+        _ application: UIApplication,
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        options: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
 
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        return UISceneConfiguration(
+            name: "Default Configuration",
+            sessionRole: connectingSceneSession.role
+        )
     }
 
-    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+    func application(
+        _ application: UIApplication,
+        supportedInterfaceOrientationsFor window: UIWindow?
+    ) -> UIInterfaceOrientationMask {
         return orientationLock
     }
-}
 
+    func application(
+        _ application: UIApplication,
+        handleEventsForBackgroundURLSession identifier: String,
+        completionHandler: @escaping () -> Void
+    ) {
+        MTConfig.handleEventsForBackgroundURLSession(identifier: identifier, completionHandler: completionHandler)
+    }
+}

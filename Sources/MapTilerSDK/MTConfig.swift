@@ -156,4 +156,21 @@ public actor MTConfig {
             await map.setTelemetry(isTelemetryEnabled)
         }
     }
+
+    /// Handles events for the background URLSession.
+    /// Call this from your AppDelegate's `application(_:handleEventsForBackgroundURLSession:completionHandler:)`
+    /// - Parameters:
+    ///   - identifier: The identifier of the URLSession.
+    ///   - completionHandler: The completion handler provided by the app delegate.
+    public static func handleEventsForBackgroundURLSession(
+        identifier: String,
+        completionHandler: @escaping () -> Void
+    ) {
+        if identifier == "com.maptiler.sdk.offline.backgroundSession" {
+            MTOfflineBackgroundManager.shared.setup(completionHandler: completionHandler)
+        } else {
+            // Not our session, call completion immediately
+            completionHandler()
+        }
+    }
 }

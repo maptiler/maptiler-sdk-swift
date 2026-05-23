@@ -70,10 +70,55 @@ class OfflineViewModel: ObservableObject, MTOfflineDownloadDelegate {
 
             await MainActor.run {
                 self.offlinePack = pack
-                downloadState = "Downloading..."
+                downloadState = "Downloading Zurich..."
             }
 
             try await pack.download()
+
+        } catch {
+            await MainActor.run {
+                downloadState = "Error: \(error.localizedDescription)"
+                print("Download failed: \(error)")
+            }
+        }
+    }
+
+    func downloadBrnoBackground() async {
+        await MainActor.run {
+            downloadState = "Estimating..."
+            downloadProgress = 0.0
+        }
+
+        // Define the region: Brno, Czech Republic
+        let brnoBBox = MTBoundingBox(
+            minLon: 16.52,
+            minLat: 49.13,
+            maxLon: 16.70,
+            maxLat: 49.25
+        )
+
+        let region = await mapView.createOfflineRegion(
+            bbox: brnoBBox,
+            minZoom: 10,
+            maxZoom: 14
+        )
+
+        let contextData = try? JSONEncoder().encode(["name": "Brno Offline"])
+
+        do {
+            await MTConfig.shared.setOfflineMaxTileCount(25000)
+
+            let pack = MTOfflinePack(region: region, context: contextData)
+            await pack.setDelegate(self)
+            await pack.setProgressReportingEnabled(true)
+
+            await MainActor.run {
+                self.offlinePack = pack
+                downloadState = "Downloading Brno in Background..."
+            }
+
+            // Important: useBackground flag set to true!
+            try await pack.download(useBackground: true)
 
         } catch {
             await MainActor.run {
@@ -94,9 +139,16 @@ class OfflineViewModel: ObservableObject, MTOfflineDownloadDelegate {
             // Load the downloaded pack into the map
             try await mapView.loadOfflinePack(pack)
 
+            var center = CLLocationCoordinate2D(latitude: 47.3769, longitude: 8.5417)
+            if let contextData = await pack.metadata.context,
+                let contextDict = try? JSONDecoder().decode([String: String].self, from: contextData),
+                contextDict["name"] == "Brno Offline" {
+                center = CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068)
+            }
+
             // Jump to the downloaded region
             await mapView.jumpTo(
-                CLLocationCoordinate2D(latitude: 47.3769, longitude: 8.5417),
+                center,
                 options: MTCameraOptions(zoom: 12)
             )
 
@@ -163,17 +215,35 @@ struct OfflineBasicView: View {
                 Text("Status: \(viewModel.downloadState)")
                     .font(.subheadline)
 
-                HStack(spacing: 20) {
-                    Button("Download Zurich") {
-                        Task { await viewModel.downloadRegion() }
-                    }
-                    .buttonStyle(.borderedProminent)
+                VStack(spacing: 12) {
+                    HStack(spacing: 16) {
+                        VStack {
+                            Button("Download Zurich") {
+                                Task { await viewModel.downloadRegion() }
+                            }
+                            .buttonStyle(.borderedProminent)
 
-                    Button("Load Offline Pack") {
-                        Task { await viewModel.loadPack() }
+                            Button("Load Zurich") {
+                                Task { await viewModel.loadPack() }
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(viewModel.offlinePack == nil || viewModel.downloadProgress < 1.0)
+                        }
+
+                        VStack {
+                            Button("Download Brno (BG)") {
+                                Task { await viewModel.downloadBrnoBackground() }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.green)
+
+                            Button("Load Brno") {
+                                Task { await viewModel.loadPack() }
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(viewModel.offlinePack == nil || viewModel.downloadProgress < 1.0)
+                        }
                     }
-                    .buttonStyle(.bordered)
-                    .disabled(viewModel.offlinePack == nil || viewModel.downloadProgress < 1.0)
                 }
                 .padding(.bottom)
             }

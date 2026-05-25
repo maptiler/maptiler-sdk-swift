@@ -19,7 +19,16 @@ internal class MTOfflineConfiguration: @unchecked Sendable {
 
     private let lock = NSLock()
     private var _plannerType: MTOfflinePlannerType = .local
-    private var _maxTileCount: Int = 15000
+    private var _userMaxTileCount: Int = 15000
+
+    /// Hard safety limit
+    internal let internalMaxTileLimit: Int = 15000
+
+    /// The default expiration interval for offline packs (30 days).
+    internal let defaultExpirationInterval: TimeInterval = 30 * 24 * 60 * 60
+
+    /// The default grace period before an expired pack is deleted (7 days).
+    internal let defaultGracePeriod: TimeInterval = 7 * 24 * 60 * 60
 
     internal var plannerType: MTOfflinePlannerType {
         get {
@@ -34,17 +43,23 @@ internal class MTOfflineConfiguration: @unchecked Sendable {
         }
     }
 
-    internal var maxTileCount: Int {
+    /// The global limit set by the SDK consumer.
+    internal var userMaxTileCount: Int {
         get {
             lock.lock()
             defer { lock.unlock() }
-            return _maxTileCount
+            return _userMaxTileCount
         }
         set {
             lock.lock()
             defer { lock.unlock() }
-            _maxTileCount = newValue
+            _userMaxTileCount = newValue
         }
+    }
+
+    /// The effective global limit (most restrictive of internal vs user).
+    internal var effectiveGlobalLimit: Int {
+        min(userMaxTileCount, internalMaxTileLimit)
     }
 
     internal init() {}

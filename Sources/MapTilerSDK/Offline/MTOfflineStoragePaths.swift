@@ -11,6 +11,11 @@ internal enum MTOfflineStoragePaths {
             .appendingPathComponent("Offline", isDirectory: true)
     }
 
+    // The persistent store for background download mappings.
+    internal static var backgroundTaskMappingURL: URL {
+        return rootDirectory.appendingPathComponent("background_tasks.json", isDirectory: false)
+    }
+
     // The dedicated temporary directory for offline downloads.
     internal static var tempDirectory: URL {
         let tempDir = FileManager.default.temporaryDirectory

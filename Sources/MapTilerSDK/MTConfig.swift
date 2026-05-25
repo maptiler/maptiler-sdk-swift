@@ -139,9 +139,11 @@ public actor MTConfig {
 
     /// Sets the maximum number of tiles allowed for a single offline region download.
     /// This prevents users from accidentally downloading massive areas that consume too much storage.
+    /// Note: MapTiler enforces an internal safety limit (currently 15,000 tiles). If you provide a value
+    /// higher than the internal limit, the internal limit will be enforced.
     /// - Parameter maxTileCount: The maximum allowed tiles (default is 15,000).
     public func setOfflineMaxTileCount(_ maxTileCount: Int) {
-        MTOfflineConfiguration.shared.maxTileCount = maxTileCount
+        MTOfflineConfiguration.shared.userMaxTileCount = maxTileCount
     }
 
     /// Sets the telemetry.
@@ -154,6 +156,23 @@ public actor MTConfig {
 
         Task {
             await map.setTelemetry(isTelemetryEnabled)
+        }
+    }
+
+    /// Handles events for the background URLSession.
+    /// Call this from your AppDelegate's `application(_:handleEventsForBackgroundURLSession:completionHandler:)`
+    /// - Parameters:
+    ///   - identifier: The identifier of the URLSession.
+    ///   - completionHandler: The completion handler provided by the app delegate.
+    public static func handleEventsForBackgroundURLSession(
+        identifier: String,
+        completionHandler: @escaping () -> Void
+    ) {
+        if identifier == "com.maptiler.sdk.offline.backgroundSession" {
+            MTOfflineBackgroundManager.shared.setup(completionHandler: completionHandler)
+        } else {
+            // Not our session, call completion immediately
+            completionHandler()
         }
     }
 }

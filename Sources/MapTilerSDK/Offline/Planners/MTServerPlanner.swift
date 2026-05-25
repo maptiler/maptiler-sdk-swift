@@ -24,9 +24,12 @@ internal class MTServerPlanner: MTOfflinePlanner {
         let zoomRange = try MTOfflineZoomRange(minZoom: definition.minZoom, maxZoom: definition.maxZoom)
         let tileCount = definition.bbox.estimatedTileCount(zoomRange: zoomRange)
 
-        let limit = MTOfflineConfiguration.shared.maxTileCount
-        if tileCount > limit {
-            throw MTOfflineError.exceedsMaximumTileCount(limit: limit, requested: tileCount)
+        let globalLimit = MTOfflineConfiguration.shared.effectiveGlobalLimit
+        let packLimit = definition.maxTileCount ?? Int.max
+        let effectiveLimit = min(globalLimit, packLimit)
+
+        if tileCount > effectiveLimit {
+            throw MTOfflineError.exceedsMaximumTileCount(limit: effectiveLimit, requested: tileCount)
         }
 
         throw MTOfflinePackError.notImplemented

@@ -212,6 +212,34 @@ open class MTMapView: UIView, Sendable {
         await self.panBy(MTPoint(x: -1, y: -1))
     }
 
+    /// Unloads the current offline pack and restores the map to an online style.
+    /// - Parameters:
+    ///   - fallbackStyle: The reference style to load after unloading the pack. Defaults to `.streets`.
+    ///   - fallbackVariant: The style variant to load. Defaults to `nil`.
+    ///   - resetCameraLimits: If `true` (default), clears any zoom and bounding box restrictions set by the pack.
+    @MainActor
+    public func unloadOfflinePack(
+        fallbackStyle: MTMapReferenceStyle = .streets,
+        fallbackVariant: MTMapStyleVariant? = nil,
+        resetCameraLimits: Bool = true
+    ) async {
+        // Update the proxy and set the new online style
+        self.setProxy(referenceStyle: fallbackStyle, styleVariant: fallbackVariant)
+        await self.style?.setStyle(fallbackStyle, styleVariant: fallbackVariant)
+
+        // Reset camera limits if requested
+        if resetCameraLimits {
+            try? await self.setMinZoom(nil)
+            try? await self.setMaxZoom(nil)
+            try? await self.setMaxBounds(nil)
+        }
+
+        // Nudge camera to force fresh tile requests and avoid visual mixing.
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        await self.panBy(MTPoint(x: 1, y: 1))
+        await self.panBy(MTPoint(x: -1, y: -1))
+    }
+
     /// Creates an offline region definition using the map's current reference style and variant.
     /// - Parameters:
     ///   - bbox: The bounding box of the region.

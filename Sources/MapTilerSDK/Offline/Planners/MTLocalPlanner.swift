@@ -26,9 +26,12 @@ internal class MTLocalPlanner: MTOfflinePlanner {
         let estimator = MTOfflineEstimator()
         let stats = try await estimator.estimatePack(region: definition)
 
-        let limit = MTOfflineConfiguration.shared.maxTileCount
-        if stats.resourceCount > limit {
-            throw MTOfflineError.exceedsMaximumTileCount(limit: limit, requested: stats.resourceCount)
+        let globalLimit = MTOfflineConfiguration.shared.effectiveGlobalLimit
+        let packLimit = definition.maxTileCount ?? Int.max
+        let effectiveLimit = min(globalLimit, packLimit)
+
+        if stats.resourceCount > effectiveLimit {
+            throw MTOfflineError.exceedsMaximumTileCount(limit: effectiveLimit, requested: stats.resourceCount)
         }
 
         return MTTileEstimate(stats: stats)
@@ -77,9 +80,12 @@ internal class MTLocalPlanner: MTOfflinePlanner {
         var totalCount = tileResources.count + glyphResources.count + spriteResources.count
         if resolvedStyle != nil { totalCount += 1 }
 
-        let limit = MTOfflineConfiguration.shared.maxTileCount
-        if totalCount > limit {
-            throw MTOfflineError.exceedsMaximumTileCount(limit: limit, requested: totalCount)
+        let globalLimit = MTOfflineConfiguration.shared.effectiveGlobalLimit
+        let packLimit = definition.maxTileCount ?? Int.max
+        let effectiveLimit = min(globalLimit, packLimit)
+
+        if totalCount > effectiveLimit {
+            throw MTOfflineError.exceedsMaximumTileCount(limit: effectiveLimit, requested: totalCount)
         }
 
         return MTManifest(

@@ -139,9 +139,11 @@ public actor MTConfig {
 
     /// Sets the maximum number of tiles allowed for a single offline region download.
     /// This prevents users from accidentally downloading massive areas that consume too much storage.
+    /// Note: MapTiler enforces an internal safety limit (currently 15,000 tiles). If you provide a value
+    /// higher than the internal limit, the internal limit will be enforced.
     /// - Parameter maxTileCount: The maximum allowed tiles (default is 15,000).
     public func setOfflineMaxTileCount(_ maxTileCount: Int) {
-        MTOfflineConfiguration.shared.maxTileCount = maxTileCount
+        MTOfflineConfiguration.shared.userMaxTileCount = maxTileCount
     }
 
     /// Sets the telemetry.

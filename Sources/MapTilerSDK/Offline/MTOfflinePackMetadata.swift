@@ -23,6 +23,8 @@ public enum MTOfflinePackState: String, Sendable, Codable, Equatable {
     case completed
     /// The pack download failed.
     case failed
+    /// The pack has expired and its tiles are no longer usable.
+    case expired
 }
 
 /// Metadata information about an offline pack.
@@ -42,11 +44,19 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
     /// The date when the pack was created.
     public let createdAt: Date
 
+    /// The date when the pack expires.
+    public var expiresAt: Date
+
     /// Optional custom data, typically used to store application-specific context (e.g. JSON data).
     public let context: Data?
 
     /// The region definition specifying the bounding box, zoom levels, and style.
     public let region: MTOfflineRegionDefinition
+
+    /// Returns true if the pack has passed its expiration date.
+    public var isExpired: Bool {
+        return Date() > expiresAt
+    }
 
     /// Initializes a new offline pack metadata object.
     ///
@@ -56,6 +66,7 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
     ///   - state: The initial state of the pack. Defaults to `.pending`.
     ///   - size: The initial size of the pack in bytes. Defaults to 0.
     ///   - createdAt: The creation date of the pack. Defaults to the current date.
+    ///   - expiresAt: The expiration date of the pack. Defaults to 30 days from now.
     ///   - context: Optional custom context data. Defaults to nil.
     public init(
         id: UUID = UUID(),
@@ -63,6 +74,7 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
         state: MTOfflinePackState = .pending,
         size: Int64 = 0,
         createdAt: Date = Date(),
+        expiresAt: Date? = nil,
         context: Data? = nil
     ) {
         self.id = id
@@ -70,6 +82,21 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
         self.state = state
         self.size = size
         self.createdAt = createdAt
+        let defaultInterval = MTOfflineConfiguration.shared.defaultExpirationInterval
+        self.expiresAt = expiresAt ?? createdAt.addingTimeInterval(defaultInterval)
         self.context = context
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.state = try container.decode(MTOfflinePackState.self, forKey: .state)
+        self.size = try container.decode(Int64.self, forKey: .size)
+        self.createdAt = try container.decode(Date.self, forKey: .createdAt)
+        self.context = try container.decodeIfPresent(Data.self, forKey: .context)
+        self.region = try container.decode(MTOfflineRegionDefinition.self, forKey: .region)
+        let defaultInterval = MTOfflineConfiguration.shared.defaultExpirationInterval
+        let decodedExpiresAt = try container.decodeIfPresent(Date.self, forKey: .expiresAt)
+        self.expiresAt = decodedExpiresAt ?? self.createdAt.addingTimeInterval(defaultInterval)
     }
 }

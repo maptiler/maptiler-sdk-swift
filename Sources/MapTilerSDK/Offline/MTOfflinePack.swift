@@ -38,6 +38,16 @@ public actor MTOfflinePack {
         }
     }
 
+    /// The date when the pack expires.
+    public var expiresAt: Date {
+        return metadata.expiresAt
+    }
+
+    /// Returns true if the pack has passed its expiration date.
+    public var isExpired: Bool {
+        return metadata.isExpired
+    }
+
     /// Sets the delegate to receive download notifications.
     public func setDelegate(_ delegate: MTOfflineDownloadDelegate?) {
         self.delegate = delegate
@@ -115,7 +125,9 @@ public actor MTOfflinePack {
         self.metadata = metadata
 
         // If a pack was "downloading" when the app was closed, it should be marked as paused or failed now.
-        if metadata.state == .downloading {
+        if metadata.isExpired {
+            self.state = .expired
+        } else if metadata.state == .downloading {
             self.state = .paused
         } else {
             self.state = metadata.state
@@ -257,6 +269,21 @@ extension MTOfflinePack {
         return sortedMetadata.map { MTOfflinePack(metadata: $0) }
     }
 
+    /// Cleans up packs that have been expired for longer than the grace period.
+    /// This permanently deletes the packs and their files from the disk.
+    public static func cleanupExpiredPacks() async throws {
+        let allPacks = try await packs()
+        let gracePeriod = MTOfflineConfiguration.shared.defaultGracePeriod
+
+        for pack in allPacks where await pack.state == .expired {
+            let expiresAt = await pack.expiresAt
+            let timeSinceExpiration = Date().timeIntervalSince(expiresAt)
+            if timeSinceExpiration > gracePeriod {
+                try await pack.remove()
+            }
+        }
+    }
+
     /// Deletes all offline packs currently stored on disk.
     public static func removeAll() async throws {
         let allPacks = try await packs()
@@ -342,6 +369,18 @@ extension MTOfflinePack {
         let manifest = try MTOfflineStorage.loadManifest(for: id)
         let tasks = buildTasks(from: manifest)
         try await startDownload(tasks: tasks, useBackground: useBackground)
+    }
+
+    /// Refreshes an expired pack, validating or updating its resources and resetting its expiration limit.
+    /// - Parameter useBackground: If true, the download will be enqueued in a background URLSession.
+    public func refresh(useBackground: Bool = false) async throws {
+        // Reset the expiration date
+        metadata.expiresAt = Date().addingTimeInterval(MTOfflineConfiguration.shared.defaultExpirationInterval)
+        await syncMetadataToDisk()
+
+        let planner = MTOfflinePlannerFactory.createPlanner()
+        let manifest = try await planner.generateManifest(for: self.region)
+        try await self.startDownload(manifest: manifest, useBackground: useBackground)
     }
 
     /// Cancels the ongoing download of the entire pack.

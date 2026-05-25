@@ -89,4 +89,25 @@ struct MTLocalPlannerTests {
             #expect(Bool(false), "Unexpected error: \(error)")
         }
     }
+
+    @Test("Verify effective limits are respected")
+    func testEffectiveLimits() async throws {
+        let planner = MTLocalPlanner()
+        // A huge bounding box covering the entire world at zoom 0-14 to force a large tile count
+        let bbox = MTBoundingBox(minLon: -180, minLat: -85, maxLon: 180, maxLat: 85)
+        
+        // Use a tiny per-pack limit
+        let tinyLimit = 10
+        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 14, referenceStyle: .basic, maxTileCount: tinyLimit)
+        
+        do {
+            _ = try await planner.estimate(for: definition)
+            #expect(Bool(false), "Expected exceedsMaximumTileCount error")
+        } catch let MTOfflineError.exceedsMaximumTileCount(limit, requested) {
+            #expect(limit == tinyLimit)
+            #expect(requested > tinyLimit)
+        } catch {
+            #expect(Bool(false), "Unexpected error: \(error)")
+        }
+    }
 }

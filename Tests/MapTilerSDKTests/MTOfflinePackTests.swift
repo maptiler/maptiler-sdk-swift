@@ -8,54 +8,67 @@ final class MTOfflinePackTests: XCTestCase {
         let bbox = MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1)
         let region = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 1, referenceStyle: .basic)
         let pack = MTOfflinePack(id: "test-pack", region: region, downloader: downloader)
-        
-        actor CancellationTracker {
+
+        actor TestTracker {
             var startedCount = 0
             var completedCount = 0
-            
-            func startTask() { startedCount += 1 }
-            func endTask() { completedCount += 1 }
-        }
-        
-        let tracker = CancellationTracker()
-        let taskReadyToCancel = expectation(description: "Tasks started")
-        
-        var tasks: [MockDownloadTask] = []
-        for i in 0..<5 {
-            let task = MockDownloadTask(id: "task-\(i)") {
-                await tracker.startTask()
-                if i == 0 {
-                    taskReadyToCancel.fulfill()
+            private var continuation: CheckedContinuation<Void, Never>?
+
+            func taskStarted() {
+                startedCount += 1
+                if startedCount == 2 {
+                    continuation?.resume()
+                    continuation = nil
                 }
-                
-                try await Task.sleep(nanoseconds: 100_000_000) // 100ms
-                await tracker.endTask()
             }
-            tasks.append(task)
+
+            func taskCompleted() {
+                completedCount += 1
+            }
+
+            func waitForTasksToStart() async {
+                if startedCount >= 2 { return }
+                await withCheckedContinuation { self.continuation = $0 }
+            }
         }
-        
-        let downloadOperation = Task {
+
+        let tracker = TestTracker()
+
+        let tasks = (0..<5).map { i in
+            MockDownloadTask(id: "task-\(i)") {
+                await tracker.taskStarted()
+                
+                // Block here until we signal from the test to simulate long running task
+                // that can be cancelled.
+                try await Task.sleep(nanoseconds: 1_000_000_000_000) // 1000s, effectively forever
+                
+                await tracker.taskCompleted()
+            }
+        }
+
+        let downloadTask = Task {
             try await pack.startDownload(tasks: tasks)
         }
-        
-        // Wait until at least one task starts
-        await fulfillment(of: [taskReadyToCancel], timeout: 5.0)
-        
-        // Wait a small amount for the async state to settle
-        try? await Task.sleep(nanoseconds: 100_000_000)
-        
-        // Cancel the pack
+
+        // Wait for exactly 2 tasks to start (maxInFlight is 2)
+        await tracker.waitForTasksToStart()
+
+        // Now cancel
         await pack.cancel()
-        
-        // Wait for download operation to finish
-        do {
-            try await downloadOperation.value
-        } catch {
-            // Expected CancellationError
+
+        // The download task should finish with CancellationError
+        let result = await downloadTask.result
+        switch result {
+        case .failure(let error):
+            XCTAssertTrue(error is CancellationError, "Expected CancellationError, got \(error)")
+        case .success:
+            XCTFail("Download task should have been cancelled")
         }
-        
-        // Check state after cancellation
+
         let state = await pack.state
-        XCTAssertEqual(state, MTOfflinePackState.canceled, "State should be updated to canceled.")
+        XCTAssertEqual(state, .canceled)
+        
+        let completed = await tracker.completedCount
+        XCTAssertEqual(completed, 0, "No tasks should have completed")
     }
 }

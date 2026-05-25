@@ -11,22 +11,13 @@ struct MTOfflineResumeTests {
     @Test("Download skips verified files")
     func testDownloadSkipsVerifiedFiles() async throws {
         let bbox = MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1)
-        let region = MTOfflineRegionDefinition(
-            bbox: bbox,
-            minZoom: 0,
-            maxZoom: 0, // Only 1 tile
-            referenceStyle: .basic
-        )
         
-        let pack = try await MTOfflinePack.createPack(region: region)
-        let packId = pack.id
-        
-        // Ensure clean state
-        try? await MTOfflineStorage.deletePack(for: packId)
-        _ = try await MTOfflinePack.createPack(region: region, context: "resume-test".data(using: .utf8)) 
-        // Wait, the createPack above generates a NEW UUID. Let's use the one we just created.
-        
+        let packId = "resume-test-" + UUID().uuidString
         let packURL = MTOfflineStoragePaths.packDirectory(for: packId)
+        
+        // Clean up any existing data for this test ID
+        try? await MTOfflineStorage.deletePack(for: packId)
+        
         let tilesURL = packURL.appendingPathComponent("tiles", isDirectory: true)
         try fileManager.createDirectory(at: tilesURL, withIntermediateDirectories: true)
         
@@ -45,7 +36,6 @@ struct MTOfflineResumeTests {
         )
         
         let firstTile = manifest.tiles[0]
-        
         let tileURL = MTOfflineStoragePaths.absoluteURL(for: packId, relativePath: firstTile.destinationPath)
         let tileDir = tileURL.deletingLastPathComponent()
         try fileManager.createDirectory(at: tileDir, withIntermediateDirectories: true)
@@ -64,28 +54,45 @@ struct MTOfflineResumeTests {
         
         let downloader = MTOfflineDownloader()
         
-        actor SafeCounter {
-            var completed = 0
-            var skipped = 0
+        actor ProgressTracker {
+            var completedCount = 0
+            var skippedCount = 0
+            var updateCount = 0
+            private var continuation: CheckedContinuation<Void, Never>?
+
             func add(completed: Int, skipped: Int) {
-                self.completed += completed
-                self.skipped += skipped
+                self.completedCount += completed
+                self.skippedCount += skipped
+                self.updateCount += 1
+                
+                // We expect 2 updates: 
+                // 1. Initial skip count (0, 1)
+                // 2. Completion of task2 (1, 0)
+                if updateCount == 2 {
+                    continuation?.resume()
+                    continuation = nil
+                }
+            }
+
+            func waitForUpdates() async {
+                if updateCount >= 2 { return }
+                await withCheckedContinuation { self.continuation = $0 }
             }
         }
         
-        let counter = SafeCounter()
+        let tracker = ProgressTracker()
         
         try await downloader.download([task1, task2]) { completed, skipped in
             Task {
-                await counter.add(completed: completed, skipped: skipped)
+                await tracker.add(completed: completed, skipped: skipped)
             }
         }
         
-        // Give the async counter a moment to process if needed
-        await Task.yield()
+        // Wait for all progress updates to be processed
+        await tracker.waitForUpdates()
 
-        let finalSkipped = await counter.skipped
-        let finalCompleted = await counter.completed
+        let finalSkipped = await tracker.skippedCount
+        let finalCompleted = await tracker.completedCount
         
         #expect(finalSkipped == 1, "One task should have been skipped")
         #expect(finalCompleted == 1, "One task should have been completed")

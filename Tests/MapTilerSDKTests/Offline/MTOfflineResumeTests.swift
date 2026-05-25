@@ -21,7 +21,11 @@ struct MTOfflineResumeTests {
         let pack = try await MTOfflinePack.createPack(region: region)
         let packId = pack.id
         
-        // Mock a downloaded tile
+        // Ensure clean state
+        try? await MTOfflineStorage.deletePack(for: packId)
+        _ = try await MTOfflinePack.createPack(region: region, context: "resume-test".data(using: .utf8)) 
+        // Wait, the createPack above generates a NEW UUID. Let's use the one we just created.
+        
         let packURL = MTOfflineStoragePaths.packDirectory(for: packId)
         let tilesURL = packURL.appendingPathComponent("tiles", isDirectory: true)
         try fileManager.createDirectory(at: tilesURL, withIntermediateDirectories: true)
@@ -60,13 +64,10 @@ struct MTOfflineResumeTests {
         
         let downloader = MTOfflineDownloader()
         
-        class SafeCounter: @unchecked Sendable {
-            private let lock = NSLock()
+        actor SafeCounter {
             var completed = 0
             var skipped = 0
             func add(completed: Int, skipped: Int) {
-                lock.lock()
-                defer { lock.unlock() }
                 self.completed += completed
                 self.skipped += skipped
             }
@@ -74,12 +75,17 @@ struct MTOfflineResumeTests {
         
         let counter = SafeCounter()
         
-        try? await downloader.download([task1, task2]) { completed, skipped in
-            counter.add(completed: completed, skipped: skipped)
+        try await downloader.download([task1, task2]) { completed, skipped in
+            Task {
+                await counter.add(completed: completed, skipped: skipped)
+            }
         }
         
-        let finalSkipped = counter.skipped
-        let finalCompleted = counter.completed
+        // Give the async counter a moment to process if needed
+        await Task.yield()
+
+        let finalSkipped = await counter.skipped
+        let finalCompleted = await counter.completed
         
         #expect(finalSkipped == 1, "One task should have been skipped")
         #expect(finalCompleted == 1, "One task should have been completed")

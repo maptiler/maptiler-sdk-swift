@@ -216,16 +216,48 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
             return url
         }
 
-        let styleName = self.getName().lowercased()
-
-        var mapId: String
-        if let variant = variant, variant != .defaultVariant {
-            mapId = "\(styleName)-v2-\(variant.rawValue)"
-        } else {
-            mapId = "\(styleName)-v2"
-        }
-
+        let mapId = getMapTilerCloudId(variant: variant)
         return URL(string: "https://api.maptiler.com/maps/\(mapId)/style.json?key=\(apiKey)")
+    }
+
+    private func getMapTilerCloudId(variant: MTMapStyleVariant?) -> String {
+        let isDefault = variant == nil || variant == .defaultVariant
+
+        switch self {
+        case .streets:
+            return isDefault ? "streets-v2" : "streets-v2-\(variant!.rawValue)"
+        case .outdoor:
+            return isDefault ? "outdoor-v2" : "outdoor-v2-\(variant!.rawValue)"
+        case .winter:
+            return isDefault ? "winter-v2" : "winter-v2-\(variant!.rawValue)"
+        case .basic:
+            return isDefault ? "basic-v2" : "basic-v2-\(variant!.rawValue)"
+        case .bright:
+            return isDefault ? "bright-v2" : "bright-v2-\(variant!.rawValue)"
+        case .topo:
+            return isDefault ? "topo-v2" : "topo-v2-\(variant!.rawValue)"
+        case .toner:
+            return isDefault ? "toner-v2" : "toner-v2-\(variant!.rawValue)"
+
+        case .satellite:
+            return "satellite"
+        case .openStreetMap:
+            return "openstreetmap"
+        case .ocean:
+            return "ocean"
+
+        case .dataviz:
+            return isDefault ? "dataviz" : "dataviz-\(variant!.rawValue)"
+        case .backdrop:
+            return isDefault ? "backdrop" : "backdrop-\(variant!.rawValue)"
+        case .aquarelle:
+            return isDefault ? "aquarelle" : "aquarelle-\(variant!.rawValue)"
+        case .landscape:
+            return isDefault ? "landscape" : "landscape-\(variant!.rawValue)"
+
+        case .custom:
+            return ""
+        }
     }
 
     /// Returns all pre-made styles.

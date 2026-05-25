@@ -96,7 +96,7 @@ internal struct MTStyleProcessor {
         updatedSource.removeValue(forKey: "scheme")
 
         // Determine extension for the local tiles
-        let ext = determineExtension(source: updatedSource)
+        let ext = determineExtension(source: source)
 
         // Inject local tiles array with the 127.0.0.1 template
         updatedSource["tiles"] = [
@@ -119,6 +119,14 @@ internal struct MTStyleProcessor {
             if lower.contains(".png") { return "png" }
             if lower.contains(".jpg") || lower.contains(".jpeg") { return "jpg" }
             if lower.contains(".webp") { return "webp" }
+        }
+
+        // Check source URL for hints about satellite or specific layers
+        if let url = source["url"] as? String {
+            let lower = url.lowercased()
+            if lower.contains("satellite") {
+                return "jpg" // MapTiler Satellite default format is JPG
+            }
         }
 
         // Default for raster/raster-dem

@@ -68,7 +68,8 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
                 continue
             }
 
-            var request = URLRequest(url: url)
+            let normalizedURL = await MTURLNormalizer.normalize(url: url)
+            var request = URLRequest(url: normalizedURL)
             request.httpMethod = "GET"
 
             let downloadTask = session.downloadTask(with: request)
@@ -199,26 +200,10 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
                 try fileManager.createDirectory(at: destDir, withIntermediateDirectories: true)
             }
 
-            if mapping.isStyle {
-                let fileData = try Data(contentsOf: location)
-                if let jsonObject = try JSONSerialization.jsonObject(with: fileData) as? [String: Any] {
-                    let baseURL = MTOfflineHTTPServer.shared.baseURLString()
-                    let processor = MTStyleProcessor(baseURL: baseURL, packName: mapping.packId)
-                    let transformed = processor.transform(style: jsonObject)
-                    let transformedData = try JSONSerialization.data(withJSONObject: transformed, options: [])
-                    try transformedData.write(to: destURL, options: .atomic)
-                } else {
-                    if fileManager.fileExists(atPath: destURL.path) {
-                        try fileManager.removeItem(at: destURL)
-                    }
-                    try fileManager.moveItem(at: location, to: destURL)
-                }
-            } else {
-                if fileManager.fileExists(atPath: destURL.path) {
-                    try fileManager.removeItem(at: destURL)
-                }
-                try fileManager.moveItem(at: location, to: destURL)
+            if fileManager.fileExists(atPath: destURL.path) {
+                try fileManager.removeItem(at: destURL)
             }
+            try fileManager.moveItem(at: location, to: destURL)
 
             self.reportResourceComplete(for: mapping.packId)
         } catch {

@@ -120,7 +120,8 @@ internal class MTLocalPlanner: MTOfflinePlanner {
 // MARK: - Helpers
 extension MTLocalPlanner {
     private func resolveStyle(url: URL) async throws -> (MTMapResource, MTStyleDependencies) {
-        let (data, response) = try await session.data(from: url)
+        let normalizedURL = await MTURLNormalizer.normalize(url: url)
+        let (data, response) = try await session.data(from: normalizedURL)
 
         guard let httpResponse = response as? HTTPURLResponse, 200...299 ~= httpResponse.statusCode else {
             throw MTOfflinePackError.networkError(URLError(.badServerResponse))
@@ -186,23 +187,14 @@ extension MTLocalPlanner {
             return MTTemplateInfo(template: first, minZoom: sourceMin, maxZoom: sourceMax)
         }
 
-        guard let urlStr = source.url, var url = URL(string: urlStr) else {
+        guard let urlStr = source.url, let url = URL(string: urlStr) else {
             return nil
         }
 
-        // Inject API key if missing
-        if let key = await MTConfig.shared.getAPIKey(), !urlStr.contains("key=") {
-            var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-            var queryItems = components?.queryItems ?? []
-            queryItems.append(URLQueryItem(name: "key", value: key))
-            components?.queryItems = queryItems
-            if let updatedURL = components?.url {
-                url = updatedURL
-            }
-        }
+        let normalizedURL = await MTURLNormalizer.normalize(url: url)
 
         // Fetch TileJSON
-        guard let (data, response) = try? await session.data(from: url),
+        guard let (data, response) = try? await session.data(from: normalizedURL),
             let httpResponse = response as? HTTPURLResponse,
             200...299 ~= httpResponse.statusCode else {
             return nil

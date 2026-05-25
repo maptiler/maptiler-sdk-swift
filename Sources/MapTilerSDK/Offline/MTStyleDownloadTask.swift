@@ -22,7 +22,8 @@ internal struct MTStyleDownloadTask: MTDownloadTask {
 
         do {
             try await retryPolicy.execute {
-                let (data, response) = try await session.data(from: resource.url)
+                let normalizedURL = await MTURLNormalizer.normalize(url: resource.url)
+                let (data, response) = try await session.data(from: normalizedURL)
 
                 guard let httpResponse = response as? HTTPURLResponse else {
                     throw MTOfflineError.networkError(URLError(.badServerResponse))
@@ -30,7 +31,8 @@ internal struct MTStyleDownloadTask: MTDownloadTask {
 
                 switch httpResponse.statusCode {
                 case 204:
-                    throw MTOfflineError.noContent
+                    // Server explicitly returned no content. Treat as success.
+                    return
                 case 200...299:
                     break
                 default:
@@ -38,18 +40,7 @@ internal struct MTStyleDownloadTask: MTDownloadTask {
                 }
 
                 guard let dest = destinationURL else { return }
-
-                // Process the style JSON
-                if let jsonObject = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                    let baseURL = MTOfflineHTTPServer.shared.baseURLString()
-                    let processor = MTStyleProcessor(baseURL: baseURL, packName: packId)
-                    let transformed = processor.transform(style: jsonObject)
-                    let transformedData = try JSONSerialization.data(withJSONObject: transformed, options: [])
-                    try await MTOfflineStorage.write(transformedData, to: dest)
-                } else {
-                    // Fallback to original data if parsing fails
-                    try await MTOfflineStorage.write(data, to: dest)
-                }
+                try await MTOfflineStorage.write(data, to: dest)
             }
         } catch let error as MTOfflineError {
             throw error

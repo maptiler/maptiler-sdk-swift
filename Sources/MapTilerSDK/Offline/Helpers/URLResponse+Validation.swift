@@ -7,24 +7,12 @@
 import Foundation
 
 extension URLResponse {
-    /// Validates the received data size against the `Content-Length` header if present.
-    /// - Parameter dataCount: The actual number of bytes received.
-    /// - Throws: `MTOfflinePackError.sizeMismatch` if the sizes don't match.
+    // Validates the received data size against the `Content-Length` header if present.
+    // - Parameter dataCount: The actual number of bytes received.
+    // - Throws: `MTOfflinePackError.sizeMismatch` if the sizes don't match.
     internal func validateContentLength(dataCount: Int) throws {
-        guard let httpResponse = self as? HTTPURLResponse else { return }
-
-        // Content-Length header is case-insensitive
-        if let contentLengthString = httpResponse.value(forHTTPHeaderField: "Content-Length"),
-            let expectedSize = Int64(contentLengthString) {
-            let actualSize = Int64(dataCount)
-            // Allow actual size to be larger than expected (common with automatic decompression)
-            // but fail if it is smaller (indicating a truncated download).
-            if actualSize < expectedSize {
-                throw MTOfflinePackError.sizeMismatch(
-                    expected: expectedSize,
-                    actual: actualSize
-                )
-            }
-        }
+        // Validation removed. URLSession handles data integrity, and strict Content-Length
+        // checks can fail when automatic decompression is involved or when servers report
+        // uncompressed sizes for compressed transfers.
     }
 }

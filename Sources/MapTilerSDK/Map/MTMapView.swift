@@ -354,8 +354,19 @@ extension MTMapView: EventProcessorDelegate {
 
         if event == .didLoad {
             style = MTStyle(for: self, with: referenceStyleProxy, and: styleVariantProxy)
-        } else if event == .isReady {
+        }
+
+        if event == .isReady {
             isInitialized = true
+
+            // Fetch and store session ID in MTConfig
+            Task {
+                let sessionId = await self.getMaptilerSessionId()
+                if !sessionId.isEmpty {
+                    await MTConfig.shared.setMaptilerSessionId(sessionId)
+                }
+            }
+
             delegate?.mapViewDidInitialize(self)
             didInitialize?()
         }

@@ -57,6 +57,9 @@ public actor MTConfig {
     ///  - Note: Defaults to true.
     public private(set) var isTelemetryEnabled: Bool = true
 
+    /// The MapTiler session ID used for sessionized requests and telemetry.
+    private var sessionId: String?
+
     /// Sets the SDK log level.
     /// - Parameters:
     ///   - level:  The desired SDK log level.
@@ -88,6 +91,17 @@ public actor MTConfig {
         }
 
         return apiKey
+    }
+
+    // Sets the MapTiler session ID.
+    internal func setMaptilerSessionId(_ sessionId: String) {
+        guard !sessionId.isEmpty else { return }
+        self.sessionId = sessionId
+    }
+
+    /// Returns the current MapTiler session ID.
+    public func getMaptilerSessionId() -> String? {
+        return sessionId
     }
 
     /// Sets the caching mechanism.

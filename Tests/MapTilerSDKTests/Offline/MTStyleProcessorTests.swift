@@ -82,7 +82,7 @@ struct MTStyleProcessorTests {
         let source = sources?["satellite"]
         #expect(source?["type"] as? String == "raster")
         #expect(source?["url"] == nil)
-        #expect(source?["tiles"] as? [String] == ["\(baseURL)/offline/\(packName)/tiles/satellite/{z}/{x}/{y}.png"])
+        #expect(source?["tiles"] as? [String] == ["\(baseURL)/offline/\(packName)/tiles/satellite/{z}/{x}/{y}.jpg"])
         #expect(source?["tileSize"] as? Int == 512)
     }
 

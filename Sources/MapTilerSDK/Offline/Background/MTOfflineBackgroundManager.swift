@@ -83,14 +83,26 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
                 resourceURL: url
             )
 
-            newMappings[downloadTask.taskIdentifier] = data
+            queue.sync {
+                self.taskMappings[downloadTask.taskIdentifier] = data
+            }
             downloadTask.resume()
         }
 
-        queue.sync {
-            for (taskId, data) in newMappings {
-                self.taskMappings[taskId] = data
+        if tasks.isEmpty {
+            persistPackState(.completed, for: packId)
+
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: .mtOfflineBackgroundPackCompleted,
+                    object: nil,
+                    userInfo: ["packId": packId]
+                )
             }
+            return
+        }
+
+        queue.sync {
             self.saveMappings()
         }
     }
@@ -145,6 +157,10 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
                     return false
                 }.count
 
+                if remainingTasks == 0 {
+                    self.persistPackState(.completed, for: packId)
+                }
+
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(
                         name: .mtOfflineBackgroundPackProgress,
@@ -164,12 +180,27 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
     }
 
     private func reportResourceFailed(for packId: String, error: Error) {
+        persistPackState(.failed, for: packId)
+
         DispatchQueue.main.async {
             NotificationCenter.default.post(
                 name: .mtOfflineBackgroundPackFailed,
                 object: nil,
                 userInfo: ["packId": packId, "error": error]
             )
+        }
+    }
+
+    private func persistPackState(_ state: MTOfflinePackState, for packId: String) {
+        Task {
+            do {
+                var metadata = try MTOfflineStorage.loadMetadata(for: packId)
+                metadata.state = state
+                metadata.size = await MTOfflineStorage.calculatePackSize(for: packId)
+                try await MTOfflineStorage.saveMetadata(metadata)
+            } catch {
+                print("MapTilerSDK: Failed to persist background pack state for \(packId): \(error)")
+            }
         }
     }
 

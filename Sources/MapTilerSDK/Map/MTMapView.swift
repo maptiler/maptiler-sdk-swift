@@ -173,9 +173,23 @@ open class MTMapView: UIView, Sendable {
     ///   - limitToRegion: Default `true` limits max bounds and zoom range to the pack's region.
     @MainActor
     public func loadOfflinePack(_ pack: MTOfflinePack, limitToRegion: Bool = true) async throws {
+        let packState = await pack.state
+        guard packState == .completed else {
+            throw MTError.unknown(
+                description: "Offline pack \(pack.id) is not ready to load. Current state: \(packState.rawValue)."
+            )
+        }
+
+        let localStyleFileURL = MTOfflineStoragePaths.styleURL(for: pack.id)
+        guard MTOfflineStorage.isFileVerified(at: localStyleFileURL) else {
+            throw MTError.unknown(
+                description: "Offline pack \(pack.id) is missing style.json on disk."
+            )
+        }
+
         let server = MTOfflineHTTPServer.shared
         if !server.isRunning {
-            try server.start()
+            try await server.start()
         }
 
         guard server.isRunning else {

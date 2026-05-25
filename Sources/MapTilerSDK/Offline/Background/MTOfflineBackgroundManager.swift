@@ -34,6 +34,7 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
         config.httpAdditionalHeaders = ["User-Agent": MTConfig.customUserAgent]
         config.waitsForConnectivity = true
         config.isDiscretionary = false // Try to start immediately while foregrounded
+        config.httpMaximumConnectionsPerHost = 5 // Throttle to prevent HTTP 429 Rate Limits
 
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }
@@ -189,6 +190,17 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
         }
 
         guard let mapping = mapping else { return }
+
+        if let httpResponse = downloadTask.response as? HTTPURLResponse {
+            let statusCode = httpResponse.statusCode
+            if statusCode != 204 && !(200...299).contains(statusCode) {
+                self.reportResourceFailed(
+                    for: mapping.packId,
+                    error: MTOfflineError.badResponse(statusCode: statusCode)
+                )
+                return
+            }
+        }
 
         let destURL = MTOfflineStoragePaths.absoluteURL(for: mapping.packId, relativePath: mapping.relativePath)
 

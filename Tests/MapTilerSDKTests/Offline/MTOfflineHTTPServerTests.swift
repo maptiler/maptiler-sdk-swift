@@ -82,6 +82,9 @@ struct MTOfflineHTTPServerTests {
         server.stop()
         #expect(!server.isRunning)
         
+        // Wait a bit for the port to be released by the OS
+        try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
+        
         try await server.start(port: 18084)
         #expect(server.isRunning)
         server.stop()

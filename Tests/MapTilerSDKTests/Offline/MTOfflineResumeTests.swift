@@ -54,13 +54,16 @@ struct MTOfflineResumeTests {
         
         let downloader = MTOfflineDownloader()
         
-        actor ProgressTracker {
+        class ProgressTracker: @unchecked Sendable {
+            private let lock = NSLock()
             var completedCount = 0
             var skippedCount = 0
             var updateCount = 0
             private var continuation: CheckedContinuation<Void, Never>?
 
             func add(completed: Int, skipped: Int) {
+                lock.lock()
+                defer { lock.unlock() }
                 self.completedCount += completed
                 self.skippedCount += skipped
                 self.updateCount += 1
@@ -75,24 +78,30 @@ struct MTOfflineResumeTests {
             }
 
             func waitForUpdates() async {
-                if updateCount >= 2 { return }
-                await withCheckedContinuation { self.continuation = $0 }
+                await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+                    lock.lock()
+                    if updateCount >= 2 {
+                        lock.unlock()
+                        cont.resume()
+                        return
+                    }
+                    self.continuation = cont
+                    lock.unlock()
+                }
             }
         }
         
         let tracker = ProgressTracker()
         
         try await downloader.download([task1, task2]) { completed, skipped in
-            Task {
-                await tracker.add(completed: completed, skipped: skipped)
-            }
+            tracker.add(completed: completed, skipped: skipped)
         }
         
         // Wait for all progress updates to be processed
         await tracker.waitForUpdates()
 
-        let finalSkipped = await tracker.skippedCount
-        let finalCompleted = await tracker.completedCount
+        let finalSkipped = tracker.skippedCount
+        let finalCompleted = tracker.completedCount
         
         #expect(finalSkipped == 1, "One task should have been skipped")
         #expect(finalCompleted == 1, "One task should have been completed")

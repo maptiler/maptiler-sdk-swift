@@ -227,6 +227,9 @@ final class OfflineViewModel: ObservableObject, MTOfflineDownloadDelegate {
                 options: MTCameraOptions(zoom: 12)
             )
 
+            let size = await pack.metadata.size
+            packSizeInfo = ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
+
             downloadState = "Loaded Offline Pack!"
         } catch {
             downloadState = "Failed to load pack: \(error.localizedDescription)"

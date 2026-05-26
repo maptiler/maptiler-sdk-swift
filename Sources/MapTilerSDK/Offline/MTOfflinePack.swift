@@ -148,7 +148,7 @@ public actor MTOfflinePack {
     }
 
     internal func markBackgroundDownloadCompleted() {
-        guard state == .downloading else { return }
+        guard state != .completed, state != .canceled, state != .expired else { return }
         state = .completed
         progress.downloadedResources = progress.totalResources
         if isProgressReportingEnabled {
@@ -158,7 +158,7 @@ public actor MTOfflinePack {
     }
 
     internal func markBackgroundDownloadFailed() {
-        guard state == .downloading else { return }
+        guard state != .completed, state != .failed, state != .canceled, state != .expired else { return }
         state = .failed
         Task { await syncMetadataToDisk() }
     }
@@ -357,6 +357,8 @@ extension MTOfflinePack {
     /// This generates the necessary manifest based on the pack's region definition
     /// and then begins downloading all required resources.
     /// - Parameter useBackground: If true, the download will be enqueued in a background URLSession.
+    /// - Note: When `useBackground` is `true`, this method returns after enqueuing tasks.
+    ///   The pack becomes loadable only after a later `.completed` state change.
     public func download(useBackground: Bool = false) async throws {
         let planner = MTOfflinePlannerFactory.createPlanner()
         let manifest = try await planner.generateManifest(for: self.region)

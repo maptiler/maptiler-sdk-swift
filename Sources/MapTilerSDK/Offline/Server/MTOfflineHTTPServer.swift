@@ -28,66 +28,120 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
 
     private init() {}
 
-    // Starts the server on the specified port.
-    // The port number to listen on defaults to 18080.
-    internal func start(port: UInt16 = 18080) throws {
-        lock.lock()
-        guard !_isRunning else {
-            lock.unlock()
-            return
-        }
-        lock.unlock()
+    private class ContinuationWrapper: @unchecked Sendable {
+        private var continuation: CheckedContinuation<NWEndpoint.Port, Error>?
+        private let wrapperLock = NSLock()
 
-        let nwPort = NWEndpoint.Port(rawValue: port)!
-        let parameters = NWParameters.tcp
-
-        var targetPort = nwPort
-        var listener: NWListener?
-
-        do {
-            listener = try NWListener(using: parameters, on: targetPort)
-        } catch {
-            MTLogger.log("Port \(port) is in use, falling back to any available port", type: .info)
-            targetPort = .any
-            listener = try NWListener(using: parameters, on: targetPort)
+        init(_ continuation: CheckedContinuation<NWEndpoint.Port, Error>) {
+            self.continuation = continuation
         }
 
-        guard let validListener = listener else { return }
-
-        validListener.stateUpdateHandler = { [weak self] state in
-            switch state {
-            case .ready:
-                let actualPort = validListener.port?.rawValue ?? 0
-                MTLogger.log("Offline server ready on port \(actualPort)", type: .info)
-                self?.lock.lock()
-                self?._port = validListener.port
-                self?.lock.unlock()
-            case .failed(let error):
-                MTLogger.log("Offline server failed: \(error)", type: .error)
-                self?.lock.lock()
-                self?._isRunning = false
-                self?.lock.unlock()
-            case .cancelled:
-                MTLogger.log("Offline server cancelled", type: .info)
-                self?.lock.lock()
-                self?._isRunning = false
-                self?.lock.unlock()
-            default:
-                break
+        func resume(returning port: NWEndpoint.Port) {
+            wrapperLock.lock()
+            defer { wrapperLock.unlock() }
+            if let cont = continuation {
+                cont.resume(returning: port)
+                continuation = nil
             }
         }
 
-        validListener.newConnectionHandler = { [weak self] connection in
-            self?.handleNewConnection(connection)
+        func resume(throwing error: Error) {
+            wrapperLock.lock()
+            defer { wrapperLock.unlock() }
+            if let cont = continuation {
+                cont.resume(throwing: error)
+                continuation = nil
+            }
+        }
+    }
+
+    private func checkIsRunning() -> NWEndpoint.Port? {
+        lock.lock()
+        defer { lock.unlock() }
+        if _isRunning, let p = _port {
+            return p
+        }
+        return nil
+    }
+
+    private func setServerState(port: NWEndpoint.Port?, isRunning: Bool, listener: NWListener? = nil) {
+        lock.lock()
+        defer { lock.unlock() }
+        if let port = port {
+            self._port = port
+        }
+        self._isRunning = isRunning
+        if let listener = listener {
+            self.listener = listener
+        }
+    }
+
+    // Starts the server on the specified port.
+    // The port number to listen on defaults to 18080.
+    internal func start(port: UInt16 = 18080) async throws {
+        if let existingPort = checkIsRunning() {
+            return
         }
 
-        validListener.start(queue: queue)
+        // swiftlint:disable all
+        let actualPort = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<NWEndpoint.Port, Error>) in
+            let wrapper = ContinuationWrapper(continuation)
 
-        lock.lock()
-        self.listener = validListener
-        self._port = targetPort
-        self._isRunning = true
-        lock.unlock()
+            let nwPort = NWEndpoint.Port(rawValue: port)!
+            let parameters = NWParameters.tcp
+
+            var targetPort = nwPort
+            var listener: NWListener?
+
+            do {
+                listener = try NWListener(using: parameters, on: targetPort)
+            } catch {
+                MTLogger.log("Port \(port) is in use, falling back to any available port", type: .info)
+                targetPort = .any
+                do {
+                    listener = try NWListener(using: parameters, on: .any)
+                } catch {
+                    wrapper.resume(throwing: error)
+                    return
+                }
+            }
+
+            guard let validListener = listener else {
+                wrapper.resume(throwing: MTError.offlineServerFailed)
+                return
+            }
+
+            validListener.stateUpdateHandler = { [weak self] state in
+                switch state {
+                case .ready:
+                    let listenerPort = validListener.port ?? .any
+                    MTLogger.log("Offline server ready on port \(listenerPort.rawValue)", type: .info)
+                    self?.setServerState(port: listenerPort, isRunning: true)
+                    wrapper.resume(returning: listenerPort)
+                case .failed(let error):
+                    MTLogger.log("Offline server failed: \(error)", type: .error)
+                    self?.setServerState(port: nil, isRunning: false)
+                    wrapper.resume(throwing: error)
+                case .cancelled:
+                    MTLogger.log("Offline server cancelled", type: .info)
+                    self?.setServerState(port: nil, isRunning: false)
+                    wrapper.resume(throwing: MTError.offlineServerFailed)
+                default:
+                    break
+                }
+            }
+
+            validListener.newConnectionHandler = { [weak self] connection in
+                self?.handleNewConnection(connection)
+            }
+
+            self.setServerState(port: nil, isRunning: false, listener: validListener)
+            validListener.start(queue: queue)
+        }
+
+        // swiftlint:enable all
+
+        self.setServerState(port: actualPort, isRunning: true)
     }
 
     // Stops the server and cancels all active connections.

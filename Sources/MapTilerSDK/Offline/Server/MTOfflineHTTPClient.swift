@@ -18,7 +18,7 @@ internal actor MTOfflineHTTPClient {
     init(
         session: MTOfflineURLSessionProtocol = URLSession.shared,
         timeoutInterval: TimeInterval = 30,
-        userAgent: String = "MapTiler-SDK-iOS"
+        userAgent: String = MTConfig.customUserAgent
     ) {
         self.session = session
         self.timeoutInterval = timeoutInterval
@@ -35,7 +35,8 @@ internal actor MTOfflineHTTPClient {
 
     // Fetches the contents of the URL and returns it as Data.
     func get(url: URL) async throws -> Data {
-        let request = createRequest(for: url)
+        let normalizedURL = await MTURLNormalizer.normalize(url: url)
+        let request = createRequest(for: normalizedURL)
         let retryPolicy = MTNetworkRetryPolicy(maxAttempts: 3)
 
         return try await retryPolicy.execute { [self] in
@@ -58,7 +59,8 @@ internal actor MTOfflineHTTPClient {
 
     // Downloads the contents of the URL directly to a specified file URL.
     func download(url: URL, to destinationURL: URL) async throws {
-        let request = createRequest(for: url)
+        let normalizedURL = await MTURLNormalizer.normalize(url: url)
+        let request = createRequest(for: normalizedURL)
         let retryPolicy = MTNetworkRetryPolicy(maxAttempts: 3)
 
         try await retryPolicy.execute { [self] in

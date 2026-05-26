@@ -32,7 +32,8 @@ internal struct MTResourceDownloadTask: MTDownloadTask {
 
         do {
             try await retryPolicy.execute {
-                let (data, response) = try await session.data(from: resource.url)
+                let normalizedURL = await MTURLNormalizer.normalize(url: resource.url)
+                let (data, response) = try await session.data(from: normalizedURL)
 
                 guard let httpResponse = response as? HTTPURLResponse else {
                     throw MTOfflineError.networkError(URLError(.badServerResponse))
@@ -40,7 +41,8 @@ internal struct MTResourceDownloadTask: MTDownloadTask {
 
                 switch httpResponse.statusCode {
                 case 204:
-                    throw MTOfflineError.noContent
+                    // Server explicitly returned no content (e.g., empty tile). Treat as success.
+                    return
                 case 200...299:
                     break
                 default:

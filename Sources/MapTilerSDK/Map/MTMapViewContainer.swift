@@ -66,6 +66,11 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
     public func makeUIView(context: Context) -> some UIView {
         mapView.setProxy(referenceStyle: referenceStyle, styleVariant: styleVariant)
 
+        // Mark the initial style as "applied" so that the first updateUIView doesn't
+        // redundanty re-apply it unless it has actually changed in the container.
+        coordinator?.lastAppliedStyle = referenceStyle
+        coordinator?.lastAppliedVariant = styleVariant
+
         mapView.delegate = coordinator
 
         mapView.didInitialize = {
@@ -115,28 +120,30 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
     }
 
     private func updateMapView(_ mapView: MTMapView) {
+        let needsUpdate = coordinator?.lastAppliedStyle != referenceStyle ||
+        coordinator?.lastAppliedVariant != styleVariant
+
         if !mapView.isInitialized {
+            // If the style changed before initialization, update the proxy.
+            if needsUpdate {
+                coordinator?.lastAppliedStyle = referenceStyle
+                coordinator?.lastAppliedVariant = styleVariant
+                mapView.setProxy(referenceStyle: referenceStyle, styleVariant: styleVariant)
+            }
+
             MTLogger.log(notInitializedMessage, type: .warning)
             return
         }
 
-        Task {
-            // Only reset the style if it actually changed; avoid clobbering runtime tweaks like sky.
-            if let style = mapView.style {
-                let needsUpdate = style.referenceStyle != referenceStyle || style.styleVariant != styleVariant
-                if needsUpdate {
-                    await style.setStyle(referenceStyle, styleVariant: styleVariant)
+        if needsUpdate {
+            coordinator?.lastAppliedStyle = referenceStyle
+            coordinator?.lastAppliedVariant = styleVariant
 
-                    // Re-apply space after style changes. setStyle() may override space
-                    // to transparent when style metadata lacks maptiler.space.
-                    if let space = mapView.options?.space {
-                        await mapView.setSpace(space)
-                    }
-                }
-            } else {
-                // Fallback: if style proxy not ready yet, request setStyle.
+            Task {
                 await mapView.style?.setStyle(referenceStyle, styleVariant: styleVariant)
 
+                // Re-apply space after style changes. setStyle() may override space
+                // to transparent when style metadata lacks maptiler.space.
                 if let space = mapView.options?.space {
                     await mapView.setSpace(space)
                 }
@@ -178,6 +185,9 @@ package class MTCoordinator: MTMapViewDelegate {
     var didTriggerEvent: ((MTEvent, MTData?) -> Void)?
     var didInitialize: (() -> Void)?
     var didUpdateLocation: ((CLLocation) -> Void)?
+
+    var lastAppliedStyle: MTMapReferenceStyle?
+    var lastAppliedVariant: MTMapStyleVariant?
 
     public func mapViewDidInitialize(_ mapView: MTMapView) {
         DispatchQueue.main.async { [weak self] in

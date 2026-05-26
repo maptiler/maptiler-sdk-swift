@@ -34,6 +34,7 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
         config.httpAdditionalHeaders = ["User-Agent": MTConfig.customUserAgent]
         config.waitsForConnectivity = true
         config.isDiscretionary = false // Try to start immediately while foregrounded
+        config.httpMaximumConnectionsPerHost = 5 // Throttle to prevent HTTP 429 Rate Limits
 
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }
@@ -68,7 +69,8 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
                 continue
             }
 
-            var request = URLRequest(url: url)
+            let normalizedURL = await MTURLNormalizer.normalize(url: url)
+            var request = URLRequest(url: normalizedURL)
             request.httpMethod = "GET"
 
             let downloadTask = session.downloadTask(with: request)
@@ -81,14 +83,26 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
                 resourceURL: url
             )
 
-            newMappings[downloadTask.taskIdentifier] = data
+            queue.sync {
+                self.taskMappings[downloadTask.taskIdentifier] = data
+            }
             downloadTask.resume()
         }
 
-        queue.sync {
-            for (taskId, data) in newMappings {
-                self.taskMappings[taskId] = data
+        if tasks.isEmpty {
+            persistPackState(.completed, for: packId)
+
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: .mtOfflineBackgroundPackCompleted,
+                    object: nil,
+                    userInfo: ["packId": packId]
+                )
             }
+            return
+        }
+
+        queue.sync {
             self.saveMappings()
         }
     }
@@ -143,6 +157,10 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
                     return false
                 }.count
 
+                if remainingTasks == 0 {
+                    self.persistPackState(.completed, for: packId)
+                }
+
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(
                         name: .mtOfflineBackgroundPackProgress,
@@ -162,12 +180,27 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
     }
 
     private func reportResourceFailed(for packId: String, error: Error) {
+        persistPackState(.failed, for: packId)
+
         DispatchQueue.main.async {
             NotificationCenter.default.post(
                 name: .mtOfflineBackgroundPackFailed,
                 object: nil,
                 userInfo: ["packId": packId, "error": error]
             )
+        }
+    }
+
+    private func persistPackState(_ state: MTOfflinePackState, for packId: String) {
+        Task {
+            do {
+                var metadata = try MTOfflineStorage.loadMetadata(for: packId)
+                metadata.state = state
+                metadata.size = await MTOfflineStorage.calculatePackSize(for: packId)
+                try await MTOfflineStorage.saveMetadata(metadata)
+            } catch {
+                print("MapTilerSDK: Failed to persist background pack state for \(packId): \(error)")
+            }
         }
     }
 
@@ -189,6 +222,17 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
 
         guard let mapping = mapping else { return }
 
+        if let httpResponse = downloadTask.response as? HTTPURLResponse {
+            let statusCode = httpResponse.statusCode
+            if statusCode != 204 && !(200...299).contains(statusCode) {
+                self.reportResourceFailed(
+                    for: mapping.packId,
+                    error: MTOfflineError.badResponse(statusCode: statusCode)
+                )
+                return
+            }
+        }
+
         let destURL = MTOfflineStoragePaths.absoluteURL(for: mapping.packId, relativePath: mapping.relativePath)
 
         do {
@@ -199,26 +243,10 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
                 try fileManager.createDirectory(at: destDir, withIntermediateDirectories: true)
             }
 
-            if mapping.isStyle {
-                let fileData = try Data(contentsOf: location)
-                if let jsonObject = try JSONSerialization.jsonObject(with: fileData) as? [String: Any] {
-                    let baseURL = MTOfflineHTTPServer.shared.baseURLString()
-                    let processor = MTStyleProcessor(baseURL: baseURL, packName: mapping.packId)
-                    let transformed = processor.transform(style: jsonObject)
-                    let transformedData = try JSONSerialization.data(withJSONObject: transformed, options: [])
-                    try transformedData.write(to: destURL, options: .atomic)
-                } else {
-                    if fileManager.fileExists(atPath: destURL.path) {
-                        try fileManager.removeItem(at: destURL)
-                    }
-                    try fileManager.moveItem(at: location, to: destURL)
-                }
-            } else {
-                if fileManager.fileExists(atPath: destURL.path) {
-                    try fileManager.removeItem(at: destURL)
-                }
-                try fileManager.moveItem(at: location, to: destURL)
+            if fileManager.fileExists(atPath: destURL.path) {
+                try fileManager.removeItem(at: destURL)
             }
+            try fileManager.moveItem(at: location, to: destURL)
 
             self.reportResourceComplete(for: mapping.packId)
         } catch {

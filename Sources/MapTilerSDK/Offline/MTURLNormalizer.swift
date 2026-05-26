@@ -13,12 +13,13 @@ internal struct MTURLNormalizer {
     // and includes the API key from `MTConfig.shared` if it isn't already present.
     internal static func normalize(url: URL) async -> URL {
         let apiKey = await MTConfig.shared.getAPIKey() ?? ""
-        return normalize(url: url, apiKey: apiKey)
+        let sessionId = await MTConfig.shared.getMaptilerSessionId()
+        return normalize(url: url, apiKey: apiKey, sessionId: sessionId)
     }
 
     // Normalizes a URL by ensuring it uses the HTTPS scheme, points to the correct MapTiler API host,
     // and includes the provided API key as a query parameter if it isn't already present.
-    internal static func normalize(url: URL, apiKey: String) -> URL {
+    internal static func normalize(url: URL, apiKey: String, sessionId: String? = nil) -> URL {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return url
         }
@@ -46,8 +47,14 @@ internal struct MTURLNormalizer {
         var queryItems = components.queryItems ?? []
         if !queryItems.contains(where: { $0.name == "key" }) {
             queryItems.append(URLQueryItem(name: "key", value: apiKey))
-            components.queryItems = queryItems
         }
+
+        // Ensure query parameter "mtsid" is present if sessionId is provided
+        if let sessionId = sessionId, !sessionId.isEmpty, !queryItems.contains(where: { $0.name == "mtsid" }) {
+            queryItems.append(URLQueryItem(name: "mtsid", value: sessionId))
+        }
+
+        components.queryItems = queryItems
 
         return components.url ?? url
     }

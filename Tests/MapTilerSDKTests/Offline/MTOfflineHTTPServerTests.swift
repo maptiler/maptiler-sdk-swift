@@ -18,7 +18,7 @@ struct MTOfflineHTTPServerTests {
         server.stop()
         
         // Start server
-        try server.start(port: 18081)
+        try await server.start(port: 18081)
         #expect(server.isRunning)
         #expect(server.baseURLString() == "http://127.0.0.1:18081")
         
@@ -34,7 +34,7 @@ struct MTOfflineHTTPServerTests {
         // Ensure it's stopped before starting
         server.stop()
         
-        try server.start(port: 18082)
+        try await server.start(port: 18082)
         defer { server.stop() }
         
         let url = URL(string: "\(server.baseURLString())/health")!
@@ -56,7 +56,7 @@ struct MTOfflineHTTPServerTests {
         // Ensure it's stopped before starting
         server.stop()
         
-        try server.start(port: 18083)
+        try await server.start(port: 18083)
         defer { server.stop() }
         
         let url = URL(string: "\(server.baseURLString())/unknown")!
@@ -77,12 +77,15 @@ struct MTOfflineHTTPServerTests {
         // Ensure it's stopped before starting
         server.stop()
         
-        try server.start(port: 18084)
+        try await server.start(port: 18084)
         #expect(server.isRunning)
         server.stop()
         #expect(!server.isRunning)
         
-        try server.start(port: 18084)
+        // Wait a bit for the port to be released by the OS
+        try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
+        
+        try await server.start(port: 18084)
         #expect(server.isRunning)
         server.stop()
         #expect(!server.isRunning)

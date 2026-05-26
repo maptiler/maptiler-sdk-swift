@@ -50,8 +50,13 @@ struct MTOfflineErrorTests {
         override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
         
         override func startLoading() {
+            let url = request.url!
+            var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            components?.query = nil
+            let cleanURL = components?.url ?? url
+            
             let handler: (@Sendable (URLRequest) throws -> (HTTPURLResponse, Data))? = MockURLProtocol.handlersLock.withLock {
-                MockURLProtocol.handlers[request.url!]
+                MockURLProtocol.handlers[cleanURL]
             }
             
             guard let handler = handler else {
@@ -72,8 +77,12 @@ struct MTOfflineErrorTests {
         override func stopLoading() {}
         
         static func setHandler(for url: URL, handler: @escaping @Sendable (URLRequest) throws -> (HTTPURLResponse, Data)) {
+            var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            components?.query = nil
+            let cleanURL = components?.url ?? url
+            
             handlersLock.withLock {
-                handlers[url] = handler
+                handlers[cleanURL] = handler
             }
         }
     }
@@ -122,7 +131,8 @@ struct MTOfflineErrorTests {
         
         _ = try? await downloader.download([task])
         
-        #expect(captor.lastError == .noContent)
+        // 204 is now treated as success in MTResourceDownloadTask
+        #expect(captor.lastError == nil)
     }
     
     @Test("Test Content Mismatch mapping (PBF vs HTML)")

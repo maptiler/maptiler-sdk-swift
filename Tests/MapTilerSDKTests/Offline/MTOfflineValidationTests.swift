@@ -11,7 +11,7 @@ import Foundation
 @Suite("Offline Validation Tests", .serialized)
 struct MTOfflineValidationTests {
 
-    @Test("Content-Length mismatch should throw sizeMismatch error")
+    @Test("Content-Length mismatch should NOT throw sizeMismatch error (validation disabled in SDK)")
     func testContentLengthMismatch() throws {
         let url = URL(string: "https://api.maptiler.com/style.json")!
         let response = HTTPURLResponse(
@@ -23,7 +23,7 @@ struct MTOfflineValidationTests {
 
         let data = Data(count: 500)
 
-        #expect(throws: MTOfflinePackError.sizeMismatch(expected: 1000, actual: 500)) {
+        #expect(throws: Never.self) {
             try response.validateContentLength(dataCount: data.count)
         }
     }

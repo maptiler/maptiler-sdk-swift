@@ -257,6 +257,10 @@ open class MTMapView: UIView, Sendable {
     /// Creates an offline region definition using the map's current reference style and variant.
     /// - Parameters:
     ///   - bbox: The bounding box of the region.
+    /// Creates an offline region definition for the current map configuration.
+    ///
+    /// - Parameters:
+    ///   - bbox: The bounding box to download.
     ///   - minZoom: The minimum zoom level.
     ///   - maxZoom: The maximum zoom level.
     ///   - pixelRatio: The pixel ratio (defaults to 1.0).
@@ -268,11 +272,34 @@ open class MTMapView: UIView, Sendable {
         maxZoom: Int,
         pixelRatio: Float = 1.0
     ) -> MTOfflineRegionDefinition {
+        createOfflineRegion(
+            geometry: .boundingBox(bbox),
+            minZoom: minZoom,
+            maxZoom: maxZoom,
+            pixelRatio: pixelRatio
+        )
+    }
+
+    /// Creates an offline region definition for the current map configuration.
+    ///
+    /// - Parameters:
+    ///   - geometry: The geometry to download (e.g. bounding box or route).
+    ///   - minZoom: The minimum zoom level.
+    ///   - maxZoom: The maximum zoom level.
+    ///   - pixelRatio: The pixel ratio (defaults to 1.0).
+    /// - Returns: A region definition configured with the current map's style configuration.
+    @MainActor
+    public func createOfflineRegion(
+        geometry: MTOfflineRegionGeometry,
+        minZoom: Int,
+        maxZoom: Int,
+        pixelRatio: Float = 1.0
+    ) -> MTOfflineRegionDefinition {
         let currentRefStyle = style?.referenceStyle ?? referenceStyleProxy
         let currentVariant = style?.styleVariant ?? styleVariantProxy
 
         return MTOfflineRegionDefinition(
-            bbox: bbox,
+            geometry: geometry,
             minZoom: minZoom,
             maxZoom: maxZoom,
             referenceStyle: currentRefStyle,

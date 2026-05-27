@@ -69,38 +69,44 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let baseStr = try container.decodeIfPresent(String.self, forKey: .base) {
-            switch baseStr {
-            case "streets": self = .streets
-            case "satellite": self = .satellite
-            case "outdoor": self = .outdoor
-            case "winter": self = .winter
-            case "dataviz": self = .dataviz
-            case "basic": self = .basic
-            case "bright": self = .bright
-            case "topo": self = .topo
-            case "toner": self = .toner
-            case "backdrop": self = .backdrop
-            case "openStreetMap": self = .openStreetMap
-            case "aquarelle": self = .aquarelle
-            case "landscape": self = .landscape
-            case "ocean": self = .ocean
-            default:
-                throw DecodingError.dataCorruptedError(
-                    forKey: .base,
-                    in: container,
-                    debugDescription: "Unknown base style"
-                )
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            if let baseStr = try container.decodeIfPresent(String.self, forKey: .base) {
+                self = try Self.from(string: baseStr, decoder: decoder)
+                return
+            } else if let urlStr = try container.decodeIfPresent(String.self, forKey: .customUrl),
+                let url = URL(string: urlStr) {
+                self = .custom(url)
+                return
             }
-        } else if let urlStr = try container.decodeIfPresent(String.self, forKey: .customUrl),
-            let url = URL(string: urlStr) {
-            self = .custom(url)
-        } else {
+        }
+
+        // Backward compatibility: try decoding as a single string
+        let container = try decoder.singleValueContainer()
+        let baseStr = try container.decode(String.self)
+        self = try Self.from(string: baseStr, decoder: decoder)
+    }
+
+    private static func from(string: String, decoder: Decoder) throws -> MTMapReferenceStyle {
+        switch string {
+        case "streets": return .streets
+        case "satellite": return .satellite
+        case "outdoor": return .outdoor
+        case "winter": return .winter
+        case "dataviz": return .dataviz
+        case "basic": return .basic
+        case "bright": return .bright
+        case "topo": return .topo
+        case "toner": return .toner
+        case "backdrop": return .backdrop
+        case "openStreetMap": return .openStreetMap
+        case "aquarelle": return .aquarelle
+        case "landscape": return .landscape
+        case "ocean": return .ocean
+        default:
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: decoder.codingPath,
-                    debugDescription: "Invalid MTMapReferenceStyle encoding"
+                    debugDescription: "Unknown base style: \(string)"
                 )
             )
         }

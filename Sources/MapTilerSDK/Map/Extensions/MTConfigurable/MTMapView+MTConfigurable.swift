@@ -40,9 +40,8 @@ extension MTMapView: MTConfigurable {
         runCommandWithStringReturnValue(GetMaptilerSessionId(), completion: completionHandler)
     }
 
-    /// Initializes resources like WebWorkers that can be shared across maps to lower load
-    /// times in some situations. `maptilersdk.workerUrl` and `maptilersdk.workerCount`, if being
-    /// used, must be set before `prewarm()` is called to have an effect.
+    /// Initializes resources that can be shared across maps to lower load
+    /// times in some situations.
     ///
     /// By default, the lifecycle of these resources is managed automatically, and they are
     /// lazily initialized when a Map is first created. By invoking `prewarm()`, these
@@ -124,7 +123,7 @@ extension MTMapView {
         }
     }
 
-    /// Initializes resources like WebWorkers that can be shared across maps to lower load
+    /// Initializes resources that can be shared across maps to lower load
     /// times in some situations.
     public func prewarm() async {
         await withCheckedContinuation { continuation in

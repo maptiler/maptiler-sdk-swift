@@ -39,6 +39,33 @@ extension MTMapView: MTConfigurable {
     public func getMaptilerSessionId(completionHandler: @escaping (Result<String, MTError>) -> Void) {
         runCommandWithStringReturnValue(GetMaptilerSessionId(), completion: completionHandler)
     }
+
+    /// Initializes resources like WebWorkers that can be shared across maps to lower load
+    /// times in some situations. `maptilersdk.workerUrl` and `maptilersdk.workerCount`, if being
+    /// used, must be set before `prewarm()` is called to have an effect.
+    ///
+    /// By default, the lifecycle of these resources is managed automatically, and they are
+    /// lazily initialized when a Map is first created. By invoking `prewarm()`, these
+    /// resources will be created ahead of time, and will not be cleared when the last Map
+    /// is removed from the page. This allows them to be re-used by new Map instances that
+    /// are created later. They can be manually cleared by calling
+    /// `clearPrewarmedResources()`.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func prewarm(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(Prewarm(), completion: completionHandler)
+    }
+
+    /// Clears up resources that have previously been created by `prewarm()`.
+    ///
+    /// Note that this is typically not necessary. You should only call this function
+    /// if you expect the user of your app to not return to a Map view at any point
+    /// in your application.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func clearPrewarmedResources(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        runCommand(ClearPrewarmedResources(), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -93,6 +120,25 @@ extension MTMapView {
                 case .failure:
                     continuation.resume(returning: "")
                 }
+            }
+        }
+    }
+
+    /// Initializes resources like WebWorkers that can be shared across maps to lower load
+    /// times in some situations.
+    public func prewarm() async {
+        await withCheckedContinuation { continuation in
+            prewarm { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Clears up resources that have previously been created by `prewarm()`.
+    public func clearPrewarmedResources() async {
+        await withCheckedContinuation { continuation in
+            clearPrewarmedResources { _ in
+                continuation.resume()
             }
         }
     }

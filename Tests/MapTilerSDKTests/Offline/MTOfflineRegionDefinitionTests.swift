@@ -6,6 +6,7 @@
 
 import Testing
 import Foundation
+import CoreLocation
 @testable import MapTilerSDK
 
 @Suite("MTOfflineRegionDefinition Compatibility Tests")

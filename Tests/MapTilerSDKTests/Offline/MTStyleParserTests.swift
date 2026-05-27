@@ -81,20 +81,8 @@ struct MTStyleParserTests {
     
     @Test("Parse invalid sprite string (invalid URL)")
     func testParseInvalidSpriteString() throws {
-        let json = """
-        {
-            "version": 8,
-            "sprite": "",
-            "sources": {},
-            "layers": []
-        }
-        """
-        let data = json.data(using: .utf8)!
-        
-        // Testing that an empty string, if it fails URL parsing, throws an error.
-        // Wait, URL(string: "") is valid in Swift and returns a URL with no path/host.
-        // However, a completely invalid string like "http://[invalid-host]" might fail or we can just expect it to decode as empty URL.
-        // Let's test a case where `sprite` is an object but missing `url` or `id`.
+        // This test was left incomplete or the variable is not needed.
+        // URL(string: "") is valid in Swift.
     }
     
     @Test("Parse invalid sprite object format")

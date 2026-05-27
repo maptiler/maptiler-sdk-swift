@@ -129,6 +129,7 @@ jobs:
         IS_PULL_REQUEST: '${{ !!github.event.pull_request }}'
         REPOSITORY: '${{ github.repository }}'
         AGENT_DIRECTIVES: '${{ steps.agent_directives.outputs.directives }}'
+        GEMINI_CLI_TRUST_WORKSPACE: true
       with:
         gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
         gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'

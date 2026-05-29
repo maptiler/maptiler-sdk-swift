@@ -218,17 +218,18 @@ open class MTMapView: UIView, Sendable {
         await self.style?.setStyle(.custom(url), styleVariant: nil)
 
         if limitToRegion {
+            let isFlexible = {
+                if case .boundingBox = pack.region.geometry { return false }
+                return true
+            }()
+            let paddingMeters = pack.region.padding ?? (isFlexible ? 2000.0 : nil)
+
             let paddedBbox: MTBoundingBox
-            if case .boundingBox = pack.region.geometry {
-                paddedBbox = pack.region.bbox
+            if let pad = paddingMeters, pad > 0, isFlexible {
+                // Pad flexible geometries so the camera can move around the corridor
+                paddedBbox = pack.region.bbox.expanded(byMeters: pad)
             } else {
-                // Pad flexible geometries by 0.02 degrees (approx 2km) so the camera can move around the corridor
-                paddedBbox = MTBoundingBox(
-                    minLon: pack.region.bbox.minLon - 0.02,
-                    minLat: pack.region.bbox.minLat - 0.02,
-                    maxLon: pack.region.bbox.maxLon + 0.02,
-                    maxLat: pack.region.bbox.maxLat + 0.02
-                )
+                paddedBbox = pack.region.bbox
             }
             try await self.setMaxBounds(paddedBbox.bounds)
             try await self.setMinZoom(Double(pack.region.minZoom))

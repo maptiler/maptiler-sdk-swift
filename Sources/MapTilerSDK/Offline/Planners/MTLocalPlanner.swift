@@ -40,24 +40,18 @@ internal class MTLocalPlanner: MTOfflinePlanner {
     internal func generateManifest(for definition: MTOfflineRegionDefinition) async throws -> MTManifest {
         try validate(definition: definition)
 
+        let isFlexible = {
+            if case .boundingBox = definition.geometry { return false }
+            return true
+        }()
+        let paddingMeters = definition.padding ?? (isFlexible ? 2000.0 : nil)
+
         // For non-rectangular geometries, slightly pad the bounding box stored in the manifest.
         // MapLibre uses this manifest bbox to aggressively clip rendering. Without padding,
         // tiles on the exact edges of a route or polygon won't be drawn.
         var manifestBbox = definition.bbox
-        if case .route = definition.geometry {
-            manifestBbox = MTBoundingBox(
-                minLon: manifestBbox.minLon - 0.02,
-                minLat: manifestBbox.minLat - 0.02,
-                maxLon: manifestBbox.maxLon + 0.02,
-                maxLat: manifestBbox.maxLat + 0.02
-            )
-        } else if case .polygon = definition.geometry {
-            manifestBbox = MTBoundingBox(
-                minLon: manifestBbox.minLon - 0.02,
-                minLat: manifestBbox.minLat - 0.02,
-                maxLon: manifestBbox.maxLon + 0.02,
-                maxLat: manifestBbox.maxLat + 0.02
-            )
+        if let pad = paddingMeters, pad > 0, isFlexible {
+            manifestBbox = manifestBbox.expanded(byMeters: pad)
         }
 
         let metadata = MTManifestMetadata(
@@ -90,6 +84,7 @@ internal class MTLocalPlanner: MTOfflinePlanner {
             geometry: definition.geometry,
             minZoom: definition.minZoom,
             maxZoom: definition.maxZoom,
+            paddingMeters: paddingMeters,
             dependencies: resolvedStyle?.dependencies
         )
 
@@ -157,6 +152,7 @@ extension MTLocalPlanner {
         geometry: MTOfflineRegionGeometry,
         minZoom: Int,
         maxZoom: Int,
+        paddingMeters: Double?,
         dependencies: MTStyleDependencies?
     ) async throws -> [MTMapResource] {
         guard let sources = dependencies?.sources else { return [] }
@@ -178,7 +174,11 @@ extension MTLocalPlanner {
             if case .boundingBox(let bbox) = geometry {
                 let splitBoxes = bbox.normalizedAndSplit()
                 for box in splitBoxes {
-                    let rangesByZoom = MTTileMath.tileRanges(for: box, zoomRange: effRange)
+                    let rangesByZoom = MTTileMath.tileRanges(
+                        for: box,
+                        zoomRange: effRange,
+                        paddingMeters: paddingMeters
+                    )
 
                     let sourceResources = createResources(
                         for: source,
@@ -192,7 +192,7 @@ extension MTLocalPlanner {
             } else {
                 var geometryTiles = Set<MTTileIndex>()
                 for zoom in effRange {
-                    geometryTiles.formUnion(MTTileMath.tiles(for: geometry, zoom: zoom))
+                    geometryTiles.formUnion(MTTileMath.tiles(for: geometry, zoom: zoom, paddingMeters: paddingMeters))
                 }
                 let sourceResources = createResources(
                     for: source,

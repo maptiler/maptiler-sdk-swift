@@ -58,6 +58,26 @@ internal struct MTTileMath {
         let maxY: Int
     }
 
+    // Calculates the required tile buffer size for a given distance padding in meters at a specific zoom and latitude.
+    internal static func calculateTileBuffer(
+        forPadding paddingMeters: Double?,
+        boundingBox: MTBoundingBox,
+        zoom: Int
+    ) -> Int {
+        guard let paddingMeters = paddingMeters else { return 1 } // Default fallback buffer
+        guard paddingMeters > 0 else { return 0 }
+
+        let maxAbsLat = Swift.max(abs(boundingBox.minLat), abs(boundingBox.maxLat))
+        let clampedLat = Swift.min(maxAbsLat, MTMath.maxSafeLatitude)
+        let cosLat = cos(MTMath.toRadians(degrees: clampedLat))
+        let tilesAtZoom = pow(2.0, Double(Swift.max(0, Swift.min(zoom, 62))))
+        let metersPerTile = (MTMath.earthCircumference * cosLat) / tilesAtZoom
+
+        if metersPerTile <= 0 { return 1 }
+        let requiredTiles = Int(ceil(paddingMeters / metersPerTile))
+        return Swift.max(1, Swift.min(requiredTiles, 50)) // Cap at 50 to prevent excessive memory usage
+    }
+
     // Calculates the discrete tile bounds (min/max X and Y) intersecting a bounding box at a given zoom level.
     internal static func tileBounds(for bbox: MTBoundingBox, zoom: Int, buffer: Int = 1) -> MTTileBounds {
         let minXRaw = longitudeToTileX(lon: bbox.minLon, zoom: zoom)
@@ -249,6 +269,16 @@ internal struct MTTileMath {
     internal static func tiles(
         for geometry: MTOfflineRegionGeometry,
         zoom: Int,
+        paddingMeters: Double?
+    ) -> Set<MTTileIndex> {
+        let buffer = calculateTileBuffer(forPadding: paddingMeters, boundingBox: geometry.bbox, zoom: zoom)
+        return tiles(for: geometry, zoom: zoom, buffer: buffer)
+    }
+
+    // Resolves tiles for any geometry type
+    internal static func tiles(
+        for geometry: MTOfflineRegionGeometry,
+        zoom: Int,
         buffer: Int = 1
     ) -> Set<MTTileIndex> {
         switch geometry {
@@ -275,11 +305,29 @@ extension MTTileMath {
     internal static func estimateTileCount(
         for geometry: MTOfflineRegionGeometry,
         zoomRange: MTOfflineZoomRange,
+        paddingMeters: Double?
+    ) -> Int {
+        switch geometry {
+        case .boundingBox(let bbox):
+            return estimateTileCount(for: bbox, zoomRange: zoomRange, paddingMeters: paddingMeters)
+        default:
+            var totalTiles = 0
+            for zoom in zoomRange.minZoom...zoomRange.maxZoom {
+                let buffer = calculateTileBuffer(forPadding: paddingMeters, boundingBox: geometry.bbox, zoom: zoom)
+                totalTiles += tiles(for: geometry, zoom: zoom, buffer: buffer).count
+            }
+            return totalTiles
+        }
+    }
+
+    // Computes the exact total number of tiles required to cover a geometry over a range of zooms.
+    internal static func estimateTileCount(
+        for geometry: MTOfflineRegionGeometry,
+        zoomRange: MTOfflineZoomRange,
         buffer: Int = 1
     ) -> Int {
         switch geometry {
         case .boundingBox(let bbox):
-            // Use highly optimized existing path for bounding boxes
             return estimateTileCount(for: bbox, zoomRange: zoomRange, buffer: buffer)
         default:
             var totalTiles = 0
@@ -288,6 +336,27 @@ extension MTTileMath {
             }
             return totalTiles
         }
+    }
+
+    // Computes the exact total number of tiles required to cover a bounding box over a range of zooms.
+    internal static func estimateTileCount(
+        for bbox: MTBoundingBox,
+        zoomRange: MTOfflineZoomRange,
+        paddingMeters: Double?
+    ) -> Int {
+        let normalizedBoxes = bbox.normalizedAndSplit()
+        var totalTiles = 0
+
+        for box in normalizedBoxes {
+            for zoom in zoomRange.minZoom...zoomRange.maxZoom {
+                let buffer = calculateTileBuffer(forPadding: paddingMeters, boundingBox: box, zoom: zoom)
+                let bounds = tileBounds(for: box, zoom: zoom, buffer: buffer)
+                let countX = bounds.maxX - bounds.minX + 1
+                let countY = bounds.maxY - bounds.minY + 1
+                totalTiles += countX * countY
+            }
+        }
+        return totalTiles
     }
 
     // Computes the exact total number of tiles required to cover a bounding box over a range of zooms.
@@ -314,6 +383,27 @@ extension MTTileMath {
     internal static func estimateTileCountPerZoom(
         for bbox: MTBoundingBox,
         zoomRange: MTOfflineZoomRange,
+        paddingMeters: Double?
+    ) -> [Int: Int] {
+        let normalizedBoxes = bbox.normalizedAndSplit()
+        var counts: [Int: Int] = [:]
+
+        for box in normalizedBoxes {
+            for zoom in zoomRange.minZoom...zoomRange.maxZoom {
+                let buffer = calculateTileBuffer(forPadding: paddingMeters, boundingBox: box, zoom: zoom)
+                let bounds = tileBounds(for: box, zoom: zoom, buffer: buffer)
+                let countX = bounds.maxX - bounds.minX + 1
+                let countY = bounds.maxY - bounds.minY + 1
+                counts[zoom, default: 0] += countX * countY
+            }
+        }
+        return counts
+    }
+
+    // Computes the exact number of tiles required per zoom level.
+    internal static func estimateTileCountPerZoom(
+        for bbox: MTBoundingBox,
+        zoomRange: MTOfflineZoomRange,
         buffer: Int = 1
     ) -> [Int: Int] {
         let normalizedBoxes = bbox.normalizedAndSplit()
@@ -334,10 +424,34 @@ extension MTTileMath {
     internal static func tileRanges(
         for bbox: MTBoundingBox,
         zoom: Int,
+        paddingMeters: Double?
+    ) -> (x: ClosedRange<Int>, y: ClosedRange<Int>) {
+        let buffer = calculateTileBuffer(forPadding: paddingMeters, boundingBox: bbox, zoom: zoom)
+        let bounds = tileBounds(for: bbox, zoom: zoom, buffer: buffer)
+        return (x: bounds.minX...bounds.maxX, y: bounds.minY...bounds.maxY)
+    }
+
+    // Calculates the closed ranges of X and Y tile coordinates for a given bounding box and zoom level.
+    internal static func tileRanges(
+        for bbox: MTBoundingBox,
+        zoom: Int,
         buffer: Int = 1
     ) -> (x: ClosedRange<Int>, y: ClosedRange<Int>) {
         let bounds = tileBounds(for: bbox, zoom: zoom, buffer: buffer)
         return (x: bounds.minX...bounds.maxX, y: bounds.minY...bounds.maxY)
+    }
+
+    // Calculates the closed ranges of X and Y tile coordinates for a given bounding box and a range of zoom levels.
+    internal static func tileRanges(
+        for bbox: MTBoundingBox,
+        zoomRange: ClosedRange<Int>,
+        paddingMeters: Double?
+    ) -> [Int: (x: ClosedRange<Int>, y: ClosedRange<Int>)] {
+        var result = [Int: (x: ClosedRange<Int>, y: ClosedRange<Int>)]()
+        for z in zoomRange {
+            result[z] = tileRanges(for: bbox, zoom: z, paddingMeters: paddingMeters)
+        }
+        return result
     }
 
     // Calculates the closed ranges of X and Y tile coordinates for a given bounding box and a range of zoom levels.

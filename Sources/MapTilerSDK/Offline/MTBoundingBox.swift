@@ -142,6 +142,40 @@ extension MTBoundingBox {
         )
     }
 
+    /// Expands the bounding box outward by a given distance in meters.
+    /// - Parameter meters: The distance in meters to expand.
+    /// - Returns: A new expanded bounding box.
+    public func expanded(byMeters meters: Double) -> MTBoundingBox {
+        guard meters > 0 else { return self }
+        let latPadding = MTMath.toDegrees(radians: meters / MTMath.earthRadius)
+
+        let midLat = (minLat + maxLat) / 2.0
+        let cosMidLat = cos(MTMath.toRadians(degrees: midLat))
+
+        let lonPadding: Double
+        if cosMidLat > 0.01 { // Avoid division by zero or extreme expansion near the exact poles
+            lonPadding = MTMath.toDegrees(radians: meters / MTMath.earthRadius) / cosMidLat
+        } else {
+            lonPadding = 180.0 // At the poles, a small meter expansion wraps around the entire globe
+        }
+
+        let newMinLat = MTBoundingBox.clampLatitude(minLat - latPadding)
+        let newMaxLat = MTBoundingBox.clampLatitude(maxLat + latPadding)
+
+        let newMinLon: Double
+        let newMaxLon: Double
+
+        if lonPadding >= 180.0 {
+            newMinLon = -180.0
+            newMaxLon = 180.0
+        } else {
+            newMinLon = MTBoundingBox.normalizeLongitude(minLon - lonPadding)
+            newMaxLon = MTBoundingBox.normalizeLongitude(maxLon + lonPadding)
+        }
+
+        return MTBoundingBox(minLon: newMinLon, minLat: newMinLat, maxLon: newMaxLon, maxLat: newMaxLat)
+    }
+
     /// Expands the bounding box outward by a given percentage.
     /// - Parameter percentage: The percentage to expand (e.g., 0.1 for a 10% buffer).
     /// - Returns: A new expanded bounding box.

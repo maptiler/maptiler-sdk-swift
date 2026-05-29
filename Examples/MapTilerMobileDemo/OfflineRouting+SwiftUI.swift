@@ -70,14 +70,7 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
                 self.routePack = finalPack
                 self.isRouteReady = finalIsReady
                 self.packSizeInfo = finalSizeInfo
-
-                // Only update status to "Ready" or "Idle" if we are not currently downloading
-                // (to avoid flickering if refreshPacks is called during download)
-                if !self.downloadState.contains("Downloading...") {
-                    self.downloadState = finalStatus
-                } else if finalIsReady {
-                    self.downloadState = finalStatus
-                }
+                self.downloadState = finalStatus
             }
         } catch {
             print("Failed to load packs: \(error)")
@@ -160,7 +153,9 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
     nonisolated func offlinePack(_ id: String, didUpdateProgress progress: MTOfflinePackProgress) {
         Task { @MainActor in
             self.downloadProgress = Float(progress.percentage)
-            self.downloadState = "Downloading... (\(progress.downloadedResources)/\(progress.totalResources))"
+            if progress.percentage < 1.0 {
+                self.downloadState = "Downloading... (\(progress.downloadedResources)/\(progress.totalResources))"
+            }
         }
     }
 

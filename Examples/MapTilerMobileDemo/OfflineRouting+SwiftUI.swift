@@ -50,12 +50,15 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
                     let contextDict = try? JSONDecoder().decode([String: String].self, from: contextData),
                     contextDict[Constants.nameDictKey] == Constants.packName {
                     foundPack = pack
-                    isReady = await pack.state == .completed
+                    let pState = await pack.state
+                    isReady = pState == .completed
 
                     if isReady {
                         let size = await pack.metadata.size
                         sizeInfo = ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
                         status = Constants.DownloadStateLabel.routeReady
+                    } else if pState == .downloading {
+                        status = Constants.DownloadStateLabel.routeDownloading
                     }
                     break
                 }
@@ -68,9 +71,18 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
 
             await MainActor.run {
                 self.routePack = finalPack
-                self.isRouteReady = finalIsReady
+
+                // Don't downgrade isRouteReady if it was already set (e.g., by the delegate)
+                self.isRouteReady = self.isRouteReady || finalIsReady
                 self.packSizeInfo = finalSizeInfo
-                self.downloadState = finalStatus
+
+                // Update status if we are now ready, or if we are not currently showing
+                // a detailed progress string.
+                if self.isRouteReady {
+                    self.downloadState = Constants.DownloadStateLabel.routeReady
+                } else if !self.downloadState.contains("Downloading...") {
+                    self.downloadState = finalStatus
+                }
             }
         } catch {
             print("Failed to load packs: \(error)")
@@ -162,6 +174,10 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
     nonisolated func offlinePack(_ id: String, didChangeState state: MTOfflinePackState) {
         Task {
             if state == .completed {
+                await MainActor.run {
+                    self.isRouteReady = true
+                    self.downloadState = Constants.DownloadStateLabel.routeReady
+                }
                 await refreshPacks()
             } else if state == .failed {
                 await MainActor.run {

@@ -40,19 +40,43 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
     func refreshPacks() async {
         do {
             let packs = try await MTOfflinePack.packs()
+            var foundPack: MTOfflinePack?
+            var isReady = false
+            var sizeInfo = ""
+            var status = Constants.DownloadStateLabel.idle
+
             for pack in packs {
                 if let contextData = await pack.metadata.context,
                     let contextDict = try? JSONDecoder().decode([String: String].self, from: contextData),
                     contextDict[Constants.nameDictKey] == Constants.packName {
-                    self.routePack = pack
-                    self.isRouteReady = await pack.state == .completed
+                    foundPack = pack
+                    isReady = await pack.state == .completed
 
-                    if self.isRouteReady {
+                    if isReady {
                         let size = await pack.metadata.size
-                        self.packSizeInfo = ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
-                        self.downloadState = Constants.DownloadStateLabel.routeReady
+                        sizeInfo = ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
+                        status = Constants.DownloadStateLabel.routeReady
                     }
-                    return
+                    break
+                }
+            }
+
+            let finalPack = foundPack
+            let finalIsReady = isReady
+            let finalSizeInfo = sizeInfo
+            let finalStatus = status
+
+            await MainActor.run {
+                self.routePack = finalPack
+                self.isRouteReady = finalIsReady
+                self.packSizeInfo = finalSizeInfo
+
+                // Only update status to "Ready" or "Idle" if we are not currently downloading
+                // (to avoid flickering if refreshPacks is called during download)
+                if !self.downloadState.contains("Downloading...") {
+                    self.downloadState = finalStatus
+                } else if finalIsReady {
+                    self.downloadState = finalStatus
                 }
             }
         } catch {
@@ -144,6 +168,12 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
         Task {
             if state == .completed {
                 await refreshPacks()
+            } else if state == .failed {
+                await MainActor.run {
+                    if !self.downloadState.contains("Error") {
+                        self.downloadState = "Download Failed!"
+                    }
+                }
             }
         }
     }

@@ -1311,7 +1311,6 @@ extension MTMapView {
         }
     }
 
-    /// Returns true while the map is zooming.
     public func isZooming() async -> Bool {
         await withCheckedContinuation { continuation in
             isZooming { result in
@@ -1323,5 +1322,78 @@ extension MTMapView {
                 }
             }
         }
+    }
+}
+
+// MARK: - UI to Offline Region Helpers
+extension MTMapView {
+    /// Translates a screen-space rectangle to a precise 4-point polygon.
+    ///
+    /// Use this for offline regions when the map is rotated or pitched to minimize
+    /// unnecessary tile downloads compared to an axis-aligned bounding box.
+    /// - Parameter rect: The screen-space rectangle.
+    /// - Returns: An array of coordinates representing the 4 corners of the rectangle.
+    @MainActor
+    public func polygon(for rect: CGRect) async -> [CLLocationCoordinate2D] {
+        let nw = await unproject(point: MTPoint(x: rect.minX, y: rect.minY))
+        let ne = await unproject(point: MTPoint(x: rect.maxX, y: rect.minY))
+        let se = await unproject(point: MTPoint(x: rect.maxX, y: rect.maxY))
+        let sw = await unproject(point: MTPoint(x: rect.minX, y: rect.maxY))
+        return [nw, ne, se, sw]
+    }
+
+    /// Translates a screen-space rectangle to a geographic bounding box.
+    ///
+    /// The resulting bounding box encompasses all coordinates visible within the specified rectangle,
+    /// accounting for current map rotation and pitch.
+    /// - Parameter rect: The screen-space rectangle.
+    /// - Returns: An `MTBoundingBox` containing the rectangle.
+    @MainActor
+    public func boundingBox(for rect: CGRect) async -> MTBoundingBox {
+        let coords = await polygon(for: rect)
+        return MTBoundingBox(from: coords)
+    }
+
+    /// Returns the bounding box of the currently visible map area.
+    @MainActor
+    public func getVisibleBoundingBox() async -> MTBoundingBox {
+        let bounds = await self.getBounds()
+        return MTBoundingBox(bounds: bounds)
+    }
+
+    /// Creates an offline region definition directly from a screen-space rectangle.
+    ///
+    /// - Parameters:
+    ///   - rect: The UI rectangle (e.g., from a selection overlay or the map's bounds).
+    ///   - minZoom: Minimum zoom level to download.
+    ///   - maxZoom: Maximum zoom level to download.
+    ///   - usePrecisePolygon: If true, uses a polygon to minimize tile count on rotated maps
+    ///    instead of an axis-aligned bounding box.
+    /// - Returns: A fully configured region definition ready for download.
+    @MainActor
+    public func createOfflineRegion(
+        covering rect: CGRect,
+        minZoom: Int,
+        maxZoom: Int,
+        usePrecisePolygon: Bool = false
+    ) async -> MTOfflineRegionDefinition {
+        let coords = await polygon(for: rect)
+        let geometry: MTOfflineRegionGeometry = usePrecisePolygon ?
+            .polygon(coords) : .boundingBox(MTBoundingBox(from: coords))
+
+        #if canImport(UIKit)
+        let pixelRatio = Float(self.traitCollection.displayScale)
+        #elseif canImport(AppKit)
+        let pixelRatio = Float(self.window?.backingScaleFactor ?? 1.0)
+        #else
+        let pixelRatio: Float = 1.0
+        #endif
+
+        return createOfflineRegion(
+            geometry: geometry,
+            minZoom: minZoom,
+            maxZoom: maxZoom,
+            pixelRatio: pixelRatio
+        )
     }
 }

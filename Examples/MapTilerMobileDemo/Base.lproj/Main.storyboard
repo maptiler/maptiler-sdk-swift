@@ -202,7 +202,7 @@
         <!--Offline-->
         <scene sceneID="Offline-Scene-ID">
             <objects>
-                <viewController id="Offline-VC-ID" customClass="OfflineViewController" customModule="MapTilerMobileDemo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Offline-VC-ID" customClass="OfflineSplitViewController" customModule="MapTilerMobileDemo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Offline-View-ID">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

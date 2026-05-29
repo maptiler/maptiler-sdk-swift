@@ -168,6 +168,10 @@ open class MTMapView: UIView, Sendable {
     }
 
     /// Loads an offline pack onto the map view.
+    ///
+    /// - Note: Loading an offline pack changes the map's style to the local offline style.
+    /// This process resets all custom sources, layers, and annotations.
+    /// You must re-add any custom map content after the style finishes loading.
     /// - Parameters:
     ///   - pack: The `MTOfflinePack` to load.
     ///   - limitToRegion: Default `true` limits max bounds and zoom range to the pack's region.
@@ -214,7 +218,19 @@ open class MTMapView: UIView, Sendable {
         await self.style?.setStyle(.custom(url), styleVariant: nil)
 
         if limitToRegion {
-            try await self.setMaxBounds(pack.region.bbox.bounds)
+            let paddedBbox: MTBoundingBox
+            if case .boundingBox = pack.region.geometry {
+                paddedBbox = pack.region.bbox
+            } else {
+                // Pad flexible geometries by 0.02 degrees (approx 2km) so the camera can move around the corridor
+                paddedBbox = MTBoundingBox(
+                    minLon: pack.region.bbox.minLon - 0.02,
+                    minLat: pack.region.bbox.minLat - 0.02,
+                    maxLon: pack.region.bbox.maxLon + 0.02,
+                    maxLat: pack.region.bbox.maxLat + 0.02
+                )
+            }
+            try await self.setMaxBounds(paddedBbox.bounds)
             try await self.setMinZoom(Double(pack.region.minZoom))
             try await self.setMaxZoom(Double(pack.region.maxZoom))
         }

@@ -34,7 +34,7 @@ public struct MTOfflineEstimator: Sendable {
         guard let key = await MTConfig.shared.getAPIKey(),
             let styleURL = region.referenceStyle.fetchStyleURL(variant: region.styleVariant, apiKey: key) else {
             // If no style URL, we can only estimate based on tile count if we assume a single vector source
-            let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: zoomRange)
+            let tileCount = MTTileMath.estimateTileCount(for: region.geometry, zoomRange: zoomRange)
             return MTPackStats(
                 expectedSize: Int64(tileCount) * MTOfflineEstimator.averageTileSizeVector,
                 resourceCount: tileCount,
@@ -72,7 +72,7 @@ public struct MTOfflineEstimator: Sendable {
 
                 if sourceMinZoom <= sourceMaxZoom {
                     if let sourceZoomRange = try? MTOfflineZoomRange(minZoom: sourceMinZoom, maxZoom: sourceMaxZoom) {
-                        let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: sourceZoomRange)
+                        let tileCount = MTTileMath.estimateTileCount(for: region.geometry, zoomRange: sourceZoomRange)
                         tilesPerSource[source.id] = tileCount
                         totalResourceCount += tileCount
 
@@ -93,7 +93,7 @@ public struct MTOfflineEstimator: Sendable {
             )
         } catch {
             // Fallback to basic estimation if parsing fails
-            let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: zoomRange)
+            let tileCount = MTTileMath.estimateTileCount(for: region.geometry, zoomRange: zoomRange)
             return MTPackStats(
                 expectedSize: Int64(tileCount) * MTOfflineEstimator.averageTileSizeVector,
                 resourceCount: tileCount,

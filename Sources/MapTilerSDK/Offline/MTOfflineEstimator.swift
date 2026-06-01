@@ -31,10 +31,21 @@ public struct MTOfflineEstimator: Sendable {
     public func estimatePack(region: MTOfflineRegionDefinition) async throws -> MTPackStats {
         let zoomRange = try MTOfflineZoomRange(minZoom: region.minZoom, maxZoom: region.maxZoom)
 
+        // For flexible geometries, if padding is not provided, we fall back to a 2000m heuristic
+        let isFlexible = {
+            if case .boundingBox = region.geometry { return false }
+            return true
+        }()
+        let paddingMeters = region.padding ?? (isFlexible ? 2000.0 : nil)
+
         guard let key = await MTConfig.shared.getAPIKey(),
             let styleURL = region.referenceStyle.fetchStyleURL(variant: region.styleVariant, apiKey: key) else {
             // If no style URL, we can only estimate based on tile count if we assume a single vector source
-            let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: zoomRange)
+            let tileCount = MTTileMath.estimateTileCount(
+                for: region.geometry,
+                zoomRange: zoomRange,
+                paddingMeters: paddingMeters
+            )
             return MTPackStats(
                 expectedSize: Int64(tileCount) * MTOfflineEstimator.averageTileSizeVector,
                 resourceCount: tileCount,
@@ -72,7 +83,11 @@ public struct MTOfflineEstimator: Sendable {
 
                 if sourceMinZoom <= sourceMaxZoom {
                     if let sourceZoomRange = try? MTOfflineZoomRange(minZoom: sourceMinZoom, maxZoom: sourceMaxZoom) {
-                        let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: sourceZoomRange)
+                        let tileCount = MTTileMath.estimateTileCount(
+                            for: region.geometry,
+                            zoomRange: sourceZoomRange,
+                            paddingMeters: paddingMeters
+                        )
                         tilesPerSource[source.id] = tileCount
                         totalResourceCount += tileCount
 
@@ -93,7 +108,11 @@ public struct MTOfflineEstimator: Sendable {
             )
         } catch {
             // Fallback to basic estimation if parsing fails
-            let tileCount = MTTileMath.estimateTileCount(for: region.bbox, zoomRange: zoomRange)
+            let tileCount = MTTileMath.estimateTileCount(
+                for: region.geometry,
+                zoomRange: zoomRange,
+                paddingMeters: paddingMeters
+            )
             return MTPackStats(
                 expectedSize: Int64(tileCount) * MTOfflineEstimator.averageTileSizeVector,
                 resourceCount: tileCount,

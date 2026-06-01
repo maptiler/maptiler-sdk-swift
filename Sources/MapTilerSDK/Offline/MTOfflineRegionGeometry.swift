@@ -16,6 +16,8 @@ public enum MTOfflineRegionGeometry: Codable, Equatable, Sendable {
     case boundingBox(MTBoundingBox)
     /// A route defined by a series of coordinates.
     case route([CLLocationCoordinate2D])
+    /// A polygon defined by a series of coordinates (the boundary).
+    case polygon([CLLocationCoordinate2D])
 
     /// The bounding box that contains the entire geometry.
     public var bbox: MTBoundingBox {
@@ -23,6 +25,8 @@ public enum MTOfflineRegionGeometry: Codable, Equatable, Sendable {
         case .boundingBox(let box):
             return box
         case .route(let coordinates):
+            return MTBoundingBox(from: coordinates)
+        case .polygon(let coordinates):
             return MTBoundingBox(from: coordinates)
         }
     }

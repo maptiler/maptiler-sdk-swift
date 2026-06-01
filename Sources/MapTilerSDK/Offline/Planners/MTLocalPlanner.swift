@@ -40,10 +40,24 @@ internal class MTLocalPlanner: MTOfflinePlanner {
     internal func generateManifest(for definition: MTOfflineRegionDefinition) async throws -> MTManifest {
         try validate(definition: definition)
 
+        let isFlexible = {
+            if case .boundingBox = definition.geometry { return false }
+            return true
+        }()
+        let paddingMeters = definition.padding ?? (isFlexible ? 2000.0 : nil)
+
+        // For non-rectangular geometries, slightly pad the bounding box stored in the manifest.
+        // MapLibre uses this manifest bbox to aggressively clip rendering. Without padding,
+        // tiles on the exact edges of a route or polygon won't be drawn.
+        var manifestBbox = definition.bbox
+        if let pad = paddingMeters, pad > 0, isFlexible {
+            manifestBbox = manifestBbox.expanded(byMeters: pad)
+        }
+
         let metadata = MTManifestMetadata(
             referenceStyle: definition.referenceStyle,
             styleVariant: definition.styleVariant,
-            bbox: definition.bbox,
+            bbox: manifestBbox,
             minZoom: definition.minZoom,
             maxZoom: definition.maxZoom,
             pixelRatio: definition.pixelRatio
@@ -67,9 +81,10 @@ internal class MTLocalPlanner: MTOfflinePlanner {
         }
 
         let tileResources = try await generateTileResources(
-            bbox: definition.bbox,
+            geometry: definition.geometry,
             minZoom: definition.minZoom,
             maxZoom: definition.maxZoom,
+            paddingMeters: paddingMeters,
             dependencies: resolvedStyle?.dependencies
         )
 
@@ -134,15 +149,14 @@ extension MTLocalPlanner {
     }
 
     private func generateTileResources(
-        bbox: MTBoundingBox,
+        geometry: MTOfflineRegionGeometry,
         minZoom: Int,
         maxZoom: Int,
+        paddingMeters: Double?,
         dependencies: MTStyleDependencies?
     ) async throws -> [MTMapResource] {
         guard let sources = dependencies?.sources else { return [] }
         var resources: [MTMapResource] = []
-
-        let splitBoxes = bbox.normalizedAndSplit()
 
         for source in sources {
             guard let resolved = await resolveTemplateURL(for: source) else { continue }
@@ -157,15 +171,34 @@ extension MTLocalPlanner {
             let ext = detectExtension(from: template)
             let effRange = effMin...effMax
 
-            for box in splitBoxes {
-                let rangesByZoom = MTTileMath.tileRanges(for: box, zoomRange: effRange)
+            if case .boundingBox(let bbox) = geometry {
+                let splitBoxes = bbox.normalizedAndSplit()
+                for box in splitBoxes {
+                    let rangesByZoom = MTTileMath.tileRanges(
+                        for: box,
+                        zoomRange: effRange,
+                        paddingMeters: paddingMeters
+                    )
 
+                    let sourceResources = createResources(
+                        for: source,
+                        template: template,
+                        ext: ext,
+                        rangesByZoom: rangesByZoom,
+                        zoomRange: effRange
+                    )
+                    resources.append(contentsOf: sourceResources)
+                }
+            } else {
+                var geometryTiles = Set<MTTileIndex>()
+                for zoom in effRange {
+                    geometryTiles.formUnion(MTTileMath.tiles(for: geometry, zoom: zoom, paddingMeters: paddingMeters))
+                }
                 let sourceResources = createResources(
                     for: source,
                     template: template,
                     ext: ext,
-                    rangesByZoom: rangesByZoom,
-                    zoomRange: effRange
+                    tiles: geometryTiles
                 )
                 resources.append(contentsOf: sourceResources)
             }
@@ -250,6 +283,32 @@ extension MTLocalPlanner {
                         resources.append(MTMapResource(url: tileUrl, destinationPath: destPath))
                     }
                 }
+            }
+        }
+        return resources
+    }
+
+    private func createResources(
+        for source: MTStyleSource,
+        template: String,
+        ext: String,
+        tiles: Set<MTTileIndex>
+    ) -> [MTMapResource] {
+        var resources: [MTMapResource] = []
+        for tile in tiles {
+            let z = tile.z
+            let x = tile.x
+            let y = tile.y
+            let resolvedY = template.contains("{-y}") ? MTTileMath.flipYCoordinate(y: y, zoom: z) : y
+            let tileUrlStr = template
+                .replacingOccurrences(of: "{z}", with: "\(z)")
+                .replacingOccurrences(of: "{x}", with: "\(x)")
+                .replacingOccurrences(of: "{y}", with: "\(resolvedY)")
+                .replacingOccurrences(of: "{-y}", with: "\(resolvedY)")
+
+            if let tileUrl = URL(string: tileUrlStr) {
+                let destPath = "tiles/\(source.id)/\(z)/\(x)/\(y).\(ext)"
+                resources.append(MTMapResource(url: tileUrl, destinationPath: destPath))
             }
         }
         return resources

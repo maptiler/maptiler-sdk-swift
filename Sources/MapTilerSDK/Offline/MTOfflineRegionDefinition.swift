@@ -25,6 +25,10 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
     public let pixelRatio: Float
     /// The maximum number of tiles allowed for this region.
     public let maxTileCount: Int?
+    /// An optional buffer in meters to add around the geometry for map interaction and tile fetching. 
+    /// If not explicitly provided, a default heuristic buffer (~2000m) may be applied 
+    /// for flexible geometries (routes and polygons).
+    public let padding: Double?
 
     /// The bounding box of the region.
     public var bbox: MTBoundingBox {
@@ -38,7 +42,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         referenceStyle: MTMapReferenceStyle,
         styleVariant: MTMapStyleVariant? = nil,
         pixelRatio: Float = 1.0,
-        maxTileCount: Int? = nil
+        maxTileCount: Int? = nil,
+        padding: Double? = nil
     ) {
         self.geometry = geometry
         self.minZoom = minZoom
@@ -47,6 +52,7 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         self.styleVariant = styleVariant
         self.pixelRatio = pixelRatio
         self.maxTileCount = maxTileCount
+        self.padding = padding
     }
 
     public init(
@@ -56,7 +62,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         referenceStyle: MTMapReferenceStyle,
         styleVariant: MTMapStyleVariant? = nil,
         pixelRatio: Float = 1.0,
-        maxTileCount: Int? = nil
+        maxTileCount: Int? = nil,
+        padding: Double? = nil
     ) {
         self.init(
             geometry: .boundingBox(bbox),
@@ -65,7 +72,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
             referenceStyle: referenceStyle,
             styleVariant: styleVariant,
             pixelRatio: pixelRatio,
-            maxTileCount: maxTileCount
+            maxTileCount: maxTileCount,
+            padding: padding
         )
     }
 
@@ -78,6 +86,7 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         case styleVariant
         case pixelRatio
         case maxTileCount
+        case padding
     }
 
     public init(from decoder: Decoder) throws {
@@ -101,6 +110,7 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         self.styleVariant = try container.decodeIfPresent(MTMapStyleVariant.self, forKey: .styleVariant)
         self.pixelRatio = try container.decode(Float.self, forKey: .pixelRatio)
         self.maxTileCount = try container.decodeIfPresent(Int.self, forKey: .maxTileCount)
+        self.padding = try container.decodeIfPresent(Double.self, forKey: .padding)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -113,5 +123,6 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         try container.encodeIfPresent(styleVariant, forKey: .styleVariant)
         try container.encode(pixelRatio, forKey: .pixelRatio)
         try container.encodeIfPresent(maxTileCount, forKey: .maxTileCount)
+        try container.encodeIfPresent(padding, forKey: .padding)
     }
 }

@@ -537,6 +537,32 @@ extension MTMapView {
         }
     }
 
+    package func runCommandWithDoubleArrayReturnValue(
+        _ command: MTCommand,
+        completion: ((Result<[Double], MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                let value = try await bridge.execute(command)
+
+                if case .doubleArray(let commandValue) = value {
+                    completion?(.success(commandValue))
+                } else {
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    let errorDesc = "Expected [Double], got invalid type."
+                    completion?(.failure(MTError.unsupportedReturnType(description: errorDesc)))
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
     package func runCommandWithOptionalStringReturnValue(
         _ command: MTCommand,
         completion: ((Result<String?, MTError>) -> Void)? = nil

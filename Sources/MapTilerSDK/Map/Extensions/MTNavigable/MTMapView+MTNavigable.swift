@@ -619,6 +619,18 @@ extension MTMapView: MTNavigable {
         runCommandWithCoordinateReturnValue(Unproject(point: point), completion: completionHandler)
     }
 
+    /// Returns a new `CLLocationCoordinate2D` object whose longitude is wrapped to the range (-180, 180).
+    /// - Parameters:
+    ///   - coordinates: The coordinates to wrap.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func wrap(
+        coordinates: CLLocationCoordinate2D,
+        completionHandler: @escaping (Result<CLLocationCoordinate2D, MTError>) -> Void
+    ) {
+        runCommandWithCoordinateReturnValue(Wrap(coordinate: coordinates), completion: completionHandler)
+    }
+
     /// Returns the map's current bearing.
     /// - Parameters:
     ///   - completionHandler: A handler block to execute when function finishes.
@@ -1250,6 +1262,22 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+                }
+            }
+        }
+    }
+
+    /// Returns a new `CLLocationCoordinate2D` object whose longitude is wrapped to the range (-180, 180).
+    /// - Parameters:
+    ///   - coordinates: The coordinates to wrap.
+    public func wrap(coordinates: CLLocationCoordinate2D) async -> CLLocationCoordinate2D {
+        await withCheckedContinuation { continuation in
+            wrap(coordinates: coordinates) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: coordinates)
                 }
             }
         }

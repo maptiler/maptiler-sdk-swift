@@ -3,8 +3,9 @@ import Testing
 import CoreLocation
 @testable import MapTilerSDK
 
-@Suite("MTOfflinePack Integration Tests", .serialized)
-struct MTOfflinePackIntegrationTests {
+extension MTOfflineGlobalStorageTests {
+    @Suite("MTOfflinePack Integration Tests")
+    struct MTOfflinePackIntegrationTests {
     
     let fileManager = FileManager.default
     
@@ -216,4 +217,5 @@ struct MTOfflinePackIntegrationTests {
         let rootDir = MTOfflineStoragePaths.rootDirectory
         #expect(!fileManager.fileExists(atPath: rootDir.path))
     }
+}
 }

@@ -2,8 +2,9 @@ import Foundation
 import Testing
 @testable import MapTilerSDK
 
-@Suite("MTOfflineStorage Tests", .serialized)
-struct MTOfflineStorageTests {
+extension MTOfflineGlobalStorageTests {
+    @Suite("MTOfflineStorage Tests")
+    struct MTOfflineStorageTests {
     
     let fileManager = FileManager.default
     
@@ -253,4 +254,5 @@ struct MTOfflineStorageTests {
         #expect(packIDs.contains(packID1))
         #expect(packIDs.contains(packID2))
     }
+}
 }

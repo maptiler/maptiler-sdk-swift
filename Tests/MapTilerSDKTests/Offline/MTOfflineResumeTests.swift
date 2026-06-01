@@ -3,8 +3,9 @@ import Testing
 import CoreLocation
 @testable import MapTilerSDK
 
-@Suite("MTOffline Resume Tests", .serialized)
-struct MTOfflineResumeTests {
+extension MTOfflineGlobalStorageTests {
+    @Suite("MTOffline Resume Tests")
+    struct MTOfflineResumeTests {
     
     let fileManager = FileManager.default
     
@@ -132,4 +133,5 @@ struct MTOfflineResumeTests {
         
         try? await MTOfflineStorage.deletePack(for: pack.id)
     }
+}
 }

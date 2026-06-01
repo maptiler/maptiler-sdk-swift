@@ -619,6 +619,20 @@ extension MTMapView: MTNavigable {
         runCommandWithCoordinateReturnValue(Unproject(point: point), completion: completionHandler)
     }
 
+    /// Adds another point to this point's x and y coordinates, yielding a new point.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point to add to the first point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointAdd(
+        point1: MTPoint,
+        point2: MTPoint,
+        completionHandler: @escaping (Result<MTPoint, MTError>) -> Void
+    ) {
+        runCommandWithPointReturnValue(PointAdd(point1: point1, point2: point2), completion: completionHandler)
+    }
+
     /// Returns a new `CLLocationCoordinate2D` object whose longitude is wrapped to the range (-180, 180).
     /// - Parameters:
     ///   - coordinates: The coordinates to wrap.
@@ -1286,6 +1300,23 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+                }
+            }
+        }
+    }
+
+    /// Adds another point to this point's x and y coordinates, yielding a new point.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point to add to the first point.
+    public func pointAdd(point1: MTPoint, point2: MTPoint) async -> MTPoint {
+        await withCheckedContinuation { continuation in
+            pointAdd(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: MTPoint(x: 0, y: 0))
                 }
             }
         }

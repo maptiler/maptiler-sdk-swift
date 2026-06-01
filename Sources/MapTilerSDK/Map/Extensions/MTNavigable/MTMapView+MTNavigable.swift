@@ -631,6 +631,30 @@ extension MTMapView: MTNavigable {
         runCommandWithCoordinateReturnValue(Wrap(coordinate: coordinates), completion: completionHandler)
     }
 
+    /// Converts a `CLLocationCoordinate2D` object to an array of doubles `[longitude, latitude]`.
+    /// - Parameters:
+    ///   - coordinates: The coordinates to convert.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func lngLatToArray(
+        coordinates: CLLocationCoordinate2D,
+        completionHandler: @escaping (Result<[Double], MTError>) -> Void
+    ) {
+        runCommandWithDoubleArrayReturnValue(LngLatToArray(coordinate: coordinates), completion: completionHandler)
+    }
+
+    /// Converts a `CLLocationCoordinate2D` object to a string representation.
+    /// - Parameters:
+    ///   - coordinates: The coordinates to convert.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func lngLatToString(
+        coordinates: CLLocationCoordinate2D,
+        completionHandler: @escaping (Result<String, MTError>) -> Void
+    ) {
+        runCommandWithStringReturnValue(LngLatToString(coordinate: coordinates), completion: completionHandler)
+    }
+
     /// Returns the map's current bearing.
     /// - Parameters:
     ///   - completionHandler: A handler block to execute when function finishes.
@@ -1278,6 +1302,40 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: coordinates)
+                }
+            }
+        }
+    }
+
+    /// Converts a `CLLocationCoordinate2D` object to an array of doubles `[longitude, latitude]`.
+    /// - Parameters:
+    ///   - coordinates: The coordinates to convert.
+    /// - Returns: An array of doubles representing the coordinates.
+    public func lngLatToArray(coordinates: CLLocationCoordinate2D) async -> [Double] {
+        await withCheckedContinuation { continuation in
+            lngLatToArray(coordinates: coordinates) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: [coordinates.longitude, coordinates.latitude])
+                }
+            }
+        }
+    }
+
+    /// Converts a `CLLocationCoordinate2D` object to a string representation.
+    /// - Parameters:
+    ///   - coordinates: The coordinates to convert.
+    /// - Returns: A string representation of the coordinates.
+    public func lngLatToString(coordinates: CLLocationCoordinate2D) async -> String {
+        await withCheckedContinuation { continuation in
+            lngLatToString(coordinates: coordinates) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: "LngLat(\(coordinates.longitude), \(coordinates.latitude))")
                 }
             }
         }

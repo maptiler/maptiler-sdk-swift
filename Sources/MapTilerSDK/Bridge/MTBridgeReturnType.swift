@@ -14,6 +14,7 @@ package enum MTBridgeReturnType: Sendable {
     case double(Double)
     case bool(Bool)
     case stringDoubleDict([String: Double])
+    case doubleArray([Double])
     case unsupportedType
     case null
 
@@ -24,6 +25,7 @@ package enum MTBridgeReturnType: Sendable {
         if let dbl = value as? Double { self = .double(dbl); return }
         if let boo = value as? Bool { self = .bool(boo); return }
         if let dict = value as? [String: Double] { self = .stringDoubleDict(dict); return }
+        if let arr = value as? [NSNumber] { self = .doubleArray(arr.map { $0.doubleValue }); return }
 
         if let num = value as? NSNumber {
             if CFGetTypeID(num) == CFBooleanGetTypeID() {

@@ -1,5 +1,5 @@
 //
-//  OfflineBasic+SwiftUI.swift
+//  OfflineBasic+SwiftUI.swif
 //  MapTilerMobileDemo
 //
 
@@ -7,43 +7,52 @@ import SwiftUI
 import MapTilerSDK
 import CoreLocation
 
-@MainActor
-final class OfflineViewModel: ObservableObject, MTOfflineDownloadDelegate {
-    enum Constants {
-        enum DownloadStateLabel {
-            static let idle = "Idle"
-            static let unterageriAndBrnoReady = "Unterägeri & Brno ready on disk"
-            static let unterageriReady = "Unterägeri ready on disk"
-            static let brnoReady = "Brno ready on disk"
-            static let estimating = "Estimating..."
-            static let unterageriDownloading = "Downloading Unterägeri..."
-            static let brnoDownloading = "Downloading Brno in Background..."
-            static let loadingOfflineStyle = "Loading offline style..."
-        }
-
-        enum PackName {
-            static let unterageri = "Unterägeri Offline"
-            static let brno = "Brno Offline"
-        }
-
-        enum ActiveCityName {
-            static let unterageri = "Unterägeri"
-            static let brno = "Brno"
-        }
-
-        static let nameDictKey = "name"
-        static let unterageriCoordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+private enum OfflineConstants {
+    enum DownloadStateLabel {
+        static let idle = "Idle"
+        static let allReady = "Regions ready on disk"
+        static let unterageriReady = "Unterägeri ready on disk"
+        static let brnoReady = "Brno ready on disk"
+        static let yellowstoneReady = "Yellowstone ready on disk"
+        static let estimating = "Estimating..."
+        static let unterageriDownloading = "Downloading Unterägeri..."
+        static let brnoDownloading = "Downloading Brno in Background..."
+        static let yellowstoneDownloading = "Downloading Yellowstone..."
+        static let loadingOfflineStyle = "Loading offline style..."
     }
 
+    enum PackName {
+        static let unterageri = "Unterägeri Offline"
+        static let brno = "Brno Offline"
+        static let yellowstone = "Yellowstone Offline"
+    }
+
+    enum ActiveCityName {
+        static let unterageri = "Unterägeri"
+        static let brno = "Brno"
+        static let yellowstone = "Yellowstone"
+    }
+
+    static let nameDictKey = "name"
+    static let unterageriCoordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
+    static let yellowstoneCoordinates = CLLocationCoordinate2D(latitude: 44.4280, longitude: -110.5885)
+}
+
+@MainActor
+final class OfflineViewModel: ObservableObject {
+    private var currentStyle: MTMapReferenceStyle = .streets
+
     @Published var downloadProgress: Float = 0.0
-    @Published var downloadState: String = Constants.DownloadStateLabel.idle
-    @Published var packSizeInfo: String = ""
+    @Published var downloadState: String = OfflineConstants.DownloadStateLabel.idle
+    @Published var packInfo: String = ""
 
     @Published var unterageriPack: MTOfflinePack?
     @Published var brnoPack: MTOfflinePack?
+    @Published var yellowstonePack: MTOfflinePack?
 
     @Published var isUnterageriReady = false
     @Published var isBrnoReady = false
+    @Published var isYellowstoneReady = false
     @Published var isMapReady = false
 
     @Published var showingRedownloadAlert = false
@@ -63,183 +72,136 @@ final class OfflineViewModel: ObservableObject, MTOfflineDownloadDelegate {
 
             var uPack: MTOfflinePack?
             var bPack: MTOfflinePack?
+            var yPack: MTOfflinePack?
 
             for pack in packs {
                 if let name = await getPackName(pack) {
-                    if name == Constants.PackName.unterageri {
-                        uPack = pack
-                    } else if name == Constants.PackName.brno {
-                        bPack = pack
+                    switch name {
+                    case OfflineConstants.PackName.unterageri: uPack = pack
+                    case OfflineConstants.PackName.brno: bPack = pack
+                    case OfflineConstants.PackName.yellowstone: yPack = pack
+                    default: break
                     }
                 }
             }
 
             let uReady = await uPack?.state == .completed
             let bReady = await bPack?.state == .completed
+            let yReady = await yPack?.state == .completed
 
             var totalSize: Int64 = 0
             if uReady { totalSize += await uPack?.metadata.size ?? 0 }
             if bReady { totalSize += await bPack?.metadata.size ?? 0 }
+            if yReady { totalSize += await yPack?.metadata.size ?? 0 }
 
             self.unterageriPack = uPack
             self.brnoPack = bPack
+            self.yellowstonePack = yPack
             self.isUnterageriReady = uReady
             self.isBrnoReady = bReady
+            self.isYellowstoneReady = yReady
 
-            updateStatusLabel(uReady: uReady, bReady: bReady, totalSize: totalSize)
+            // Determine which pack to show details for (prefer the active one, or any ready one)
+            var packToShow: MTOfflinePack?
+
+            let packMatchesActiveName = { (pack: MTOfflinePack?) async -> Bool in
+                guard let pack = pack else { return false }
+                guard let data = await pack.metadata.context,
+                    let dict = try? JSONDecoder().decode([String: String].self, from: data),
+                    let name = dict[OfflineConstants.nameDictKey] else {
+                    return false
+                }
+                return name == self.activeCityName
+            }
+
+            if await packMatchesActiveName(yPack) {
+                packToShow = yPack
+            } else if await packMatchesActiveName(bPack) {
+                packToShow = bPack
+            } else if await packMatchesActiveName(uPack) {
+                packToShow = uPack
+            } else {
+                packToShow = yPack ?? bPack ?? uPack
+            }
+
+            await updateStatusLabel(
+                uReady: uReady, bReady: bReady, yReady: yReady,
+                totalSize: totalSize, packToShow: packToShow
+            )
         } catch {
             print("Failed to load existing offline packs: \(error)")
         }
     }
 
-    private func updateStatusLabel(uReady: Bool, bReady: Bool, totalSize: Int64) {
-        if uReady && bReady {
-            downloadState = Constants.DownloadStateLabel.unterageriAndBrnoReady
+    private func generatePackInfo(for pack: MTOfflinePack, totalSize: Int64) async -> String {
+        let metadata = await pack.metadata
+        let progress = await pack.progress
+        let sizeStr = ByteCountFormatter.string(fromByteCount: metadata.size, countStyle: .file)
+        let totalSizeStr = ByteCountFormatter.string(fromByteCount: totalSize, countStyle: .file)
+        let dateStr = DateFormatter.localizedString(from: metadata.createdAt, dateStyle: .short, timeStyle: .short)
+        let expStr = DateFormatter.localizedString(from: metadata.expiresAt, dateStyle: .short, timeStyle: .short)
+
+        let areaSqKm = AreaCalculator.areaInSquareKilometers(for: metadata.region.geometry.bbox)
+        let areaStr = String(format: "%.1f sq km", areaSqKm)
+
+        return """
+        Pack Size: \(sizeStr) (Total All Packs: \(totalSizeStr))
+        Area: ~\(areaStr)
+        Resources: \(progress.downloadedResources)/\(progress.totalResources)
+        Created: \(dateStr)
+        Expires: \(expStr)
+        Pixel Ratio: \(metadata.region.pixelRatio)x
+        """
+    }
+
+    private func updateStatusLabel(
+        uReady: Bool, bReady: Bool, yReady: Bool,
+        totalSize: Int64, packToShow: MTOfflinePack?
+    ) async {
+        if uReady && bReady && yReady {
+            downloadState = OfflineConstants.DownloadStateLabel.allReady
         } else if uReady {
-            downloadState = Constants.DownloadStateLabel.unterageriReady
+            downloadState = OfflineConstants.DownloadStateLabel.unterageriReady
         } else if bReady {
-            downloadState = Constants.DownloadStateLabel.brnoReady
+            downloadState = OfflineConstants.DownloadStateLabel.brnoReady
+        } else if yReady {
+            downloadState = OfflineConstants.DownloadStateLabel.yellowstoneReady
         } else {
-            downloadState = Constants.DownloadStateLabel.idle
+            downloadState = OfflineConstants.DownloadStateLabel.idle
         }
 
-        if totalSize > 0 {
-            packSizeInfo = ByteCountFormatter.string(fromByteCount: totalSize, countStyle: .file)
+        if let pack = packToShow {
+            packInfo = await generatePackInfo(for: pack, totalSize: totalSize)
+        } else if totalSize > 0 {
+            packInfo = "Total size: \(ByteCountFormatter.string(fromByteCount: totalSize, countStyle: .file))"
         } else {
-            packSizeInfo = ""
+            packInfo = ""
         }
     }
 
     private func getPackName(_ pack: MTOfflinePack) async -> String? {
         if let contextData = await pack.metadata.context,
             let contextDict = try? JSONDecoder().decode([String: String].self, from: contextData) {
-            return contextDict[Constants.nameDictKey]
+            return contextDict[OfflineConstants.nameDictKey]
         }
         return nil
-    }
-
-    func downloadRegion() async {
-        if isUnterageriReady {
-            activeCityName = Constants.ActiveCityName.unterageri
-            showingRedownloadAlert = true
-            return
-        }
-        await performUnterageriDownload()
-    }
-
-    private func performUnterageriDownload() async {
-        downloadState = Constants.DownloadStateLabel.estimating
-        downloadProgress = 0.0
-        packSizeInfo = ""
-
-        // Define the region: Unterägeri, Switzerland
-        let unterageriBBox = MTBoundingBox(
-            minLon: 8.55,
-            minLat: 47.10,
-            maxLon: 8.62,
-            maxLat: 47.16
-        )
-
-        let region = MTOfflineRegionDefinition(
-            bbox: unterageriBBox,
-            minZoom: 10,
-            maxZoom: 14,
-            referenceStyle: .outdoor
-        )
-
-        // Add a context dictionary so we can store custom metadata like the name
-        let contextData = try? JSONEncoder().encode([Constants.nameDictKey: Constants.PackName.unterageri])
-
-        do {
-            let pack = MTOfflinePack(region: region, context: contextData)
-            await pack.setDelegate(self)
-            await pack.setProgressReportingEnabled(true)
-
-            self.unterageriPack = pack
-            self.isUnterageriReady = false
-            downloadState = Constants.DownloadStateLabel.unterageriDownloading
-
-            try await pack.download()
-
-        } catch {
-            downloadState = "Error: \(error.localizedDescription)"
-            print("Download failed: \(error)")
-        }
-    }
-
-    func downloadBrnoBackground() async {
-        if isBrnoReady {
-            activeCityName = Constants.ActiveCityName.brno
-            showingRedownloadAlert = true
-            return
-        }
-        await performBrnoDownload()
-    }
-
-    private func performBrnoDownload() async {
-        downloadState = Constants.DownloadStateLabel.estimating
-        downloadProgress = 0.0
-        packSizeInfo = ""
-
-        // Define the region: Brno, Czech Republic
-        let brnoBBox = MTBoundingBox(
-            minLon: 16.52,
-            minLat: 49.13,
-            maxLon: 16.70,
-            maxLat: 49.25
-        )
-
-        let region = MTOfflineRegionDefinition(
-            bbox: brnoBBox,
-            minZoom: 10,
-            maxZoom: 14,
-            referenceStyle: .outdoor
-        )
-
-        let contextData = try? JSONEncoder().encode([Constants.nameDictKey: Constants.PackName.brno])
-
-        do {
-            let pack = MTOfflinePack(region: region, context: contextData)
-            await pack.setDelegate(self)
-            await pack.setProgressReportingEnabled(true)
-
-            self.brnoPack = pack
-            self.isBrnoReady = false
-            downloadState = Constants.DownloadStateLabel.brnoDownloading
-
-            // Important: useBackground flag set to true!
-            try await pack.download(useBackground: true)
-
-        } catch {
-            downloadState = "Error: \(error.localizedDescription)"
-            print("Download failed: \(error)")
-        }
-    }
-
-    func confirmRedownload() async {
-        if activeCityName == Constants.ActiveCityName.unterageri {
-            if let pack = unterageriPack { try? await pack.remove() }
-            await performUnterageriDownload()
-        } else if activeCityName == Constants.ActiveCityName.brno {
-            if let pack = brnoPack { try? await pack.remove() }
-            await performBrnoDownload()
-        }
     }
 
     func loadPack(_ pack: MTOfflinePack?) async {
         guard let pack = pack else { return }
 
-        downloadState = Constants.DownloadStateLabel.loadingOfflineStyle
+        downloadState = OfflineConstants.DownloadStateLabel.loadingOfflineStyle
 
         do {
             // Load the downloaded pack into the map
             try await mapView.loadOfflinePack(pack)
 
-            var center = CLLocationCoordinate2D(latitude: 47.13, longitude: 8.58)
-            if let contextData = await pack.metadata.context,
-                let contextDict = try? JSONDecoder().decode([String: String].self, from: contextData),
-                contextDict[Constants.nameDictKey] == Constants.PackName.brno {
+            var center = OfflineConstants.unterageriCoordinates
+            let name = await getPackName(pack)
+            if name == OfflineConstants.PackName.brno {
                 center = CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068)
+            } else if name == OfflineConstants.PackName.yellowstone {
+                center = OfflineConstants.yellowstoneCoordinates
             }
 
             // Jump to the downloaded region
@@ -250,22 +212,155 @@ final class OfflineViewModel: ObservableObject, MTOfflineDownloadDelegate {
 
             // Re-add the marker after style change (loading offline pack resets style)
             let marker = MTMarker(
-                coordinates: Constants.unterageriCoordinates,
+                coordinates: center,
                 icon: UIImage(named: "maptiler-marker")
             )
             await mapView.addMarker(marker)
 
-            let size = await pack.metadata.size
-            packSizeInfo = ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
+            // We calculate total size across all ready packs to pass to generatePackInfo
+            var totalSize: Int64 = 0
+            if isUnterageriReady { totalSize += await unterageriPack?.metadata.size ?? 0 }
+            if isBrnoReady { totalSize += await brnoPack?.metadata.size ?? 0 }
+            if isYellowstoneReady { totalSize += await yellowstonePack?.metadata.size ?? 0 }
 
-            downloadState = "Loaded Offline Pack!"
-        } catch {
+            packInfo = await generatePackInfo(for: pack, totalSize: totalSize)
+
+            downloadState = "Loaded \(name ?? "Pack")!"        } catch {
             downloadState = "Failed to load pack: \(error.localizedDescription)"
         }
     }
+}
 
-    // MARK: - MTOfflineDownloadDelegate
+// MARK: - Download Methods
+extension OfflineViewModel {
+    func downloadUnterageri() async {
+        if isUnterageriReady {
+            activeCityName = OfflineConstants.ActiveCityName.unterageri
+            showingRedownloadAlert = true
+            return
+        }
+        await performUnterageriDownload()
+    }
 
+    private func performUnterageriDownload() async {
+        downloadState = OfflineConstants.DownloadStateLabel.estimating
+        downloadProgress = 0.0
+        packInfo = ""
+
+        let region = MTOfflineRegionDefinition(
+            bbox: MTBoundingBox(minLon: 8.55, minLat: 47.10, maxLon: 8.62, maxLat: 47.16),
+            minZoom: 10, maxZoom: 14, referenceStyle: currentStyle
+        )
+
+        let contextData = try? JSONEncoder().encode([
+            OfflineConstants.nameDictKey: OfflineConstants.PackName.unterageri
+        ])
+
+        do {
+            let pack = MTOfflinePack(region: region, context: contextData)
+            await pack.setDelegate(self)
+            await pack.setProgressReportingEnabled(true)
+
+            self.unterageriPack = pack
+            self.isUnterageriReady = false
+            downloadState = OfflineConstants.DownloadStateLabel.unterageriDownloading
+
+            try await pack.download()
+        } catch {
+            downloadState = "Error: \(error.localizedDescription)"
+        }
+    }
+
+    func downloadBrnoBackground() async {
+        if isBrnoReady {
+            activeCityName = OfflineConstants.ActiveCityName.brno
+            showingRedownloadAlert = true
+            return
+        }
+        await performBrnoDownload()
+    }
+
+    private func performBrnoDownload() async {
+        downloadState = OfflineConstants.DownloadStateLabel.estimating
+        downloadProgress = 0.0
+        packInfo = ""
+
+        let region = MTOfflineRegionDefinition(
+            bbox: MTBoundingBox(minLon: 16.52, minLat: 49.13, maxLon: 16.70, maxLat: 49.25),
+            minZoom: 12, maxZoom: 16, referenceStyle: currentStyle
+        )
+
+        let contextData = try? JSONEncoder().encode([OfflineConstants.nameDictKey: OfflineConstants.PackName.brno])
+
+        do {
+            let pack = MTOfflinePack(region: region, context: contextData)
+            await pack.setDelegate(self)
+            await pack.setProgressReportingEnabled(true)
+
+            self.brnoPack = pack
+            self.isBrnoReady = false
+            downloadState = OfflineConstants.DownloadStateLabel.brnoDownloading
+
+            try await pack.download(useBackground: true)
+        } catch {
+            downloadState = "Error: \(error.localizedDescription)"
+        }
+    }
+
+    func downloadYellowstone() async {
+        if isYellowstoneReady {
+            activeCityName = OfflineConstants.ActiveCityName.yellowstone
+            showingRedownloadAlert = true
+            return
+        }
+        await performYellowstoneDownload()
+    }
+
+    private func performYellowstoneDownload() async {
+        downloadState = OfflineConstants.DownloadStateLabel.estimating
+        downloadProgress = 0.0
+        packInfo = ""
+
+        let region = MTOfflineRegionDefinition(
+            bbox: MTBoundingBox(minLon: -111.15, minLat: 44.12, maxLon: -109.81, maxLat: 45.10),
+            minZoom: 7, maxZoom: 15, referenceStyle: currentStyle
+        )
+
+        let contextData = try? JSONEncoder().encode([
+            OfflineConstants.nameDictKey: OfflineConstants.PackName.yellowstone
+        ])
+
+        do {
+            let pack = MTOfflinePack(region: region, context: contextData)
+            await pack.setDelegate(self)
+            await pack.setProgressReportingEnabled(true)
+
+            self.yellowstonePack = pack
+            self.isYellowstoneReady = false
+            downloadState = OfflineConstants.DownloadStateLabel.yellowstoneDownloading
+
+            try await pack.download()
+        } catch {
+            downloadState = "Error: \(error.localizedDescription)"
+        }
+    }
+
+    func confirmRedownload() async {
+        if activeCityName == OfflineConstants.ActiveCityName.unterageri {
+            if let pack = unterageriPack { try? await pack.remove() }
+            await performUnterageriDownload()
+        } else if activeCityName == OfflineConstants.ActiveCityName.brno {
+            if let pack = brnoPack { try? await pack.remove() }
+            await performBrnoDownload()
+        } else if activeCityName == OfflineConstants.ActiveCityName.yellowstone {
+            if let pack = yellowstonePack { try? await pack.remove() }
+            await performYellowstoneDownload()
+        }
+    }
+}
+
+// MARK: - MTOfflineDownloadDelegate
+extension OfflineViewModel: MTOfflineDownloadDelegate {
     nonisolated func offlinePack(_ id: String, didUpdateProgress progress: MTOfflinePackProgress) {
         Task { @MainActor in
             self.downloadProgress = Float(progress.percentage)
@@ -323,11 +418,11 @@ struct OfflineBasicView: View {
         ZStack(alignment: .bottom) {
             MTMapViewContainer(map: viewModel.mapView) {
                 MTMarker(
-                    coordinates: OfflineViewModel.Constants.unterageriCoordinates,
+                    coordinates: OfflineConstants.unterageriCoordinates,
                     icon: UIImage(named: "maptiler-marker")
                 )
             }
-            .referenceStyle(.outdoor)
+            .referenceStyle(.streets)
             .didInitialize {
                 viewModel.isMapReady = true
             }
@@ -348,18 +443,19 @@ struct OfflineBasicView: View {
                     Text("Status: \(viewModel.downloadState)")
                         .font(.subheadline)
 
-                    if !viewModel.packSizeInfo.isEmpty {
-                        Text("Size: \(viewModel.packSizeInfo)")
+                    if !viewModel.packInfo.isEmpty {
+                        Text(viewModel.packInfo)
                             .font(.caption)
                             .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
                     }
                 }
 
                 VStack(spacing: 12) {
-                    HStack(spacing: 16) {
+                    HStack(spacing: 8) {
                         VStack {
                             Button("Download Unterägeri") {
-                                Task { await viewModel.downloadRegion() }
+                                Task { await viewModel.downloadUnterageri() }
                             }
                             .buttonStyle(DemoButtonStyle(backgroundColor: .blue, foregroundColor: .white))
                             .disabled(!viewModel.isMapReady)
@@ -383,6 +479,20 @@ struct OfflineBasicView: View {
                             }
                             .buttonStyle(DemoButtonStyle())
                             .disabled(!viewModel.isBrnoReady)
+                        }
+
+                        VStack {
+                            Button("Download Yellowstone") {
+                                Task { await viewModel.downloadYellowstone() }
+                            }
+                            .buttonStyle(DemoButtonStyle(backgroundColor: .orange, foregroundColor: .white))
+                            .disabled(!viewModel.isMapReady)
+
+                            Button("Load Yellowstone") {
+                                Task { await viewModel.loadPack(viewModel.yellowstonePack) }
+                            }
+                            .buttonStyle(DemoButtonStyle())
+                            .disabled(!viewModel.isYellowstoneReady)
                         }
                     }
                 }

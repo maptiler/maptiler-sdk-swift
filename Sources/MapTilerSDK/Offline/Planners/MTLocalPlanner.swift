@@ -146,7 +146,8 @@ extension MTLocalPlanner {
         let normalizedURL = await MTURLNormalizer.normalize(url: url)
         let (data, response) = try await session.data(from: normalizedURL)
 
-        guard let httpResponse = response as? HTTPURLResponse, 200...299 ~= httpResponse.statusCode else {
+        guard let httpResponse = response as? HTTPURLResponse,
+            200...299 ~= httpResponse.statusCode || httpResponse.statusCode == 204 else {
             throw MTOfflinePackError.networkError(URLError(.badServerResponse))
         }
 
@@ -252,7 +253,8 @@ extension MTLocalPlanner {
             throw MTOfflineError.networkError(URLError(.unknown))
         }
 
-        guard let httpResponse = response as? HTTPURLResponse, 200...299 ~= httpResponse.statusCode else {
+        guard let httpResponse = response as? HTTPURLResponse,
+            200...299 ~= httpResponse.statusCode || httpResponse.statusCode == 204 else {
             throw MTOfflineError.networkError(URLError(.badServerResponse))
         }
 

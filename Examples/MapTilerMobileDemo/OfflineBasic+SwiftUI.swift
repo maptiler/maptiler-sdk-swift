@@ -105,12 +105,7 @@ final class OfflineViewModel: ObservableObject {
             var packToShow: MTOfflinePack?
 
             let packMatchesActiveName = { (pack: MTOfflinePack?) async -> Bool in
-                guard let pack = pack else { return false }
-                guard let data = await pack.metadata.context,
-                    let dict = try? JSONDecoder().decode([String: String].self, from: data),
-                    let name = dict[OfflineConstants.nameDictKey] else {
-                    return false
-                }
+                guard let pack = pack, let name = await self.getPackName(pack) else { return false }
                 return name == self.activeCityName
             }
 
@@ -323,7 +318,7 @@ extension OfflineViewModel {
 
         let region = MTOfflineRegionDefinition(
             bbox: MTBoundingBox(minLon: -111.15, minLat: 44.12, maxLon: -109.81, maxLat: 45.10),
-            minZoom: 7, maxZoom: 15, referenceStyle: currentStyle
+            minZoom: 7, maxZoom: 13, referenceStyle: currentStyle
         )
 
         let contextData = try? JSONEncoder().encode([

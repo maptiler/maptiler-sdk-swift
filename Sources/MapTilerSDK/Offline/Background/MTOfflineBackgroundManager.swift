@@ -222,9 +222,12 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
 
         guard let mapping = mapping else { return }
 
+        var isNoContent = false
         if let httpResponse = downloadTask.response as? HTTPURLResponse {
             let statusCode = httpResponse.statusCode
-            if statusCode != 204 && !(200...299).contains(statusCode) {
+            if statusCode == 204 {
+                isNoContent = true
+            } else if !(200...299).contains(statusCode) {
                 self.reportResourceFailed(
                     for: mapping.packId,
                     error: MTOfflineError.badResponse(statusCode: statusCode)
@@ -233,25 +236,31 @@ internal class MTOfflineBackgroundManager: NSObject, URLSessionDownloadDelegate,
             }
         }
 
-        let destURL = MTOfflineStoragePaths.absoluteURL(for: mapping.packId, relativePath: mapping.relativePath)
+        if !isNoContent {
+            let destURL = MTOfflineStoragePaths.absoluteURL(for: mapping.packId, relativePath: mapping.relativePath)
 
-        do {
-            let fileManager = FileManager.default
-            let destDir = destURL.deletingLastPathComponent()
+            do {
+                let fileManager = FileManager.default
+                let destDir = destURL.deletingLastPathComponent()
 
-            if !fileManager.fileExists(atPath: destDir.path) {
-                try fileManager.createDirectory(at: destDir, withIntermediateDirectories: true)
+                if !fileManager.fileExists(atPath: destDir.path) {
+                    try fileManager.createDirectory(at: destDir, withIntermediateDirectories: true)
+                }
+
+                if fileManager.fileExists(atPath: destURL.path) {
+                    try fileManager.removeItem(at: destURL)
+                }
+                try fileManager.moveItem(at: location, to: destURL)
+            } catch {
+                self.reportResourceFailed(
+                    for: mapping.packId,
+                    error: MTOfflineError.fileSystemError(error.localizedDescription)
+                )
+                return
             }
-
-            if fileManager.fileExists(atPath: destURL.path) {
-                try fileManager.removeItem(at: destURL)
-            }
-            try fileManager.moveItem(at: location, to: destURL)
-
-            self.reportResourceComplete(for: mapping.packId)
-        } catch {
-            self.reportResourceFailed(for: mapping.packId, error: error)
         }
+
+        self.reportResourceComplete(for: mapping.packId)
     }
 
     internal func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {

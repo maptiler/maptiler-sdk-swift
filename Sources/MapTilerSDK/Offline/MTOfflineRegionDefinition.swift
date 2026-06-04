@@ -13,9 +13,27 @@ import Foundation
 public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
     /// The geometry of the region.
     public let geometry: MTOfflineRegionGeometry
+
     /// The minimum zoom level.
+    ///
+    /// - Note: This defines the data fetched from the server, *not* the camera's zoom limit.
+    /// If you download a very small geographic area (e.g., a single neighborhood) and set `minZoom` to 0, 
+    /// the map camera may still prevent the user from zooming out to 0 when loading the pack. 
+    /// This is because the camera is physically constrained by the bounding box of the downloaded data 
+    /// to prevent the user from panning into "blank" map areas. 
+    /// The apparent minimum zoom is dictated by the screen size 
+    /// relative to the bounding box.
     public let minZoom: Int
+
     /// The maximum zoom level.
+    ///
+    /// Higher zoom levels provide street-level detail but exponentially increase the storage size.
+    ///
+    /// - Note: If you request a `maxZoom` that exceeds the source's maximum available zoom 
+    /// (e.g., requesting zoom 18 for MapTiler Planet vector tiles which end at zoom 14), the SDK 
+    /// will automatically download the highest available resolution (zoom 14) for that area. 
+    /// This ensures that the map engine can perform client-side "overzooming" to render 
+    /// the requested detail level offline.
     public let maxZoom: Int
     /// The reference style for the map.
     public let referenceStyle: MTMapReferenceStyle

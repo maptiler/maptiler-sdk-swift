@@ -67,9 +67,8 @@ public struct MTOfflineEstimator: Sendable {
             totalSize += Int64(spriteCount) * MTOfflineEstimator.averageSpriteSize
 
             // Rough estimate: we download common glyph ranges for each font stack
-            // Common ranges are 0-255 (Basic Latin) and maybe a few others.
-            // Let's assume 4 ranges per font stack for estimation.
-            let glyphRangesPerFontStack = 4
+            // MTGlyphHelper generates 256 ranges for the default 65535 index (0-255 chunks).
+            let glyphRangesPerFontStack = 256
             let glyphCount = dependencies.fontStacks.count * glyphRangesPerFontStack
             totalResourceCount += glyphCount
             totalSize += Int64(glyphCount) * MTOfflineEstimator.averageGlyphRangeSize

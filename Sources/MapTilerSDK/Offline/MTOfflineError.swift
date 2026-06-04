@@ -72,6 +72,10 @@ public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
     /// A file system error occurred while attempting to save or read offline data.
     case fileSystemError(String)
 
+    /// The requested offline region resulted in no tiles.
+    /// This typically happens when the area is too small for the selected zoom level.
+    case invalidRegion
+
     /// The offline download or operation was cancelled by the user or system.
     case cancelled
 
@@ -105,6 +109,8 @@ public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
             return "The download request of \(requested) tiles exceeds the maximum allowed limit of \(limit) tiles."
         case .fileSystemError(let message):
             return "A file system error occurred: \(message)."
+        case .invalidRegion:
+            return "The requested offline region resulted in no tiles."
         case .cancelled:
             return "The offline operation was cancelled."
         }
@@ -137,6 +143,8 @@ public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
                 "min/max latitudes are between -90 and 90."
         case .reversedZoomLevels:
             return "Ensure that the minimum zoom level is less than or equal to the maximum zoom level."
+        case .invalidRegion:
+            return "Try selecting a larger geographic area or a higher detail level (higher zoom range)."
         default:
             return nil
         }
@@ -161,6 +169,7 @@ public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
         case (.exceedsMaximumTileCount(let ll, let lr), .exceedsMaximumTileCount(let rl, let rr)):
             return ll == rl && lr == rr
         case (.fileSystemError(let l), .fileSystemError(let r)): return l == r
+        case (.invalidRegion, .invalidRegion): return true
         case (.cancelled, .cancelled): return true
         default: return false
         }

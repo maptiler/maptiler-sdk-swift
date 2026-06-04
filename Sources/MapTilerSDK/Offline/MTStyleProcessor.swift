@@ -18,14 +18,14 @@ internal struct MTStyleProcessor {
     }
 
     /// Transforms the given style dictionary into an offline-ready version.
-    internal func transform(style: [String: Any]) -> [String: Any] {
+    internal func transform(style: [String: Any], maxZoom: Int? = nil) -> [String: Any] {
         var transformed = style
 
         rewriteSprites(&transformed)
         rewriteGlyphs(&transformed)
 
         var purgedSourceIds = Set<String>()
-        rewriteSources(&transformed, purgedSourceIds: &purgedSourceIds)
+        rewriteSources(&transformed, purgedSourceIds: &purgedSourceIds, maxZoom: maxZoom)
         rewriteLayers(&transformed, purgedSourceIds: purgedSourceIds)
 
         return transformed
@@ -54,7 +54,7 @@ internal struct MTStyleProcessor {
         }
     }
 
-    private func rewriteSources(_ transformed: inout [String: Any], purgedSourceIds: inout Set<String>) {
+    private func rewriteSources(_ transformed: inout [String: Any], purgedSourceIds: inout Set<String>, maxZoom: Int?) {
         guard var sources = transformed["sources"] as? [String: [String: Any]] else { return }
 
         let sourcesToPurge = ["maptiler_attribution"]
@@ -63,7 +63,7 @@ internal struct MTStyleProcessor {
         }
 
         for (sourceId, source) in sources {
-            sources[sourceId] = transformSource(sourceId: sourceId, source: source)
+            sources[sourceId] = transformSource(sourceId: sourceId, source: source, maxZoom: maxZoom)
         }
         transformed["sources"] = sources
     }
@@ -80,7 +80,7 @@ internal struct MTStyleProcessor {
         transformed["layers"] = layers
     }
 
-    private func transformSource(sourceId: String, source: [String: Any]) -> [String: Any] {
+    private func transformSource(sourceId: String, source: [String: Any], maxZoom: Int?) -> [String: Any] {
         var updatedSource = source
 
         // Only process vector and raster sources
@@ -94,6 +94,11 @@ internal struct MTStyleProcessor {
 
         // Remove scheme to ensure local XYZ storage is used correctly by the renderer
         updatedSource.removeValue(forKey: "scheme")
+
+        // Force the maxzoom property so the map engine knows it can overzoom this local source
+        if let maxZoom = maxZoom {
+            updatedSource["maxzoom"] = maxZoom
+        }
 
         // Determine extension for the local tiles
         let ext = determineExtension(source: source)

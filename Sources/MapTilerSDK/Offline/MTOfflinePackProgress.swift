@@ -13,6 +13,8 @@ public struct MTOfflinePackProgress: Sendable, Equatable, Codable {
     public var totalResources: Int
     /// Number of resources that have been successfully downloaded.
     public var downloadedResources: Int
+    /// Total number of tile resources required for the pack.
+    public var totalTileResources: Int
     /// The completion percentage (0.0 to 1.0).
     public var percentage: Double {
         guard totalResources > 0 else { return 0 }

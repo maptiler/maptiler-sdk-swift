@@ -103,13 +103,21 @@ internal class MTLocalPlanner: MTOfflinePlanner {
             throw MTOfflineError.exceedsMaximumTileCount(limit: effectiveLimit, requested: totalCount)
         }
 
-        return MTManifest(
+        let manifest = MTManifest(
             metadata: metadata,
             style: resolvedStyle?.resource,
             tiles: tileResources,
             glyphs: glyphResources,
             sprites: spriteResources
         )
+
+        // Ensure the pack actually contains data.
+        // If 0 tiles were found, the area/zoom combination is likely invalid or too small.
+        guard !manifest.tiles.isEmpty else {
+            throw MTOfflineError.invalidRegion
+        }
+
+        return manifest
     }
 
     // Validates the initial parameters to fail fast if they are malformed or invalid.
@@ -159,12 +167,19 @@ extension MTLocalPlanner {
         var resources: [MTMapResource] = []
 
         for source in sources {
-            guard let resolved = await resolveTemplateURL(for: source) else { continue }
+            let resolved = try await resolveTemplateURL(for: source)
             let template = resolved.template
 
             // Intersect requested zoom with source zoom limits
-            let effMin = Swift.max(minZoom, resolved.minZoom)
-            let effMax = Swift.min(maxZoom, resolved.maxZoom)
+            var effMin = Swift.max(minZoom, resolved.minZoom)
+            var effMax = Swift.min(maxZoom, resolved.maxZoom)
+
+            // Overzoom support: if requested minZoom is above source maxZoom, 
+            // we download the source maxZoom tiles to allow engine overzooming.
+            if minZoom > resolved.maxZoom {
+                effMin = resolved.maxZoom
+                effMax = resolved.maxZoom
+            }
 
             guard effMin <= effMax else { continue }
 
@@ -212,7 +227,7 @@ extension MTLocalPlanner {
         let maxZoom: Int
     }
 
-    private func resolveTemplateURL(for source: MTStyleSource) async -> MTTemplateInfo? {
+    private func resolveTemplateURL(for source: MTStyleSource) async throws -> MTTemplateInfo {
         let sourceMin = source.minZoom ?? 0
         let sourceMax = source.maxZoom ?? 22
 
@@ -221,24 +236,32 @@ extension MTLocalPlanner {
         }
 
         guard let urlStr = source.url, let url = URL(string: urlStr) else {
-            return nil
+            throw MTOfflineError.networkError(URLError(.badURL))
         }
 
         let normalizedURL = await MTURLNormalizer.normalize(url: url)
 
         // Fetch TileJSON
-        guard let (data, response) = try? await session.data(from: normalizedURL),
-            let httpResponse = response as? HTTPURLResponse,
-            200...299 ~= httpResponse.statusCode else {
-            return nil
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(from: normalizedURL)
+        } catch let urlError as URLError {
+            throw MTOfflineError.networkError(urlError)
+        } catch {
+            throw MTOfflineError.networkError(URLError(.unknown))
+        }
+
+        guard let httpResponse = response as? HTTPURLResponse, 200...299 ~= httpResponse.statusCode else {
+            throw MTOfflineError.networkError(URLError(.badServerResponse))
         }
 
         guard let tileJSON = try? JSONDecoder().decode(MTTileJSON.self, from: data) else {
-            return nil
+            throw MTOfflineError.networkError(URLError(.cannotParseResponse))
         }
 
         guard let template = tileJSON.preferredTileURLTemplate else {
-            return nil
+            throw MTOfflineError.networkError(URLError(.cannotParseResponse))
         }
         // TileJSON zoom limits take precedence over style source limits if present
         let finalMin = tileJSON.minzoom

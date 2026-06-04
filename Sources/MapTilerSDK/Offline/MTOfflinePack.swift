@@ -7,7 +7,11 @@ public actor MTOfflinePack {
     /// The region definition of the pack.
     public nonisolated let region: MTOfflineRegionDefinition
     /// The current progress of the pack download.
-    public private(set) var progress: MTOfflinePackProgress = .init(totalResources: 0, downloadedResources: 0)
+    public private(set) var progress: MTOfflinePackProgress = .init(
+        totalResources: 0,
+        downloadedResources: 0,
+        totalTileResources: 0
+    )
 
     /// The metadata object linking state and region.
     public private(set) var metadata: MTOfflinePackMetadata
@@ -124,6 +128,12 @@ public actor MTOfflinePack {
         self.downloader = downloader
         self.metadata = metadata
 
+        self.progress = .init(
+            totalResources: metadata.totalResources,
+            downloadedResources: metadata.downloadedResources,
+            totalTileResources: metadata.totalTileResources
+        )
+
         // If a pack was "downloading" when the app was closed, it should be marked as paused or failed now.
         if metadata.isExpired {
             self.state = .expired
@@ -151,10 +161,12 @@ public actor MTOfflinePack {
         guard state != .completed, state != .canceled, state != .expired else { return }
         state = .completed
         progress.downloadedResources = progress.totalResources
-        if isProgressReportingEnabled {
-            delegate?.offlinePack(id, didUpdateProgress: progress)
+        Task {
+            await syncMetadataToDisk()
+            if isProgressReportingEnabled {
+                delegate?.offlinePack(id, didUpdateProgress: progress)
+            }
         }
-        Task { await syncMetadataToDisk() }
     }
 
     internal func markBackgroundDownloadFailed() {
@@ -170,6 +182,9 @@ public actor MTOfflinePack {
         // Update the struct before saving
         metadata.state = state
         metadata.size = await MTOfflineStorage.calculatePackSize(for: id)
+        metadata.totalResources = progress.totalResources
+        metadata.downloadedResources = progress.downloadedResources
+        metadata.totalTileResources = progress.totalTileResources
 
         do {
             try await MTOfflineStorage.saveMetadata(metadata)
@@ -181,8 +196,6 @@ public actor MTOfflinePack {
     internal func updateProgress(completed: Int, skipped: Int) {
         progress.downloadedResources += (completed + skipped)
 
-        guard isProgressReportingEnabled else { return }
-
         let now = Date()
         // Throttle progress events to at most 10 per second
         let shouldYield = now.timeIntervalSince(lastProgressEventTime) >= 0.1 ||
@@ -190,7 +203,12 @@ public actor MTOfflinePack {
 
         if shouldYield {
             lastProgressEventTime = now
-            delegate?.offlinePack(id, didUpdateProgress: progress)
+            Task {
+                await syncMetadataToDisk()
+                if isProgressReportingEnabled {
+                    delegate?.offlinePack(id, didUpdateProgress: progress)
+                }
+            }
         }
     }
 
@@ -312,6 +330,8 @@ extension MTOfflinePack {
         progress.totalResources = tasks.count
         progress.downloadedResources = 0
 
+        await syncMetadataToDisk()
+
         let packURL = MTOfflineStoragePaths.packDirectory(for: id)
 
         if useBackground {
@@ -350,6 +370,9 @@ extension MTOfflinePack {
     internal func startDownload(manifest: MTManifest, useBackground: Bool = false) async throws {
         try await MTOfflineStorage.saveManifest(manifest, for: id)
         let tasks = buildTasks(from: manifest)
+
+        progress.totalTileResources = manifest.tiles.count
+
         try await startDownload(tasks: tasks, useBackground: useBackground)
     }
 
@@ -370,6 +393,9 @@ extension MTOfflinePack {
     public func resume(useBackground: Bool = false) async throws {
         let manifest = try MTOfflineStorage.loadManifest(for: id)
         let tasks = buildTasks(from: manifest)
+
+        progress.totalTileResources = manifest.tiles.count
+
         try await startDownload(tasks: tasks, useBackground: useBackground)
     }
 

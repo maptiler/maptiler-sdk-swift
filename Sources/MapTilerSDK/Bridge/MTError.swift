@@ -7,10 +7,12 @@
 //  MapTilerSDK
 //
 
+import Foundation
+
 /// Represents all the errors that can occur in the MapTiler SDK.
 ///
 /// All methods within the SDK throw MTError.
-public enum MTError: Error {
+public enum MTError: Error, LocalizedError {
     /// Method execution failed with exception.
     ///
     ///  - Parameter body: Exception details.
@@ -78,6 +80,10 @@ public enum MTError: Error {
         case .offlineServerFailed:
             return "Offline server failed to start or is not running."
         }
+    }
+
+    public var errorDescription: String? {
+        return reason
     }
 }
 

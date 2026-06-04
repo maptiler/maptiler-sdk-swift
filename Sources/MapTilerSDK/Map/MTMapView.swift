@@ -172,6 +172,13 @@ open class MTMapView: UIView, Sendable {
     /// - Note: Loading an offline pack changes the map's style to the local offline style.
     /// This process resets all custom sources, layers, and annotations.
     /// You must re-add any custom map content after the style finishes loading.
+    ///
+    /// When `limitToRegion` is `true` (the default), the map's camera is locked to the bounding box
+    /// of the downloaded area. This physically restricts how far out the user can zoom. For example, 
+    /// if you downloaded a 5-mile area with a `minZoom` of 0, you will *not* be able to zoom out to 0, 
+    /// because the 5-mile area would become a tiny dot on the screen. The apparent minimum zoom 
+    /// becomes whatever level is required to fit the downloaded bounding box perfectly onto the device screen.
+    ///
     /// - Parameters:
     ///   - pack: The `MTOfflinePack` to load.
     ///   - limitToRegion: Default `true` limits max bounds and zoom range to the pack's region.

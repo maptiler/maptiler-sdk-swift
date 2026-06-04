@@ -19,6 +19,7 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
     private var _port: NWEndpoint.Port?
     private let queue = DispatchQueue(label: "com.maptiler.offline.server", qos: .userInitiated)
     private let lock = NSLock()
+    private let router = MTOfflineRouter()
 
     private var _isRunning = false
     public var isRunning: Bool {
@@ -155,6 +156,48 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
         MTLogger.log("Offline server stopped", type: .info)
     }
 
+    private func handleStyleJSON(at url: URL, on connection: NWConnection) {
+        guard let fileData = try? Data(contentsOf: url),
+            let jsonObject = try? JSONSerialization.jsonObject(with: fileData) as? [String: Any] else {
+            sendResponse(
+                statusCode: 404,
+                body: Data("Not Found".utf8),
+                mimeType: "text/plain",
+                on: connection
+            )
+            return
+        }
+
+        let packID = url.deletingLastPathComponent().lastPathComponent
+
+        var downloadedMaxZoom: Int?
+        if let manifest = try? MTOfflineStorage.loadManifest(for: packID) {
+            downloadedMaxZoom = manifest.metadata.maxZoom
+        }
+
+        let processor = MTStyleProcessor(baseURL: self.baseURLString(), packName: packID)
+        let transformed = processor.transform(style: jsonObject, maxZoom: downloadedMaxZoom)
+
+        if let transformedData = try? JSONSerialization.data(withJSONObject: transformed, options: []) {
+            sendResponse(
+                statusCode: 200,
+                body: transformedData,
+                mimeType: "application/json",
+                on: connection
+            )
+        } else {
+            sendResponse(
+                statusCode: 500,
+                body: Data("Internal Server Error".utf8),
+                mimeType: "text/plain",
+                on: connection
+            )
+        }
+    }
+}
+
+// MARK: - HTTP Server Logic
+extension MTOfflineHTTPServer {
     // Returns the base URL string for the server.
     internal func baseURLString() -> String {
         lock.lock(); defer { lock.unlock() }
@@ -202,8 +245,6 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
         }
     }
 
-    private let router = MTOfflineRouter()
-
     private func processData(_ data: Data, on connection: NWConnection) {
         // Simple manual HTTP parser
         guard let requestString = String(data: data, encoding: .utf8) else {
@@ -229,44 +270,34 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
         MTLogger.log("Offline server GET \(path)", type: .info)
 
         if method == "GET" {
-            if path == "/health" || path == "/health/" {
-                sendResponse(
-                    statusCode: 200,
-                    body: Data("OK".utf8),
-                    mimeType: "text/plain",
-                    on: connection
-                )
-            } else if let resolved = router.resolve(path: path) {
-                // Dynamically transform style.json to inject the correct baseURL with the current port
-                if resolved.url.lastPathComponent == "style.json",
-                    let fileData = try? Data(contentsOf: resolved.url),
-                    let jsonObject = try? JSONSerialization.jsonObject(with: fileData) as? [String: Any] {
+            handleGetRequest(path: path, on: connection)
+        } else {
+            sendResponse(
+                statusCode: 405,
+                body: Data("Method Not Allowed".utf8),
+                mimeType: "text/plain",
+                on: connection
+            )
+        }
+    }
 
-                    let packID = resolved.url.deletingLastPathComponent().lastPathComponent
-                    let processor = MTStyleProcessor(baseURL: self.baseURLString(), packName: packID)
-                    let transformed = processor.transform(style: jsonObject)
+    private func handleGetRequest(path: String, on connection: NWConnection) {
+        if path == "/health" || path == "/health/" {
+            sendResponse(
+                statusCode: 200,
+                body: Data("OK".utf8),
+                mimeType: "text/plain",
+                on: connection
+            )
+        } else if let resolved = router.resolve(path: path) {
+            // Dynamically transform style.json to inject the correct baseURL with the current port
+            if resolved.url.lastPathComponent == "style.json" {
+                handleStyleJSON(at: resolved.url, on: connection)
+                return
+            }
 
-                    if let transformedData = try? JSONSerialization.data(withJSONObject: transformed, options: []) {
-                        sendResponse(
-                            statusCode: 200,
-                            body: transformedData,
-                            mimeType: "application/json",
-                            on: connection
-                        )
-                        return
-                    }
-                }
-
-                if let fileData = try? Data(contentsOf: resolved.url) {
-                    sendResponse(statusCode: 200, body: fileData, mimeType: resolved.mimeType, on: connection)
-                } else {
-                    sendResponse(
-                        statusCode: 404,
-                        body: Data("Not Found".utf8),
-                        mimeType: "text/plain",
-                        on: connection
-                    )
-                }
+            if let fileData = try? Data(contentsOf: resolved.url) {
+                sendResponse(statusCode: 200, body: fileData, mimeType: resolved.mimeType, on: connection)
             } else {
                 sendResponse(
                     statusCode: 404,
@@ -277,8 +308,8 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
             }
         } else {
             sendResponse(
-                statusCode: 405,
-                body: Data("Method Not Allowed".utf8),
+                statusCode: 404,
+                body: Data("Not Found".utf8),
                 mimeType: "text/plain",
                 on: connection
             )

@@ -53,6 +53,15 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
     /// The region definition specifying the bounding box, zoom levels, and style.
     public let region: MTOfflineRegionDefinition
 
+    /// Total number of resources required for the pack.
+    public var totalResources: Int
+
+    /// Total number of tile resources required for the pack.
+    public var totalTileResources: Int
+
+    /// Number of resources that have been successfully downloaded.
+    public var downloadedResources: Int
+
     /// Returns true if the pack has passed its expiration date.
     public var isExpired: Bool {
         return Date() > expiresAt
@@ -68,6 +77,9 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
     ///   - createdAt: The creation date of the pack. Defaults to the current date.
     ///   - expiresAt: The expiration date of the pack. Defaults to 30 days from now.
     ///   - context: Optional custom context data. Defaults to nil.
+    ///   - totalResources: Total resources for the pack. Defaults to 0.
+    ///   - downloadedResources: Downloaded resources for the pack. Defaults to 0.
+    ///   - totalTileResources: Total tile resources for the pack. Defaults to 0.
     public init(
         id: UUID = UUID(),
         region: MTOfflineRegionDefinition,
@@ -75,7 +87,10 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
         size: Int64 = 0,
         createdAt: Date = Date(),
         expiresAt: Date? = nil,
-        context: Data? = nil
+        context: Data? = nil,
+        totalResources: Int = 0,
+        downloadedResources: Int = 0,
+        totalTileResources: Int = 0
     ) {
         self.id = id
         self.region = region
@@ -85,6 +100,9 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
         let defaultInterval = MTOfflineConfiguration.shared.defaultExpirationInterval
         self.expiresAt = expiresAt ?? createdAt.addingTimeInterval(defaultInterval)
         self.context = context
+        self.totalResources = totalResources
+        self.downloadedResources = downloadedResources
+        self.totalTileResources = totalTileResources
     }
 
     public init(from decoder: Decoder) throws {
@@ -95,8 +113,17 @@ public struct MTOfflinePackMetadata: Codable, Equatable, Sendable {
         self.createdAt = try container.decode(Date.self, forKey: .createdAt)
         self.context = try container.decodeIfPresent(Data.self, forKey: .context)
         self.region = try container.decode(MTOfflineRegionDefinition.self, forKey: .region)
+        self.totalResources = (try? container.decode(Int.self, forKey: .totalResources)) ?? 0
+        self.downloadedResources = (try? container.decode(Int.self, forKey: .downloadedResources)) ?? 0
+        self.totalTileResources = (try? container.decode(Int.self, forKey: .totalTileResources)) ?? 0
+
         let defaultInterval = MTOfflineConfiguration.shared.defaultExpirationInterval
         let decodedExpiresAt = try container.decodeIfPresent(Date.self, forKey: .expiresAt)
         self.expiresAt = decodedExpiresAt ?? self.createdAt.addingTimeInterval(defaultInterval)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, state, size, createdAt, expiresAt, context, region
+        case totalResources, downloadedResources, totalTileResources
     }
 }

@@ -90,11 +90,17 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
     }
 
     func downloadRoute() async {
-        if isRouteReady {
-            if let pack = routePack { try? await pack.remove() }
-            isRouteReady = false
+        if let packs = try? await MTOfflinePack.packs() {
+            for pack in packs {
+                if let contextData = await pack.metadata.context,
+                    let contextDict = try? JSONDecoder().decode([String: String].self, from: contextData),
+                    contextDict[Constants.nameDictKey] == Constants.packName {
+                    try? await pack.remove()
+                }
+            }
         }
 
+        isRouteReady = false
         downloadState = "Parsing GeoJSON..."
         downloadProgress = 0.0
 

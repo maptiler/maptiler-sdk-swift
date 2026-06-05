@@ -120,7 +120,7 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
         case .outdoor: try container.encode("outdoor", forKey: .base)
         case .winter: try container.encode("winter", forKey: .base)
         case .dataviz: try container.encode("dataviz", forKey: .base)
-        case .base: try container.encode("basic", forKey: .base)
+        case .base: try container.encode("base", forKey: .base)
         case .bright: try container.encode("bright", forKey: .base)
         case .topo: try container.encode("topo", forKey: .base)
         case .toner: try container.encode("toner", forKey: .base)

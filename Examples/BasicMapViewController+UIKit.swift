@@ -28,7 +28,7 @@ class BasicMapViewController: UIViewController {
             bearing: 1.0,
             pitch: 20.0
         )
-        mapView = MTMapView(frame: view.frame, options: options, referenceStyle: .basic)
+        mapView = MTMapView(frame: view.frame, options: options, referenceStyle: .base)
         mapView.delegate = self
 
         view.addSubview(mapView)
@@ -45,7 +45,7 @@ class BasicMapViewController: UIViewController {
 
 extension BasicMapViewController: MTMapViewDelegate {
     func mapViewDidInitialize(_ mapView: MTMapView) {
-        mapView.style?.setStyle(.basic, styleVariant: .defaultVariant)
+        mapView.style?.setStyle(.base, styleVariant: .defaultVariant)
     }
 
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {

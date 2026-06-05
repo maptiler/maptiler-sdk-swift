@@ -24,7 +24,7 @@ extension MTOfflineGlobalStorageTests {
         
         let manifest = MTManifest(
             metadata: MTManifestMetadata(
-                referenceStyle: .basic,
+                referenceStyle: .base,
                 bbox: bbox,
                 minZoom: 0,
                 maxZoom: 0,
@@ -118,7 +118,7 @@ extension MTOfflineGlobalStorageTests {
             bbox: bbox,
             minZoom: 5,
             maxZoom: 15,
-            referenceStyle: .basic
+            referenceStyle: .base
         )
         
         let pack = try await MTOfflinePack.createPack(region: region)

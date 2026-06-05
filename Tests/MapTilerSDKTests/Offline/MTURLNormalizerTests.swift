@@ -12,27 +12,27 @@ import Foundation
 struct MTURLNormalizerTests {
     
     @Test func testNormalURLWithoutKey() {
-        let url = URL(string: "https://api.maptiler.com/maps/streets-v2/style.json")!
+        let url = URL(string: "https://api.maptiler.com/maps/streets-v4/style.json")!
         let normalized = MTURLNormalizer.normalize(url: url, apiKey: "MY_KEY")
-        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v2/style.json?key=MY_KEY")
+        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v4/style.json?key=MY_KEY")
     }
 
     @Test func testNormalURLWithKey() {
-        let url = URL(string: "https://api.maptiler.com/maps/streets-v2/style.json?key=EXISTING_KEY")!
+        let url = URL(string: "https://api.maptiler.com/maps/streets-v4/style.json?key=EXISTING_KEY")!
         let normalized = MTURLNormalizer.normalize(url: url, apiKey: "MY_KEY")
-        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v2/style.json?key=EXISTING_KEY")
+        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v4/style.json?key=EXISTING_KEY")
     }
 
     @Test func testMaptilerSchemeWithoutKey() {
-        let url = URL(string: "maptiler://maps/streets-v2/style.json")!
+        let url = URL(string: "maptiler://maps/streets-v4/style.json")!
         let normalized = MTURLNormalizer.normalize(url: url, apiKey: "MY_KEY")
-        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v2/style.json?key=MY_KEY")
+        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v4/style.json?key=MY_KEY")
     }
 
     @Test func testMaptilerSchemeWithKey() {
-        let url = URL(string: "maptiler://maps/streets-v2/style.json?key=EXISTING_KEY")!
+        let url = URL(string: "maptiler://maps/streets-v4/style.json?key=EXISTING_KEY")!
         let normalized = MTURLNormalizer.normalize(url: url, apiKey: "MY_KEY")
-        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v2/style.json?key=EXISTING_KEY")
+        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v4/style.json?key=EXISTING_KEY")
     }
 
     @Test func testURLWithOtherQueryParametersWithoutKey() {
@@ -65,9 +65,9 @@ struct MTURLNormalizerTests {
         let key = "CONFIG_KEY"
         await MTConfig.shared.setAPIKey(key)
         
-        let url = URL(string: "maptiler://maps/streets-v2/style.json")!
+        let url = URL(string: "maptiler://maps/streets-v4/style.json")!
         let normalized = await MTURLNormalizer.normalize(url: url)
         
-        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v2/style.json?key=\(key)")
+        #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v4/style.json?key=\(key)")
     }
 }

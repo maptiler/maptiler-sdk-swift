@@ -18,8 +18,8 @@ struct MTLocalPlannerTests {
     func testInvalidZoomRange() async throws {
         let planner = MTLocalPlanner()
         let bbox = MTBoundingBox(minLon: 0, minLat: 0, maxLon: 10, maxLat: 10)
-        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 10, maxZoom: 5, referenceStyle: .basic)
-        
+        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 10, maxZoom: 5, referenceStyle: .base)
+
         do {
             _ = try await planner.estimate(for: definition)
             #expect(Bool(false), "Expected invalidZoomRange error")
@@ -44,8 +44,8 @@ struct MTLocalPlannerTests {
         let planner = MTLocalPlanner()
         // Invalid latitude > 90
         let bbox = MTBoundingBox(minLon: 0, minLat: 0, maxLon: 10, maxLat: 100)
-        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 5, referenceStyle: .basic)
-        
+        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 5, referenceStyle: .base)
+
         do {
             _ = try await planner.estimate(for: definition)
             #expect(Bool(false), "Expected invalidBoundingBox error")
@@ -69,7 +69,7 @@ struct MTLocalPlannerTests {
     func testInvalidBoundingBoxMinMax() async throws {
         let planner = MTLocalPlanner()
         let bbox = MTBoundingBox(minLon: 0, minLat: 10, maxLon: 10, maxLat: 0)
-        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 5, referenceStyle: .basic)
+        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 5, referenceStyle: .base)
         
         do {
             _ = try await planner.estimate(for: definition)
@@ -98,7 +98,7 @@ struct MTLocalPlannerTests {
         
         // Use a tiny per-pack limit
         let tinyLimit = 10
-        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 14, referenceStyle: .basic, maxTileCount: tinyLimit)
+        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 14, referenceStyle: .base, maxTileCount: tinyLimit)
         
         do {
             _ = try await planner.estimate(for: definition)

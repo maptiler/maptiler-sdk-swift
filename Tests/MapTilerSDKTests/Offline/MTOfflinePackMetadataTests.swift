@@ -17,7 +17,7 @@ struct MTOfflinePackMetadataTests {
             bbox: MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1),
             minZoom: 0,
             maxZoom: 5,
-            referenceStyle: .basic
+            referenceStyle: .base
         )
         let metadata = MTOfflinePackMetadata(region: region)
         
@@ -39,7 +39,7 @@ struct MTOfflinePackMetadataTests {
             bbox: MTBoundingBox(minLon: -10, minLat: -10, maxLon: 10, maxLat: 10),
             minZoom: 2,
             maxZoom: 10,
-            referenceStyle: .basic
+            referenceStyle: .base
         )
         
         let originalMetadata = MTOfflinePackMetadata(
@@ -82,7 +82,7 @@ struct MTOfflinePackMetadataTests {
             bbox: MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1),
             minZoom: 0,
             maxZoom: 1,
-            referenceStyle: .basic
+            referenceStyle: .base
         )
         
         let metadata = MTOfflinePackMetadata(region: region, createdAt: fixedDate)

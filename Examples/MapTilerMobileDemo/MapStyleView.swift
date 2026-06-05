@@ -17,7 +17,7 @@ struct MapStyleView: View {
         static let brnoCoordinates = CLLocationCoordinate2D(latitude: 49.212596, longitude: 16.626576)
     }
 
-    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var referenceStyle: MTMapReferenceStyle = .base
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
 
     @State public var mapView = MTMapView(options: MTMapOptions())
@@ -31,7 +31,7 @@ struct MapStyleView: View {
     }
 
     var body: some View {
-        GeometryReader { reader in
+        GeometryReader { _ in
             VStack {
                 HStack(alignment: .bottom) {
                     Picker(Constants.emptyString, selection: $referenceStyle) {
@@ -74,7 +74,11 @@ struct MapStyleView: View {
                 }
 
                 MTMapViewContainer(map: mapView) {
-                    MTMarker(coordinates: Constants.unterageriCoordinates, icon: UIImage(named: "maptiler-marker"), draggable: true)
+                    MTMarker(
+                        coordinates: Constants.unterageriCoordinates,
+                        icon: UIImage(named: "maptiler-marker"),
+                        draggable: true
+                    )
                 }
                 .referenceStyle(referenceStyle)
                 .styleVariant(styleVariant)

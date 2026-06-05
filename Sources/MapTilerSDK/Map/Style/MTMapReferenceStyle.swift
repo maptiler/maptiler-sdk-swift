@@ -29,8 +29,8 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
     /// A minimalist style for data visualization.
     case dataviz
 
-    /// A minimalist alternative to STREETS, with a touch of flat design.
-    case basic
+    /// A clear general purpose map.
+    case base
 
     /// A minimalist style for high contrast navigation.
     case bright
@@ -93,7 +93,7 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
         case "outdoor": return .outdoor
         case "winter": return .winter
         case "dataviz": return .dataviz
-        case "basic": return .basic
+        case "base": return .base
         case "bright": return .bright
         case "topo": return .topo
         case "toner": return .toner
@@ -120,7 +120,7 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
         case .outdoor: try container.encode("outdoor", forKey: .base)
         case .winter: try container.encode("winter", forKey: .base)
         case .dataviz: try container.encode("dataviz", forKey: .base)
-        case .basic: try container.encode("basic", forKey: .base)
+        case .base: try container.encode("basic", forKey: .base)
         case .bright: try container.encode("bright", forKey: .base)
         case .topo: try container.encode("topo", forKey: .base)
         case .toner: try container.encode("toner", forKey: .base)
@@ -146,7 +146,7 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
             return [.defaultVariant, .light, .dark]
         case .dataviz:
             return [.defaultVariant, .light, .dark]
-        case .basic:
+        case .base:
             return [.defaultVariant, .light, .dark, .pastel]
         case .bright:
             return [.defaultVariant, .light, .dark, .pastel]
@@ -192,8 +192,8 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
             return "WINTER"
         case .dataviz:
             return "DATAVIZ"
-        case .basic:
-            return "BASIC"
+        case .base:
+            return "BASE"
         case .bright:
             return "BRIGHT"
         case .topo:
@@ -231,19 +231,19 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
 
         switch self {
         case .streets:
-            return isDefault ? "streets-v2" : "streets-v2-\(variant!.rawValue)"
+            return isDefault ? "streets-v4" : "streets-v4-\(variant!.rawValue)"
         case .outdoor:
-            return isDefault ? "outdoor-v2" : "outdoor-v2-\(variant!.rawValue)"
+            return isDefault ? "outdoor-v4" : "outdoor-v4-\(variant!.rawValue)"
         case .winter:
-            return isDefault ? "winter-v2" : "winter-v2-\(variant!.rawValue)"
-        case .basic:
-            return isDefault ? "basic-v2" : "basic-v2-\(variant!.rawValue)"
+            return isDefault ? "winter-v4" : "winter-v4-\(variant!.rawValue)"
+        case .base:
+            return isDefault ? "base-v4" : "base-v4-\(variant!.rawValue)"
         case .bright:
-            return isDefault ? "bright-v2" : "bright-v2-\(variant!.rawValue)"
+            return isDefault ? "bright-v4" : "bright-v4-\(variant!.rawValue)"
         case .topo:
-            return isDefault ? "topo-v2" : "topo-v2-\(variant!.rawValue)"
+            return isDefault ? "topo-v4" : "topo-v4-\(variant!.rawValue)"
         case .toner:
-            return isDefault ? "toner-v2" : "toner-v2-\(variant!.rawValue)"
+            return isDefault ? "toner-v4" : "toner-v4-\(variant!.rawValue)"
 
         case .satellite:
             return "satellite"
@@ -274,7 +274,7 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
             .outdoor,
             .winter,
             .dataviz,
-            .basic,
+            .base,
             .bright,
             .topo,
             .toner,

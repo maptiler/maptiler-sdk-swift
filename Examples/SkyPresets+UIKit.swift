@@ -28,7 +28,7 @@ class SkyPresetsViewController: UIViewController {
 
     private func setupMap() {
         let options = MTMapOptions()
-        mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .basic, styleVariant: .defaultVariant)
+        mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .base, styleVariant: .defaultVariant)
         mapView.delegate = self
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(mapView)

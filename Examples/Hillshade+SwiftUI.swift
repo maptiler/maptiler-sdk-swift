@@ -8,7 +8,7 @@ import MapTilerSDK
 
 /// Demonstrates adding a hillshade layer sourced from Terrain RGB DEM tiles.
 struct HillshadeExample: View {
-    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var referenceStyle: MTMapReferenceStyle = .base
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: 3.0))
 

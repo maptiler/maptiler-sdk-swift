@@ -16,7 +16,7 @@ final class PolygonBasicUIKitExampleViewController: UIViewController {
         Task { await MTConfig.shared.setAPIKey("YOUR_API_KEY") }
 
         let options = MTMapOptions(zoom: 1.8)
-        mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .basic, styleVariant: .defaultVariant)
+        mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .base, styleVariant: .defaultVariant)
         view.addSubview(mapView)
 
         Task { await addPolygons() }

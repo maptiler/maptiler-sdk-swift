@@ -18,7 +18,7 @@ extension MTOfflineGlobalStorageTests {
             bbox: bbox,
             minZoom: 0,
             maxZoom: 10,
-            referenceStyle: .basic,
+            referenceStyle: .base,
             maxTileCount: 1000
         )
         
@@ -65,7 +65,7 @@ extension MTOfflineGlobalStorageTests {
             bbox: bbox,
             minZoom: 0,
             maxZoom: 10,
-            referenceStyle: .basic
+            referenceStyle: .base
         )
         
         // Create packs with delays to ensure different creation dates after ISO8601 truncation
@@ -106,7 +106,7 @@ extension MTOfflineGlobalStorageTests {
             bbox: MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1),
             minZoom: 0,
             maxZoom: 1,
-            referenceStyle: .basic
+            referenceStyle: .base
         )
         
         let packURL = MTOfflineStoragePaths.packDirectory(for: packId)
@@ -144,7 +144,7 @@ extension MTOfflineGlobalStorageTests {
             bbox: MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1),
             minZoom: 0,
             maxZoom: 1,
-            referenceStyle: .basic
+            referenceStyle: .base
         )
         
         let pack = try await MTOfflinePack.createPack(region: region)
@@ -196,7 +196,7 @@ extension MTOfflineGlobalStorageTests {
             bbox: MTBoundingBox(minLon: 0, minLat: 0, maxLon: 1, maxLat: 1),
             minZoom: 0,
             maxZoom: 1,
-            referenceStyle: .basic
+            referenceStyle: .base
         )
         
         let _ = try await MTOfflinePack.createPack(region: region)

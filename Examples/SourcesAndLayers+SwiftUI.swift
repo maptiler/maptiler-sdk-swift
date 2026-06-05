@@ -20,7 +20,7 @@ struct SourcesAndLayersMapView: View {
         string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY"
     ) ?? URL.documentsDirectory
 
-    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var referenceStyle: MTMapReferenceStyle = .base
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
 
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: Constants.defaultZoomLevel))

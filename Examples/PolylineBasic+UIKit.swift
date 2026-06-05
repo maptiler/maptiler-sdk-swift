@@ -16,7 +16,7 @@ final class PolylineBasicUIKitExampleViewController: UIViewController {
         Task { await MTConfig.shared.setAPIKey("YOUR_API_KEY") }
 
         let options = MTMapOptions(zoom: 2.0)
-        mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .basic, styleVariant: .defaultVariant)
+        mapView = MTMapView(frame: view.bounds, options: options, referenceStyle: .base, styleVariant: .defaultVariant)
         view.addSubview(mapView)
 
         Task { await addLines() }

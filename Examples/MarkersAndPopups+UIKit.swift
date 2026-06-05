@@ -37,7 +37,7 @@ class MarkersAndPopupsMapViewController: UIViewController {
             bearing: 1.0,
             pitch: 20.0
         )
-        mapView = MTMapView(frame: view.frame, options: options, referenceStyle: .basic)
+        mapView = MTMapView(frame: view.frame, options: options, referenceStyle: .base)
         mapView.delegate = self
 
         view.addSubview(mapView)

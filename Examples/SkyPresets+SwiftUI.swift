@@ -31,7 +31,7 @@ struct SkyPresetsView: View {
     var body: some View {
         VStack(spacing: 12) {
             MTMapViewContainer(map: mapView) {}
-                .referenceStyle(.basic)
+                .referenceStyle(.base)
                 .styleVariant(.defaultVariant)
                 .didInitialize {
                     Task { @MainActor in

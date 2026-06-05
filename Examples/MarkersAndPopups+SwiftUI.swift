@@ -15,7 +15,7 @@ struct MarkersAndPopupsMapView: View {
     let unterageriCoordinates = CLLocationCoordinate2D(latitude: 47.137765, longitude: 8.581651)
     let brnoCoordinates = CLLocationCoordinate2D(latitude: 49.212596, longitude: 16.626576)
 
-    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var referenceStyle: MTMapReferenceStyle = .base
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
 
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: Constants.defaultZoomLevel))

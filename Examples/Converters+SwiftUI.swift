@@ -9,7 +9,7 @@ import MapTilerSDK
 /// Demonstrates using MTMapView converters to transform GPX and KML
 /// strings into GeoJSON, then render them via polyline/polygon helpers.
 struct ConvertersExample: View {
-    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var referenceStyle: MTMapReferenceStyle = .base
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: 2.0))
 

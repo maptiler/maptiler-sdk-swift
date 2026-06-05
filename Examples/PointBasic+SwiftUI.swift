@@ -9,7 +9,7 @@ import MapTilerSDK
 /// Demonstrates a basic point layer using MTPointLayerHelper
 /// with solid color, outline and optional labels.
 struct PointBasicExample: View {
-    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var referenceStyle: MTMapReferenceStyle = .base
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: 1.6))
 

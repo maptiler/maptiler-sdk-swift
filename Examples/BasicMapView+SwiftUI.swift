@@ -13,7 +13,7 @@ struct BasicMapView: View {
         static let defaultZoomLevel = 2.0
     }
 
-    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var referenceStyle: MTMapReferenceStyle = .base
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
 
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: Constants.defaultZoomLevel))

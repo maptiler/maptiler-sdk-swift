@@ -9,7 +9,7 @@ import MapTilerSDK
 /// Demonstrates a basic polygon layer using MTPolygonLayerHelper
 /// with fill color/opacity and outlined borders.
 struct PolygonBasicExample: View {
-    @State private var referenceStyle: MTMapReferenceStyle = .basic
+    @State private var referenceStyle: MTMapReferenceStyle = .base
     @State private var styleVariant: MTMapStyleVariant? = .defaultVariant
     @State private var mapView = MTMapView(options: MTMapOptions(zoom: 1.8))
 

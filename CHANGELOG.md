@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.0.0](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/2.0.0)
+Released on 2026-06-05.
+### Added
+- New MTOfflinePack API providing options for map region downloads for the offline usage. Download and serve map regions while not connected to the internet. Supports all the base styles and glyph ranges.
+- Replaced Basic style with Base style.
+- Added new v4 base map styles.
+
 ## [1.3.2](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/1.3.2)
 Released on 2026-03-26.
 ### Fixed

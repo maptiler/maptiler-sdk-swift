@@ -633,6 +633,62 @@ extension MTMapView: MTNavigable {
         runCommandWithPointReturnValue(PointAdd(point1: point1, point2: point2), completion: completionHandler)
     }
 
+    /// Get the angle from the 0, 0 coordinate to this point, in radians.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointAngle(
+        point: MTPoint,
+        completionHandler: @escaping (Result<Double, MTError>) -> Void
+    ) {
+        runCommandWithDoubleReturnValue(PointAngle(point: point), completion: completionHandler)
+    }
+
+    /// Get the angle from this point to another point, in radians.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointAngleTo(
+        point1: MTPoint,
+        point2: MTPoint,
+        completionHandler: @escaping (Result<Double, MTError>) -> Void
+    ) {
+        runCommandWithDoubleReturnValue(PointAngleTo(point1: point1, point2: point2), completion: completionHandler)
+    }
+
+    /// Get the angle between this point and another point, in radians.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointAngleWith(
+        point1: MTPoint,
+        point2: MTPoint,
+        completionHandler: @escaping (Result<Double, MTError>) -> Void
+    ) {
+        runCommandWithDoubleReturnValue(PointAngleWith(point1: point1, point2: point2), completion: completionHandler)
+    }
+
+    /// Find the angle of the two vectors.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - x: The x-coordinate.
+    ///   - y: The y-coordinate.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointAngleWithSep(
+        point: MTPoint,
+        x: Double,
+        y: Double,
+        completionHandler: @escaping (Result<Double, MTError>) -> Void
+    ) {
+        runCommandWithDoubleReturnValue(PointAngleWithSep(point: point, x: x, y: y), completion: completionHandler)
+    }
+
     /// Returns a new `CLLocationCoordinate2D` object whose longitude is wrapped to the range (-180, 180).
     /// - Parameters:
     ///   - coordinates: The coordinates to wrap.
@@ -1317,6 +1373,74 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Get the angle from the 0, 0 coordinate to this point, in radians.
+    /// - Parameters:
+    ///   - point: The point.
+    public func pointAngle(point: MTPoint) async -> Double {
+        await withCheckedContinuation { continuation in
+            pointAngle(point: point) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0)
+                }
+            }
+        }
+    }
+
+    /// Get the angle from this point to another point, in radians.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point.
+    public func pointAngleTo(point1: MTPoint, point2: MTPoint) async -> Double {
+        await withCheckedContinuation { continuation in
+            pointAngleTo(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0)
+                }
+            }
+        }
+    }
+
+    /// Get the angle between this point and another point, in radians.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point.
+    public func pointAngleWith(point1: MTPoint, point2: MTPoint) async -> Double {
+        await withCheckedContinuation { continuation in
+            pointAngleWith(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0)
+                }
+            }
+        }
+    }
+
+    /// Find the angle of the two vectors.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - x: The x-coordinate.
+    ///   - y: The y-coordinate.
+    public func pointAngleWithSep(point: MTPoint, x: Double, y: Double) async -> Double {
+        await withCheckedContinuation { continuation in
+            pointAngleWithSep(point: point, x: x, y: y) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0)
                 }
             }
         }

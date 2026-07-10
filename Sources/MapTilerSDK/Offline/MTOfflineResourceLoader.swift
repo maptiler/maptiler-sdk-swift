@@ -139,7 +139,7 @@ internal class MTOfflineResourceLoader {
         while let fileURL = enumerator?.nextObject() as? URL {
             if let resourceValues = try? fileURL.resourceValues(forKeys: [.fileSizeKey]),
                 let fileSize = resourceValues.fileSize {
-                    totalSize += Int64(fileSize)
+                totalSize += Int64(fileSize)
             }
         }
 

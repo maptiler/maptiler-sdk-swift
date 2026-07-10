@@ -80,13 +80,12 @@ package final class WebViewExecutor: MTCommandExecutable {
                 }
                 return .unsupportedType
             }
-        // swiftlint:disable indentation_width
         } else {
             return try await withCheckedThrowingContinuation { continuation in
                 webView.evaluateJavaScript(js) { [weak self] result, error in
                     if let error = error {
                         if let error = error as? WKError,
-                           error.code != .javaScriptResultTypeIsUnsupported {
+                            error.code != .javaScriptResultTypeIsUnsupported {
                             if isVerbose {
                                 let commandMessage = "Bridging error occurred for \(command)"
                                 MTLogger.log(
@@ -124,7 +123,6 @@ package final class WebViewExecutor: MTCommandExecutable {
                 }
             }
         }
-        // swiftlint:enable indentation_width
     }
 }
 

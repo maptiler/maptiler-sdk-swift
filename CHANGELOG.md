@@ -1,24 +1,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [2.0.0](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/2.0.0)
+## [2.0.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.0.0)
 Released on 2026-06-05.
 ### Added
 - New MTOfflinePack API providing options for map region downloads for the offline usage. Download and serve map regions while not connected to the internet. Supports all the base styles and glyph ranges.
 - Replaced Basic style with Base style.
 - Added new v4 base map styles.
 
-## [1.3.2](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/1.3.2)
+## [1.3.2](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/1.3.2)
 Released on 2026-03-26.
 ### Fixed
 - MTVectorHelpers now properly remove source and layers.
 
-## [1.3.1](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/1.3.1)
+## [1.3.1](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/1.3.1)
 Released on 2026-03-06.
 ### Fixed
 - MacOS via Catalyst double zoom to drag gesture now properly handles the drag event.
 
-## [1.3.0](https://github.com/maptiler/maptiler-sdk-kotlin/releases/tag/1.3.0)
+## [1.3.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/1.3.0)
 Released on 2026-02-27.
 ### Added
 - Polygon, Polyline and Heatmap helpers: Simple way to add data to the map

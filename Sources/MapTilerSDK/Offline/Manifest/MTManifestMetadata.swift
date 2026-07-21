@@ -17,6 +17,7 @@ internal struct MTManifestMetadata: Codable, Sendable {
     public let minZoom: Int
     public let maxZoom: Int
     public let pixelRatio: Float
+    public let isTerrainEnabled: Bool
 
     public init(
         referenceStyle: MTMapReferenceStyle,
@@ -24,7 +25,8 @@ internal struct MTManifestMetadata: Codable, Sendable {
         bbox: MTBoundingBox,
         minZoom: Int,
         maxZoom: Int,
-        pixelRatio: Float
+        pixelRatio: Float,
+        isTerrainEnabled: Bool = false
     ) {
         self.referenceStyle = referenceStyle
         self.styleVariant = styleVariant
@@ -32,5 +34,6 @@ internal struct MTManifestMetadata: Codable, Sendable {
         self.minZoom = minZoom
         self.maxZoom = maxZoom
         self.pixelRatio = pixelRatio
+        self.isTerrainEnabled = isTerrainEnabled
     }
 }

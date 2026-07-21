@@ -112,7 +112,7 @@ struct MTStyleProcessorTests {
         
         #expect(sources?["jpg-source"]?["tiles"] as? [String] == ["\(baseURL)/offline/\(packName)/tiles/jpg-source/{z}/{x}/{y}.jpg"])
         #expect(sources?["webp-source"]?["tiles"] as? [String] == ["\(baseURL)/offline/\(packName)/tiles/webp-source/{z}/{x}/{y}.webp"])
-        #expect(sources?["dem-source"]?["tiles"] as? [String] == ["\(baseURL)/offline/\(packName)/tiles/dem-source/{z}/{x}/{y}.png"])
+        #expect(sources?["dem-source"]?["tiles"] as? [String] == ["\(baseURL)/offline/\(packName)/tiles/dem-source/{z}/{x}/{y}.webp"])
     }
 
     @Test("Transform style with mixed multiple sprites")
@@ -264,5 +264,68 @@ struct MTStyleProcessorTests {
             .replacingOccurrences(of: "{range}", with: "0-255")
             
         #expect(resolvedLocalURL == "\(baseURL)/offline/\(packName)/glyphs/Noto Sans Regular/0-255.pbf")
+    }
+
+    @Test("Inject terrain when missing from style but enabled in manifest")
+    func testInjectTerrain() {
+        let transformer = MTStyleProcessor(baseURL: baseURL, packName: packName)
+        
+        let style: [String: Any] = [
+            "version": 8,
+            "sources": [
+                "maptiler": [
+                    "type": "vector",
+                    "url": "maptiler://tiles.json"
+                ]
+            ]
+        ]
+        
+        let transformed = transformer.transform(style: style, maxZoom: 14, isTerrainEnabled: true)
+        
+        // Verify terrain property
+        let terrain = transformed["terrain"] as? [String: Any]
+        #expect(terrain != nil)
+        #expect(terrain?["source"] as? String == "maptiler-terrain")
+        #expect(terrain?["exaggeration"] as? Double == 1.0)
+        
+        // Verify injected source
+        let sources = transformed["sources"] as? [String: [String: Any]]
+        let source = sources?["maptiler-terrain"]
+        #expect(source != nil)
+        #expect(source?["type"] as? String == "raster-dem")
+        #expect(source?["maxzoom"] as? Int == 14)
+        #expect(source?["tiles"] as? [String] == ["\(baseURL)/offline/\(packName)/tiles/maptiler-terrain/{z}/{x}/{y}.webp"])
+    }
+
+    @Test("Transform existing terrain source in style")
+    func testTransformExistingTerrain() {
+        let transformer = MTStyleProcessor(baseURL: baseURL, packName: packName)
+        
+        let style: [String: Any] = [
+            "version": 8,
+            "sources": [
+                "my-terrain": [
+                    "type": "raster-dem",
+                    "url": "https://api.maptiler.com/terrain.json"
+                ]
+            ],
+            "terrain": [
+                "source": "my-terrain",
+                "exaggeration": 1.5
+            ]
+        ]
+        
+        let transformed = transformer.transform(style: style, isTerrainEnabled: true)
+        
+        // Verify terrain property (should be preserved/updated)
+        let terrain = transformed["terrain"] as? [String: Any]
+        #expect(terrain != nil)
+        #expect(terrain?["source"] as? String == "my-terrain")
+        
+        // Verify source transformation
+        let sources = transformed["sources"] as? [String: [String: Any]]
+        let source = sources?["my-terrain"]
+        #expect(source != nil)
+        #expect(source?["tiles"] as? [String] == ["\(baseURL)/offline/\(packName)/tiles/my-terrain/{z}/{x}/{y}.webp"])
     }
 }

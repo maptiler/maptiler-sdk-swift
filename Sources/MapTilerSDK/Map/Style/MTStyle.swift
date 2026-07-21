@@ -230,7 +230,15 @@ extension MTStyle {
 
     /// Returns a boolean indicating whether a source is already added to the map.
     public func sourceExists(_ source: MTSource) -> Bool {
-        return mapSources[source.identifier] != nil
+        return sourceExists(withId: source.identifier)
+    }
+
+    /// Returns a boolean indicating whether a source with the provided ID is already added to the map.
+    public func sourceExists(withId id: String) -> Bool {
+        if let weakSource = mapSources[id] {
+            return weakSource.source != nil
+        }
+        return false
     }
 }
 
@@ -246,7 +254,7 @@ extension MTStyle {
         // Background layers have no source; add them directly.
         if layer.type == .background {
             mapView.addLayer(layer, completionHandler: completionHandler)
-        } else if mapSources[layer.sourceIdentifier] != nil {
+        } else if sourceExists(withId: layer.sourceIdentifier) {
             mapView.isSourceLoaded(id: layer.sourceIdentifier) { [weak self] result in
                 guard let self else {
                     completionHandler?(.failure(MTError.bridgeNotLoaded))
@@ -330,7 +338,15 @@ extension MTStyle {
 
     /// Returns a boolean indicating whether a layer is already added to the map.
     public func layerExists(_ layer: MTLayer) -> Bool {
-        return mapLayers[layer.identifier] != nil
+        return layerExists(withId: layer.identifier)
+    }
+
+    /// Returns a boolean indicating whether a layer with the provided ID is already added to the map.
+    public func layerExists(withId id: String) -> Bool {
+        if let weakLayer = mapLayers[id] {
+            return weakLayer.layer != nil
+        }
+        return false
     }
 }
 
@@ -478,7 +494,7 @@ extension MTStyle {
     /// - Throws: A ``MTStyleError.sourceAlreadyExists`` if source with the same
     /// id is already added to the map.
     public func addSource(_ source: MTSource) async throws {
-        guard mapSources[source.identifier] == nil else {
+        if let weakSource = mapSources[source.identifier], weakSource.source != nil {
             throw MTStyleError.sourceAlreadyExists
         }
 
@@ -486,12 +502,7 @@ extension MTStyle {
             addSource(source) { result in
                 switch result {
                 case .success:
-                    switch result {
-                case .success(let res):
-                    continuation.resume(returning: res)
-                case .failure(let err):
-                    continuation.resume(throwing: err)
-                }
+                    continuation.resume()
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }

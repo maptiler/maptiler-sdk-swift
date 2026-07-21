@@ -171,12 +171,18 @@ internal final class MTOfflineHTTPServer: @unchecked Sendable {
         let packID = url.deletingLastPathComponent().lastPathComponent
 
         var downloadedMaxZoom: Int?
+        var isTerrainEnabled = false
         if let manifest = try? MTOfflineStorage.loadManifest(for: packID) {
             downloadedMaxZoom = manifest.metadata.maxZoom
+            isTerrainEnabled = manifest.metadata.isTerrainEnabled
         }
 
         let processor = MTStyleProcessor(baseURL: self.baseURLString(), packName: packID)
-        let transformed = processor.transform(style: jsonObject, maxZoom: downloadedMaxZoom)
+        let transformed = processor.transform(
+            style: jsonObject,
+            maxZoom: downloadedMaxZoom,
+            isTerrainEnabled: isTerrainEnabled
+        )
 
         if let transformedData = try? JSONSerialization.data(withJSONObject: transformed, options: []) {
             sendResponse(

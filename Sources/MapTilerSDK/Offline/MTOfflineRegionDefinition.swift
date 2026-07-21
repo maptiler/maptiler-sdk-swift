@@ -47,6 +47,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
     /// If not explicitly provided, a default heuristic buffer (~2000m) may be applied 
     /// for flexible geometries (routes and polygons).
     public let padding: Double?
+    /// Boolean indicating whether 3D terrain is enabled for this offline region.
+    public let isTerrainEnabled: Bool
 
     /// The bounding box of the region.
     public var bbox: MTBoundingBox {
@@ -61,7 +63,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         styleVariant: MTMapStyleVariant? = nil,
         pixelRatio: Float = 1.0,
         maxTileCount: Int? = nil,
-        padding: Double? = nil
+        padding: Double? = nil,
+        isTerrainEnabled: Bool = false
     ) {
         self.geometry = geometry
         self.minZoom = minZoom
@@ -71,6 +74,7 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         self.pixelRatio = pixelRatio
         self.maxTileCount = maxTileCount
         self.padding = padding
+        self.isTerrainEnabled = isTerrainEnabled
     }
 
     public init(
@@ -81,7 +85,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         styleVariant: MTMapStyleVariant? = nil,
         pixelRatio: Float = 1.0,
         maxTileCount: Int? = nil,
-        padding: Double? = nil
+        padding: Double? = nil,
+        isTerrainEnabled: Bool = false
     ) {
         self.init(
             geometry: .boundingBox(bbox),
@@ -91,7 +96,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
             styleVariant: styleVariant,
             pixelRatio: pixelRatio,
             maxTileCount: maxTileCount,
-            padding: padding
+            padding: padding,
+            isTerrainEnabled: isTerrainEnabled
         )
     }
 
@@ -105,6 +111,7 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         case pixelRatio
         case maxTileCount
         case padding
+        case isTerrainEnabled
     }
 
     public init(from decoder: Decoder) throws {
@@ -129,6 +136,7 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         self.pixelRatio = try container.decode(Float.self, forKey: .pixelRatio)
         self.maxTileCount = try container.decodeIfPresent(Int.self, forKey: .maxTileCount)
         self.padding = try container.decodeIfPresent(Double.self, forKey: .padding)
+        self.isTerrainEnabled = try container.decodeIfPresent(Bool.self, forKey: .isTerrainEnabled) ?? false
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -142,5 +150,6 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         try container.encode(pixelRatio, forKey: .pixelRatio)
         try container.encodeIfPresent(maxTileCount, forKey: .maxTileCount)
         try container.encodeIfPresent(padding, forKey: .padding)
+        try container.encode(isTerrainEnabled, forKey: .isTerrainEnabled)
     }
 }

@@ -18,7 +18,13 @@ internal struct MTStyleProcessor {
     }
 
     /// Transforms the given style dictionary into an offline-ready version.
-    internal func transform(style: [String: Any], maxZoom: Int? = nil) -> [String: Any] {
+    internal func transform(
+        style: [String: Any],
+        maxZoom: Int? = nil,
+        isTerrainEnabled: Bool = false
+    ) -> [String: Any] {
+        let rasterId = "raster-dem"
+
         var transformed = style
 
         rewriteSprites(&transformed)
@@ -27,6 +33,39 @@ internal struct MTStyleProcessor {
         var purgedSourceIds = Set<String>()
         rewriteSources(&transformed, purgedSourceIds: &purgedSourceIds, maxZoom: maxZoom)
         rewriteLayers(&transformed, purgedSourceIds: purgedSourceIds)
+
+        if isTerrainEnabled {
+            var sources = transformed["sources"] as? [String: Any] ?? [:]
+
+            // Find the ID of the first raster-dem source
+            let rasterDemId = sources.first { _, value in
+                if let sourceObj = value as? [String: Any], let type = sourceObj["type"] as? String {
+                    return type == rasterId
+                }
+                return false
+            }?.key ?? "maptiler-terrain"
+
+            // Inject the source if it is missing (which happens if it wasn't in the original style.json)
+            if sources[rasterDemId] == nil {
+                let localURL = "\(baseURL)/offline/\(packName)/tiles/\(rasterDemId)/{z}/{x}/{y}.webp"
+                var sourceObj: [String: Any] = [
+                    "type": rasterId,
+                    "tiles": [localURL]
+                ]
+
+                if let mz = maxZoom {
+                    sourceObj["maxzoom"] = mz
+                }
+
+                sources[rasterDemId] = sourceObj
+                transformed["sources"] = sources
+            }
+
+            transformed["terrain"] = [
+                "source": rasterDemId,
+                "exaggeration": 1.0
+            ]
+        }
 
         return transformed
     }
@@ -132,9 +171,18 @@ internal struct MTStyleProcessor {
             if lower.contains("satellite") {
                 return "jpg" // MapTiler Satellite default format is JPG
             }
+
+            // Terrain is in webp format
+            if lower.contains("terrain") {
+                return "webp"
+            }
         }
 
-        // Default for raster/raster-dem
+        if type == "raster-dem" {
+            return "webp"
+        }
+
+        // Default for standard raster layers
         return "png"
     }
 }

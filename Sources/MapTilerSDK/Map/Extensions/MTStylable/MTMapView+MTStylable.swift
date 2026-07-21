@@ -359,7 +359,48 @@ extension MTMapView: MTStylable {
         exaggerationFactor: Double = 1.0,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        runCommand(EnableTerrain(exaggerationFactor: exaggerationFactor), completion: completionHandler)
+        let terrainId = "maptiler-terrain"
+
+        // If we are offline, the JS SDK's enableTerrain() will try to fetch from api.maptiler.com, which fails.
+        // Instead, we manually inject the local source if it's missing.
+        var isOffline = false
+        var packID: String?
+
+        if let currentStyle = style?.referenceStyle,
+            case .custom(let url) = currentStyle,
+            url.path.contains("/offline/") {
+            isOffline = true
+
+            // Extract packID from the URL path: /offline/{packID}/style.json
+            let pathComponents = url.pathComponents
+            if let offlineIndex = pathComponents.firstIndex(of: "offline"), offlineIndex + 1 < pathComponents.count {
+                packID = pathComponents[offlineIndex + 1]
+            }
+        }
+
+        if isOffline, let pid = packID {
+            let server = MTOfflineHTTPServer.shared
+            let baseURL = server.baseURLString()
+            let cleanBaseURL = baseURL.hasSuffix("/") ? String(baseURL.dropLast()) : baseURL
+
+            let tilesPath = "/offline/\(pid)/tiles/\(terrainId)/{z}/{x}/{y}.webp"
+            let localURL = URL(string: "\(cleanBaseURL)\(tilesPath)")!
+            let terrainSource = MTRasterDEMSource(identifier: terrainId, tiles: [localURL])
+
+            Task {
+                if !(self.style?.sourceExists(withId: terrainId) ?? false) {
+                    try? await self.style?.addSource(terrainSource)
+                }
+
+                self.runCommand(
+                    SetTerrain(sourceId: terrainId, exaggeration: exaggerationFactor),
+                    completion: completionHandler
+                )
+            }
+        } else {
+            runCommand(EnableTerrain(exaggerationFactor: exaggerationFactor), completion: completionHandler)
+        }
+
         options?.setTerrainIsEnabled(true)
         options?.setTerrainExaggeration(exaggerationFactor)
     }
@@ -369,7 +410,19 @@ extension MTMapView: MTStylable {
     ///    - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func disableTerrain(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        runCommand(DisableTerrain(), completion: completionHandler)
+        var isOffline = false
+        if let currentStyle = style?.referenceStyle,
+            case .custom(let url) = currentStyle,
+            url.path.contains("/offline/") {
+            isOffline = true
+        }
+
+        if isOffline {
+            runCommand(SetTerrain(sourceId: "maptiler-terrain", exaggeration: 0), completion: completionHandler)
+        } else {
+            runCommand(DisableTerrain(), completion: completionHandler)
+        }
+
         options?.setTerrainIsEnabled(false)
     }
 

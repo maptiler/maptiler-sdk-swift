@@ -60,25 +60,11 @@ internal class MTLocalPlanner: MTOfflinePlanner {
             bbox: manifestBbox,
             minZoom: definition.minZoom,
             maxZoom: definition.maxZoom,
-            pixelRatio: definition.pixelRatio
+            pixelRatio: definition.pixelRatio,
+            isTerrainEnabled: definition.isTerrainEnabled
         )
 
-        let resolvedStyle: (resource: MTMapResource, dependencies: MTStyleDependencies)?
-        if case .custom(let customURL) = definition.referenceStyle {
-            // For custom styles we still just use the URL
-            resolvedStyle = try await resolveStyle(url: customURL)
-        } else {
-            guard let key = await MTConfig.shared.getAPIKey() else {
-                throw MTOfflinePackError.unauthorized
-            }
-            guard let styleURL = definition.referenceStyle.fetchStyleURL(
-                variant: definition.styleVariant,
-                apiKey: key
-            ) else {
-                throw MTOfflinePackError.invalidZoomRange // Generic mapId failure fallback
-            }
-            resolvedStyle = try await resolveStyle(url: styleURL)
-        }
+        let resolvedStyle = try await resolveStyleAndDependencies(for: definition)
 
         let tileResources = try await generateTileResources(
             geometry: definition.geometry,
@@ -118,6 +104,52 @@ internal class MTLocalPlanner: MTOfflinePlanner {
         }
 
         return manifest
+    }
+
+    // Resolves the style URL and its dependencies, injecting terrain sources if necessary.
+    private func resolveStyleAndDependencies(
+        for definition: MTOfflineRegionDefinition
+    ) async throws -> (resource: MTMapResource, dependencies: MTStyleDependencies)? {
+        var resolvedStyle: (resource: MTMapResource, dependencies: MTStyleDependencies)?
+        if case .custom(let customURL) = definition.referenceStyle {
+            // For custom styles we still just use the URL
+            resolvedStyle = try await resolveStyle(url: customURL)
+        } else {
+            guard let key = await MTConfig.shared.getAPIKey() else {
+                throw MTOfflinePackError.unauthorized
+            }
+            guard let styleURL = definition.referenceStyle.fetchStyleURL(
+                variant: definition.styleVariant,
+                apiKey: key
+            ) else {
+                throw MTOfflinePackError.invalidZoomRange // Generic mapId failure fallback
+            }
+            resolvedStyle = try await resolveStyle(url: styleURL)
+        }
+
+        if definition.isTerrainEnabled, let currentDependencies = resolvedStyle?.dependencies {
+            if !currentDependencies.sources.contains(where: { $0.type == "raster-dem" }) {
+                let apiKey = await MTConfig.shared.getAPIKey() ?? ""
+                let terrainSource = MTStyleSource(
+                    id: "maptiler-terrain",
+                    type: "raster-dem",
+                    url: "https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=\(apiKey)"
+                )
+
+                var newSources = currentDependencies.sources
+                newSources.append(terrainSource)
+
+                let updatedDependencies = MTStyleDependencies(
+                    sprites: currentDependencies.sprites,
+                    glyphsTemplate: currentDependencies.glyphsTemplate,
+                    sources: newSources,
+                    fontStacks: currentDependencies.fontStacks
+                )
+                resolvedStyle?.dependencies = updatedDependencies
+            }
+        }
+
+        return resolvedStyle
     }
 
     // Validates the initial parameters to fail fast if they are malformed or invalid.

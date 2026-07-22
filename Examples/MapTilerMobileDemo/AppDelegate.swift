@@ -47,6 +47,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Task {
             await MTConfig.shared.setAPIKey(mapTilerAPIKey)
             await MTConfig.shared.setLogLevel(.debug(verbose: true))
+
+            await MTConfig.shared.setApplicationIdentifier("com.maptilerdemo.app")
         }
 
         return true

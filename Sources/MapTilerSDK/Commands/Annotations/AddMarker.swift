@@ -7,7 +7,10 @@
 //  MapTilerSDK
 //
 
+import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 package struct AddMarker: MTCommand {
     var marker: MTMarker
@@ -41,10 +44,12 @@ package struct AddMarker: MTCommand {
 
                 // Bridge popup open/close events to Swift for marker-attached popup
                 window.postPopupEvent_\(popup.identifier) = (eventName) => {
-                    window.webkit.messageHandlers.mapHandler.postMessage({
-                        event: eventName,
-                        data: { id: '\(popup.identifier)' }
-                    });
+                    window.webkit.messageHandlers.mapHandler.postMessage(
+                        JSON.stringify({
+                            event: eventName,
+                            data: { id: '\(popup.identifier)' }
+                        })
+                    );
                 };
 
                 window.\(popup.identifier).on('open', () => window.postPopupEvent_\(popup.identifier)('open'));
@@ -101,25 +106,40 @@ package func markerDragEventHandlers(for marker: MTMarker) -> String {
             };
 
             if (eventName === 'dragstart') {
-                window.webkit.messageHandlers.mapHandler.postMessage({
-                    event: 'dragstart',
-                    data: data
-                });
+                window.webkit.messageHandlers.mapHandler.postMessage(
+                    JSON.stringify({
+                        event: 'dragstart',
+                        data: data
+                    })
+                );
             } else if (eventName === 'dragend') {
-                window.webkit.messageHandlers.mapHandler.postMessage({
-                    event: 'dragend',
-                    data: data
-                });
+                window.webkit.messageHandlers.mapHandler.postMessage(
+                    JSON.stringify({
+                        event: 'dragend',
+                        data: data
+                    })
+                );
             } else {
-                window.webkit.messageHandlers.mapHandler.postMessage({
-                    event: eventName,
-                    data: data
-                });
+                window.webkit.messageHandlers.mapHandler.postMessage(
+                    JSON.stringify({
+                        event: eventName,
+                        data: data
+                    })
+                );
             }
         };
 
         window.\(marker.identifier).on('drag', () => window.postDragEvent_\(marker.identifier)('drag'));
         window.\(marker.identifier).on('dragstart', () => window.postDragEvent_\(marker.identifier)('dragstart'));
         window.\(marker.identifier).on('dragend', () => window.postDragEvent_\(marker.identifier)('dragend'));
+
+        window.\(marker.identifier).getElement().addEventListener('click', () => {
+            window.webkit.messageHandlers.mapHandler.postMessage(
+                JSON.stringify({
+                    event: 'marker.click',
+                    data: { id: '\(marker.identifier)' }
+                })
+            );
+        });
     """
 }

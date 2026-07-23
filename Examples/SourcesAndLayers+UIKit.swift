@@ -66,6 +66,19 @@ extension SourcesAndLayersMapViewController: MTMapViewDelegate {
     func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
         if event == .sourceDidUpdate {
             print("Source Updated")
+        } else if event == .didTap, let point = data?.point {
+            Task {
+                do {
+                    let pointToQuery = CGPoint(x: point.x, y: point.y)
+                    let featuresJson = try await mapView.queryRenderedFeatures(
+                        at: pointToQuery,
+                        layers: ["contoursLayer"]
+                    )
+                    print("Tapped features on contoursLayer: \(featuresJson ?? "none")")
+                } catch {
+                    print("Error querying features: \(error)")
+                }
+            }
         }
     }
 }

@@ -248,6 +248,7 @@ extension MTMapView: MTStylable {
     ///    - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addMarker(_ marker: MTMarker, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        style?.registerMarker(marker)
         runCommand(AddMarker(marker: marker), completion: completionHandler)
     }
 
@@ -264,6 +265,7 @@ extension MTMapView: MTStylable {
         withSingleIcon: UIImage?,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
+        markers.forEach { style?.registerMarker($0) }
         runCommand(AddMarkers(markers: markers, withSingleIcon: withSingleIcon), completion: completionHandler)
     }
 
@@ -273,6 +275,7 @@ extension MTMapView: MTStylable {
     ///    - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func removeMarker(_ marker: MTMarker, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        style?.unregisterMarker(marker.identifier)
         runCommand(RemoveMarker(marker: marker), completion: completionHandler)
     }
 
@@ -284,6 +287,7 @@ extension MTMapView: MTStylable {
     ///    - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func removeMarkers(_ markers: [MTMarker], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
+        markers.forEach { style?.unregisterMarker($0.identifier) }
         runCommand(RemoveMarkers(markers: markers), completion: completionHandler)
     }
 

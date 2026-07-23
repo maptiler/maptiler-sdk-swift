@@ -67,6 +67,15 @@ struct MTMarkerTests {
         #expect(jsString.contains("event: 'dragend'"))
     }
 
+    @Test func addMarkerCommand_registersClickEvent() async throws {
+        let marker = MTMarker(coordinates: coordinate)
+        let jsString = AddMarker(marker: marker).toJS()
+
+        #expect(jsString.contains("\(marker.identifier).getElement().addEventListener('click'"))
+        #expect(jsString.contains("event: 'marker.click'"))
+        #expect(jsString.contains("id: '\(marker.identifier)'"))
+    }
+
     @Test func addMarkersCommand_includesAnchorAndOffsetForSharedIcon() async throws {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 2, height: 2))
         let image = renderer.image { context in

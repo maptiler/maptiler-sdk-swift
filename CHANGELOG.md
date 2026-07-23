@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.1.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.1.0)
+Released on 2026-07-23.
+### Added
+- Option to set application identifier.
+- Feature querying.
+
 ## [2.0.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.0.0)
 Released on 2026-06-05.
 ### Added

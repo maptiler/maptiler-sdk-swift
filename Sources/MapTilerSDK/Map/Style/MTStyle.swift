@@ -30,6 +30,7 @@ public class MTStyle {
     internal unowned var mapView: MTMapView!
     private var mapSources: [String: MTWeakSource] = [:]
     private var mapLayers: [String: MTWeakLayer] = [:]
+    private var mapMarkers: [String: MTMarker] = [:]
 
     var queue: [StyleTask] = []
 
@@ -48,6 +49,18 @@ public class MTStyle {
     package func processLayersQueueIfNeeded() {
         queue.forEach { $0.execute() }
         queue.removeAll()
+    }
+
+    internal func registerMarker(_ marker: MTMarker) {
+        mapMarkers[marker.identifier] = marker
+    }
+
+    internal func unregisterMarker(_ identifier: String) {
+        mapMarkers.removeValue(forKey: identifier)
+    }
+
+    internal func findMarker(identifier: String) -> MTMarker? {
+        return mapMarkers[identifier]
     }
 
     /// Updates the map's style object with a new value.

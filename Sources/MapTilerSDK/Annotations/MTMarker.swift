@@ -7,7 +7,9 @@
 //  MapTilerSDK
 //
 
+#if canImport(UIKit)
 import UIKit
+#endif
 import CoreLocation
 
 /// Annotation element that can be added to the map.
@@ -59,6 +61,9 @@ public class MTMarker: MTAnnotation, MTMapViewContent, @unchecked Sendable {
 
     /// Optional attached custom annotation.
     weak public private(set) var annotationView: MTCustomAnnotationView?
+
+    /// Callback triggered when the marker is clicked.
+    public var onTap: ((MTMarker) -> Void)?
 
     private var tapThreshold: Double = 30.0
 
@@ -725,20 +730,15 @@ extension MTMarker: MTMapViewContentDelegate {
 
             self.coordinates = coordinates
             annotationView?.setCoordinates(self.coordinates, in: mapView)
-        } else if event == .didTap {
-            if let tapCoordinate = data?.coordinate {
-                Task {
-                    let tapPoint = await mapView.project(coordinates: tapCoordinate)
-                    let markerPoint = await mapView.project(coordinates: self.coordinates)
+        } else if event == .markerDidTap {
+            guard data?.id == identifier else {
+                return
+            }
 
-                    let dx = tapPoint.x - markerPoint.x
-                    let dy = tapPoint.y - markerPoint.y
-                    let distance = sqrt(dx * dx + dy * dy)
+            onTap?(self)
 
-                    if distance < tapThreshold {
-                        await annotationView?.addTo(mapView)
-                    }
-                }
+            Task {
+                await annotationView?.addTo(mapView)
             }
         }
     }

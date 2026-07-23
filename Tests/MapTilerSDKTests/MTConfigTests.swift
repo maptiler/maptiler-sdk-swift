@@ -26,4 +26,36 @@ struct MTConfigTests {
         let expectedJS = "\(MTBridge.sdkObject).clearPrewarmedResources();"
         #expect(ClearPrewarmedResources().toJS() == expectedJS)
     }
+
+    @Test func defaultUserAgent() async throws {
+        // Reset state for test isolation
+        await MTConfig.shared.setApplicationIdentifier("")
+        
+        let ua = MTConfig.customUserAgent
+        #expect(ua == "MapTiler-Mobile-SDK-iOS/\(MTConfig.version)")
+    }
+
+    @Test func customUserAgent() async throws {
+        let appId = "com.example.app"
+        await MTConfig.shared.setApplicationIdentifier(appId)
+        
+        let ua = MTConfig.customUserAgent
+        #expect(ua == "\(appId) MapTiler-Mobile-SDK-iOS/\(MTConfig.version)")
+        
+        // Reset state
+        await MTConfig.shared.setApplicationIdentifier("")
+    }
+
+    @Test func customUserAgentSanitization() async throws {
+        // Test strict allowlist: alphanumeric, period, hyphen, underscore
+        // Everything else (spaces, emojis, slashes, control chars) should be stripped
+        let maliciousId = "com.example.app\r\nInject: Header\tX🔥 /\\;*"
+        await MTConfig.shared.setApplicationIdentifier(maliciousId)
+        
+        let ua = MTConfig.customUserAgent
+        #expect(ua == "com.example.appInjectHeaderX MapTiler-Mobile-SDK-iOS/\(MTConfig.version)")
+        
+        // Reset state
+        await MTConfig.shared.setApplicationIdentifier("")
+    }
 }

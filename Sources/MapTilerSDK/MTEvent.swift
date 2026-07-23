@@ -55,6 +55,9 @@ public enum MTEvent: String {
     /// Triggered when a "drag to pan" interaction starts.
     case dragDidStart = "dragstart"
 
+    /// Triggered when a marker is clicked.
+    case markerDidTap = "marker.click"
+
     /// Triggered after the last frame rendered before the map enters an "idle" state.
     ///
     /// Idle state means that no camera transitions are in progress, all currently requested tiles have loaded,

@@ -54,12 +54,13 @@ package struct AddTextPopup: MTCommand {
 
             // Bridge popup open/close events to Swift
             window.postPopupEvent_\(popup.identifier) = (eventName) => {
-                window.webkit.messageHandlers.mapHandler.postMessage({
-                    event: eventName,
-                    data: { id: '\(popup.identifier)' }
-                });
+                window.webkit.messageHandlers.mapHandler.postMessage(
+                    JSON.stringify({
+                        event: eventName,
+                        data: { id: '\(popup.identifier)' }
+                    })
+                );
             };
-
             window.\(popup.identifier).on('open', () => window.postPopupEvent_\(popup.identifier)('open'));
             window.\(popup.identifier).on('close', () => window.postPopupEvent_\(popup.identifier)('close'));
             """

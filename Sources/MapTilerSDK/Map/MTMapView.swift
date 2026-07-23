@@ -332,6 +332,30 @@ open class MTMapView: UIView, Sendable {
         )
     }
 
+    /// Returns an array of GeoJSON Feature objects representing visible features at a given point.
+    ///
+    /// - Parameters:
+    ///   - point: The point at which to query for features.
+    ///   - layers: Optional list of layer IDs to filter the query.
+    ///   - filter: Optional filter to apply to the query (MapLibre filter expression as JSON string).
+    /// - Returns: A JSON string representing the array of features.
+    public func queryRenderedFeatures(
+        at point: CGPoint,
+        layers: [String]? = nil,
+        filter: String? = nil
+    ) async throws -> String? {
+        let returnTypeValue = try await webViewExecutor.execute(
+            QueryRenderedFeatures(point: point, layers: layers, filter: filter)
+        )
+
+        switch returnTypeValue {
+        case .string(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+
     package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {
@@ -406,6 +430,14 @@ open class MTMapView: UIView, Sendable {
 extension MTMapView: EventProcessorDelegate {
     package func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent, with data: MTData?) {
         MTLogger.log("MTEvent triggered: \(event)", type: .event)
+
+        if event == .markerDidTap, let id = data?.id {
+            let foundMarker = style?.findMarker(identifier: id)
+            MTLogger.log("Marker click received for ID: \(id), foundMarker exists: \(foundMarker != nil)", type: .info)
+            if let marker = foundMarker {
+                marker.onTap?(marker)
+            }
+        }
 
         delegate?.mapView(self, didTriggerEvent: event, with: data)
 

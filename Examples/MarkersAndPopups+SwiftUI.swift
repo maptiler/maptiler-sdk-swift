@@ -36,6 +36,9 @@ struct MarkersAndPopupsMapView: View {
             .styleVariant(styleVariant)
             .didInitialize {
                 let marker = MTMarker(coordinates: brnoCoordinates)
+                marker.onTap = { _ in
+                    print("Marker tapped at Brno!")
+                }
 
                 Task {
                     await mapView.addMarker(marker)

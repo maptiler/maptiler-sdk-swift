@@ -22,15 +22,28 @@ public actor MTConfig {
     /// SDK version
     public static let version = "1.3.2"
 
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var _applicationIdentifier: String?
+
     // Custom User-Agent string for the SDK
-    internal static let customUserAgent = "MapTiler-Mobile-SDK-iOS/\(version)"
+    internal static var customUserAgent: String {
+        let baseUA = "MapTiler-Mobile-SDK-iOS/\(version)"
+        lock.lock()
+        let appId = _applicationIdentifier
+        lock.unlock()
+
+        if let appId, !appId.isEmpty {
+            return "\(appId) \(baseUA)"
+        }
+        return baseUA
+    }
 
     // A configured URLSession that includes the SDK's User-Agent
-    internal static let sharedURLSession: URLSession = {
+    internal static var sharedURLSession: URLSession {
         let configuration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = ["User-Agent": customUserAgent]
         return URLSession(configuration: configuration)
-    }()
+    }
 
     /// SDK log level.
     public private(set) var logLevel: MTLogLevel = .none
@@ -91,6 +104,26 @@ public actor MTConfig {
         }
 
         return apiKey
+    }
+
+    /// Sets a custom application identifier to be prepended to the SDK's User-Agent string.
+    /// This allows you to restrict your MapTiler API key to specific applications.
+    ///
+    /// Must be called before `MTMapView` is initialized and before offline downloads are started.
+    /// - Parameter identifier: The application identifier (e.g., your bundle identifier).
+    ///   Only alphanumeric characters, periods, hyphens, and underscores are allowed.
+    ///   All other characters will be removed.
+    public func setApplicationIdentifier(_ identifier: String) {
+        // Strict sanitization: Only allow alphanumeric, period, hyphen, and underscore.
+        // This prevents HTTP Header Injection (CRLF) and malformed User-Agent strings.
+        let allowedCharset = CharacterSet(
+            charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._"
+        )
+        let sanitized = String(identifier.unicodeScalars.filter { allowedCharset.contains($0) })
+
+        Self.lock.lock()
+        Self._applicationIdentifier = sanitized
+        Self.lock.unlock()
     }
 
     // Sets the MapTiler session ID.

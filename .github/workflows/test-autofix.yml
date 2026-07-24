@@ -23,13 +23,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set Up Swift
+      - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
         with:
-          xcode-version: '16.2'
-
+          xcode-version: '26.6'
       - name: Select Xcode
-        run: sudo xcode-select --switch /Applications/Xcode_16.2.app
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
 
       - name: Verify Swift Version
         run: swift --version
@@ -102,13 +101,12 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-      - name: Set Up Swift
+      - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@592f3a0ea6269bc3452fd67ae771c3174f6d01cf
         with:
-          xcode-version: '16.2'
-
+          xcode-version: '26.6'
       - name: Select Xcode
-        run: sudo xcode-select --switch /Applications/Xcode_16.2.app
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
 
       - name: Verify Swift Version
         run: swift --version

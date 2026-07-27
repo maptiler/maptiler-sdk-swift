@@ -633,6 +633,34 @@ extension MTMapView: MTNavigable {
         runCommandWithPointReturnValue(PointAdd(point1: point1, point2: point2), completion: completionHandler)
     }
 
+    /// Divide this point's x and y coordinates by a scaling factor, yielding a new point.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - k: The scaling factor.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointDiv(
+        point: MTPoint,
+        k: Double,
+        completionHandler: @escaping (Result<MTPoint, MTError>) -> Void
+    ) {
+        runCommandWithPointReturnValue(PointDiv(point: point, k: k), completion: completionHandler)
+    }
+
+    /// Divide this point's x and y coordinates by another point's x and y coordinates, yielding a new point.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The point to divide the first point by.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointDivByPoint(
+        point1: MTPoint,
+        point2: MTPoint,
+        completionHandler: @escaping (Result<MTPoint, MTError>) -> Void
+    ) {
+        runCommandWithPointReturnValue(PointDivByPoint(point1: point1, point2: point2), completion: completionHandler)
+    }
+
     /// Calculate distance between this point and another point.
     /// - Parameters:
     ///   - point1: The first point.
@@ -1396,6 +1424,40 @@ extension MTMapView {
     public func pointAdd(point1: MTPoint, point2: MTPoint) async -> MTPoint {
         await withCheckedContinuation { continuation in
             pointAdd(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Divide this point's x and y coordinates by a scaling factor, yielding a new point.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - k: The scaling factor.
+    public func pointDiv(point: MTPoint, k: Double) async -> MTPoint {
+        await withCheckedContinuation { continuation in
+            pointDiv(point: point, k: k) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Divide this point's x and y coordinates by another point's x and y coordinates, yielding a new point.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The point to divide the first point by.
+    public func pointDivByPoint(point1: MTPoint, point2: MTPoint) async -> MTPoint {
+        await withCheckedContinuation { continuation in
+            pointDivByPoint(point1: point1, point2: point2) { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

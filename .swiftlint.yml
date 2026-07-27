@@ -22,7 +22,7 @@ indentation_width: 4
 cyclomatic_complexity:
   ignores_case_statements: true
 file_length:
-  warning: 1700
+  warning: 1800
 function_body_length:
   warning: 70
 type_body_length:

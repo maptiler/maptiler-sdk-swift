@@ -633,6 +633,34 @@ extension MTMapView: MTNavigable {
         runCommandWithPointReturnValue(PointAdd(point1: point1, point2: point2), completion: completionHandler)
     }
 
+    /// Calculate distance between this point and another point.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointDist(
+        point1: MTPoint,
+        point2: MTPoint,
+        completionHandler: @escaping (Result<Double, MTError>) -> Void
+    ) {
+        runCommandWithDoubleReturnValue(PointDist(point1: point1, point2: point2), completion: completionHandler)
+    }
+
+    /// Calculate squared distance between this point and another point.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointDistSqr(
+        point1: MTPoint,
+        point2: MTPoint,
+        completionHandler: @escaping (Result<Double, MTError>) -> Void
+    ) {
+        runCommandWithDoubleReturnValue(PointDistSqr(point1: point1, point2: point2), completion: completionHandler)
+    }
+
     /// Get the angle from the 0, 0 coordinate to this point, in radians.
     /// - Parameters:
     ///   - point: The point.
@@ -1373,6 +1401,40 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Calculate distance between this point and another point.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point.
+    public func pointDist(point1: MTPoint, point2: MTPoint) async -> Double {
+        await withCheckedContinuation { continuation in
+            pointDist(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0)
+                }
+            }
+        }
+    }
+
+    /// Calculate squared distance between this point and another point.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point.
+    public func pointDistSqr(point1: MTPoint, point2: MTPoint) async -> Double {
+        await withCheckedContinuation { continuation in
+            pointDistSqr(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0)
                 }
             }
         }

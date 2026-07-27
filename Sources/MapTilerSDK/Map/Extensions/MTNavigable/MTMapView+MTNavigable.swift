@@ -633,6 +633,20 @@ extension MTMapView: MTNavigable {
         runCommandWithPointReturnValue(PointAdd(point1: point1, point2: point2), completion: completionHandler)
     }
 
+    /// Compare this point with another point, yielding a boolean indicating if they are equal.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point to compare with the first point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointEquals(
+        point1: MTPoint,
+        point2: MTPoint,
+        completionHandler: @escaping (Result<Bool, MTError>) -> Void
+    ) {
+        runCommandWithBoolReturnValue(PointEquals(point1: point1, point2: point2), completion: completionHandler)
+    }
+
     /// Divide this point's x and y coordinates by a scaling factor, yielding a new point.
     /// - Parameters:
     ///   - point: The point.
@@ -1429,6 +1443,23 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Compare this point with another point, yielding a boolean indicating if they are equal.
+    /// - Parameters:
+    ///   - point1: The first point.
+    ///   - point2: The second point to compare with the first point.
+    public func pointEquals(point1: MTPoint, point2: MTPoint) async -> Bool {
+        await withCheckedContinuation { continuation in
+            pointEquals(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
                 }
             }
         }

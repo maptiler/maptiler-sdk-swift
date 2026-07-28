@@ -9,6 +9,8 @@
 
 import CoreLocation
 
+// swiftlint:disable file_length
+
 extension MTMapView: MTNavigable {
     /// Sets the bearing of the map.
     ///
@@ -701,6 +703,18 @@ extension MTMapView: MTNavigable {
         completionHandler: @escaping (Result<Double, MTError>) -> Void
     ) {
         runCommandWithDoubleReturnValue(PointDistSqr(point1: point1, point2: point2), completion: completionHandler)
+    }
+
+    /// Calculate magnitude of this point vector.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointMag(
+        point: MTPoint,
+        completionHandler: @escaping (Result<Double, MTError>) -> Void
+    ) {
+        runCommandWithDoubleReturnValue(PointMag(point: point), completion: completionHandler)
     }
 
     /// Get the angle from the 0, 0 coordinate to this point, in radians.
@@ -1523,6 +1537,22 @@ extension MTMapView {
     public func pointDistSqr(point1: MTPoint, point2: MTPoint) async -> Double {
         await withCheckedContinuation { continuation in
             pointDistSqr(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0)
+                }
+            }
+        }
+    }
+
+    /// Calculate magnitude of this point vector.
+    /// - Parameter point: The point.
+    /// - Returns: The magnitude of the point.
+    public func pointMag(point: MTPoint) async -> Double {
+        await withCheckedContinuation { continuation in
+            pointMag(point: point) { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

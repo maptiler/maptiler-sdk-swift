@@ -69,6 +69,7 @@ package final class WebViewManager: NSObject {
 
         controller.add(self, name: Constants.Error.handler)
         controller.add(self, name: Constants.Map.handler)
+        controller.add(self, name: Constants.Module.handler)
 
         return controller
     }
@@ -106,6 +107,13 @@ extension WebViewManager {
 
         enum Map {
             static let handler = "mapHandler"
+            static let event = "event"
+            static let data = "data"
+        }
+
+        enum Module {
+            static let handler = "moduleHandler"
+            static let id = "moduleId"
             static let event = "event"
             static let data = "data"
         }

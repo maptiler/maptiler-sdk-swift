@@ -9,7 +9,7 @@
 import Foundation
 import CoreFoundation
 
-package enum MTBridgeReturnType: Sendable {
+public enum MTBridgeReturnType: Sendable {
     case string(String)
     case double(Double)
     case bool(Bool)
@@ -18,7 +18,7 @@ package enum MTBridgeReturnType: Sendable {
     case unsupportedType
     case null
 
-    init(from value: Any?) throws {
+    package init(from value: Any?) throws {
         guard let value = value else { self = .null; return }
 
         if let str = value as? String { self = .string(str); return }

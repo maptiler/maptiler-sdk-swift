@@ -7,4 +7,4 @@
 //  MapTilerSDK
 //
 
-package protocol MTValueCommand: MTCommand {}
+public protocol MTValueCommand: MTCommand {}

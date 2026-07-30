@@ -12,6 +12,12 @@ import Foundation
 @MainActor
 package protocol EventProcessorDelegate: AnyObject {
     func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent, with data: MTData?)
+    func eventProcessor(
+        _ processor: EventProcessor,
+        didTriggerModuleEvent event: String,
+        for moduleId: String,
+        with data: [String: Any]?
+    )
 }
 
 @MainActor
@@ -36,6 +42,10 @@ package class EventProcessor {
         }
 
         processEventIfNeeded(event, with: data)
+    }
+
+    func registerModuleEvent(_ event: String, for moduleId: String, with data: [String: Any]? = nil) {
+        delegate?.eventProcessor(self, didTriggerModuleEvent: event, for: moduleId, with: data)
     }
 
     private func processEventIfNeeded(_ event: MTEvent, with data: MTData? = nil) {

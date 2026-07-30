@@ -19,7 +19,22 @@ extension WebViewManager: WKScriptMessageHandler {
             handleError(with: message)
         } else if message.name == Constants.Map.handler {
             handleEvent(with: message)
+        } else if message.name == Constants.Module.handler {
+            handleModuleEvent(with: message)
         }
+    }
+
+    private func handleModuleEvent(with message: WKScriptMessage) {
+        guard let json = message.body as? String,
+            let data = json.data(using: .utf8),
+            let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let moduleId = dict[Constants.Module.id] as? String,
+            let event = dict[Constants.Module.event] as? String else {
+            return
+        }
+
+        let payload = dict[Constants.Module.data] as? [String: Any]
+        eventProcessor.registerModuleEvent(event, for: moduleId, with: payload)
     }
 
     private func handleError(with message: WKScriptMessage) {

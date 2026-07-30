@@ -7,9 +7,9 @@
 //  MapTilerSDK
 //
 
-package typealias JSString = String
+public typealias JSString = String
 
-package protocol MTCommand: Sendable {
+public protocol MTCommand: Sendable {
     func toJS() -> JSString
 }
 

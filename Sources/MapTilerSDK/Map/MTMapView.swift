@@ -73,6 +73,8 @@ open class MTMapView: UIView, Sendable {
 
     package var contentDelegates: [String: MTWeakContentDelegate] = [:]
 
+    private var modules: [String: MTMapModule] = [:]
+
     /// Boolean indicating whether map is initialized,
     public private(set) var isInitialized: Bool = false
 
@@ -464,6 +466,10 @@ extension MTMapView: EventProcessorDelegate {
                 }
             }
 
+            for module in modules.values {
+                module.onMapReady()
+            }
+
             delegate?.mapViewDidInitialize(self)
             didInitialize?()
         }
@@ -473,6 +479,15 @@ extension MTMapView: EventProcessorDelegate {
         }
 
         handleOptionsChange(event: event)
+    }
+
+    package func eventProcessor(
+        _ processor: EventProcessor,
+        didTriggerModuleEvent event: String,
+        for moduleId: String,
+        with data: [String: Any]?
+    ) {
+        modules[moduleId]?.onMessageReceived(event, with: data)
     }
 
     private func handleOptionsChange(event: MTEvent) {

@@ -9,6 +9,6 @@
 
 package struct EnableGlobeProjection: MTCommand {
     package func toJS() -> JSString {
-        return "\(MTBridge.mapObject).enableGlobeProjection();"
+        return "\(MTBridge.mapObject).setProjection('globe');"
     }
 }

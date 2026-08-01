@@ -445,7 +445,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.centerOnIpPoint { outcome in
@@ -469,7 +469,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .double(expectedElevation))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.getCameraTargetElevation { outcome in
@@ -492,7 +492,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.centerOnIpPoint()
 
@@ -505,7 +505,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .double(expectedElevation))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let elevation = await mapView.getCameraTargetElevation()
 
@@ -518,7 +518,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.zoomTo(10) { outcome in
@@ -541,7 +541,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.rotateTo(90) { outcome in
@@ -564,7 +564,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.zoomTo(10)
 
@@ -576,7 +576,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.rotateTo(90)
 
@@ -588,7 +588,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.stop { outcome in
@@ -611,7 +611,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.stop()
 
@@ -623,7 +623,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.isMoving { outcome in
@@ -646,7 +646,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await mapView.isMoving()
 
@@ -659,7 +659,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.isRotating { outcome in
@@ -682,7 +682,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await mapView.isRotating()
 
@@ -695,7 +695,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.isZooming { outcome in
@@ -718,7 +718,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await mapView.isZooming()
 
@@ -732,7 +732,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .stringDoubleDict(["left": 10, "top": 20, "right": 30, "bottom": 40]))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.getPadding { outcome in
@@ -756,7 +756,7 @@ struct MTNavigationTests {
         let executor = MockExecutor(result: .stringDoubleDict(["left": 10, "top": 20, "right": 30, "bottom": 40]))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let padding = try await mapView.getPadding()
 
@@ -770,7 +770,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.snapToNorth(animationOptions: nil) { outcome in
@@ -793,7 +793,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.snapToNorth(animationOptions: nil)
 
@@ -805,7 +805,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.resetNorth(animationOptions: nil) { outcome in
@@ -828,7 +828,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.resetNorth(animationOptions: nil)
 
@@ -840,7 +840,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.resetNorthPitch(animationOptions: nil) { outcome in
@@ -863,7 +863,7 @@ struct MTNavigationTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.resetNorthPitch(animationOptions: nil)
 

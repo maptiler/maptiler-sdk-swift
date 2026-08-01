@@ -20,7 +20,7 @@ class MainViewController: UIViewController {
         didSet {
             mapView.delegate = self
             mapView.options = MTMapOptions(
-                space: .enabled(true),
+                space: .config(MTSpace(preset: .milkywayColored)),
                 halo: .enabled(true)
             )
         }
@@ -67,6 +67,10 @@ class MainViewController: UIViewController {
     var aerowayLayer: MTFillLayer!
     var placeLayer: MTSymbolLayer!
     var satelliteLayer: MTRasterLayer!
+
+    private var openMapSource: MTVectorTileSource?
+    private var contoursSource: MTVectorTileSource?
+    private var satelliteSource: MTRasterTileSource?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -159,23 +163,29 @@ class MainViewController: UIViewController {
                 if let openMapURL = URL(
                     string: "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=\(mapTilerAPIKey)"
                 ) {
-                    let aerowaySource = MTVectorTileSource(identifier: "openmapsource", url: openMapURL)
-                    try await mapView.style?.addSource(aerowaySource)
+                    openMapSource = MTVectorTileSource(identifier: "openmapsource", url: openMapURL)
+                    if let openMapSource {
+                        try await mapView.style?.addSource(openMapSource)
+                    }
                 }
 
                 if let contoursURL = URL(
                     string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=\(mapTilerAPIKey)"
                 ) {
-                    let contoursSource = MTVectorTileSource(identifier: "contourssource", url: contoursURL)
-                    try await mapView.style?.addSource(contoursSource)
+                    contoursSource = MTVectorTileSource(identifier: "contourssource", url: contoursURL)
+                    if let contoursSource {
+                        try await mapView.style?.addSource(contoursSource)
+                    }
                 }
 
                 // Satellite raster source (TileJSON)
                 if let satelliteURL = URL(
                     string: "https://api.maptiler.com/tiles/satellite/tiles.json?key=\(mapTilerAPIKey)"
                 ) {
-                    let satelliteSource = MTRasterTileSource(identifier: "satellitesource", url: satelliteURL)
-                    try await mapView.style?.addSource(satelliteSource)
+                    satelliteSource = MTRasterTileSource(identifier: "satellitesource", url: satelliteURL)
+                    if let satelliteSource {
+                        try await mapView.style?.addSource(satelliteSource)
+                    }
                 }
             }
         }
@@ -301,7 +311,11 @@ extension MainViewController: LayerViewDelegate {
     private func updateLayer(_ layer: MTLayer, for state: Bool) {
         Task {
             if state {
-                try await mapView.style?.addLayer(layer)
+                do {
+                    try await mapView.style?.addLayer(layer)
+                } catch {
+                    print("addLayer failed with \(error)")
+                }
             } else {
                 try await mapView.style?.removeLayer(layer)
             }

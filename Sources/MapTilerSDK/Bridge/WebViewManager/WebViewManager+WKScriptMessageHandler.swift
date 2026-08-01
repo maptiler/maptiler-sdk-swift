@@ -34,7 +34,7 @@ extension WebViewManager: WKScriptMessageHandler {
         }
 
         let payload = dict[Constants.Module.data] as? [String: Any]
-        eventProcessor.registerModuleEvent(event, for: moduleId, with: payload)
+        eventProcessor?.registerModuleEvent(event, for: moduleId, with: payload)
     }
 
     private func handleError(with message: WKScriptMessage) {
@@ -63,11 +63,11 @@ extension WebViewManager: WKScriptMessageHandler {
                 let jsonData = try? JSONSerialization.data(withJSONObject: payload) {
                 let decoder = JSONDecoder()
                 if let eventData = try? decoder.decode(MTData.self, from: jsonData) {
-                    eventProcessor.registerEvent(MTEvent(rawValue: event), with: eventData)
+                    eventProcessor?.registerEvent(MTEvent(rawValue: event), with: eventData)
                     return
                 }
             }
-            eventProcessor.registerEvent(MTEvent(rawValue: event))
+            eventProcessor?.registerEvent(MTEvent(rawValue: event))
         }
     }
 }

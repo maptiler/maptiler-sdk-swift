@@ -9,6 +9,8 @@
 
 #if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
 #endif
 import CoreLocation
 
@@ -688,7 +690,8 @@ extension MTMarker {
     ///
     /// Prefer ``MTMapView/addMarker(_:)`` instead.
     public func addToMap(_ mapView: MTMapView) {
-        Task {
+        Task { [weak self] in
+            guard let self = self else { return }
             let marker = MTMarker(
                 coordinates: self.coordinates,
                 color: self.color,
@@ -737,8 +740,8 @@ extension MTMarker: MTMapViewContentDelegate {
 
             onTap?(self)
 
-            Task {
-                await annotationView?.addTo(mapView)
+            Task { [weak self] in
+                await self?.annotationView?.addTo(mapView)
             }
         }
     }

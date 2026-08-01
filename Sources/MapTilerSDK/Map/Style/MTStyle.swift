@@ -28,8 +28,8 @@ public class MTStyle {
     public private(set) var styleVariant: MTMapStyleVariant?
 
     internal unowned var mapView: MTMapView!
-    private var mapSources: [String: MTWeakSource] = [:]
-    private var mapLayers: [String: MTWeakLayer] = [:]
+    private var mapSources: [String: any MTSource] = [:]
+    private var mapLayers: [String: any MTLayer] = [:]
     private var mapMarkers: [String: MTMarker] = [:]
 
     var queue: [StyleTask] = []
@@ -41,8 +41,8 @@ public class MTStyle {
     ) {
         self.mapView = mapView
 
-        Task {
-            await setStyle(referenceStyle, styleVariant: styleVariant)
+        Task { [weak self] in
+            await self?.setStyle(referenceStyle, styleVariant: styleVariant)
         }
     }
 
@@ -201,7 +201,7 @@ public class MTStyle {
         setStyle(referenceStyle, styleVariant: styleVariant) { [weak self] result in
             // Re-apply space if configured in options.
             if let space = self?.mapView.options?.space {
-                Task { await self?.mapView.setSpace(space) }
+                Task { [weak self] in await self?.mapView.setSpace(space) }
             }
             completionHandler?(result)
         }
@@ -225,7 +225,7 @@ extension MTStyle {
     ///     - source: Source to be added.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addSource(_ source: MTSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        mapSources[source.identifier] = MTWeakSource(source: source)
+        mapSources[source.identifier] = source
 
         mapView.addSource(source, completionHandler: completionHandler)
     }
@@ -248,10 +248,7 @@ extension MTStyle {
 
     /// Returns a boolean indicating whether a source with the provided ID is already added to the map.
     public func sourceExists(withId id: String) -> Bool {
-        if let weakSource = mapSources[id] {
-            return weakSource.source != nil
-        }
-        return false
+        return mapSources[id] != nil
     }
 }
 
@@ -262,7 +259,7 @@ extension MTStyle {
     ///     - layer: Layer to be added.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addLayer(_ layer: MTLayer, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
+        mapLayers[layer.identifier] = layer
 
         // Background layers have no source; add them directly.
         if layer.type == .background {
@@ -303,7 +300,7 @@ extension MTStyle {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addLayers(_ layers: [MTLayer], completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         for layer in layers {
-            mapLayers[layer.identifier] = MTWeakLayer(layer: layer)
+            mapLayers[layer.identifier] = layer
         }
 
         mapView.addLayers(layers, completionHandler: completionHandler)
@@ -356,10 +353,7 @@ extension MTStyle {
 
     /// Returns a boolean indicating whether a layer with the provided ID is already added to the map.
     public func layerExists(withId id: String) -> Bool {
-        if let weakLayer = mapLayers[id] {
-            return weakLayer.layer != nil
-        }
-        return false
+        return mapLayers[id] != nil
     }
 }
 
@@ -507,7 +501,7 @@ extension MTStyle {
     /// - Throws: A ``MTStyleError.sourceAlreadyExists`` if source with the same
     /// id is already added to the map.
     public func addSource(_ source: MTSource) async throws {
-        if let weakSource = mapSources[source.identifier], weakSource.source != nil {
+        if mapSources[source.identifier] != nil {
             throw MTStyleError.sourceAlreadyExists
         }
 

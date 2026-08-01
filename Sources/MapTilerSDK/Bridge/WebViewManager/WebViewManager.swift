@@ -18,7 +18,7 @@ protocol WebViewManagerDelegate: AnyObject {
 @MainActor
 package final class WebViewManager: NSObject {
     private var webView: WKWebView?
-    package var eventProcessor: EventProcessor!
+    package var eventProcessor: EventProcessor?
 
     weak var delegate: WebViewManagerDelegate?
 
@@ -30,6 +30,18 @@ package final class WebViewManager: NSObject {
         initWebView(frame: frame)
 
         return webView
+    }
+
+    func cleanUp() {
+        if let controller = webView?.configuration.userContentController {
+            controller.removeAllScriptMessageHandlers()
+            controller.removeAllUserScripts()
+        }
+        webView?.navigationDelegate = nil
+        webView?.loadHTMLString("", baseURL: nil)
+        webView?.removeFromSuperview()
+        webView = nil
+        eventProcessor = nil
     }
 
     private func initWebView(frame: CGRect) {
@@ -67,9 +79,15 @@ package final class WebViewManager: NSObject {
         controller.addUserScript(getDisableCalloutsScript())
 
         let proxy = WeakScriptMessageHandlerProxy(self)
-        controller.add(proxy, name: Constants.Error.handler)
-        controller.add(proxy, name: Constants.Map.handler)
-        controller.add(proxy, name: Constants.Module.handler)
+        if #available(iOS 14.0, *) {
+            controller.add(proxy, contentWorld: .page, name: Constants.Error.handler)
+            controller.add(proxy, contentWorld: .page, name: Constants.Map.handler)
+            controller.add(proxy, contentWorld: .page, name: Constants.Module.handler)
+        } else {
+            controller.add(proxy, name: Constants.Error.handler)
+            controller.add(proxy, name: Constants.Map.handler)
+            controller.add(proxy, name: Constants.Module.handler)
+        }
 
         return controller
     }

@@ -530,7 +530,8 @@ extension MTTextPopup {
     ///
     /// Prefer ``MTMapView/addTextPopup(_:)`` instead.
     public func addToMap(_ mapView: MTMapView) {
-        Task {
+        Task { [weak self] in
+            guard let self = self else { return }
             let popup = MTTextPopup(
                 coordinates: self.coordinates,
                 text: self.text,

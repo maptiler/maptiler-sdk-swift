@@ -8,7 +8,6 @@
 //
 
 import WebKit
-import UIKit
 
 @MainActor
 protocol WebViewManagerDelegate: AnyObject {
@@ -67,9 +66,10 @@ package final class WebViewManager: NSObject {
 
         controller.addUserScript(getDisableCalloutsScript())
 
-        controller.add(self, name: Constants.Error.handler)
-        controller.add(self, name: Constants.Map.handler)
-        controller.add(self, name: Constants.Module.handler)
+        let proxy = WeakScriptMessageHandlerProxy(self)
+        controller.add(proxy, name: Constants.Error.handler)
+        controller.add(proxy, name: Constants.Map.handler)
+        controller.add(proxy, name: Constants.Module.handler)
 
         return controller
     }
@@ -86,6 +86,23 @@ package final class WebViewManager: NSObject {
         // swiftlint:enable line_length
 
         return WKUserScript(source: disableCalloutsScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+    }
+}
+
+// MARK: - WeakScriptMessageHandlerProxy
+@MainActor
+private final class WeakScriptMessageHandlerProxy: NSObject, WKScriptMessageHandler {
+    private weak var handler: WKScriptMessageHandler?
+
+    init(_ handler: WKScriptMessageHandler) {
+        self.handler = handler
+    }
+
+    func userContentController(
+        _ userContentController: WKUserContentController,
+        didReceive message: WKScriptMessage
+    ) {
+        handler?.userContentController(userContentController, didReceive: message)
     }
 }
 

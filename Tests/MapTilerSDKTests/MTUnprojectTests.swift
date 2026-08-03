@@ -24,7 +24,7 @@ struct MTUnprojectTests {
         let expectedLng = 20.0
         let executor = MockExecutor(result: .stringDoubleDict(["lat": expectedLat, "lng": expectedLng]))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
         
         let point = MTPoint(x: 100, y: 200)
 
@@ -51,7 +51,7 @@ struct MTUnprojectTests {
         let expectedLng = 40.0
         let executor = MockExecutor(result: .stringDoubleDict(["lat": expectedLat, "lng": expectedLng]))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
         
         let point = MTPoint(x: 300, y: 400)
 

@@ -404,29 +404,29 @@ extension MTMapView: MTNavigable {
     ///   - cameraHelper: Helper to use for setting the viewport.
     ///   - zoomLevel: Desired zoom level to set.
     public func setViewport(with cameraHelper: MTMapCameraHelper, zoomLevel: Double? = nil) {
-        Task {
+        Task { [weak self] in
             if let centerCoordinate = cameraHelper.centerCoordinate {
-                setCenter(centerCoordinate, completionHandler: nil)
+                self?.setCenter(centerCoordinate, completionHandler: nil)
             }
 
             if let bearing = cameraHelper.bearing {
-                setBearing(bearing, completionHandler: nil)
+                self?.setBearing(bearing, completionHandler: nil)
             }
 
             if let pitch = cameraHelper.pitch {
-                setPitch(pitch, completionHandler: nil)
+                self?.setPitch(pitch, completionHandler: nil)
             }
 
             if let roll = cameraHelper.roll {
-                setRoll(roll, completionHandler: nil)
+                self?.setRoll(roll, completionHandler: nil)
             }
 
             if let elevation = cameraHelper.elevation {
-                setCenterElevation(elevation, completionHandler: nil)
+                self?.setCenterElevation(elevation, completionHandler: nil)
             }
 
             if let zoomLevel {
-                setZoom(zoomLevel, completionHandler: nil)
+                self?.setZoom(zoomLevel, completionHandler: nil)
             }
         }
     }

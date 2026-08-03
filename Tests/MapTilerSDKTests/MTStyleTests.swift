@@ -111,7 +111,7 @@ struct MTStyleTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.loaded { outcome in
@@ -134,7 +134,7 @@ struct MTStyleTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let isLoaded = await mapView.loaded()
 
@@ -153,7 +153,7 @@ struct MTStyleTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.isStyleLoaded { outcome in
@@ -176,7 +176,7 @@ struct MTStyleTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let isLoaded = await mapView.isStyleLoaded()
 
@@ -194,7 +194,7 @@ struct MTStyleTests {
     @Test func isGlobeProjectionWrapper_shouldReturnBridgeValue() async throws {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.isGlobeProjection { outcome in
@@ -216,7 +216,7 @@ struct MTStyleTests {
     @Test func isGlobeProjectionAsyncWrapper_shouldReturnBridgeValue() async throws {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let isGlobe = await mapView.isGlobeProjection()
 
@@ -259,7 +259,7 @@ struct MTStyleTests {
     @Test func setSkyWrappers_shouldDispatchCommand() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let sky = MTSky(skyColor: .color(MTColor(hex: "#FF0000")))
         let options = MTStyleSetterOptions(shouldValidate: false)
@@ -292,7 +292,7 @@ struct MTStyleTests {
     @Test func setSkyAsyncWrapper_shouldDispatchCommand() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let sky = MTSky(skyColor: .color(MTColor(hex: "#00FF00")))
 
@@ -461,7 +461,7 @@ struct MTStyleTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.addImage(name: "wrapper-icon", image: image) { outcome in
@@ -488,7 +488,7 @@ struct MTStyleTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.addImage(name: "wrapper-icon-async", image: image)
 
@@ -518,7 +518,7 @@ struct MTStyleTests {
     @Test func addImageWrapper_shouldFailWithInvalidImage() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
         
         let result = await withCheckedContinuation { continuation in
             mapView.addImage(name: "invalid-icon", image: UIImage()) { outcome in
@@ -543,7 +543,7 @@ struct MTStyleTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.removeImage(name: "wrapper-icon") { outcome in
@@ -568,7 +568,7 @@ struct MTStyleTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.removeImage(name: "wrapper-icon-async")
 
@@ -583,7 +583,7 @@ struct MTStyleTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.updateImage(name: "updated-wrapper-icon", image: image) { outcome in
@@ -609,7 +609,7 @@ struct MTStyleTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.updateImage(name: "updated-async-wrapper", image: image)
 
@@ -624,7 +624,7 @@ struct MTStyleTests {
         let mapView = MTMapView(frame: .zero)
         let spriteURL = URL(string: "https://example.com/sprite.json")!
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.addSprite(id: "sprite-wrapper", url: spriteURL) { outcome in
@@ -651,7 +651,7 @@ struct MTStyleTests {
         let mapView = MTMapView(frame: .zero)
         let spriteURL = URL(string: "https://example.com/async-sprite.json")!
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.addSprite(id: "async-sprite", url: spriteURL)
 
@@ -666,7 +666,7 @@ struct MTStyleTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.removeSprite(id: "sprite-wrapper") { outcome in
@@ -691,7 +691,7 @@ struct MTStyleTests {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.removeSprite(id: "async-sprite")
 
@@ -706,7 +706,7 @@ struct MTStyleTests {
         let mapView = MTMapView(frame: .zero)
         let spriteURL = URL(string: "https://example.com/sprite.json")!
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let _ = await withCheckedContinuation { continuation in
             mapView.setSprite(spriteURL) { outcome in
@@ -724,7 +724,7 @@ struct MTStyleTests {
         let mapView = MTMapView(frame: .zero)
         let spriteURL = URL(string: "https://example.com/sprite.json")!
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
         await mapView.setSprite(spriteURL)
         
         let command = executor.lastCommand as? SetSprite
@@ -735,7 +735,7 @@ struct MTStyleTests {
     @Test func setSecondaryLanguageWrapper_shouldDispatchCommand() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let _ = await withCheckedContinuation { continuation in
             mapView.setSecondaryLanguage(.country(.english)) { outcome in
@@ -756,7 +756,7 @@ struct MTStyleTests {
     @Test func setSecondaryLanguageAsyncWrapper_shouldDispatchCommand() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.setSecondaryLanguage(.country(.english))
         
@@ -774,7 +774,7 @@ struct MTStyleTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.areTilesLoaded { outcome in
@@ -797,7 +797,7 @@ struct MTStyleTests {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
 
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let isLoaded = await mapView.areTilesLoaded()
 
@@ -845,7 +845,7 @@ struct MTStyleTests {
     @Test func hasTerrainWrapper_shouldReturnBridgeValue() async throws {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let result = await withCheckedContinuation { continuation in
             mapView.hasTerrain { outcome in
@@ -867,7 +867,7 @@ struct MTStyleTests {
     @Test func hasTerrainAsyncWrapper_shouldReturnBridgeValue() async throws {
         let executor = MockExecutor(result: .bool(true))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         let hasTerrain = await mapView.hasTerrain()
         #expect(hasTerrain)
@@ -878,7 +878,7 @@ struct MTStyleTests {
     @Test func setTerrainWrappers_shouldDispatchCommand() async throws {
         let executor = MockExecutor()
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
 
         await mapView.setTerrain(sourceId: "maptiler-terrain", exaggeration: 1.5)
         var command = executor.lastCommand as? SetTerrain

@@ -14,6 +14,9 @@ public extension MTMapView {
     /// - Parameter gpxString: Raw GPX XML content.
     /// - Returns: A GeoJSON FeatureCollection encoded as a JSON string.
     func convertGPXToGeoJSON(_ gpxString: String) async throws -> String {
+        guard let bridge = bridge else {
+            throw MTError.bridgeNotLoaded
+        }
         let result = try await bridge.execute(ConvertGPX(gpxString: gpxString))
         guard case .string(let json) = result else {
             throw MTError.unsupportedReturnType(description: "Expected GeoJSON string from GPX conversion.")
@@ -25,6 +28,9 @@ public extension MTMapView {
     /// - Parameter kmlString: Raw KML XML content.
     /// - Returns: A GeoJSON FeatureCollection encoded as a JSON string.
     func convertKMLToGeoJSON(_ kmlString: String) async throws -> String {
+        guard let bridge = bridge else {
+            throw MTError.bridgeNotLoaded
+        }
         let result = try await bridge.execute(ConvertKML(kmlString: kmlString))
         guard case .string(let json) = result else {
             throw MTError.unsupportedReturnType(description: "Expected GeoJSON string from KML conversion.")

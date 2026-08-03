@@ -8,7 +8,11 @@
 //
 
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 /// RGBA color represented by 0...255 components.
 public struct MTRGBAColor: Sendable, Codable {
@@ -245,8 +249,8 @@ public final class MTColorRamp: @unchecked Sendable {
 public extension MTColorRamp {
     /// Returns bounds of the color ramp.
     public func getBounds(in mapView: MTMapView) async throws -> MTColorRampBounds {
-        try await ensureInitialized(in: mapView)
-        let result = try await mapView.bridge.execute(GetColorRampBounds(identifier: identifier))
+        let bridge = try await ensureInitialized(in: mapView)
+        let result = try await bridge.execute(GetColorRampBounds(identifier: identifier))
 
         guard case .string(let json) = result else {
             throw MTError.unsupportedReturnType(description: "Expected bounds JSON, got \(String(describing: result)).")
@@ -265,9 +269,9 @@ public extension MTColorRamp {
         smooth: Bool = true,
         in mapView: MTMapView
     ) async throws -> MTRGBAColor {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let options = smooth ? #"{"smooth":true}"# : #"{"smooth":false}"#
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             GetColorFromColorRamp(identifier: identifier, value: value, optionsJSON: options)
         )
 
@@ -281,14 +285,14 @@ public extension MTColorRamp {
         includeAlpha: Bool = false,
         in mapView: MTMapView
     ) async throws -> String {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let options = """
         {
             "smooth": \(smooth ? "true" : "false"),
             "withAlpha": \(includeAlpha ? "true" : "false")
         }
         """
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             GetColorHexFromColorRamp(identifier: identifier, value: value, optionsJSON: options)
         )
 
@@ -305,9 +309,9 @@ public extension MTColorRamp {
         smooth: Bool = true,
         in mapView: MTMapView
     ) async throws -> MTRGBAColor {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let options = smooth ? #"{"smooth":true}"# : #"{"smooth":false}"#
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             GetColorRelativeFromColorRamp(identifier: identifier, value: value, optionsJSON: options)
         )
 
@@ -316,8 +320,8 @@ public extension MTColorRamp {
 
     /// Returns raw stops backing the ramp.
     public func getRawColorStops(in mapView: MTMapView) async throws -> [MTColorRampStop] {
-        try await ensureInitialized(in: mapView)
-        let result = try await mapView.bridge.execute(GetRawColorStopsFromColorRamp(identifier: identifier))
+        let bridge = try await ensureInitialized(in: mapView)
+        let result = try await bridge.execute(GetRawColorStopsFromColorRamp(identifier: identifier))
 
         guard case .string(let json) = result, let data = json.data(using: .utf8) else {
             let description = "Expected color stops JSON, got \(String(describing: result))."
@@ -329,9 +333,9 @@ public extension MTColorRamp {
 
     /// Clones the color ramp.
     public func clone(in mapView: MTMapView) async throws -> MTColorRamp {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let targetIdentifier = MTColorRamp.makeIdentifier()
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             CloneColorRamp(sourceIdentifier: identifier, targetIdentifier: targetIdentifier)
         )
 
@@ -346,9 +350,9 @@ public extension MTColorRamp {
 
     /// Returns a ramp reversed in-place or cloned depending on the `clone` flag.
     public func reverse(clone: Bool = true, in mapView: MTMapView) async throws -> MTColorRamp {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let targetIdentifier = clone ? MTColorRamp.makeIdentifier() : identifier
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             ReverseColorRamp(sourceIdentifier: identifier, targetIdentifier: targetIdentifier, clone: clone)
         )
 
@@ -374,12 +378,12 @@ public extension MTColorRamp {
         clone: Bool = true,
         in mapView: MTMapView
     ) async throws -> MTColorRamp {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let targetIdentifier = clone ? MTColorRamp.makeIdentifier() : identifier
         let clampedMin = min
         let clampedMax = max == min ? min + 1 : max
 
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             ScaleColorRamp(
                 sourceIdentifier: identifier,
                 targetIdentifier: targetIdentifier,
@@ -410,11 +414,11 @@ public extension MTColorRamp {
         clone: Bool = true,
         in mapView: MTMapView
     ) async throws -> MTColorRamp {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let targetIdentifier = clone ? MTColorRamp.makeIdentifier() : identifier
         let encodedStops = try MTColorRamp.encodeToJSONString(stops)
 
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             SetStopsOnColorRamp(
                 sourceIdentifier: identifier,
                 targetIdentifier: targetIdentifier,
@@ -449,11 +453,11 @@ public extension MTColorRamp {
         samples: Int = 15,
         in mapView: MTMapView
     ) async throws -> MTColorRamp {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let targetIdentifier = MTColorRamp.makeIdentifier()
         let safeSamples = max(2, samples)
 
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             ResampleColorRamp(
                 sourceIdentifier: identifier,
                 targetIdentifier: targetIdentifier,
@@ -473,9 +477,9 @@ public extension MTColorRamp {
 
     /// Prepends a transparent stop at the beginning of the ramp.
     public func transparentStart(in mapView: MTMapView) async throws -> MTColorRamp {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let targetIdentifier = MTColorRamp.makeIdentifier()
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             TransparentStartColorRamp(sourceIdentifier: identifier, targetIdentifier: targetIdentifier)
         )
 
@@ -490,8 +494,8 @@ public extension MTColorRamp {
 
     /// Returns true if the first stop is transparent.
     public func hasTransparentStart(in mapView: MTMapView) async throws -> Bool {
-        try await ensureInitialized(in: mapView)
-        let result = try await mapView.bridge.execute(
+        let bridge = try await ensureInitialized(in: mapView)
+        let result = try await bridge.execute(
             HasTransparentStartColorRamp(identifier: identifier)
         )
 
@@ -509,7 +513,7 @@ public extension MTColorRamp {
         options: MTColorRampCanvasStripOptions = MTColorRampCanvasStripOptions(),
         in mapView: MTMapView
     ) async throws -> UIImage {
-        try await ensureInitialized(in: mapView)
+        let bridge = try await ensureInitialized(in: mapView)
         let clampedSize = options.size.map { max(1, min(2048, $0)) }
         let sanitizedOptions = MTColorRampCanvasStripOptions(
             horizontal: options.horizontal,
@@ -518,7 +522,7 @@ public extension MTColorRamp {
         )
 
         let optionsJSON = try MTColorRamp.encodeToJSONString(sanitizedOptions)
-        let result = try await mapView.bridge.execute(
+        let result = try await bridge.execute(
             GetCanvasStripFromColorRamp(identifier: identifier, optionsJSON: optionsJSON)
         )
 
@@ -596,21 +600,25 @@ public extension MTColorRamp {
 }
 
 private extension MTColorRamp {
-    func ensureInitialized(in mapView: MTMapView) async throws {
+    func ensureInitialized(in mapView: MTMapView) async throws -> MTBridge {
+        guard let bridge = mapView.bridge else { throw MTError.bridgeNotLoaded }
+
         switch creation {
         case .custom(let options):
             let json = try MTColorRamp.encodeToJSONString(options)
-            try await mapView.bridge.execute(CreateColorRamp(identifier: identifier, optionsJSON: json))
+            try await bridge.execute(CreateColorRamp(identifier: identifier, optionsJSON: json))
         case .preset(let preset):
-            try await mapView.bridge.execute(
+            try await bridge.execute(
                 CreateColorRampFromPreset(identifier: identifier, preset: preset.rawValue)
             )
         case .arrayDefinition(let definition):
             let json = try MTColorRamp.encodeToJSONString(definition)
-            try await mapView.bridge.execute(
+            try await bridge.execute(
                 CreateColorRampFromArrayDefinition(identifier: identifier, definitionJSON: json)
             )
         }
+
+        return bridge
     }
 
     func snapshotOptions(for identifier: String, in mapView: MTMapView) async throws -> MTColorRampOptions {
@@ -636,7 +644,8 @@ private extension MTColorRamp {
     }
 
     static func decodeStops(from identifier: String, in mapView: MTMapView) async throws -> [MTColorRampStop] {
-        let result = try await mapView.bridge.execute(GetRawColorStopsFromColorRamp(identifier: identifier))
+        guard let bridge = mapView.bridge else { throw MTError.bridgeNotLoaded }
+        let result = try await bridge.execute(GetRawColorStopsFromColorRamp(identifier: identifier))
 
         guard case .string(let json) = result, let data = json.data(using: .utf8) else {
             let description = "Expected color stops JSON, got \(String(describing: result))."

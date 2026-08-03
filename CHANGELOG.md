@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.1.1](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.1.1)
+Released on 2026-08-03.
+### Fixed
+- Leak in script handler is sanitized.
+- Destroy method created.
+
 ## [2.1.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.1.0)
 Released on 2026-07-23.
 ### Added

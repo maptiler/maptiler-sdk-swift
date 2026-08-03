@@ -23,7 +23,7 @@ struct MTLngLatToArrayTests {
         let expectedArray = [10.0, 50.0]
         let executor = LngLatToArrayMockExecutor(result: .doubleArray(expectedArray))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
         
         let coordinate = CLLocationCoordinate2D(latitude: 50.0, longitude: 10.0)
 
@@ -48,7 +48,7 @@ struct MTLngLatToArrayTests {
         let expectedArray = [10.0, 50.0]
         let executor = LngLatToArrayMockExecutor(result: .doubleArray(expectedArray))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
         
         let coordinate = CLLocationCoordinate2D(latitude: 50.0, longitude: 10.0)
 

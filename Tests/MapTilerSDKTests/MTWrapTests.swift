@@ -24,7 +24,7 @@ struct MTWrapTests {
         let expectedLng = -170.0
         let executor = WrapMockExecutor(result: .stringDoubleDict(["lat": expectedLat, "lng": expectedLng]))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
         
         let coordinate = CLLocationCoordinate2D(latitude: 50.0, longitude: 190.0)
 
@@ -51,7 +51,7 @@ struct MTWrapTests {
         let expectedLng = -170.0
         let executor = WrapMockExecutor(result: .stringDoubleDict(["lat": expectedLat, "lng": expectedLng]))
         let mapView = MTMapView(frame: .zero)
-        mapView.bridge.executor = executor
+        mapView.bridge?.executor = executor
         
         let coordinate = CLLocationCoordinate2D(latitude: 50.0, longitude: 190.0)
 

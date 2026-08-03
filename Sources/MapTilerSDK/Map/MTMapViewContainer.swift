@@ -73,7 +73,9 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
 
         mapView.delegate = coordinator
 
-        mapView.didInitialize = {
+        mapView.didInitialize = { [weak mapView] in
+            guard let mapView = mapView else { return }
+
             let sources = content.filter { $0 is MTSource }
 
             for item in sources {
@@ -104,6 +106,12 @@ package struct MTMapViewRepresentable: UIViewRepresentable {
         }
 
         return mapView
+    }
+
+    public static func dismantleUIView(_ uiView: UIViewType, coordinator: Coordinator) {
+        if let mapView = uiView as? MTMapView {
+            mapView.destroy()
+        }
     }
 
     public func makeCoordinator() -> Coordinator {

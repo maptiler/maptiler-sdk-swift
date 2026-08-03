@@ -20,7 +20,7 @@ public actor MTConfig {
     private var unit: MTUnit = .metric
 
     /// SDK version
-    public static let version = "2.1.0"
+    public static let version = "2.1.1"
 
     private static let lock = NSLock()
     nonisolated(unsafe) private static var _applicationIdentifier: String?

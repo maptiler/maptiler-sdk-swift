@@ -9,6 +9,6 @@
 
 package struct EnableMercatorProjection: MTCommand {
     package func toJS() -> JSString {
-        return "\(MTBridge.mapObject).enableMercatorProjection();"
+        return "\(MTBridge.mapObject).setProjection('mercator');"
     }
 }

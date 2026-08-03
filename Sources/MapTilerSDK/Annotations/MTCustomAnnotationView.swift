@@ -241,8 +241,8 @@ extension MTCustomAnnotationView: @preconcurrency MTMapViewContent {
     /// Prefer ``addTo(_:)`` instead.
     @MainActor
     public func addToMap(_ mapView: MTMapView) {
-        Task {
-            await self.addTo(mapView)
+        Task { [weak self] in
+            await self?.addTo(mapView)
         }
     }
 }
@@ -250,7 +250,8 @@ extension MTCustomAnnotationView: @preconcurrency MTMapViewContent {
 extension MTCustomAnnotationView: MTMapViewContentDelegate {
     package func mapView(_ mapView: MTMapView, didTriggerEvent event: MTEvent, with data: MTData?) {
         if event == .isMoving {
-            Task {
+            Task { [weak self] in
+                guard let self = self else { return }
                 await self.setCoordinates(self.coordinates, in: mapView)
             }
         }

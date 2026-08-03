@@ -7,7 +7,11 @@
 //  MapTilerSDK
 //
 
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 import WebKit
 import CoreLocation
 
@@ -66,7 +70,7 @@ open class MTMapView: UIView, Sendable {
     public var options: MTMapOptions? = MTMapOptions()
 
     /// Service responsible for gestures handling
-    public var gestureService: MTGestureService!
+    public var gestureService: MTGestureService?
 
     /// Delegate object responsible for event propagation
     public weak var delegate: MTMapViewDelegate?
@@ -81,11 +85,11 @@ open class MTMapView: UIView, Sendable {
     /// Triggers when map initializes for the first time.
     public var didInitialize: (() -> Void)?
 
-    package var bridge: MTBridge!
+    package var bridge: MTBridge?
 
-    package var eventProcessor: EventProcessor!
+    package var eventProcessor: EventProcessor?
 
-    private var webViewExecutor: WebViewExecutor!
+    private var webViewExecutor: WebViewExecutor?
 
     /// Initializes the map with the frame.
     override public init(frame: CGRect) {
@@ -127,6 +131,34 @@ open class MTMapView: UIView, Sendable {
         commonInit()
     }
 
+    deinit {
+        destroy()
+    }
+
+    /// Destroys the map view and its underlying bridging pipeline.
+    ///
+    /// Call this when the map view is being permanently removed from the view hierarchy
+    public func destroy() {
+        self.delegate = nil
+        self.didInitialize = nil
+        self.contentDelegates.removeAll()
+        self.modules.removeAll()
+
+        self.style = nil
+
+        webViewExecutor?.cleanUp()
+        webViewExecutor?.delegate = nil
+        webViewExecutor = nil
+
+        bridge?.executor = nil
+        bridge = nil
+
+        eventProcessor?.delegate = nil
+        eventProcessor = nil
+
+        gestureService = nil
+    }
+
     /// Initializes location tracking manager.
     ///
     /// In order to track user location you have to initialize the MLLocationManager,
@@ -140,34 +172,42 @@ open class MTMapView: UIView, Sendable {
     }
 
     private func commonInit() {
-        eventProcessor = EventProcessor()
+        let eventProcessor = EventProcessor()
+        self.eventProcessor = eventProcessor
         eventProcessor.delegate = self
 
-        webViewExecutor = WebViewExecutor(frame: frame, eventProcessor: eventProcessor)
+        let webViewExecutor = WebViewExecutor(frame: frame, eventProcessor: eventProcessor)
+        self.webViewExecutor = webViewExecutor
         webViewExecutor.delegate = self
 
         if let webView = webViewExecutor.getWebView() {
             addSubview(webView)
         }
 
-        bridge = MTBridge(executor: webViewExecutor)
+        let bridge = MTBridge(executor: webViewExecutor)
+        self.bridge = bridge
         gestureService = MTGestureService(bridge: bridge, eventProcessor: eventProcessor, mapView: self)
     }
 
     open override func layoutSubviews() {
         super.layoutSubviews()
 
-        if let webView = webViewExecutor.getWebView() {
+        if let webView = webViewExecutor?.getWebView() {
             webView.frame = bounds
         }
     }
+}
 
+extension MTMapView {
     /// Reloads the map view.
     public func reload() {
-        if let webView = webViewExecutor.getWebView() {
+        if let webView = webViewExecutor?.getWebView() {
             webView.reload()
         }
     }
+}
+
+extension MTMapView {
 
     /// Loads an offline pack onto the map view.
     ///
@@ -176,9 +216,9 @@ open class MTMapView: UIView, Sendable {
     /// You must re-add any custom map content after the style finishes loading.
     ///
     /// When `limitToRegion` is `true` (the default), the map's camera is locked to the bounding box
-    /// of the downloaded area. This physically restricts how far out the user can zoom. For example, 
-    /// if you downloaded a 5-mile area with a `minZoom` of 0, you will *not* be able to zoom out to 0, 
-    /// because the 5-mile area would become a tiny dot on the screen. The apparent minimum zoom 
+    /// of the downloaded area. This physically restricts how far out the user can zoom. For example,
+    /// if you downloaded a 5-mile area with a `minZoom` of 0, you will *not* be able to zoom out to 0,
+    /// because the 5-mile area would become a tiny dot on the screen. The apparent minimum zoom
     /// becomes whatever level is required to fit the downloaded bounding box perfectly onto the device screen.
     ///
     /// - Parameters:
@@ -346,6 +386,10 @@ open class MTMapView: UIView, Sendable {
         layers: [String]? = nil,
         filter: String? = nil
     ) async throws -> String? {
+        guard let webViewExecutor = webViewExecutor else {
+            throw MTError.bridgeNotLoaded
+        }
+
         let returnTypeValue = try await webViewExecutor.execute(
             QueryRenderedFeatures(point: point, layers: layers, filter: filter)
         )
@@ -403,7 +447,7 @@ open class MTMapView: UIView, Sendable {
             let isSessionLogicEnabled = await MTConfig.shared.isSessionLogicEnabled
 
             do {
-                try await _ = bridge.execute(InitializeMap(
+                try await _ = bridge?.execute(InitializeMap(
                     apiKey: apiKey,
                     options: options,
                     referenceStyle: referenceStyleProxy,
@@ -426,6 +470,15 @@ open class MTMapView: UIView, Sendable {
     package func addContentDelegate(_ contentDelegate: MTMapViewContentDelegate) {
         let delegate = MTWeakContentDelegate(delegate: contentDelegate)
         contentDelegates[delegate.id] = delegate
+    }
+
+    /// Registers a module to the map view.
+    ///
+    /// - Parameters:
+    ///   - module: The module to be registered.
+    public func registerModule(_ module: MTMapModule) {
+        modules[module.id] = module
+        module.onAttach(to: self)
     }
 }
 
@@ -460,7 +513,7 @@ extension MTMapView: EventProcessorDelegate {
 
             // Fetch and store session ID in MTConfig
             Task {
-                let sessionId = await self.getMaptilerSessionId()
+                let sessionId = await getMaptilerSessionId()
                 if !sessionId.isEmpty {
                     await MTConfig.shared.setMaptilerSessionId(sessionId)
                 }
@@ -552,7 +605,7 @@ extension MTMapView {
     package func runCommand(_ command: MTCommand, completion: ((Result<Void, MTError>) -> Void)? = nil) {
         Task {
             do {
-                try await _ = bridge.execute(command)
+                try await _ = bridge?.execute(command)
                 completion?(.success(()))
             } catch {
                 MTLogger.log("\(error)", type: .error)
@@ -572,6 +625,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if case .double(let commandValue) = value {
@@ -597,6 +654,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if case .doubleArray(let commandValue) = value {
@@ -623,6 +684,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if case .string(let commandValue) = value {
@@ -650,6 +715,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if case .string(let commandValue) = value {
@@ -675,6 +744,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if let projection = value?.projectionValue {
@@ -702,6 +775,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if let commandValue = value?.boolValue {
@@ -727,6 +804,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if case .stringDoubleDict(let commandValue) = value {
@@ -768,6 +849,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if case .stringDoubleDict(let commandValue) = value {
@@ -807,6 +892,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 if case .string(let commandValue) = value, let bounds = decodeBounds(from: commandValue) {
@@ -838,6 +927,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
 
                 switch value {
@@ -885,6 +978,10 @@ extension MTMapView {
     ) {
         Task {
             do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
                 let value = try await bridge.execute(command)
                 switch value {
                 case .stringDoubleDict(let dict):

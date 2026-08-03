@@ -7,7 +7,11 @@
 //  MapTilerSDK
 //
 
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 import CoreLocation
 
 extension MTMapView: MTStylable {
@@ -391,7 +395,8 @@ extension MTMapView: MTStylable {
             let localURL = URL(string: "\(cleanBaseURL)\(tilesPath)")!
             let terrainSource = MTRasterDEMSource(identifier: terrainId, tiles: [localURL])
 
-            Task {
+            Task { [weak self] in
+                guard let self = self else { return }
                 if !(self.style?.sourceExists(withId: terrainId) ?? false) {
                     try? await self.style?.addSource(terrainSource)
                 }

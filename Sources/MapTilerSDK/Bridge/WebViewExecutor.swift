@@ -20,7 +20,7 @@ package final class WebViewExecutor: MTCommandExecutable {
     private let exceptionKey: String = "WKJavaScriptExceptionMessage"
 
     private var webView: WKWebView?
-    private var webViewManager: WebViewManager!
+    private var webViewManager: WebViewManager?
     private var eventProcessor: EventProcessor!
 
     weak var delegate: WebViewExecutorDelegate?
@@ -28,10 +28,11 @@ package final class WebViewExecutor: MTCommandExecutable {
     init(frame: CGRect, eventProcessor: EventProcessor) {
         self.eventProcessor = eventProcessor
 
-        webViewManager = WebViewManager(eventProcessor: eventProcessor)
-        webViewManager.delegate = self
+        let manager = WebViewManager(eventProcessor: eventProcessor)
+        manager.delegate = self
+        self.webViewManager = manager
 
-        guard let webView = webViewManager.getAttachableWebView(frame: frame) else {
+        guard let webView = manager.getAttachableWebView(frame: frame) else {
             return
         }
 
@@ -42,6 +43,13 @@ package final class WebViewExecutor: MTCommandExecutable {
 
     func getWebView() -> WKWebView? {
         return webView
+    }
+
+    func cleanUp() {
+        webViewManager?.cleanUp()
+        webViewManager?.delegate = nil
+        webViewManager = nil
+        webView = nil
     }
 
     @MainActor

@@ -22,6 +22,7 @@ public class MTGestureService {
     package init(bridge: MTBridge, eventProcessor: EventProcessor, mapView: MTMapView) {
         self.bridge = bridge
         self.eventProcessor = eventProcessor
+        self.mapView = mapView
 
         enabledGestures[.doubleTapZoomIn] = MTGestureFactory.makeGesture(with: .doubleTapZoomIn, bridge: bridge)
         enabledGestures[.dragPan] = MTGestureFactory.makeGesture(with: .dragPan, bridge: bridge)
@@ -36,9 +37,9 @@ public class MTGestureService {
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func disableGesture(with type: MTGestureType, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         if let gesture = enabledGestures[type] {
-            Task {
+            Task { [weak self] in
                 await gesture.disable()
-                enabledGestures.removeValue(forKey: type)
+                self?.enabledGestures.removeValue(forKey: type)
                 completionHandler?(.success(()))
             }
 
@@ -64,10 +65,11 @@ public class MTGestureService {
         options: MTDragPanOptions? = nil,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        Task {
-            enabledGestures[.dragPan] = MTGestureFactory.makeGesture(with: .dragPan, bridge: bridge)
+        Task { [weak self] in
+            guard let self = self else { return }
+            self.enabledGestures[.dragPan] = MTGestureFactory.makeGesture(with: .dragPan, bridge: self.bridge)
 
-            guard let dragPanGesture = enabledGestures[.dragPan] as? MTDragPanGesture else {
+            guard let dragPanGesture = self.enabledGestures[.dragPan] as? MTDragPanGesture else {
                 return
             }
 
@@ -88,11 +90,12 @@ public class MTGestureService {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func enablePinchRotateAndZoomGesture(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        Task {
-            enabledGestures[.pinchRotateAndZoom] = MTGestureFactory
-                .makeGesture(with: .pinchRotateAndZoom, bridge: bridge)
+        Task { [weak self] in
+            guard let self = self else { return }
+            self.enabledGestures[.pinchRotateAndZoom] = MTGestureFactory
+                .makeGesture(with: .pinchRotateAndZoom, bridge: self.bridge)
 
-            let pinchRotateAndZoomGesture = enabledGestures[.pinchRotateAndZoom] as? MTPinchRotateAndZoomGesture
+            let pinchRotateAndZoomGesture = self.enabledGestures[.pinchRotateAndZoom] as? MTPinchRotateAndZoomGesture
             guard let pinchRotateAndZoomGesture else {
                 return
             }
@@ -110,11 +113,12 @@ public class MTGestureService {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func enableTwoFingerDragPitchGesture(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        Task {
-            enabledGestures[.twoFingersDragPitch] = MTGestureFactory
-                .makeGesture(with: .twoFingersDragPitch, bridge: bridge)
+        Task { [weak self] in
+            guard let self = self else { return }
+            self.enabledGestures[.twoFingersDragPitch] = MTGestureFactory
+                .makeGesture(with: .twoFingersDragPitch, bridge: self.bridge)
 
-            let twoFingersDragPitchGesture = enabledGestures[.twoFingersDragPitch] as? MTTwoFingersDragPitchGesture
+            let twoFingersDragPitchGesture = self.enabledGestures[.twoFingersDragPitch] as? MTTwoFingersDragPitchGesture
             guard let twoFingersDragPitchGesture else {
                 return
             }
@@ -132,10 +136,14 @@ public class MTGestureService {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func enableDoubleTapZoomInGesture(completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
-        Task {
-            enabledGestures[.doubleTapZoomIn] = MTGestureFactory.makeGesture(with: .doubleTapZoomIn, bridge: bridge)
+        Task { [weak self] in
+            guard let self = self else { return }
+            self.enabledGestures[.doubleTapZoomIn] = MTGestureFactory.makeGesture(
+                with: .doubleTapZoomIn,
+                bridge: self.bridge
+            )
 
-            let doubleTapZoomInGesture = enabledGestures[.doubleTapZoomIn] as? MTDoubleTapZoomInGesture
+            let doubleTapZoomInGesture = self.enabledGestures[.doubleTapZoomIn] as? MTDoubleTapZoomInGesture
             guard let doubleTapZoomInGesture else {
                 return
             }

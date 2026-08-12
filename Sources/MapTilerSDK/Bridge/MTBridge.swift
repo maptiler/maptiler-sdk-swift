@@ -22,7 +22,10 @@ package final class MTBridge: @unchecked Sendable {
         self.executor = executor
     }
 
-    func execute(_ command: MTCommand) async throws -> MTBridgeReturnType? {
-        return try await executor?.execute(command)
+    func execute(_ command: MTCommand) async throws -> MTBridgeReturnType {
+        guard let executor = executor else {
+            throw MTError.bridgeNotLoaded
+        }
+        return try await executor.execute(command)
     }
 }

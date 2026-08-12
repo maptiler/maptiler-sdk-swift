@@ -479,6 +479,10 @@ extension MTMapView {
     public func registerModule(_ module: MTMapModule) {
         modules[module.id] = module
         module.onAttach(to: self)
+
+        if isInitialized {
+            module.onMapReady()
+        }
     }
 }
 
@@ -602,6 +606,15 @@ extension MTMapView: EventProcessorDelegate {
 }
 
 extension MTMapView {
+    @MainActor
+    public func execute(command: MTCommand) async throws -> MTBridgeReturnType {
+        guard let bridge = bridge else {
+            throw MTError.bridgeNotLoaded
+        }
+
+        return try await bridge.execute(command)
+    }
+
     package func runCommand(_ command: MTCommand, completion: ((Result<Void, MTError>) -> Void)? = nil) {
         Task {
             do {
@@ -750,7 +763,7 @@ extension MTMapView {
                 }
                 let value = try await bridge.execute(command)
 
-                if let projection = value?.projectionValue {
+                if let projection = value.projectionValue {
                     options?.setProjection(projection)
                     completion?(.success(projection))
                 } else {
@@ -781,7 +794,7 @@ extension MTMapView {
                 }
                 let value = try await bridge.execute(command)
 
-                if let commandValue = value?.boolValue {
+                if let commandValue = value.boolValue {
                     completion?(.success(commandValue))
                 } else {
                     MTLogger.log("\(command) returned invalid type.", type: .error)

@@ -35,4 +35,10 @@ public enum MTLayerType: String, Codable {
 
     /// The background color or pattern of the map.
     case background
+
+    /// A custom layer.
+    case custom
+
+    /// A weather layer.
+    case weather
 }

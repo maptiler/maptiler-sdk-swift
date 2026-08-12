@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.1.2](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.1.2)
+Released on 2026-08-12.
+### Added
+- Missing bridge mechanism for custom layer support.
+
 ## [2.1.1](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.1.1)
 Released on 2026-08-03.
 ### Fixed

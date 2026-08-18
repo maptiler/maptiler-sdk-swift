@@ -647,6 +647,23 @@ extension MTMapView: MTNavigable {
         runCommandWithPointReturnValue(PointRotate(point: point, angle: angle), completion: completionHandler)
     }
 
+    /// Rotate this point around a pivot point by an angle a, given in radians.
+    /// - Parameters:
+    ///   - point: The point to rotate.
+    ///   - angle: Angle to rotate in radians.
+    ///   - pivot: Point to rotate around.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointRotateAround(
+        point: MTPoint,
+        angle: Double,
+        pivot: MTPoint,
+        completionHandler: @escaping (Result<MTPoint, MTError>) -> Void
+    ) {
+        let command = PointRotateAround(point: point, angle: angle, pivot: pivot)
+        runCommandWithPointReturnValue(command, completion: completionHandler)
+    }
+
     /// Adds another point to this point's x and y coordinates, yielding a new point.
     /// - Parameters:
     ///   - point1: The first point.
@@ -1536,6 +1553,24 @@ extension MTMapView {
     public func pointRotate(point: MTPoint, angle: Double) async -> MTPoint {
         await withCheckedContinuation { continuation in
             pointRotate(point: point, angle: angle) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Rotate this point around a pivot point by an angle a, given in radians.
+    /// - Parameters:
+    ///   - point: The point to rotate.
+    ///   - angle: Angle to rotate in radians.
+    ///   - pivot: Point to rotate around.
+    public func pointRotateAround(point: MTPoint, angle: Double, pivot: MTPoint) async -> MTPoint {
+        await withCheckedContinuation { continuation in
+            pointRotateAround(point: point, angle: angle, pivot: pivot) { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

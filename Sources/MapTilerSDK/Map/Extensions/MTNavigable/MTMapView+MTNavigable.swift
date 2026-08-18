@@ -621,6 +621,18 @@ extension MTMapView: MTNavigable {
         runCommandWithCoordinateReturnValue(Unproject(point: point), completion: completionHandler)
     }
 
+    /// Calculate perpendicular point.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointPerp(
+        point: MTPoint,
+        completionHandler: @escaping (Result<MTPoint, MTError>) -> Void
+    ) {
+        runCommandWithPointReturnValue(PointPerp(point: point), completion: completionHandler)
+    }
+
     /// Adds another point to this point's x and y coordinates, yielding a new point.
     /// - Parameters:
     ///   - point1: The first point.
@@ -1482,6 +1494,22 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+                }
+            }
+        }
+    }
+
+    /// Calculate perpendicular point.
+    /// - Parameters:
+    ///   - point: The point.
+    public func pointPerp(point: MTPoint) async -> MTPoint {
+        await withCheckedContinuation { continuation in
+            pointPerp(point: point) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: MTPoint(x: 0, y: 0))
                 }
             }
         }

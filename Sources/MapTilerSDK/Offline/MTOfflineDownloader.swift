@@ -156,7 +156,7 @@ internal actor MTOfflineDownloader {
                 delegate?.offlinePack("", didFailResource: offlineError, context: context)
             }
 
-            if !(error is CancellationError) {
+            if error is CancellationError {
                 throw error
             }
         } else {

@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.1.3](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.1.3)
+Released on 2026-08-24.
+### Fixed
+- Offline pack retry mechanism updated to accomodate 429s.
+
 ## [2.1.2](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.1.2)
 Released on 2026-08-12.
 ### Added

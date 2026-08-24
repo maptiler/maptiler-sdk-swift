@@ -170,8 +170,8 @@ final class OfflineRoutingViewModel: ObservableObject, MTOfflineDownloadDelegate
     // MARK: - MTOfflineDownloadDelegate
     nonisolated func offlinePack(_ id: String, didUpdateProgress progress: MTOfflinePackProgress) {
         Task { @MainActor in
-            self.downloadProgress = Float(progress.percentage)
-            if progress.percentage < 1.0 {
+            if await self.routePack?.state == .downloading {
+                self.downloadProgress = Float(progress.percentage)
                 self.downloadState = "Downloading... (\(progress.downloadedResources)/\(progress.totalResources))"
             }
         }

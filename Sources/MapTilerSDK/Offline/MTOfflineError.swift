@@ -30,6 +30,9 @@ public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
     /// The server returned a bad HTTP response with the given status code.
     case badResponse(statusCode: Int)
 
+    /// The server returned a 429 Too Many Requests response, indicating rate limiting.
+    case rateLimitExceeded(retryAfter: TimeInterval?)
+
     /// A general network connectivity issue or URLSession error occurred.
     case networkError(URLError)
 
@@ -85,6 +88,11 @@ public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
             return "The provided URL is invalid: \(urlString)."
         case .badResponse(let statusCode):
             return "The server returned a bad response with status code: \(statusCode)."
+        case .rateLimitExceeded(let retryAfter):
+            if let retryAfter = retryAfter {
+                return "Rate limit exceeded. Please retry after \(retryAfter) seconds."
+            }
+            return "Rate limit exceeded. Please retry later."
         case .networkError(let error):
             return "A network error occurred: \(error.localizedDescription)."
         case .noContent:
@@ -125,6 +133,11 @@ public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
                 return "Verify that your API key is valid and has permission to access this resource."
             }
             return "Try again later. If the problem persists, check the server status."
+        case .rateLimitExceeded(let retryAfter):
+            if let retryAfter = retryAfter {
+                return "Wait for \(retryAfter) seconds before retrying the download."
+            }
+            return "Wait for a few minutes before retrying to avoid further rate limiting."
         case .networkError:
             return "Check your internet connection and try again."
         case .noContent:
@@ -154,6 +167,7 @@ public enum MTOfflineError: Error, LocalizedError, Sendable, Equatable {
         switch (lhs, rhs) {
         case (.invalidURL(let l), .invalidURL(let r)): return l == r
         case (.badResponse(let l), .badResponse(let r)): return l == r
+        case (.rateLimitExceeded(let l), .rateLimitExceeded(let r)): return l == r
         case (.networkError(let l), .networkError(let r)): return l == r
         case (.noContent, .noContent): return true
         case (.contentMismatch(let le, let la), .contentMismatch(let re, let ra)): return le == re && la == ra

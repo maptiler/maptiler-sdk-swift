@@ -346,9 +346,14 @@ extension MTOfflinePack {
                 }
 
                 if !Task.isCancelled && state != .paused && state != .canceled {
-                    state = .completed
-                    // Ensure UI sees 100% on completion
-                    progress.downloadedResources = progress.totalResources
+                    if progress.downloadedResources < progress.totalResources {
+                        state = .failed
+                    } else {
+                        state = .completed
+                        // Ensure UI sees 100% on completion
+                        progress.downloadedResources = progress.totalResources
+                    }
+
                     if isProgressReportingEnabled {
                         delegate?.offlinePack(id, didUpdateProgress: progress)
                     }

@@ -720,6 +720,18 @@ extension MTMapView: MTNavigable {
         runCommandWithPointReturnValue(PointDivByPoint(point1: point1, point2: point2), completion: completionHandler)
     }
 
+    /// Round this point's x and y coordinates, yielding a new point.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointRound(
+        point: MTPoint,
+        completionHandler: @escaping (Result<MTPoint, MTError>) -> Void
+    ) {
+        runCommandWithPointReturnValue(PointRound(point: point), completion: completionHandler)
+    }
+
     /// Multiply this point's x and y coordinates by a scaling factor, yielding a new point.
     /// - Parameters:
     ///   - point: The point.
@@ -1639,6 +1651,22 @@ extension MTMapView {
     public func pointDivByPoint(point1: MTPoint, point2: MTPoint) async -> MTPoint {
         await withCheckedContinuation { continuation in
             pointDivByPoint(point1: point1, point2: point2) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: MTPoint(x: 0, y: 0))
+                }
+            }
+        }
+    }
+
+    /// Round this point's x and y coordinates, yielding a new point.
+    /// - Parameters:
+    ///   - point: The point.
+    public func pointRound(point: MTPoint) async -> MTPoint {
+        await withCheckedContinuation { continuation in
+            pointRound(point: point) { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

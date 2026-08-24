@@ -41,8 +41,8 @@ internal struct MTStyleDownloadTask: MTDownloadTask {
             }
         } catch let error as MTOfflineHTTPError {
             switch error {
-            case .tooManyRequests:
-                throw MTOfflineError.badResponse(statusCode: 429)
+            case .tooManyRequests(let retryAfter):
+                throw MTOfflineError.rateLimitExceeded(retryAfter: retryAfter)
             case .notFound:
                 throw MTOfflineError.badResponse(statusCode: 404)
             case .serverError(let code), .clientError(let code):

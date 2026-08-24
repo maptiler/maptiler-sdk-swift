@@ -134,6 +134,34 @@ struct MTOfflineErrorTests {
         // 204 is now treated as success in MTResourceDownloadTask
         #expect(captor.lastError == nil)
     }
+
+    @Test("Test 429 Too Many Requests error mapping")
+    func test429ErrorMapping() async throws {
+        let captor = ErrorCaptor()
+        let downloader = MTOfflineDownloader(delegate: captor)
+        let session = createMockSession()
+        let url = URL(string: "https://example.com/429/tile.pbf")!
+        
+        MockURLProtocol.setHandler(for: url) { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 429, httpVersion: nil, headerFields: ["Retry-After": "120"])!
+            return (response, Data())
+        }
+        
+        let resource = MTMapResource(url: url, destinationPath: "/tmp/tile429.pbf")
+        
+        // We override maxAttempts in the network retry policy indirectly here because MTResourceDownloadTask creates its own.
+        // It takes 8 attempts by default, so we'll let it fail all 8 times for this test.
+        let task = MTResourceDownloadTask(resource: resource, packId: "test-pack", session: session)
+        
+        // Temporarily override max delay or attempts if needed, but since MockURLProtocol returns immediately, 
+        // 8 attempts will happen very quickly unless the sleep actually delays the test.
+        // For simplicity, we just assert the final mapped error.
+        
+        _ = try? await downloader.download([task])
+        
+        #expect(captor.lastError == .rateLimitExceeded(retryAfter: 120))
+        #expect(captor.lastContext?.url == url)
+    }
     
     @Test("Test Content Mismatch mapping (PBF vs HTML)")
     func testContentMismatchMapping() async throws {

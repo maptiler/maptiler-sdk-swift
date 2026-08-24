@@ -42,7 +42,7 @@ internal actor MTOfflineHTTPClient {
         return try await retryPolicy.execute { [self] in
             do {
                 let (data, response) = try await session.data(for: request)
-                try validate(response: response)
+                try response.validateHTTPStatus()
                 try response.validateContentLength(dataCount: data.count)
                 return data
             } catch let error as MTOfflineHTTPError {
@@ -66,7 +66,7 @@ internal actor MTOfflineHTTPClient {
         try await retryPolicy.execute { [self] in
             do {
                 let (tempURL, response) = try await session.download(for: request)
-                try validate(response: response)
+                try response.validateHTTPStatus()
 
                 // Validate downloaded file size
                 let attributes = try FileManager.default.attributesOfItem(atPath: tempURL.path)
@@ -87,42 +87,6 @@ internal actor MTOfflineHTTPClient {
             } catch {
                 throw MTOfflineHTTPError.unknown(error.localizedDescription)
             }
-        }
-    }
-
-    private nonisolated func validate(response: URLResponse) throws {
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw MTOfflineHTTPError.invalidResponse
-        }
-
-        switch httpResponse.statusCode {
-        case 200...299:
-            return
-        case 404:
-            throw MTOfflineHTTPError.notFound
-        case 429:
-            let retryAfterStr = httpResponse.value(forHTTPHeaderField: "Retry-After")
-            var retryAfter: TimeInterval?
-            if let str = retryAfterStr, let time = TimeInterval(str) {
-                retryAfter = time
-            } else if let str = retryAfterStr {
-                // Try parsing HTTP date
-                let formatter = DateFormatter()
-                formatter.locale = Locale(identifier: "en_US_POSIX")
-                formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
-                formatter.timeZone = TimeZone(secondsFromGMT: 0)
-                if let date = formatter.date(from: str) {
-                    let delay = date.timeIntervalSince(Date())
-                    retryAfter = delay > 0 ? delay : 0
-                }
-            }
-            throw MTOfflineHTTPError.tooManyRequests(retryAfter: retryAfter)
-        case 400...499:
-            throw MTOfflineHTTPError.clientError(httpResponse.statusCode)
-        case 500...599:
-            throw MTOfflineHTTPError.serverError(httpResponse.statusCode)
-        default:
-            throw MTOfflineHTTPError.invalidResponse
         }
     }
 

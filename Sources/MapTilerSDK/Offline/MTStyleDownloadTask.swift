@@ -18,29 +18,39 @@ internal struct MTStyleDownloadTask: MTDownloadTask {
     }
 
     internal func execute() async throws {
-        let retryPolicy = MTNetworkRetryPolicy(maxAttempts: 3)
+        let retryPolicy = MTNetworkRetryPolicy(maxAttempts: 8)
 
         do {
             try await retryPolicy.execute {
                 let normalizedURL = await MTURLNormalizer.normalize(url: resource.url)
                 let (data, response) = try await session.data(from: normalizedURL)
 
+                try response.validateHTTPStatus()
+
                 guard let httpResponse = response as? HTTPURLResponse else {
                     throw MTOfflineError.networkError(URLError(.badServerResponse))
                 }
 
-                switch httpResponse.statusCode {
-                case 204:
+                if httpResponse.statusCode == 204 {
                     // Server explicitly returned no content. Treat as success.
                     return
-                case 200...299:
-                    break
-                default:
-                    throw MTOfflineError.badResponse(statusCode: httpResponse.statusCode)
                 }
 
                 guard let dest = destinationURL else { return }
                 try await MTOfflineStorage.write(data, to: dest)
+            }
+        } catch let error as MTOfflineHTTPError {
+            switch error {
+            case .tooManyRequests:
+                throw MTOfflineError.badResponse(statusCode: 429)
+            case .notFound:
+                throw MTOfflineError.badResponse(statusCode: 404)
+            case .serverError(let code), .clientError(let code):
+                throw MTOfflineError.badResponse(statusCode: code)
+            case .timeout:
+                throw MTOfflineError.networkError(URLError(.timedOut))
+            default:
+                throw MTOfflineError.networkError(URLError(.badServerResponse))
             }
         } catch let error as MTOfflineError {
             throw error

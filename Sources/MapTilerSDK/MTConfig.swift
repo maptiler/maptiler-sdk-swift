@@ -20,7 +20,7 @@ public actor MTConfig {
     private var unit: MTUnit = .metric
 
     /// SDK version
-    public static let version = "2.1.1"
+    public static let version = "2.1.3"
 
     private static let lock = NSLock()
     nonisolated(unsafe) private static var _applicationIdentifier: String?
@@ -38,12 +38,14 @@ public actor MTConfig {
         return baseUA
     }
 
-    // A configured URLSession that includes the SDK's User-Agent
-    internal static var sharedURLSession: URLSession {
+    nonisolated(unsafe) private static let _sharedURLSession: URLSession = {
         let configuration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = ["User-Agent": customUserAgent]
         return URLSession(configuration: configuration)
-    }
+    }()
+
+    // A configured URLSession that includes the SDK's User-Agent
+    internal static var sharedURLSession: URLSession { _sharedURLSession }
 
     /// SDK log level.
     public private(set) var logLevel: MTLogLevel = .none

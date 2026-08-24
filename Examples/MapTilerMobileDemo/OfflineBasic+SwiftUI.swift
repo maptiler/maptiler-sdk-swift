@@ -358,8 +358,14 @@ extension OfflineViewModel {
 extension OfflineViewModel: MTOfflineDownloadDelegate {
     nonisolated func offlinePack(_ id: String, didUpdateProgress progress: MTOfflinePackProgress) {
         Task { @MainActor in
-            self.downloadProgress = Float(progress.percentage)
-            self.downloadState = "Downloading... (\(progress.downloadedResources)/\(progress.totalResources))"
+            let activePack = [self.unterageriPack, self.brnoPack, self.yellowstonePack]
+                .compactMap { $0 }
+                .first { $0.id == id }
+
+            if await activePack?.state == .downloading {
+                self.downloadProgress = Float(progress.percentage)
+                self.downloadState = "Downloading... (\(progress.downloadedResources)/\(progress.totalResources))"
+            }
         }
     }
 

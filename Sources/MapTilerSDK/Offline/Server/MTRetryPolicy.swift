@@ -42,7 +42,7 @@ internal struct MTNetworkRetryPolicy: MTRetryPolicy {
                 if let httpError = error as? MTOfflineHTTPError,
                     case .tooManyRequests(let retryAfter) = httpError,
                     let providedDelay = retryAfter {
-                    delay = providedDelay
+                    delay = min(providedDelay, maxDelay)
                 } else {
                     // Exponential backoff: baseDelay * 2^(attempt - 1)
                     let exponentialDelay = baseDelay * pow(2.0, Double(attempt - 1))

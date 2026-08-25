@@ -51,4 +51,22 @@ public protocol MTControllable {
     /// - Parameters:
     ///   - position: Map position to add the control to.
     func addTerrainControl(position: MTMapCorner) async
+
+    /// Adds the attribution control to the map.
+    /// - Parameters:
+    ///   - position: Map position to add the control to.
+    ///   - compact: If true, force a compact attribution that shows on click. If false, force the full attribution
+    ///              control. The default is a responsive attribution that collapses when the map is less than 640
+    ///              pixels wide.
+    ///   - customAttribution: String or strings to show in addition to any other attributions.
+    func addAttributionControl(position: MTMapCorner, compact: Bool?, customAttribution: [String]?) async
+
+    /// Adds the attribution control to the map.
+    /// - Parameters:
+    ///   - position: Map position to add the control to.
+    ///   - compact: If true, force a compact attribution that shows on click. If false, force the full attribution
+    ///              control. The default is a responsive attribution that collapses when the map is less than 640
+    ///              pixels wide.
+    ///   - customAttribution: String to show in addition to any other attributions.
+    func addAttributionControl(position: MTMapCorner, compact: Bool?, customAttribution: String?) async
 }

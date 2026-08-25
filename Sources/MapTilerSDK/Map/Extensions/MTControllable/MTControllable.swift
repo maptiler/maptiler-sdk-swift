@@ -23,4 +23,12 @@ public protocol MTControllable {
     ///     - linkURL: URL of the anchor link.
     ///     - position: Map position to add the control to.
     func addLogoControl(name: String, logoURL: URL, linkURL: URL, position: MTMapCorner) async
+
+    /// Adds the navigation control to the map.
+    ///  - Parameters:
+    ///     - position: Map position to add the control to.
+    ///     - showCompass: If true the compass button is included.
+    ///     - showZoom: If true the zoom-in and zoom-out buttons are included.
+    ///     - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
+    func addNavigationControl(position: MTMapCorner, showCompass: Bool, showZoom: Bool, visualizePitch: Bool) async
 }

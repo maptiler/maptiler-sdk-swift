@@ -52,6 +52,32 @@ extension MTMapView: MTControllable {
 
         options?.setLogoPosition(position)
     }
+
+    /// Adds navigation control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - showCompass: If true the compass button is included.
+    ///   - showZoom: If true the zoom-in and zoom-out buttons are included.
+    ///   - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addNavigationControl(
+        position: MTMapCorner = .topRight,
+        showCompass: Bool = true,
+        showZoom: Bool = true,
+        visualizePitch: Bool = true,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            AddNavigationControl(
+                position: position,
+                showCompass: showCompass,
+                showZoom: showZoom,
+                visualizePitch: visualizePitch
+            ),
+            completion: completionHandler
+        )
+    }
 }
 
 // Concurrency
@@ -77,6 +103,30 @@ extension MTMapView {
     public func addLogoControl(name: String, logoURL: URL, linkURL: URL, position: MTMapCorner) async {
         await withCheckedContinuation { continuation in
             addLogoControl(name: name, logoURL: logoURL, linkURL: linkURL, position: position) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds navigation control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - showCompass: If true the compass button is included.
+    ///   - showZoom: If true the zoom-in and zoom-out buttons are included.
+    ///   - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
+    public func addNavigationControl(
+        position: MTMapCorner = .topRight,
+        showCompass: Bool = true,
+        showZoom: Bool = true,
+        visualizePitch: Bool = true
+    ) async {
+        await withCheckedContinuation { continuation in
+            addNavigationControl(
+                position: position,
+                showCompass: showCompass,
+                showZoom: showZoom,
+                visualizePitch: visualizePitch
+            ) { _ in
                 continuation.resume()
             }
         }

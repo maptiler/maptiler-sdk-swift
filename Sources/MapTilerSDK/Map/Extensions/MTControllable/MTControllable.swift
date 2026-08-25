@@ -46,4 +46,9 @@ public protocol MTControllable {
     /// - Parameters:
     ///   - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
     func navigationControlVisualizePitch(_ visualizePitch: Bool) async
+
+    /// Adds the terrain control to the map.
+    /// - Parameters:
+    ///   - position: Map position to add the control to.
+    func addTerrainControl(position: MTMapCorner) async
 }

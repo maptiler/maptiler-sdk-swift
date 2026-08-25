@@ -114,6 +114,18 @@ extension MTMapView: MTControllable {
     ) {
         runCommand(NavigationControlVisualizePitch(visualizePitch: visualizePitch), completion: completionHandler)
     }
+
+    /// Adds the terrain control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addTerrainControl(
+        position: MTMapCorner = .topRight,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(AddTerrainControl(position: position), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -196,6 +208,17 @@ extension MTMapView {
     public func navigationControlVisualizePitch(_ visualizePitch: Bool) async {
         await withCheckedContinuation { continuation in
             navigationControlVisualizePitch(visualizePitch) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds the terrain control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    public func addTerrainControl(position: MTMapCorner = .topRight) async {
+        await withCheckedContinuation { continuation in
+            addTerrainControl(position: position) { _ in
                 continuation.resume()
             }
         }

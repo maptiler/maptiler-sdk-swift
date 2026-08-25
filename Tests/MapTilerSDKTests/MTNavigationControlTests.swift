@@ -45,4 +45,12 @@ struct MTNavigationControlTests {
         let expectedJS = "\(MTBridge.mapObject).navigationControl.showZoom = false;"
         #expect(command.toJS() == expectedJS)
     }
+
+    @Test func navigationControlVisualizePitchCommand_shouldMatchJS() async throws {
+        let visualizePitch = true
+        let command = NavigationControlVisualizePitch(visualizePitch: visualizePitch)
+
+        let expectedJS = "\(MTBridge.mapObject).navigationControl.visualizePitch = true;"
+        #expect(command.toJS() == expectedJS)
+    }
 }

@@ -41,4 +41,9 @@ public protocol MTControllable {
     /// - Parameters:
     ///   - showZoom: If true the zoom-in and zoom-out buttons are included.
     func navigationControlShowZoom(_ showZoom: Bool) async
+
+    /// Toggles the pitch visualization on the navigation control compass.
+    /// - Parameters:
+    ///   - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
+    func navigationControlVisualizePitch(_ visualizePitch: Bool) async
 }

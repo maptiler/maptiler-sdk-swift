@@ -33,9 +33,16 @@ struct MTNavigationControlTests {
     @Test func navigationControlShowCompassCommand_shouldMatchJS() async throws {
         let showCompass = false
         let command = NavigationControlShowCompass(showCompass: showCompass)
-        
+
         let expectedJS = "\(MTBridge.mapObject).navigationControl.showCompass = false;"
-        
+        #expect(command.toJS() == expectedJS)
+    }
+
+    @Test func navigationControlShowZoomCommand_shouldMatchJS() async throws {
+        let showZoom = false
+        let command = NavigationControlShowZoom(showZoom: showZoom)
+
+        let expectedJS = "\(MTBridge.mapObject).navigationControl.showZoom = false;"
         #expect(command.toJS() == expectedJS)
     }
 }

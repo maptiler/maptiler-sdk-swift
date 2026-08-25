@@ -90,6 +90,18 @@ extension MTMapView: MTControllable {
     ) {
         runCommand(NavigationControlShowCompass(showCompass: showCompass), completion: completionHandler)
     }
+
+    /// Toggles the zoom controls visibility on the navigation control.
+    /// - Parameters:
+    ///   - showZoom: If true the zoom-in and zoom-out buttons are included.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func navigationControlShowZoom(
+        _ showZoom: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(NavigationControlShowZoom(showZoom: showZoom), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -150,6 +162,17 @@ extension MTMapView {
     public func navigationControlShowCompass(_ showCompass: Bool) async {
         await withCheckedContinuation { continuation in
             navigationControlShowCompass(showCompass) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Toggles the zoom controls visibility on the navigation control.
+    /// - Parameters:
+    ///   - showZoom: If true the zoom-in and zoom-out buttons are included.
+    public func navigationControlShowZoom(_ showZoom: Bool) async {
+        await withCheckedContinuation { continuation in
+            navigationControlShowZoom(showZoom) { _ in
                 continuation.resume()
             }
         }

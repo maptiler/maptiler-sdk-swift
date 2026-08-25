@@ -36,4 +36,9 @@ public protocol MTControllable {
     /// - Parameters:
     ///   - showCompass: If true the compass button is included.
     func navigationControlShowCompass(_ showCompass: Bool) async
+
+    /// Toggles the zoom controls visibility on the navigation control.
+    /// - Parameters:
+    ///   - showZoom: If true the zoom-in and zoom-out buttons are included.
+    func navigationControlShowZoom(_ showZoom: Bool) async
 }

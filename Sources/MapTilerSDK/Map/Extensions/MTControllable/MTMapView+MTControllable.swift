@@ -78,6 +78,18 @@ extension MTMapView: MTControllable {
             completion: completionHandler
         )
     }
+
+    /// Toggles the compass visibility on the navigation control.
+    /// - Parameters:
+    ///   - showCompass: If true the compass button is included.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func navigationControlShowCompass(
+        _ showCompass: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(NavigationControlShowCompass(showCompass: showCompass), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -127,6 +139,17 @@ extension MTMapView {
                 showZoom: showZoom,
                 visualizePitch: visualizePitch
             ) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Toggles the compass visibility on the navigation control.
+    /// - Parameters:
+    ///   - showCompass: If true the compass button is included.
+    public func navigationControlShowCompass(_ showCompass: Bool) async {
+        await withCheckedContinuation { continuation in
+            navigationControlShowCompass(showCompass) { _ in
                 continuation.resume()
             }
         }

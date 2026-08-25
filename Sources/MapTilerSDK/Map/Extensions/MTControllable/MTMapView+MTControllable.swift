@@ -126,6 +126,51 @@ extension MTMapView: MTControllable {
     ) {
         runCommand(AddTerrainControl(position: position), completion: completionHandler)
     }
+
+    /// Adds the attribution control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - compact: If true, force a compact attribution that shows on click. If false, force the full attribution
+    ///              control. The default is a responsive attribution that collapses when the map is less than 640
+    ///              pixels wide.
+    ///   - customAttribution: String or strings to show in addition to any other attributions.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addAttributionControl(
+        position: MTMapCorner = .bottomRight,
+        compact: Bool? = nil,
+        customAttribution: [String]? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            AddAttributionControl(position: position, compact: compact, customAttribution: customAttribution),
+            completion: completionHandler
+        )
+    }
+
+    /// Adds the attribution control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - compact: If true, force a compact attribution that shows on click. If false, force the full attribution
+    ///              control. The default is a responsive attribution that collapses when the map is less than 640
+    ///              pixels wide.
+    ///   - customAttribution: String to show in addition to any other attributions.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addAttributionControl(
+        position: MTMapCorner = .bottomRight,
+        compact: Bool? = nil,
+        customAttribution: String? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        let attributions = customAttribution.map { [$0] }
+        addAttributionControl(
+            position: position,
+            compact: compact,
+            customAttribution: attributions,
+            completionHandler: completionHandler
+        )
+    }
 }
 
 // Concurrency
@@ -219,6 +264,52 @@ extension MTMapView {
     public func addTerrainControl(position: MTMapCorner = .topRight) async {
         await withCheckedContinuation { continuation in
             addTerrainControl(position: position) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds the attribution control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - compact: If true, force a compact attribution that shows on click. If false, force the full attribution
+    ///              control. The default is a responsive attribution that collapses when the map is less than 640
+    ///              pixels wide.
+    ///   - customAttribution: String or strings to show in addition to any other attributions.
+    public func addAttributionControl(
+        position: MTMapCorner = .bottomRight,
+        compact: Bool? = nil,
+        customAttribution: [String]? = nil
+    ) async {
+        await withCheckedContinuation { continuation in
+            addAttributionControl(
+                position: position,
+                compact: compact,
+                customAttribution: customAttribution
+            ) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds the attribution control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - compact: If true, force a compact attribution that shows on click. If false, force the full attribution
+    ///              control. The default is a responsive attribution that collapses when the map is less than 640
+    ///              pixels wide.
+    ///   - customAttribution: String to show in addition to any other attributions.
+    public func addAttributionControl(
+        position: MTMapCorner = .bottomRight,
+        compact: Bool? = nil,
+        customAttribution: String? = nil
+    ) async {
+        await withCheckedContinuation { continuation in
+            addAttributionControl(
+                position: position,
+                compact: compact,
+                customAttribution: customAttribution
+            ) { _ in
                 continuation.resume()
             }
         }

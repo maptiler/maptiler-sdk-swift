@@ -102,6 +102,18 @@ extension MTMapView: MTControllable {
     ) {
         runCommand(NavigationControlShowZoom(showZoom: showZoom), completion: completionHandler)
     }
+
+    /// Toggles the pitch visualization on the navigation control compass.
+    /// - Parameters:
+    ///   - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func navigationControlVisualizePitch(
+        _ visualizePitch: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(NavigationControlVisualizePitch(visualizePitch: visualizePitch), completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -173,6 +185,17 @@ extension MTMapView {
     public func navigationControlShowZoom(_ showZoom: Bool) async {
         await withCheckedContinuation { continuation in
             navigationControlShowZoom(showZoom) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Toggles the pitch visualization on the navigation control compass.
+    /// - Parameters:
+    ///   - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
+    public func navigationControlVisualizePitch(_ visualizePitch: Bool) async {
+        await withCheckedContinuation { continuation in
+            navigationControlVisualizePitch(visualizePitch) { _ in
                 continuation.resume()
             }
         }

@@ -828,6 +828,18 @@ extension MTMapView: MTNavigable {
         runCommandWithDoubleReturnValue(PointMag(point: point), completion: completionHandler)
     }
 
+    /// Calculate unit vector of this point.
+    /// - Parameters:
+    ///   - point: The point.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func pointUnit(
+        point: MTPoint,
+        completionHandler: @escaping (Result<MTPoint, MTError>) -> Void
+    ) {
+        runCommandWithPointReturnValue(PointUnit(point: point), completion: completionHandler)
+    }
+
     /// Get the angle from the 0, 0 coordinate to this point, in radians.
     /// - Parameters:
     ///   - point: The point.
@@ -1804,6 +1816,22 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: 0)
+                }
+            }
+        }
+    }
+
+    /// Calculate unit vector of this point.
+    /// - Parameter point: The point.
+    /// - Returns: The unit vector point.
+    public func pointUnit(point: MTPoint) async -> MTPoint {
+        await withCheckedContinuation { continuation in
+            pointUnit(point: point) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: MTPoint(x: 0, y: 0))
                 }
             }
         }

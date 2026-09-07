@@ -69,4 +69,11 @@ public protocol MTControllable {
     ///              pixels wide.
     ///   - customAttribution: String to show in addition to any other attributions.
     func addAttributionControl(position: MTMapCorner, compact: Bool?, customAttribution: String?) async
+
+    /// Adds the scale control to the map.
+    /// - Parameters:
+    ///   - position: Map position to add the control to.
+    ///   - maxWidth: The maximum length of the scale control in pixels.
+    ///   - unit: Unit of the distance.
+    func addScaleControl(position: MTMapCorner, maxWidth: Int?, unit: MTUnit?) async
 }

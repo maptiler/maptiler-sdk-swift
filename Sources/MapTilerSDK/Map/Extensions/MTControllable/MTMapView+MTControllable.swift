@@ -171,6 +171,25 @@ extension MTMapView: MTControllable {
             completionHandler: completionHandler
         )
     }
+
+    /// Adds the scale control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - maxWidth: The maximum length of the scale control in pixels.
+    ///   - unit: Unit of the distance.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func addScaleControl(
+        position: MTMapCorner = .bottomLeft,
+        maxWidth: Int? = nil,
+        unit: MTUnit? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            AddScaleControl(position: position, maxWidth: maxWidth, unit: unit),
+            completion: completionHandler
+        )
+    }
 }
 
 // Concurrency
@@ -309,6 +328,27 @@ extension MTMapView {
                 position: position,
                 compact: compact,
                 customAttribution: customAttribution
+            ) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Adds the scale control to the map.
+    /// - Parameters:
+    ///   - position: The corner position of the control.
+    ///   - maxWidth: The maximum length of the scale control in pixels.
+    ///   - unit: Unit of the distance.
+    public func addScaleControl(
+        position: MTMapCorner = .bottomLeft,
+        maxWidth: Int? = nil,
+        unit: MTUnit? = nil
+    ) async {
+        await withCheckedContinuation { continuation in
+            addScaleControl(
+                position: position,
+                maxWidth: maxWidth,
+                unit: unit
             ) { _ in
                 continuation.resume()
             }

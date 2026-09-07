@@ -40,6 +40,9 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Boolean value indicating whether the popup is currently open on the map.
     public private(set) var isOpen: Bool = false
 
+    /// Boolean value indicating whether the popup displays a close button.
+    public private(set) var closeButton: Bool = true
+
     /// Called when the popup opens on the map.
     public var onOpen: (() -> Void)?
 
@@ -53,12 +56,14 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     ///  - offset: The pixel distance from the popup's coordinates.
     ///  - maxWidth: The maximum width of the popup.
     ///  - anchor: Anchor of the popup.
+    ///  - closeButton: Boolean indicating whether the popup displays a close button.
     public init(
         coordinates: CLLocationCoordinate2D,
         text: String,
         offset: Double = 0.0,
         maxWidth: Double? = nil,
-        anchor: MTAnchor? = nil
+        anchor: MTAnchor? = nil,
+        closeButton: Bool = true
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -66,6 +71,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.offset = offset
         self.maxWidth = maxWidth
         self.anchor = anchor
+        self.closeButton = closeButton
     }
 
     /// Sets coordinates for the popup.
@@ -149,6 +155,23 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         isSubpixelPositioningEnabled = isEnabled
 
         mapView.setSubpixelPositioning(isEnabled, for: self, completionHandler: completionHandler)
+    }
+
+    /// Toggles the visibility of the close button.
+    /// - Parameters:
+    ///   - isVisible: Boolean indicating whether the close button is visible.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setCloseButton(
+        _ isVisible: Bool,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.closeButton = isVisible
+
+        mapView.setCloseButton(isVisible, for: self, completionHandler: completionHandler)
     }
 
     /// Updates the popup text content.
@@ -401,6 +424,19 @@ extension MTTextPopup {
         }
     }
 
+    /// Toggles the visibility of the close button.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setCloseButton(_ isVisible: Bool, in mapView: MTMapView) async {
+        self.closeButton = isVisible
+
+        await withCheckedContinuation { continuation in
+            setCloseButton(isVisible, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
     /// Updates the popup text content.
     /// - Parameter mapView: Map view to apply to.
     @MainActor
@@ -536,7 +572,9 @@ extension MTTextPopup {
                 coordinates: self.coordinates,
                 text: self.text,
                 offset: self.offset ?? 0.0,
-                maxWidth: self.maxWidth
+                maxWidth: self.maxWidth,
+                anchor: self.anchor,
+                closeButton: self.closeButton
             )
 
             await mapView.addTextPopup(popup)

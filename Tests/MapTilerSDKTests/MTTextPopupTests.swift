@@ -27,6 +27,18 @@ struct MTTextPopupTests {
         #expect(jsString.contains("\"maxWidth\":320"))
     }
 
+    @Test func addTextPopupCommand_includesCloseButton() async throws {
+        let popup = MTTextPopup(
+            coordinates: coordinate,
+            text: "Hello World",
+            closeButton: false
+        )
+
+        let jsString = AddTextPopup(popup: popup).toJS()
+
+        #expect(jsString.contains("\"closeButton\":false"))
+    }
+
 
     @Test func addTextPopupCommand_includesAnchorWhenProvided() async throws {
         let popup = MTTextPopup(
@@ -123,6 +135,31 @@ struct MTTextPopupTests {
         #expect(
             SetSubpixelPositioningToTextPopup(popup: popup, isEnabled: true).toJS()
                 == "window.\(popup.identifier).setSubpixelPositioning(true);"
+        )
+        #expect(
+            SetCloseButtonToTextPopup(popup: popup, isVisible: true).toJS()
+                == """
+                var popup = window.\(popup.identifier);
+                if (popup) {
+                    popup.options.closeButton = true;
+                    if (true) {
+                        if (!popup._closeButton && popup._content) {
+                            var btn = document.createElement('button');
+                            btn.className = 'maplibregl-popup-close-button';
+                            btn.type = 'button';
+                            btn.innerHTML = '&#215;';
+                            btn.setAttribute('aria-label', 'Close popup');
+                            btn.addEventListener('click', () => popup.remove());
+                            popup._closeButton = btn;
+                            popup._content.appendChild(btn);
+                        } else if (popup._closeButton) {
+                            popup._closeButton.style.display = 'block';
+                        }
+                    } else if (popup._closeButton) {
+                        popup._closeButton.style.display = 'none';
+                    }
+                }
+                """
         )
         #expect(
             SetTextToTextPopup(popup: popup, text: popup.text).toJS()

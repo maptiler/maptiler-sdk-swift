@@ -864,6 +864,17 @@ extension MTMapView: MTStylable {
         )
     }
 
+    package func setCloseButton(
+        _ isVisible: Bool,
+        for popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            SetCloseButtonToTextPopup(popup: popup, isVisible: isVisible),
+            completion: completionHandler
+        )
+    }
+
     package func setAnchor(
         _ anchor: MTAnchor?,
         to popup: MTTextPopup,

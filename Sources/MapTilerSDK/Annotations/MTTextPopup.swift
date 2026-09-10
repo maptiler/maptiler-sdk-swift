@@ -43,6 +43,9 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Boolean value indicating whether the popup displays a close button.
     public private(set) var closeButton: Bool = true
 
+    /// Boolean value indicating whether the popup closes when the map is clicked.
+    public private(set) var closeOnClick: Bool = true
+
     /// Called when the popup opens on the map.
     public var onOpen: (() -> Void)?
 
@@ -57,13 +60,15 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     ///  - maxWidth: The maximum width of the popup.
     ///  - anchor: Anchor of the popup.
     ///  - closeButton: Boolean indicating whether the popup displays a close button.
+    ///  - closeOnClick: Boolean indicating whether the popup closes when the map is clicked.
     public init(
         coordinates: CLLocationCoordinate2D,
         text: String,
         offset: Double = 0.0,
         maxWidth: Double? = nil,
         anchor: MTAnchor? = nil,
-        closeButton: Bool = true
+        closeButton: Bool = true,
+        closeOnClick: Bool = true
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -72,6 +77,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.maxWidth = maxWidth
         self.anchor = anchor
         self.closeButton = closeButton
+        self.closeOnClick = closeOnClick
     }
 
     /// Sets coordinates for the popup.
@@ -172,6 +178,23 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.closeButton = isVisible
 
         mapView.setCloseButton(isVisible, for: self, completionHandler: completionHandler)
+    }
+
+    /// Toggles the close on click behavior.
+    /// - Parameters:
+    ///   - isEnabled: Boolean indicating whether the popup closes on map click.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setCloseOnClick(
+        _ isEnabled: Bool,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.closeOnClick = isEnabled
+
+        mapView.setCloseOnClick(isEnabled, for: self, completionHandler: completionHandler)
     }
 
     /// Updates the popup text content.
@@ -437,6 +460,19 @@ extension MTTextPopup {
         }
     }
 
+    /// Toggles the close on click behavior.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setCloseOnClick(_ isEnabled: Bool, in mapView: MTMapView) async {
+        self.closeOnClick = isEnabled
+
+        await withCheckedContinuation { continuation in
+            setCloseOnClick(isEnabled, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
     /// Updates the popup text content.
     /// - Parameter mapView: Map view to apply to.
     @MainActor
@@ -574,7 +610,8 @@ extension MTTextPopup {
                 offset: self.offset ?? 0.0,
                 maxWidth: self.maxWidth,
                 anchor: self.anchor,
-                closeButton: self.closeButton
+                closeButton: self.closeButton,
+                closeOnClick: self.closeOnClick
             )
 
             await mapView.addTextPopup(popup)

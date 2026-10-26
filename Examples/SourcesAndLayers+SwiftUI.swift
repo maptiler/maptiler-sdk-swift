@@ -17,7 +17,7 @@ struct SourcesAndLayersMapView: View {
     let airportsSourceID = "airportsSource"
 
     let contoursTilesURL = URL(
-        string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY"
+        string: "\(MTConfig.shared.apiURL)tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY"
     ) ?? URL.documentsDirectory
 
     @State private var referenceStyle: MTMapReferenceStyle = .base

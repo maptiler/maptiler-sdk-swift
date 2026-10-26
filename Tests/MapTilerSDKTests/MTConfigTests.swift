@@ -58,4 +58,30 @@ struct MTConfigTests {
         // Reset state
         await MTConfig.shared.setApplicationIdentifier("")
     }
+
+    @Test func setUseEuEndpointsToJS() async throws {
+        #expect(SetUseEuEndpoints(useEuEndpoints: true).toJS() == "\(MTBridge.sdkObject).config.useEuEndpoints = true;")
+        #expect(SetUseEuEndpoints(useEuEndpoints: false).toJS() == "\(MTBridge.sdkObject).config.useEuEndpoints = false;")
+    }
+
+    @Test func initializeMapPassesUseEuEndpoints() async throws {
+        let euCommand = InitializeMap(
+            apiKey: "KEY",
+            options: nil,
+            referenceStyle: .streets,
+            styleVariant: nil,
+            shouldEnableSessionLogic: true,
+            useEuEndpoints: true
+        )
+        #expect(euCommand.toJS().contains(", true, true);"))
+
+        let defaultCommand = InitializeMap(
+            apiKey: "KEY",
+            options: nil,
+            referenceStyle: .streets,
+            styleVariant: nil,
+            shouldEnableSessionLogic: true
+        )
+        #expect(defaultCommand.toJS().contains(", true, false);"))
+    }
 }

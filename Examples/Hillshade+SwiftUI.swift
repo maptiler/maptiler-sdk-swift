@@ -29,7 +29,7 @@ struct HillshadeExample: View {
         guard let apiKey = await MTConfig.shared.getAPIKey() else { return }
 
         guard let url = URL(
-            string: "https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=\(apiKey)"
+            string: "\(MTConfig.shared.apiURL)tiles/terrain-rgb-v2/tiles.json?key=\(apiKey)"
         ) else { return }
 
         let dem = MTRasterDEMSource(identifier: "hillshadeSource", url: url)

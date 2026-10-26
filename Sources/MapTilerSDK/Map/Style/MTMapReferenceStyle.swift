@@ -223,7 +223,7 @@ public enum MTMapReferenceStyle: Identifiable, Hashable, Sendable, Codable {
         }
 
         let mapId = getMapTilerCloudId(variant: variant)
-        return URL(string: "https://api.maptiler.com/maps/\(mapId)/style.json?key=\(apiKey)")
+        return URL(string: "\(MTConfig.shared.apiURL)maps/\(mapId)/style.json?key=\(apiKey)")
     }
 
     private func getMapTilerCloudId(variant: MTMapStyleVariant?) -> String {

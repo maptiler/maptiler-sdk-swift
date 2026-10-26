@@ -277,7 +277,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
         let source = MTVectorTileSource(
             identifier: "planet-source",
-            url: URL("https://api.maptiler.com/tiles/v3/tiles.json")!
+            url: URL(string: "\(MTConfig.shared.apiURL)tiles/v3/tiles.json")!
         )
         await benchmarkJSExecution(command: AddSource(source: source))
 
@@ -441,7 +441,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
         let source = MTVectorTileSource(
             identifier: "bench-source",
-            tiles: [URL(string: "https://api.maptiler.com/tiles/v3/tiles.json")!]
+            tiles: [URL(string: "\(MTConfig.shared.apiURL)tiles/v3/tiles.json")!]
         )
         try? await mapView.style?.addSource(source)
 
@@ -469,37 +469,37 @@ public final class MTBenchmark: MTMapViewDelegate {
         let sources: [(String, String, UIColor)] = [
             (
                 "contour",
-                "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=\(apiKey)",
+                "\(MTConfig.shared.apiURL)tiles/contours-v2/{z}/{x}/{y}.pbf?key=\(apiKey)",
                 .red.withAlphaComponent(0.2)
             ),
             (
                 "administrative",
-                "https://api.maptiler.com/tiles/countries/{z}/{x}/{y}.pbf?key=\(apiKey)",
+                "\(MTConfig.shared.apiURL)tiles/countries/{z}/{x}/{y}.pbf?key=\(apiKey)",
                 .white.withAlphaComponent(0.2)
             ),
             (
                 "land",
-                "https://api.maptiler.com/tiles/land/{z}/{x}/{y}.pbf?key=\(apiKey)",
+                "\(MTConfig.shared.apiURL)tiles/land/{z}/{x}/{y}.pbf?key=\(apiKey)",
                 .blue.withAlphaComponent(0.2)
             ),
             (
                 "contour",
-                "https://api.maptiler.com/tiles/ocean/{z}/{x}/{y}.pbf?key=\(apiKey)",
+                "\(MTConfig.shared.apiURL)tiles/ocean/{z}/{x}/{y}.pbf?key=\(apiKey)",
                 .green.withAlphaComponent(0.2)
             ),
             (
                 "ski",
-                "https://api.maptiler.com/tiles/outdoor/{z}/{x}/{y}.pbf?key=\(apiKey)",
+                "\(MTConfig.shared.apiURL)tiles/outdoor/{z}/{x}/{y}.pbf?key=\(apiKey)",
                 .orange.withAlphaComponent(0.2)
             ),
             (
                 "batiments",
-                "https://api.maptiler.com/tiles/fr-cadastre/{z}/{x}/{y}.pbf?key=\(apiKey)",
+                "\(MTConfig.shared.apiURL)tiles/fr-cadastre/{z}/{x}/{y}.pbf?key=\(apiKey)",
                 .black.withAlphaComponent(0.2)
             ),
             (
                 "building",
-                "https://api.maptiler.com/tiles/ch-swisstopo-lbm/{z}/{x}/{y}.pbf?key=\(apiKey)",
+                "\(MTConfig.shared.apiURL)tiles/ch-swisstopo-lbm/{z}/{x}/{y}.pbf?key=\(apiKey)",
                 .lightGray.withAlphaComponent(0.2)
             )
         ]
@@ -527,7 +527,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
             let source = MTVectorTileSource(
                 identifier: "source-\(sourceTuple.0)",
-                tiles: [URL(string: "https://api.maptiler.com/tiles/v3-openmaptiles/{z}/{x}/{y}.pbf?key=\(apiKey)")!]
+                tiles: [URL(string: "\(MTConfig.shared.apiURL)tiles/v3-openmaptiles/{z}/{x}/{y}.pbf?key=\(apiKey)")!]
             )
             try? await mapView.style?.addSource(source)
 
@@ -545,7 +545,7 @@ public final class MTBenchmark: MTMapViewDelegate {
 
             let source = MTVectorTileSource(
                 identifier: "source-\(sourceTuple.0)",
-                tiles: [URL(string: "https://api.maptiler.com/tiles/uk-openzoomstack/{z}/{x}/{y}.pbf?key=\(apiKey)")!]
+                tiles: [URL(string: "\(MTConfig.shared.apiURL)tiles/uk-openzoomstack/{z}/{x}/{y}.pbf?key=\(apiKey)")!]
             )
             try? await mapView.style?.addSource(source)
 

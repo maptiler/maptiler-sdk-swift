@@ -15,4 +15,5 @@ package protocol MTConfigurable {
     func setSession(_ isEnabled: Bool) async
     func setUnit(_ unit: MTUnit) async
     func setTelemetry(_ isEnabled: Bool) async
+    func setUseEuEndpoints(_ useEuEndpoints: Bool) async
 }

@@ -8,7 +8,8 @@ import Testing
 import Foundation
 @testable import MapTilerSDK
 
-@Suite
+// Serialized because the EU endpoint tests toggle the global MTConfig API host.
+@Suite(.serialized)
 struct MTURLNormalizerTests {
     
     @Test func testNormalURLWithoutKey() {
@@ -69,5 +70,35 @@ struct MTURLNormalizerTests {
         let normalized = await MTURLNormalizer.normalize(url: url)
         
         #expect(normalized.absoluteString == "https://api.maptiler.com/maps/streets-v4/style.json?key=\(key)")
+    }
+
+    @Test func testDefaultApiEndpoints() async {
+        await MTConfig.shared.setUseEuEndpoints(false)
+
+        #expect(MTConfig.shared.useEuEndpoints == false)
+        #expect(MTConfig.shared.apiHost == "api.maptiler.com")
+        #expect(MTConfig.shared.apiURL == "https://api.maptiler.com/")
+    }
+
+    @Test func testEuApiEndpoints() async {
+        await MTConfig.shared.setUseEuEndpoints(true)
+
+        #expect(MTConfig.shared.useEuEndpoints == true)
+        #expect(MTConfig.shared.apiHost == "api.maptiler.eu")
+        #expect(MTConfig.shared.apiURL == "https://api.maptiler.eu/")
+
+        let url = URL(string: "maptiler://maps/streets-v4/style.json")!
+        let normalized = MTURLNormalizer.normalize(url: url, apiKey: "KEY")
+        #expect(normalized.absoluteString == "https://api.maptiler.eu/maps/streets-v4/style.json?key=KEY")
+
+        let styleURL = MTMapReferenceStyle.streets.fetchStyleURL(apiKey: "KEY")
+        #expect(styleURL?.absoluteString == "https://api.maptiler.eu/maps/streets-v4/style.json?key=KEY")
+
+        let offlineStyleURL = MTOfflineEndpoints.style(mapId: "streets-v4", apiKey: "KEY")
+        #expect(offlineStyleURL?.absoluteString == "https://api.maptiler.eu/maps/streets-v4/style.json?key=KEY")
+
+        await MTConfig.shared.setUseEuEndpoints(false)
+        #expect(MTConfig.shared.apiHost == "api.maptiler.com")
+        #expect(MTConfig.shared.apiURL == "https://api.maptiler.com/")
     }
 }

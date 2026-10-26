@@ -75,6 +75,35 @@ public actor MTConfig {
     /// The MapTiler session ID used for sessionized requests and telemetry.
     private var sessionId: String?
 
+    /// Default MapTiler API host.
+    public static let defaultAPIHost = "api.maptiler.com"
+
+    /// EU-based MapTiler API host.
+    public static let euAPIHost = "api.maptiler.eu"
+
+    nonisolated(unsafe) private static var _useEuEndpoints: Bool = false
+
+    /// Boolean indicating whether the EU-based `api.maptiler.eu` host is currently in use
+    /// instead of the default `api.maptiler.com`.
+    ///
+    ///  - Note: Defaults to false.
+    public nonisolated var useEuEndpoints: Bool {
+        Self.lock.lock()
+        defer { Self.lock.unlock() }
+        return Self._useEuEndpoints
+    }
+
+    /// The host currently used for the MapTiler API requests (`api.maptiler.com` or `api.maptiler.eu`).
+    public nonisolated var apiHost: String {
+        return useEuEndpoints ? Self.euAPIHost : Self.defaultAPIHost
+    }
+
+    /// The base URL currently used for the MapTiler API requests
+    /// (`https://api.maptiler.com/` or `https://api.maptiler.eu/`).
+    public nonisolated var apiURL: String {
+        return "https://\(apiHost)/"
+    }
+
     /// Sets the SDK log level.
     /// - Parameters:
     ///   - level:  The desired SDK log level.
@@ -93,6 +122,26 @@ public actor MTConfig {
         if let map {
             Task {
                 await  map.setAPIKey(apiKey)
+            }
+        }
+    }
+
+    /// Switch between the default `api.maptiler.com` host and the EU-based `api.maptiler.eu` host.
+    ///
+    /// Set to `false` to switch back to the default.
+    /// Make sure to call before map init and before offline downloads are started.
+    /// - Parameters:
+    ///   - useEuEndpoints:  Boolean indicating whether the EU-based host should be used.
+    ///   - map:  Map view to apply to.
+    /// - Note: Disabled by default
+    public func setUseEuEndpoints(_ useEuEndpoints: Bool, for map: MTMapView? = nil) {
+        Self.lock.lock()
+        Self._useEuEndpoints = useEuEndpoints
+        Self.lock.unlock()
+
+        if let map {
+            Task {
+                await map.setUseEuEndpoints(useEuEndpoints)
             }
         }
     }

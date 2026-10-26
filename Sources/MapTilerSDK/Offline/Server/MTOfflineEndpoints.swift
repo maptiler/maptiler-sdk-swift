@@ -2,7 +2,9 @@ import Foundation
 
 // Defines standard MapTiler endpoints and URL constructors for offline assets.
 internal enum MTOfflineEndpoints {
-    internal static let baseURL = "https://api.maptiler.com"
+    internal static var baseURL: String {
+        return "https://\(MTConfig.shared.apiHost)"
+    }
 
     // The entry point that defines what sources, sprites, and glyphs need to be downloaded.
     internal static func style(mapId: String, apiKey: String) -> URL? {

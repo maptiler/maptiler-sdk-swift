@@ -452,7 +452,8 @@ extension MTMapView {
                     options: options,
                     referenceStyle: referenceStyleProxy,
                     styleVariant: styleVariantProxy,
-                    shouldEnableSessionLogic: isSessionLogicEnabled)
+                    shouldEnableSessionLogic: isSessionLogicEnabled,
+                    useEuEndpoints: MTConfig.shared.useEuEndpoints)
                 )
 
                 MTLogger.log("\(MTLogger.infoMarker) - Map Initialized Successfully", type: .info)

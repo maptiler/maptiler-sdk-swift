@@ -161,7 +161,7 @@ class MainViewController: UIViewController {
         Task {
             if let mapTilerAPIKey = await MTConfig.shared.getAPIKey() {
                 if let openMapURL = URL(
-                    string: "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=\(mapTilerAPIKey)"
+                    string: "\(MTConfig.shared.apiURL)tiles/v3-openmaptiles/tiles.json?key=\(mapTilerAPIKey)"
                 ) {
                     openMapSource = MTVectorTileSource(identifier: "openmapsource", url: openMapURL)
                     if let openMapSource {
@@ -170,7 +170,7 @@ class MainViewController: UIViewController {
                 }
 
                 if let contoursURL = URL(
-                    string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=\(mapTilerAPIKey)"
+                    string: "\(MTConfig.shared.apiURL)tiles/contours-v2/tiles.json?key=\(mapTilerAPIKey)"
                 ) {
                     contoursSource = MTVectorTileSource(identifier: "contourssource", url: contoursURL)
                     if let contoursSource {
@@ -180,7 +180,7 @@ class MainViewController: UIViewController {
 
                 // Satellite raster source (TileJSON)
                 if let satelliteURL = URL(
-                    string: "https://api.maptiler.com/tiles/satellite/tiles.json?key=\(mapTilerAPIKey)"
+                    string: "\(MTConfig.shared.apiURL)tiles/satellite/tiles.json?key=\(mapTilerAPIKey)"
                 ) {
                     satelliteSource = MTRasterTileSource(identifier: "satellitesource", url: satelliteURL)
                     if let satelliteSource {

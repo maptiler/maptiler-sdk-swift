@@ -33,6 +33,14 @@ extension MTMapView: MTConfigurable {
         runCommand(SetTelemetry(shouldEnableTelemetry: isEnabled), completion: completionHandler)
     }
 
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    package func setUseEuEndpoints(
+        _ useEuEndpoints: Bool,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetUseEuEndpoints(useEuEndpoints: useEuEndpoints), completion: completionHandler)
+    }
+
     /// Returns the current SDK session UUID used for sessionized requests and telemetry.
     /// - Parameter completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
@@ -104,6 +112,14 @@ extension MTMapView {
     package func setTelemetry(_ isEnabled: Bool) async {
         await withCheckedContinuation { continuation in
             setTelemetry(isEnabled) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    package func setUseEuEndpoints(_ useEuEndpoints: Bool) async {
+        await withCheckedContinuation { continuation in
+            setUseEuEndpoints(useEuEndpoints) { _ in
                 continuation.resume()
             }
         }

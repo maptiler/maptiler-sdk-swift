@@ -13,6 +13,7 @@ package struct InitializeMap: MTCommand {
     var referenceStyle: MTMapReferenceStyle
     var styleVariant: MTMapStyleVariant?
     var shouldEnableSessionLogic: Bool
+    var useEuEndpoints: Bool = false
 
     package func toJS() -> JSString {
         let referenceStyleName = referenceStyle.getName()
@@ -42,7 +43,7 @@ package struct InitializeMap: MTCommand {
         }
 
         return """
-        initializeMap('\(apiKey)', \(styleString), \(optionsString), \(shouldEnableSessionLogic));
+        initializeMap('\(apiKey)', \(styleString), \(optionsString), \(shouldEnableSessionLogic), \(useEuEndpoints));
         if (typeof map !== 'undefined' && map.telemetry) {
             map.telemetry.registerModule('maptiler-sdk-ios', '\(MTConfig.version)');
         }

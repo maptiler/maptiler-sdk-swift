@@ -53,6 +53,17 @@ Task {
 }
 ```
 
+To send MapTiler API requests to the EU-based `api.maptiler.eu` host instead of the default `api.maptiler.com`, enable EU endpoints before the map is initialized:
+
+```swift
+Task {
+    await MTConfig.shared.setUseEuEndpoints(true)
+}
+
+MTConfig.shared.apiHost // "api.maptiler.eu"
+MTConfig.shared.apiURL  // "https://api.maptiler.eu/"
+```
+
 ### UIKit
 
 ```swift
@@ -116,7 +127,7 @@ guard let style = mapView.style else {
     return
 }
 
-if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=YOUR_API_KEY") {
+if let contoursTilesURL = URL(string: "\(MTConfig.shared.apiURL)tiles/contours-v2/tiles.json?key=YOUR_API_KEY") {
     let contoursDataSource = MTVectorTileSource(identifier: "contoursSource", url: contoursTilesURL)
     style.addSource(contoursDataSource)
 
@@ -135,7 +146,7 @@ if let contoursTilesURL = URL(string: "https://api.maptiler.com/tiles/contours-v
 
 var body: some View {
     MTMapViewContainer(map: mapView) {
-        MTVectorTileSource(identifier: "countoursSource", url: URL(string: "https://api.maptiler.com/tiles/contours-v2/tiles.json?key=YOUR_API_KEY"))
+        MTVectorTileSource(identifier: "countoursSource", url: URL(string: "\(MTConfig.shared.apiURL)tiles/contours-v2/tiles.json?key=YOUR_API_KEY"))
 
         MTLineLayer(identifier: "contoursLayer", sourceIdentifier: "countoursSource", sourceLayer: "contour_ft")
             .color(.brown)

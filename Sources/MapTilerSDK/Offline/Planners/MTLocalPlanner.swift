@@ -133,7 +133,7 @@ internal class MTLocalPlanner: MTOfflinePlanner {
                 let terrainSource = MTStyleSource(
                     id: "maptiler-terrain",
                     type: "raster-dem",
-                    url: "https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=\(apiKey)"
+                    url: "\(MTConfig.shared.apiURL)tiles/terrain-rgb-v2/tiles.json?key=\(apiKey)"
                 )
 
                 var newSources = currentDependencies.sources

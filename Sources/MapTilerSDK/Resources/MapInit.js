@@ -3,9 +3,10 @@
  - It does not use ES Modules or TypeScript to ensure compatibility with non-module environments.
  */
 
-function initializeMap(apiKey, style, options, session) {
+function initializeMap(apiKey, style, options, session, useEuEndpoints) {
     maptilersdk.config.apiKey = apiKey;
     maptilersdk.config.session = session;
+    maptilersdk.config.useEuEndpoints = useEuEndpoints === true;
 
     const baseOptions = {
         container: 'map',

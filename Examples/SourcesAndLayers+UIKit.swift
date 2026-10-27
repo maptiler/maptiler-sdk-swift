@@ -40,7 +40,7 @@ class SourcesAndLayersMapViewController: UIViewController {
         }
 
         if let contoursTilesURL = URL(
-            string: "https://api.maptiler.com/tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY"
+            string: "\(MTConfig.shared.apiURL)tiles/contours-v2/{z}/{x}/{y}.pbf?key=YOUR_API_KEY"
         ) {
             let contoursDataSource = MTVectorTileSource(identifier: "contoursSource", tiles: [contoursTilesURL])
             style.addSource(contoursDataSource)

@@ -19,7 +19,7 @@ extension MTMapView: MTControllable {
         position: MTMapCorner,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        if let url = URL(string: "https://api.maptiler.com/resources/logo.svg"),
+        if let url = URL(string: "\(MTConfig.shared.apiURL)resources/logo.svg"),
             let linkURL = URL(string: "https://www.maptiler.com") {
             runCommand(
                 AddLogoControl(name: "MapTilerLogo", url: url, linkURL: linkURL, position: position),

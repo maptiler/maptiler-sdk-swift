@@ -30,9 +30,9 @@ internal struct MTURLNormalizer {
             let originalPath = components.path
 
             components.scheme = "https"
-            components.host = "api.maptiler.com"
+            components.host = MTConfig.shared.apiHost
 
-            // Map maptiler://<host>/<path> to https://api.maptiler.com/<host>/<path>
+            // Map maptiler://<host>/<path> to https://<MTConfig.apiHost>/<host>/<path>
             var newPath = "/" + originalHost
             if !originalPath.isEmpty {
                 if !originalPath.hasPrefix("/") {

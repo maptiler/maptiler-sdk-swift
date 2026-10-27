@@ -897,6 +897,17 @@ extension MTMapView: MTStylable {
         )
     }
 
+    package func setFocusAfterOpen(
+        _ isEnabled: Bool,
+        for popup: MTTextPopup,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            SetFocusAfterOpenToTextPopup(popup: popup, isEnabled: isEnabled),
+            completion: completionHandler
+        )
+    }
+
     package func setAnchor(
         _ anchor: MTAnchor?,
         to popup: MTTextPopup,

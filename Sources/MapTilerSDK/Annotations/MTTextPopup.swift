@@ -46,6 +46,9 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Boolean value indicating whether the popup closes when the map is clicked.
     public private(set) var closeOnClick: Bool = true
 
+    /// Boolean value indicating whether the popup closes when the map moves.
+    public private(set) var closeOnMove: Bool = false
+
     /// Called when the popup opens on the map.
     public var onOpen: (() -> Void)?
 
@@ -61,6 +64,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     ///  - anchor: Anchor of the popup.
     ///  - closeButton: Boolean indicating whether the popup displays a close button.
     ///  - closeOnClick: Boolean indicating whether the popup closes when the map is clicked.
+    ///  - closeOnMove: Boolean indicating whether the popup closes when the map moves.
     public init(
         coordinates: CLLocationCoordinate2D,
         text: String,
@@ -68,7 +72,8 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         maxWidth: Double? = nil,
         anchor: MTAnchor? = nil,
         closeButton: Bool = true,
-        closeOnClick: Bool = true
+        closeOnClick: Bool = true,
+        closeOnMove: Bool = false
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -78,6 +83,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.anchor = anchor
         self.closeButton = closeButton
         self.closeOnClick = closeOnClick
+        self.closeOnMove = closeOnMove
     }
 
     /// Sets coordinates for the popup.
@@ -195,6 +201,23 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.closeOnClick = isEnabled
 
         mapView.setCloseOnClick(isEnabled, for: self, completionHandler: completionHandler)
+    }
+
+    /// Toggles the close on move behavior.
+    /// - Parameters:
+    ///   - isEnabled: Boolean indicating whether the popup closes when the map moves.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setCloseOnMove(
+        _ isEnabled: Bool,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.closeOnMove = isEnabled
+
+        mapView.setCloseOnMove(isEnabled, for: self, completionHandler: completionHandler)
     }
 
     /// Updates the popup text content.
@@ -468,6 +491,19 @@ extension MTTextPopup {
 
         await withCheckedContinuation { continuation in
             setCloseOnClick(isEnabled, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Toggles the close on move behavior.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setCloseOnMove(_ isEnabled: Bool, in mapView: MTMapView) async {
+        self.closeOnMove = isEnabled
+
+        await withCheckedContinuation { continuation in
+            setCloseOnMove(isEnabled, in: mapView) { _ in
                 continuation.resume()
             }
         }

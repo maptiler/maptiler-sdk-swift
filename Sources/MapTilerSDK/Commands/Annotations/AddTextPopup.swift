@@ -17,6 +17,7 @@ package struct AddTextPopup: MTCommand {
             let anchor: MTAnchor?
             let closeButton: Bool
             let closeOnClick: Bool
+            let closeOnMove: Bool
 
             enum CodingKeys: String, CodingKey {
                 case offset
@@ -24,6 +25,7 @@ package struct AddTextPopup: MTCommand {
                 case anchor
                 case closeButton
                 case closeOnClick
+                case closeOnMove
             }
 
             func encode(to encoder: Encoder) throws {
@@ -31,6 +33,7 @@ package struct AddTextPopup: MTCommand {
                 try container.encode(offset, forKey: .offset)
                 try container.encode(closeButton, forKey: .closeButton)
                 try container.encode(closeOnClick, forKey: .closeOnClick)
+                try container.encode(closeOnMove, forKey: .closeOnMove)
 
                 if let maxWidth {
                     try container.encode(maxWidth, forKey: .maxWidth)
@@ -47,7 +50,8 @@ package struct AddTextPopup: MTCommand {
             maxWidth: popup.maxWidth,
             anchor: popup.anchor,
             closeButton: popup.closeButton,
-            closeOnClick: popup.closeOnClick
+            closeOnClick: popup.closeOnClick,
+            closeOnMove: popup.closeOnMove
         )
         let optionsString = options.toJSON() ?? "{}"
         let coordinates = popup.coordinates.toLngLat()

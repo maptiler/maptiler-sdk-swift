@@ -86,6 +86,19 @@ struct MTTextPopupTests {
 
         #expect(jsString.contains("\"anchor\":\"top\""))
     }
+
+    @Test func addTextPopupCommand_omitsAnchorWhenNil() async throws {
+        let popup = MTTextPopup(
+            coordinates: coordinate,
+            text: "Hello World",
+            offset: 2.0
+        )
+
+        let jsString = AddTextPopup(popup: popup).toJS()
+
+        #expect(!jsString.contains("anchor"))
+    }
+
     @Test func addTextPopupCommand_omitsMaxWidthWhenNil() async throws {
         let popup = MTTextPopup(
             coordinates: coordinate,

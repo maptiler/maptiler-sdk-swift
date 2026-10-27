@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.2.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.2.0)
+Released on 2026-10-27.
+### Added
+- Users now have option to set EU endpoint for the API in addition to the default one.
+
 ## [2.1.3](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.1.3)
 Released on 2026-08-24.
 ### Fixed

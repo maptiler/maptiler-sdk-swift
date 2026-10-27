@@ -63,6 +63,18 @@ struct MTTextPopupTests {
         #expect(jsString.contains("\"closeOnMove\":true"))
     }
 
+    @Test func addTextPopupCommand_includesFocusAfterOpen() async throws {
+        let popup = MTTextPopup(
+            coordinates: coordinate,
+            text: "Hello World",
+            focusAfterOpen: false
+        )
+
+        let jsString = AddTextPopup(popup: popup).toJS()
+
+        #expect(jsString.contains("\"focusAfterOpen\":false"))
+    }
+
     @Test func addTextPopupCommand_includesAnchorWhenProvided() async throws {
         let popup = MTTextPopup(
             coordinates: coordinate,
@@ -203,6 +215,15 @@ struct MTTextPopupTests {
                 var popup = window.\(popup.identifier);
                 if (popup) {
                     popup.options.closeOnMove = true;
+                }
+                """
+        )
+        #expect(
+            SetFocusAfterOpenToTextPopup(popup: popup, isEnabled: false).toJS()
+                == """
+                var popup = window.\(popup.identifier);
+                if (popup) {
+                    popup.options.focusAfterOpen = false;
                 }
                 """
         )

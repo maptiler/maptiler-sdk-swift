@@ -49,6 +49,9 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     /// Boolean value indicating whether the popup closes when the map moves.
     public private(set) var closeOnMove: Bool = false
 
+    /// Boolean value indicating whether the popup receives focus after it opens.
+    public private(set) var focusAfterOpen: Bool = true
+
     /// Called when the popup opens on the map.
     public var onOpen: (() -> Void)?
 
@@ -65,6 +68,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
     ///  - closeButton: Boolean indicating whether the popup displays a close button.
     ///  - closeOnClick: Boolean indicating whether the popup closes when the map is clicked.
     ///  - closeOnMove: Boolean indicating whether the popup closes when the map moves.
+    ///  - focusAfterOpen: Boolean indicating whether the popup receives focus after it opens.
     public init(
         coordinates: CLLocationCoordinate2D,
         text: String,
@@ -73,7 +77,8 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         anchor: MTAnchor? = nil,
         closeButton: Bool = true,
         closeOnClick: Bool = true,
-        closeOnMove: Bool = false
+        closeOnMove: Bool = false,
+        focusAfterOpen: Bool = true
     ) {
         self.identifier = "mark\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         self.coordinates = coordinates
@@ -84,6 +89,7 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.closeButton = closeButton
         self.closeOnClick = closeOnClick
         self.closeOnMove = closeOnMove
+        self.focusAfterOpen = focusAfterOpen
     }
 
     /// Sets coordinates for the popup.
@@ -218,6 +224,23 @@ public class MTTextPopup: MTAnnotation, MTMapViewContent, @unchecked Sendable {
         self.closeOnMove = isEnabled
 
         mapView.setCloseOnMove(isEnabled, for: self, completionHandler: completionHandler)
+    }
+
+    /// Toggles the focus after open behavior.
+    /// - Parameters:
+    ///   - isEnabled: Boolean indicating whether the popup receives focus after it opens.
+    ///   - mapView: Map view to apply to.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setFocusAfterOpen(
+        _ isEnabled: Bool,
+        in mapView: MTMapView,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        self.focusAfterOpen = isEnabled
+
+        mapView.setFocusAfterOpen(isEnabled, for: self, completionHandler: completionHandler)
     }
 
     /// Updates the popup text content.
@@ -509,6 +532,19 @@ extension MTTextPopup {
         }
     }
 
+    /// Toggles the focus after open behavior.
+    /// - Parameter mapView: Map view to apply to.
+    @MainActor
+    public func setFocusAfterOpen(_ isEnabled: Bool, in mapView: MTMapView) async {
+        self.focusAfterOpen = isEnabled
+
+        await withCheckedContinuation { continuation in
+            setFocusAfterOpen(isEnabled, in: mapView) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
     /// Updates the popup text content.
     /// - Parameter mapView: Map view to apply to.
     @MainActor
@@ -647,7 +683,9 @@ extension MTTextPopup {
                 maxWidth: self.maxWidth,
                 anchor: self.anchor,
                 closeButton: self.closeButton,
-                closeOnClick: self.closeOnClick
+                closeOnClick: self.closeOnClick,
+                closeOnMove: self.closeOnMove,
+                focusAfterOpen: self.focusAfterOpen
             )
 
             await mapView.addTextPopup(popup)

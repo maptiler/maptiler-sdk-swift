@@ -50,6 +50,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             await MTConfig.shared.setLogLevel(.debug(verbose: true))
 
             await MTConfig.shared.setApplicationIdentifier("com.maptilerdemo.app")
+
+            // Pack tools automation (snapshot, validation downloads), only when requested by launch arguments.
+            await CalibrationRunner.runLaunchActions()
         }
 
         return true

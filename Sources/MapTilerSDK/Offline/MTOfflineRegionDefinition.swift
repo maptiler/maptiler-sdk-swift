@@ -49,6 +49,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
     public let padding: Double?
     /// Boolean indicating whether 3D terrain is enabled for this offline region.
     public let isTerrainEnabled: Bool
+    /// The Unicode ranges of label glyphs to download for each font. Defaults to Latin, Greek and Cyrillic.
+    public let glyphRanges: MTOfflineGlyphRanges
 
     /// The bounding box of the region.
     public var bbox: MTBoundingBox {
@@ -64,7 +66,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         pixelRatio: Float = 1.0,
         maxTileCount: Int? = nil,
         padding: Double? = nil,
-        isTerrainEnabled: Bool = false
+        isTerrainEnabled: Bool = false,
+        glyphRanges: MTOfflineGlyphRanges = .latinGreekCyrillic
     ) {
         self.geometry = geometry
         self.minZoom = minZoom
@@ -75,6 +78,7 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         self.maxTileCount = maxTileCount
         self.padding = padding
         self.isTerrainEnabled = isTerrainEnabled
+        self.glyphRanges = glyphRanges
     }
 
     public init(
@@ -86,7 +90,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         pixelRatio: Float = 1.0,
         maxTileCount: Int? = nil,
         padding: Double? = nil,
-        isTerrainEnabled: Bool = false
+        isTerrainEnabled: Bool = false,
+        glyphRanges: MTOfflineGlyphRanges = .latinGreekCyrillic
     ) {
         self.init(
             geometry: .boundingBox(bbox),
@@ -97,7 +102,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
             pixelRatio: pixelRatio,
             maxTileCount: maxTileCount,
             padding: padding,
-            isTerrainEnabled: isTerrainEnabled
+            isTerrainEnabled: isTerrainEnabled,
+            glyphRanges: glyphRanges
         )
     }
 
@@ -112,6 +118,7 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         case maxTileCount
         case padding
         case isTerrainEnabled
+        case glyphRanges
     }
 
     public init(from decoder: Decoder) throws {
@@ -137,6 +144,8 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         self.maxTileCount = try container.decodeIfPresent(Int.self, forKey: .maxTileCount)
         self.padding = try container.decodeIfPresent(Double.self, forKey: .padding)
         self.isTerrainEnabled = try container.decodeIfPresent(Bool.self, forKey: .isTerrainEnabled) ?? false
+        // Packs created before glyph ranges existed downloaded every range; keep that when they are refreshed.
+        self.glyphRanges = try container.decodeIfPresent(MTOfflineGlyphRanges.self, forKey: .glyphRanges) ?? .all
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -151,5 +160,6 @@ public struct MTOfflineRegionDefinition: Codable, Equatable, Sendable {
         try container.encodeIfPresent(maxTileCount, forKey: .maxTileCount)
         try container.encodeIfPresent(padding, forKey: .padding)
         try container.encode(isTerrainEnabled, forKey: .isTerrainEnabled)
+        try container.encode(glyphRanges, forKey: .glyphRanges)
     }
 }

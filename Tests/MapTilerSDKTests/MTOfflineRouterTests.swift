@@ -90,6 +90,28 @@ struct MTOfflineRouterTests {
         }
     }
 
+    @Test func testGlyphsRoutingFromFontstackDirectory() throws {
+        try withTempDirectory { rootDir in
+            let packID = "test-pack"
+            let fontstack = "Roboto Regular,Noto Sans Regular"
+            // Packs store glyphs under the whole font stack.
+            let stackDir = rootDir.appendingPathComponent(packID).appendingPathComponent("glyphs/\(fontstack)")
+            try FileManager.default.createDirectory(at: stackDir, withIntermediateDirectories: true)
+            let glyphURL = stackDir.appendingPathComponent("0-255.pbf")
+            try Data([1]).write(to: glyphURL)
+
+            let router = MTOfflineRouter(rootDirectory: rootDir)
+            let path = "/offline/\(packID)/glyphs/\(fontstack)/0-255.pbf"
+            #expect(router.resolve(path: path)?.url.path == glyphURL.path)
+
+            // A range that was not downloaded is still recognized as a glyph request.
+            let missing = "/offline/\(packID)/glyphs/\(fontstack)/19968-20223.pbf"
+            #expect(router.resolve(path: missing) == nil)
+            #expect(router.isGlyphRequest(path: missing))
+            #expect(!router.isGlyphRequest(path: "/offline/\(packID)/tiles/v/1/2/3.pbf"))
+        }
+    }
+
     @Test func testTileRouting() throws {
         try withTempDirectory { rootDir in
             let packID = "test-pack"

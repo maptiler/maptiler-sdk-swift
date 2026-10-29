@@ -1,0 +1,751 @@
+{
+  "version": 1,
+  "description": "Shared offline pack estimation fixtures. Every implementation (Swift SDK, Kotlin SDK, TypeScript estimator) must produce exactly these counts.",
+  "metadata": {
+    "streets": {
+      "styleURL": "https://api.maptiler.com/maps/streets-v4/style.json",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "type": "vector",
+          "tileURLTemplate": "https://api.maptiler.com/tiles/v4/{z}/{x}/{y}.pbf",
+          "minZoom": 0,
+          "maxZoom": 14
+        }
+      ],
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "type": "raster-dem",
+        "tileURLTemplate": "https://api.maptiler.com/tiles/terrain-rgb-v2/{z}/{x}/{y}.webp",
+        "minZoom": 0,
+        "maxZoom": 12
+      },
+      "glyphsTemplate": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf",
+      "fontStacks": [
+        [
+          "Noto Sans Regular"
+        ],
+        [
+          "Noto Sans Bold"
+        ],
+        [
+          "Noto Sans Italic"
+        ],
+        [
+          "Noto Sans Bold",
+          "Noto Sans Regular"
+        ]
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.com/maps/streets-v4/sprite"
+        }
+      ]
+    },
+    "outdoor": {
+      "styleURL": "https://api.maptiler.com/maps/outdoor-v4/style.json",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "type": "vector",
+          "tileURLTemplate": "https://api.maptiler.com/tiles/v4/{z}/{x}/{y}.pbf",
+          "minZoom": 0,
+          "maxZoom": 14
+        },
+        {
+          "id": "outdoor",
+          "type": "vector",
+          "tileURLTemplate": "https://api.maptiler.com/tiles/outdoor/{z}/{x}/{y}.pbf",
+          "minZoom": 5,
+          "maxZoom": 14
+        },
+        {
+          "id": "terrain-rgb",
+          "type": "raster-dem",
+          "tileURLTemplate": "https://api.maptiler.com/tiles/terrain-rgb-v2/{z}/{x}/{y}.webp",
+          "minZoom": 0,
+          "maxZoom": 12
+        }
+      ],
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "type": "raster-dem",
+        "tileURLTemplate": "https://api.maptiler.com/tiles/terrain-rgb-v2/{z}/{x}/{y}.webp",
+        "minZoom": 0,
+        "maxZoom": 12
+      },
+      "glyphsTemplate": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf",
+      "fontStacks": [
+        [
+          "Noto Sans Regular"
+        ],
+        [
+          "Noto Sans Bold"
+        ],
+        [
+          "Noto Sans Italic"
+        ]
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.com/maps/outdoor-v4/sprite"
+        }
+      ]
+    },
+    "satellite": {
+      "styleURL": "https://api.maptiler.com/maps/satellite/style.json",
+      "sources": [
+        {
+          "id": "satellite",
+          "type": "raster",
+          "tileURLTemplate": "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg",
+          "minZoom": 0,
+          "maxZoom": 20
+        }
+      ],
+      "terrainSource": null,
+      "glyphsTemplate": null,
+      "fontStacks": [],
+      "sprites": []
+    },
+    "custom-tms": {
+      "styleURL": "https://example.com/style.json",
+      "sources": [
+        {
+          "id": "custom",
+          "type": "raster",
+          "tileURLTemplate": "https://example.com/tiles/{z}/{x}/{-y}.png",
+          "minZoom": 2,
+          "maxZoom": 10
+        }
+      ],
+      "terrainSource": null,
+      "glyphsTemplate": null,
+      "fontStacks": [
+        [
+          "Open Sans Regular"
+        ]
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://example.com/sprite"
+        },
+        {
+          "id": "extra",
+          "url": "https://example.com/extra-sprite"
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "name": "bbox-zurich-z0-14",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            8.52,
+            47.36,
+            8.56,
+            47.39
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 14
+      }
+    },
+    {
+      "name": "bbox-zurich-padding-500-z10-16-clamped-to-source-max",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            8.52,
+            47.36,
+            8.56,
+            47.39
+          ]
+        },
+        "minZoom": 10,
+        "maxZoom": 16,
+        "padding": 500
+      }
+    },
+    {
+      "name": "bbox-overzoom-request-above-source-max",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            8.53,
+            47.37,
+            8.55,
+            47.38
+          ]
+        },
+        "minZoom": 16,
+        "maxZoom": 18
+      }
+    },
+    {
+      "name": "bbox-padding-zero",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            8.52,
+            47.36,
+            8.56,
+            47.39
+          ]
+        },
+        "minZoom": 5,
+        "maxZoom": 14,
+        "padding": 0
+      }
+    },
+    {
+      "name": "bbox-antimeridian-fiji-z0-10",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            177.0,
+            -19.2,
+            -178.5,
+            -16.0
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 10
+      }
+    },
+    {
+      "name": "bbox-world-z0-6",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            -180,
+            -85,
+            180,
+            85
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 6
+      }
+    },
+    {
+      "name": "bbox-switzerland-z0-14-exceeds-limit",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            5.95,
+            45.81,
+            10.5,
+            47.81
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 14
+      }
+    },
+    {
+      "name": "bbox-max-tile-count-override",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            8.52,
+            47.36,
+            8.56,
+            47.39
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 14,
+        "maxTileCount": 1000
+      }
+    },
+    {
+      "name": "bbox-terrain-added",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            7.6,
+            45.9,
+            7.9,
+            46.1
+          ]
+        },
+        "minZoom": 5,
+        "maxZoom": 14,
+        "terrain": true
+      }
+    },
+    {
+      "name": "bbox-terrain-already-in-style",
+      "metadata": "outdoor",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            7.6,
+            45.9,
+            7.9,
+            46.1
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 14,
+        "terrain": true
+      }
+    },
+    {
+      "name": "bbox-satellite-z10-18",
+      "metadata": "satellite",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            14.41,
+            50.08,
+            14.43,
+            50.09
+          ]
+        },
+        "minZoom": 10,
+        "maxZoom": 18
+      }
+    },
+    {
+      "name": "bbox-custom-tms-source-zoom-limits",
+      "metadata": "custom-tms",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            -0.2,
+            51.45,
+            0.05,
+            51.56
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 12
+      }
+    },
+    {
+      "name": "bbox-high-latitude-padding",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            18.9,
+            69.6,
+            19.0,
+            69.7
+          ]
+        },
+        "minZoom": 8,
+        "maxZoom": 14,
+        "padding": 1500
+      }
+    },
+    {
+      "name": "polygon-zurich-concave-default-padding",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "polygon",
+          "coordinates": [
+            [
+              8.525,
+              47.395
+            ],
+            [
+              8.565,
+              47.358
+            ],
+            [
+              8.545,
+              47.37
+            ],
+            [
+              8.525,
+              47.34
+            ],
+            [
+              8.485,
+              47.368
+            ],
+            [
+              8.525,
+              47.395
+            ]
+          ]
+        },
+        "minZoom": 8,
+        "maxZoom": 14
+      }
+    },
+    {
+      "name": "polygon-zurich-padding-zero-unclosed",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "polygon",
+          "coordinates": [
+            [
+              8.525,
+              47.395
+            ],
+            [
+              8.565,
+              47.358
+            ],
+            [
+              8.525,
+              47.34
+            ],
+            [
+              8.485,
+              47.368
+            ]
+          ]
+        },
+        "minZoom": 10,
+        "maxZoom": 14,
+        "padding": 0
+      }
+    },
+    {
+      "name": "polygon-bowtie-self-intersecting",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "polygon",
+          "coordinates": [
+            [
+              2.0,
+              48.0
+            ],
+            [
+              3.0,
+              49.0
+            ],
+            [
+              3.0,
+              48.0
+            ],
+            [
+              2.0,
+              49.0
+            ],
+            [
+              2.0,
+              48.0
+            ]
+          ]
+        },
+        "minZoom": 6,
+        "maxZoom": 12,
+        "padding": 100
+      }
+    },
+    {
+      "name": "polygon-switzerland-outline-z0-13",
+      "metadata": "outdoor",
+      "region": {
+        "geometry": {
+          "type": "polygon",
+          "coordinates": [
+            [
+              6.02,
+              46.14
+            ],
+            [
+              6.8,
+              46.43
+            ],
+            [
+              7.04,
+              45.93
+            ],
+            [
+              7.86,
+              45.92
+            ],
+            [
+              8.44,
+              46.25
+            ],
+            [
+              9.04,
+              45.84
+            ],
+            [
+              9.3,
+              46.5
+            ],
+            [
+              10.13,
+              46.23
+            ],
+            [
+              10.47,
+              46.55
+            ],
+            [
+              10.39,
+              47.0
+            ],
+            [
+              9.6,
+              47.06
+            ],
+            [
+              9.53,
+              47.53
+            ],
+            [
+              8.57,
+              47.8
+            ],
+            [
+              7.55,
+              47.58
+            ],
+            [
+              6.86,
+              47.36
+            ],
+            [
+              6.02,
+              46.14
+            ]
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 13,
+        "padding": 1000
+      }
+    },
+    {
+      "name": "polygon-two-points-treated-as-route",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "polygon",
+          "coordinates": [
+            [
+              8.5,
+              47.3
+            ],
+            [
+              8.6,
+              47.4
+            ]
+          ]
+        },
+        "minZoom": 10,
+        "maxZoom": 13,
+        "padding": 200
+      }
+    },
+    {
+      "name": "route-alps-default-padding",
+      "metadata": "outdoor",
+      "region": {
+        "geometry": {
+          "type": "route",
+          "coordinates": [
+            [
+              8.558,
+              47.112
+            ],
+            [
+              8.58,
+              47.135
+            ],
+            [
+              8.592,
+              47.168
+            ],
+            [
+              8.65,
+              47.2
+            ],
+            [
+              8.71,
+              47.25
+            ]
+          ]
+        },
+        "minZoom": 10,
+        "maxZoom": 14
+      }
+    },
+    {
+      "name": "route-padding-300-z12-15",
+      "metadata": "outdoor",
+      "region": {
+        "geometry": {
+          "type": "route",
+          "coordinates": [
+            [
+              8.558,
+              47.112
+            ],
+            [
+              8.58,
+              47.135
+            ],
+            [
+              8.592,
+              47.168
+            ]
+          ]
+        },
+        "minZoom": 12,
+        "maxZoom": 15,
+        "padding": 300
+      }
+    },
+    {
+      "name": "route-long-diagonal-z0-12",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "route",
+          "coordinates": [
+            [
+              2.35,
+              48.86
+            ],
+            [
+              4.84,
+              45.76
+            ],
+            [
+              7.26,
+              43.7
+            ],
+            [
+              9.19,
+              45.46
+            ],
+            [
+              11.25,
+              43.77
+            ]
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 12,
+        "padding": 2500
+      }
+    },
+    {
+      "name": "route-single-point",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "route",
+          "coordinates": [
+            [
+              -73.9857,
+              40.7484
+            ]
+          ]
+        },
+        "minZoom": 5,
+        "maxZoom": 14,
+        "padding": 50
+      }
+    },
+    {
+      "name": "route-satellite-high-zoom",
+      "metadata": "satellite",
+      "region": {
+        "geometry": {
+          "type": "route",
+          "coordinates": [
+            [
+              -122.4194,
+              37.7749
+            ],
+            [
+              -122.41,
+              37.78
+            ],
+            [
+              -122.405,
+              37.79
+            ]
+          ]
+        },
+        "minZoom": 14,
+        "maxZoom": 17,
+        "padding": 100
+      }
+    },
+    {
+      "name": "bbox-zurich-all-glyph-ranges",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            8.52,
+            47.36,
+            8.56,
+            47.39
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 14,
+        "glyphRanges": "all"
+      }
+    },
+    {
+      "name": "bbox-zurich-custom-glyph-ranges",
+      "metadata": "streets",
+      "region": {
+        "geometry": {
+          "type": "bbox",
+          "bbox": [
+            8.52,
+            47.36,
+            8.56,
+            47.39
+          ]
+        },
+        "minZoom": 0,
+        "maxZoom": 14,
+        "glyphRanges": [
+          0,
+          19968,
+          20000,
+          44032
+        ]
+      }
+    }
+  ]
+}

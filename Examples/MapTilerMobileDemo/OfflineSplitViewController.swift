@@ -24,6 +24,7 @@ class OfflineSplitViewController: UIViewController {
 
 struct OfflineContainerView: View {
     @State private var selectedMode = 0
+    @State private var showingPackTools = false
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -45,7 +46,12 @@ struct OfflineContainerView: View {
             .cornerRadius(8)
             .padding(.horizontal)
             .padding(.top, 16)
+            // Hidden entry to the pack estimator and calibration tools.
+            .simultaneousGesture(LongPressGesture(minimumDuration: 1.5).onEnded { _ in showingPackTools = true })
         }
         .animation(.easeInOut, value: selectedMode)
+        .fullScreenCover(isPresented: $showingPackTools) {
+            PackToolsView()
+        }
     }
 }

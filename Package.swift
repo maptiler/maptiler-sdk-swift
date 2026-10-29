@@ -24,7 +24,10 @@ let package = Package(
         .testTarget(
             name: "MapTilerSDKTests",
             dependencies: ["MapTilerSDK"],
-            path: "Tests"
+            path: "Tests",
+            resources: [
+                .copy("MapTilerSDKTests/Offline/Fixtures")
+            ]
         )
     ]
 )

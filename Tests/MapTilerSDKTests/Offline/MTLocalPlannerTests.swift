@@ -92,13 +92,23 @@ struct MTLocalPlannerTests {
 
     @Test("Verify effective limits are respected")
     func testEffectiveLimits() async throws {
-        let planner = MTLocalPlanner()
+        let base = "https://planner-limits.test"
+        EstimationMockURLProtocol.register("\(base)/style.json", json: """
+        { "version": 8, "sources": { "v": { "type": "vector", "tiles": ["\(base)/{z}/{x}/{y}.pbf"], "maxzoom": 14 } }, "layers": [] }
+        """)
+        let planner = MTLocalPlanner(session: EstimationMockURLProtocol.makeSession())
         // A huge bounding box covering the entire world at zoom 0-14 to force a large tile count
         let bbox = MTBoundingBox(minLon: -180, minLat: -85, maxLon: 180, maxLat: 85)
         
         // Use a tiny per-pack limit
         let tinyLimit = 10
-        let definition = MTOfflineRegionDefinition(bbox: bbox, minZoom: 0, maxZoom: 14, referenceStyle: .base, maxTileCount: tinyLimit)
+        let definition = MTOfflineRegionDefinition(
+            bbox: bbox,
+            minZoom: 0,
+            maxZoom: 14,
+            referenceStyle: .custom(URL(string: "\(base)/style.json")!),
+            maxTileCount: tinyLimit
+        )
         
         do {
             _ = try await planner.estimate(for: definition)

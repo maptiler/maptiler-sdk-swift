@@ -14,7 +14,7 @@ public struct MTOfflineSourceMetadata: Codable, Equatable, Sendable {
     /// The source identifier from the style.
     public let id: String
     /// The source type (`vector`, `raster` or `raster-dem`).
-    public let type: String?
+    public let type: MTSourceType?
     /// The tile URL template used for downloads.
     public let tileURLTemplate: String
     /// The minimum zoom level provided by the source.
@@ -22,7 +22,7 @@ public struct MTOfflineSourceMetadata: Codable, Equatable, Sendable {
     /// The maximum zoom level provided by the source.
     public let maxZoom: Int
 
-    public init(id: String, type: String?, tileURLTemplate: String, minZoom: Int, maxZoom: Int) {
+    public init(id: String, type: MTSourceType?, tileURLTemplate: String, minZoom: Int, maxZoom: Int) {
         self.id = id
         self.type = type
         self.tileURLTemplate = tileURLTemplate

@@ -14,7 +14,7 @@ public struct MTSourceStats: Equatable, Sendable {
     /// The source identifier from the style.
     public let id: String
     /// The source type (`vector`, `raster` or `raster-dem`).
-    public let type: String?
+    public let type: MTSourceType?
     /// The lowest zoom level downloaded for this source.
     public let minZoom: Int
     /// The highest zoom level downloaded for this source. It may be lower than the requested maximum zoom
@@ -28,7 +28,7 @@ public struct MTSourceStats: Equatable, Sendable {
         tilesPerZoom.values.reduce(0, +)
     }
 
-    public init(id: String, type: String?, minZoom: Int, maxZoom: Int, tilesPerZoom: [Int: Int]) {
+    public init(id: String, type: MTSourceType?, minZoom: Int, maxZoom: Int, tilesPerZoom: [Int: Int]) {
         self.id = id
         self.type = type
         self.minZoom = minZoom
@@ -80,17 +80,20 @@ public struct MTPackStats {
         return Swift.max(1, (tileCount + tileBudget - 1) / tileBudget)
     }
 
+    @available(
+        *,
+        deprecated,
+        message: "Use init(expectedSize:resourceCount:sources:glyphCount:spriteCount:styleCount:resourceLimit:)."
+    )
     public init(expectedSize: Int64, resourceCount: Int, tilesPerSource: [String: Int] = [:]) {
-        self.init(
-            expectedSize: expectedSize,
-            resourceCount: resourceCount,
-            sources: [],
-            glyphCount: 0,
-            spriteCount: 0,
-            styleCount: 0,
-            resourceLimit: MTOfflineConfiguration.shared.effectiveGlobalLimit,
-            tilesPerSource: tilesPerSource
-        )
+        self.expectedSize = expectedSize
+        self.resourceCount = resourceCount
+        self.tilesPerSource = tilesPerSource
+        self.sources = []
+        self.glyphCount = 0
+        self.spriteCount = 0
+        self.styleCount = 0
+        self.resourceLimit = MTOfflineConfiguration.shared.effectiveGlobalLimit
     }
 
     public init(
@@ -102,31 +105,9 @@ public struct MTPackStats {
         styleCount: Int,
         resourceLimit: Int
     ) {
-        self.init(
-            expectedSize: expectedSize,
-            resourceCount: resourceCount,
-            sources: sources,
-            glyphCount: glyphCount,
-            spriteCount: spriteCount,
-            styleCount: styleCount,
-            resourceLimit: resourceLimit,
-            tilesPerSource: Dictionary(sources.map { ($0.id, $0.tileCount) }, uniquingKeysWith: +)
-        )
-    }
-
-    private init(
-        expectedSize: Int64,
-        resourceCount: Int,
-        sources: [MTSourceStats],
-        glyphCount: Int,
-        spriteCount: Int,
-        styleCount: Int,
-        resourceLimit: Int,
-        tilesPerSource: [String: Int]
-    ) {
         self.expectedSize = expectedSize
         self.resourceCount = resourceCount
-        self.tilesPerSource = tilesPerSource
+        self.tilesPerSource = Dictionary(sources.map { ($0.id, $0.tileCount) }, uniquingKeysWith: +)
         self.sources = sources
         self.glyphCount = glyphCount
         self.spriteCount = spriteCount

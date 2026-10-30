@@ -59,7 +59,7 @@ internal struct MTOfflineResourcePlan {
         try definition.validateForOffline()
 
         var sourceList = metadata.sources
-        if definition.isTerrainEnabled, !sourceList.contains(where: { $0.type == "raster-dem" }) {
+        if definition.isTerrainEnabled, !sourceList.contains(where: { $0.type == .rasterDEM }) {
             guard let terrainSource = metadata.terrainSource else {
                 throw MTOfflineError.missingKey("terrainSource")
             }

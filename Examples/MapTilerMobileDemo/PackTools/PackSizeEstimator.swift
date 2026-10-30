@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import MapTilerSDK
+@_spi(PackTools) import MapTilerSDK
 
 // Estimated bytes with lower and upper bound.
 struct SizeRange {
@@ -82,7 +82,7 @@ enum PackSizeEstimator {
             let key = PackKeys.tileset(fromTemplate: source.tileURLTemplate)
 
             guard let tileset = model.tilesets[key] else {
-                let isRaster = source.type?.contains("raster") == true
+                let isRaster = source.type == .raster || source.type == .rasterDEM
                 let size = Double(group.tileCount) * (isRaster ? fallbackRasterTile : fallbackVectorTile)
                 estimate.tiles += PackBytes(bytes: size, wire: size, allocated: size)
                 append(source.id, to: &estimate.uncalibratedSources)

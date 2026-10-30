@@ -43,7 +43,7 @@ struct MTOfflineEstimatorFixtureTests {
         metadata: MTOfflineStyleMetadata
     ) -> OfflineEstimatorFixtures.Expected {
         var sources = metadata.sources
-        if region.isTerrainEnabled, !sources.contains(where: { $0.type == "raster-dem" }), let terrain = metadata.terrainSource {
+        if region.isTerrainEnabled, !sources.contains(where: { $0.type == .rasterDEM }), let terrain = metadata.terrainSource {
             sources.append(terrain)
         }
         let isFlexible: Bool = {

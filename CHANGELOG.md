@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.3.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.3.0)
+Released on 2026-10-30.
+### Added
+- Estimation API now calcuates with improved accurracy using calibrated snapshots.
+- Default Offline Pack Glyph ranges are changed to .latinGreekCyrillic and new .all case is added.
+
 ## [2.2.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.2.0)
 Released on 2026-10-27.
 ### Added

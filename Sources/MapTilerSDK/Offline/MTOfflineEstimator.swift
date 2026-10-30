@@ -64,7 +64,7 @@ public struct MTOfflineEstimator: Sendable {
         expectedSize += Int64(plan.glyphCount) * MTOfflineEstimator.averageGlyphRangeSize
 
         let sources = plan.sources.map { sourcePlan in
-            let isRaster = sourcePlan.source.type?.contains("raster") == true
+            let isRaster = sourcePlan.source.type == .raster || sourcePlan.source.type == .rasterDEM
             let averageTileSize = isRaster
                 ? MTOfflineEstimator.averageTileSizeRaster
                 : MTOfflineEstimator.averageTileSizeVector
@@ -101,6 +101,7 @@ public struct MTOfflineEstimator: Sendable {
     ///   - styleMetadata: Previously resolved metadata of the region's style.
     ///   - groupZoom: The zoom level of the ancestor tiles used for grouping.
     /// - Returns: The tile groups of every source.
+    @_spi(PackTools)
     public func tileGroups(
         region: MTOfflineRegionDefinition,
         styleMetadata: MTOfflineStyleMetadata,
@@ -141,6 +142,7 @@ public struct MTOfflineEstimator: Sendable {
 }
 
 /// Tiles of one source at one zoom level that share an ancestor tile.
+@_spi(PackTools)
 public struct MTTileGroup: Equatable, Sendable {
     /// The source identifier from the style.
     public let sourceId: String

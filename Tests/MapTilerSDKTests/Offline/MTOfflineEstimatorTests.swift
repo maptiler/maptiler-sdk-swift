@@ -114,7 +114,7 @@ struct MTOfflineEstimatorTests {
     @Test("Redacted metadata has no API keys or session ids and estimates the same")
     func testRedactedMetadata() throws {
         let source = { (id: String, template: String) in
-            MTOfflineSourceMetadata(id: id, type: "vector", tileURLTemplate: template, minZoom: 0, maxZoom: 14)
+            MTOfflineSourceMetadata(id: id, type: .vector, tileURLTemplate: template, minZoom: 0, maxZoom: 14)
         }
         let metadata = MTOfflineStyleMetadata(
             styleURL: "https://t/maps/streets/style.json?key=SECRET",
@@ -154,7 +154,7 @@ struct MTOfflineEstimatorTests {
     func testOverzoom() throws {
         let metadata = MTOfflineStyleMetadata(
             styleURL: nil,
-            sources: [MTOfflineSourceMetadata(id: "v", type: "vector", tileURLTemplate: "https://t/{z}/{x}/{y}.pbf", minZoom: 0, maxZoom: 14)],
+            sources: [MTOfflineSourceMetadata(id: "v", type: .vector, tileURLTemplate: "https://t/{z}/{x}/{y}.pbf", minZoom: 0, maxZoom: 14)],
             glyphsTemplate: nil,
             fontStacks: [],
             sprites: []
@@ -173,8 +173,8 @@ struct MTOfflineEstimatorTests {
 
     @Test("Terrain adds a terrain source only when the style has none")
     func testTerrain() throws {
-        let terrain = MTOfflineSourceMetadata(id: "maptiler-terrain", type: "raster-dem", tileURLTemplate: "https://t/{z}/{x}/{y}.webp", minZoom: 0, maxZoom: 12)
-        let vector = MTOfflineSourceMetadata(id: "v", type: "vector", tileURLTemplate: "https://t/{z}/{x}/{y}.pbf", minZoom: 0, maxZoom: 14)
+        let terrain = MTOfflineSourceMetadata(id: "maptiler-terrain", type: .rasterDEM, tileURLTemplate: "https://t/{z}/{x}/{y}.webp", minZoom: 0, maxZoom: 12)
+        let vector = MTOfflineSourceMetadata(id: "v", type: .vector, tileURLTemplate: "https://t/{z}/{x}/{y}.pbf", minZoom: 0, maxZoom: 14)
         let definition = MTOfflineRegionDefinition(
             bbox: MTBoundingBox(minLon: 8.52, minLat: 47.36, maxLon: 8.56, maxLat: 47.39),
             minZoom: 0,
@@ -187,7 +187,7 @@ struct MTOfflineEstimatorTests {
         let stats = try MTOfflineEstimator().estimatePack(region: definition, styleMetadata: withTerrain)
         #expect(stats.sources.map(\.id) == ["v", "maptiler-terrain"])
 
-        let styleTerrain = MTOfflineSourceMetadata(id: "dem", type: "raster-dem", tileURLTemplate: "https://t/{z}/{x}/{y}.webp", minZoom: 0, maxZoom: 12)
+        let styleTerrain = MTOfflineSourceMetadata(id: "dem", type: .rasterDEM, tileURLTemplate: "https://t/{z}/{x}/{y}.webp", minZoom: 0, maxZoom: 12)
         let builtIn = MTOfflineStyleMetadata(styleURL: nil, sources: [vector, styleTerrain], terrainSource: terrain, glyphsTemplate: nil, fontStacks: [], sprites: [])
         #expect(try MTOfflineEstimator().estimatePack(region: definition, styleMetadata: builtIn).sources.map(\.id) == ["v", "dem"])
 
@@ -201,7 +201,7 @@ struct MTOfflineEstimatorTests {
     func testLimitAndPackCount() throws {
         let metadata = MTOfflineStyleMetadata(
             styleURL: nil,
-            sources: [MTOfflineSourceMetadata(id: "v", type: "vector", tileURLTemplate: "https://t/{z}/{x}/{y}.pbf", minZoom: 0, maxZoom: 14)],
+            sources: [MTOfflineSourceMetadata(id: "v", type: .vector, tileURLTemplate: "https://t/{z}/{x}/{y}.pbf", minZoom: 0, maxZoom: 14)],
             glyphsTemplate: "https://t/{fontstack}/{range}.pbf",
             fontStacks: [["A"]],
             sprites: [MTOfflineSpriteMetadata(id: "default", url: "https://t/sprite")]
@@ -252,7 +252,7 @@ struct MTOfflineEstimatorTests {
 struct MTOfflineGlyphRangesTests {
     private let metadata = MTOfflineStyleMetadata(
         styleURL: nil,
-        sources: [MTOfflineSourceMetadata(id: "v", type: "vector", tileURLTemplate: "https://t/{z}/{x}/{y}.pbf", minZoom: 0, maxZoom: 14)],
+        sources: [MTOfflineSourceMetadata(id: "v", type: .vector, tileURLTemplate: "https://t/{z}/{x}/{y}.pbf", minZoom: 0, maxZoom: 14)],
         glyphsTemplate: "https://t/{fontstack}/{range}.pbf",
         fontStacks: [["A"], ["B", "C"]],
         sprites: []

@@ -42,7 +42,7 @@ internal actor MTOfflineMetadataResolver {
         }
 
         var terrainSource: MTOfflineSourceMetadata?
-        if includeTerrain, !sources.contains(where: { $0.type == "raster-dem" }) {
+        if includeTerrain, !sources.contains(where: { $0.type == .rasterDEM }) {
             let apiKey = await MTConfig.shared.getAPIKey() ?? ""
             terrainSource = try await resolveSource(MTStyleSource(
                 id: "maptiler-terrain",
@@ -72,7 +72,7 @@ internal actor MTOfflineMetadataResolver {
         }
         let variant = definition.styleVariant
         guard let styleURL = definition.referenceStyle.fetchStyleURL(variant: variant, apiKey: key) else {
-            throw MTOfflinePackError.invalidZoomRange // Generic mapId failure fallback
+            throw MTOfflinePackError.styleResolutionFailed
         }
         return styleURL
     }
@@ -83,7 +83,7 @@ internal actor MTOfflineMetadataResolver {
         if let tiles = source.tiles, let first = tiles.first {
             return MTOfflineSourceMetadata(
                 id: source.id,
-                type: source.type,
+                type: source.type.flatMap(MTSourceType.init(rawValue:)),
                 tileURLTemplate: first,
                 minZoom: source.minZoom ?? 0,
                 maxZoom: source.maxZoom ?? 22
@@ -91,28 +91,18 @@ internal actor MTOfflineMetadataResolver {
         }
 
         guard let urlString = source.url, let url = URL(string: urlString) else {
-            throw MTOfflineError.networkError(URLError(.badURL))
+            throw MTOfflinePackError.networkError(URLError(.badURL))
         }
 
-        let data: Data
-        do {
-            data = try await fetch(url)
-        } catch let urlError as URLError {
-            throw MTOfflineError.networkError(urlError)
-        } catch is MTOfflinePackError {
-            throw MTOfflineError.networkError(URLError(.badServerResponse))
-        } catch {
-            throw MTOfflineError.networkError(URLError(.unknown))
-        }
-
+        let data = try await fetch(url)
         guard let tileJSON = try? JSONDecoder().decode(MTTileJSON.self, from: data),
             let template = tileJSON.preferredTileURLTemplate else {
-            throw MTOfflineError.networkError(URLError(.cannotParseResponse))
+            throw MTOfflinePackError.networkError(URLError(.cannotParseResponse))
         }
 
         return MTOfflineSourceMetadata(
             id: source.id,
-            type: source.type,
+            type: source.type.flatMap(MTSourceType.init(rawValue:)),
             tileURLTemplate: template,
             minZoom: tileJSON.minzoom,
             maxZoom: tileJSON.maxzoom
@@ -121,7 +111,13 @@ internal actor MTOfflineMetadataResolver {
 
     private func fetch(_ url: URL) async throws -> Data {
         let normalizedURL = await MTURLNormalizer.normalize(url: url)
-        let (data, response) = try await session.data(from: normalizedURL)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(from: normalizedURL)
+        } catch {
+            throw MTOfflinePackError.networkError(error)
+        }
 
         guard let httpResponse = response as? HTTPURLResponse,
             200...299 ~= httpResponse.statusCode else {

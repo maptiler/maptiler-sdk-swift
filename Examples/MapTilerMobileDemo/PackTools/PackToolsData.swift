@@ -104,6 +104,10 @@ struct PackBytes: Codable, Equatable {
         PackBytes(bytes: lhs.bytes + rhs.bytes, wire: lhs.wire + rhs.wire, allocated: lhs.allocated + rhs.allocated)
     }
 
+    static func += (lhs: inout PackBytes, rhs: PackBytes) {
+        lhs = lhs + rhs
+    }
+
     static func * (lhs: PackBytes, factor: Double) -> PackBytes {
         PackBytes(bytes: lhs.bytes * factor, wire: lhs.wire * factor, allocated: lhs.allocated * factor)
     }

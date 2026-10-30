@@ -272,6 +272,20 @@ extension MTOfflinePack {
         return try await estimator.estimatePack(region: region)
     }
 
+    /// Estimates the pack size for a given region definition without any network requests.
+    ///
+    /// - Parameters:
+    ///   - region: The definition of the region to estimate.
+    ///   - styleMetadata: Previously resolved metadata of the region's style.
+    /// - Returns: An `MTPackStats` object containing the estimates.
+    /// - Throws: An error if the region is invalid.
+    public static func estimateSize(
+        region: MTOfflineRegionDefinition,
+        styleMetadata: MTOfflineStyleMetadata
+    ) throws -> MTPackStats {
+        try MTOfflineEstimator().estimatePack(region: region, styleMetadata: styleMetadata)
+    }
+
     /// Retrieves all offline packs currently stored on disk.
     /// The packs are stably sorted by their creation date (oldest first).
     ///

@@ -312,6 +312,8 @@ extension MTOfflineHTTPServer {
                     on: connection
                 )
             }
+        } else if router.isGlyphRequest(path: path) {
+            sendResponse(statusCode: 200, body: Data(), mimeType: "application/x-protobuf", on: connection)
         } else {
             sendResponse(
                 statusCode: 404,

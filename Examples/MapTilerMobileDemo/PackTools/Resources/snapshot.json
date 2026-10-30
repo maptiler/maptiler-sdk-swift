@@ -1,0 +1,1711 @@
+{
+  "generatedAt": "2026-10-28T13:05:11Z",
+  "styles": {
+    "aquarelle/dark": {
+      "fontStacks": [],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/aquarelle-dark/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/aquarelle-dark/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "aquarelle/default": {
+      "fontStacks": [],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/aquarelle/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/aquarelle/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "aquarelle/vivid": {
+      "fontStacks": [],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/aquarelle-vivid/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/aquarelle-vivid/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "backdrop/dark": {
+      "fontStacks": [
+        [
+          "Metropolis Semi Bold Italic",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Semi Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Bold",
+          "Noto Sans Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/backdrop-dark/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/backdrop-dark/style.json"
+    },
+    "backdrop/default": {
+      "fontStacks": [
+        [
+          "Metropolis Semi Bold Italic",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Semi Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Bold",
+          "Noto Sans Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/backdrop/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/backdrop/style.json"
+    },
+    "backdrop/light": {
+      "fontStacks": [
+        [
+          "Metropolis Semi Bold Italic",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Semi Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Bold",
+          "Noto Sans Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/backdrop-light/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/backdrop-light/style.json"
+    },
+    "base/dark": {
+      "fontStacks": [
+        [
+          "Inter Semi Bold",
+          "Noto Sans Semi Bold"
+        ],
+        [
+          "Inter Light",
+          "Noto Sans Light"
+        ],
+        [
+          "Inter Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Inter Regular",
+          "Noto Sans Regular"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/base-v4-dark/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "base/default": {
+      "fontStacks": [
+        [
+          "Inter Light",
+          "Noto Sans Light"
+        ],
+        [
+          "Inter Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Inter Semi Bold",
+          "Noto Sans Semi Bold"
+        ],
+        [
+          "Inter Medium",
+          "Noto Sans Medium"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/base-v4/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "base/light": {
+      "fontStacks": [
+        [
+          "Inter Light",
+          "Noto Sans Light"
+        ],
+        [
+          "Inter Semi Bold",
+          "Noto Sans Semi Bold"
+        ],
+        [
+          "Inter Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Inter Medium",
+          "Noto Sans Medium"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/base-v4-light/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "dataviz/dark": {
+      "fontStacks": [
+        [
+          "Metropolis Semi Bold Italic",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Semi Bold",
+          "Noto Sans Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/dataviz-dark/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/dataviz-dark/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "dataviz/default": {
+      "fontStacks": [
+        [
+          "Metropolis Semi Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Semi Bold Italic",
+          "Noto Sans Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/dataviz/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/dataviz/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "dataviz/light": {
+      "fontStacks": [
+        [
+          "Metropolis Semi Bold Italic",
+          "Noto Sans Bold"
+        ],
+        [
+          "Metropolis Semi Bold",
+          "Noto Sans Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/dataviz-light/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/dataviz-light/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "landscape/dark": {
+      "fontStacks": [
+        [
+          "Noto Sans Semi Condensed Semi Bold",
+          "Noto Sans Semi Bold"
+        ],
+        [
+          "Noto Sans Semi Condensed Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Noto Sans Condensed Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Frutiger Neue Medium Italic",
+          "Noto Sans Medium Italic"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "hand_drawn_hillshade",
+          "maxZoom": 9,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/hand-drawn-hillshade/{z}/{x}/{y}",
+          "type": "raster"
+        },
+        {
+          "id": "land-gradient-dark",
+          "maxZoom": 4,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land-gradient-dark/{z}/{x}/{y}",
+          "type": "raster"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/landscape-dark/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/landscape-dark/style.json"
+    },
+    "landscape/default": {
+      "fontStacks": [
+        [
+          "Noto Sans Semi Condensed Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Frutiger Neue Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Noto Sans Condensed Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Noto Sans Semi Condensed Semi Bold",
+          "Noto Sans Semi Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "hand_drawn_hillshade",
+          "maxZoom": 9,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/hand-drawn-hillshade/{z}/{x}/{y}",
+          "type": "raster"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "land-gradient",
+          "maxZoom": 4,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land-gradient/{z}/{x}/{y}",
+          "type": "raster"
+        },
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/landscape/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/landscape/style.json"
+    },
+    "landscape/vivid": {
+      "fontStacks": [
+        [
+          "Frutiger Neue Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Noto Sans Semi Condensed Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Noto Sans Semi Condensed Semi Bold",
+          "Noto Sans Semi Bold"
+        ],
+        [
+          "Noto Sans Condensed Regular",
+          "Noto Sans Regular"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "land-gradient",
+          "maxZoom": 4,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land-gradient/{z}/{x}/{y}",
+          "type": "raster"
+        },
+        {
+          "id": "hand_drawn_hillshade",
+          "maxZoom": 9,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/hand-drawn-hillshade/{z}/{x}/{y}",
+          "type": "raster"
+        },
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/landscape-vivid/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/landscape-vivid/style.json"
+    },
+    "ocean/default": {
+      "fontStacks": [
+        [
+          "Libre Baskerville Italic",
+          "Noto Serif Italic"
+        ],
+        [
+          "Roboto Medium Italic",
+          "Noto Sans Italic"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "contours",
+          "maxZoom": 14,
+          "minZoom": 9,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/contours/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "ocean_rgb",
+          "maxZoom": 7,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/ocean-rgb/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "ocean",
+          "maxZoom": 12,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/ocean/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "land",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/land/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/ocean/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/ocean/style.json"
+    },
+    "openstreetmap/default": {
+      "fontStacks": [
+        [
+          "Open Sans Regular",
+          "Open Sans Light"
+        ],
+        [
+          "Open Sans Semi Bold Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Noto Sans Regular"
+        ],
+        [
+          "Open Sans Regular",
+          "Noto Sans Bold"
+        ],
+        [
+          "Open Sans Semi Bold",
+          "Noto Sans Regular"
+        ],
+        [
+          "Open Sans Bold Italic",
+          "Noto Sans Regular"
+        ],
+        [
+          "Open Sans Semi Bold Italic",
+          "Noto Sans Bold"
+        ],
+        [
+          "Open Sans Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Open Sans Semi Bold Italic",
+          "Noto Sans Regular"
+        ],
+        [
+          "Open Sans Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Open Sans Semi Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Open Sans Regular",
+          "Noto Sans Regular"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "openmaptiles",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3-openmaptiles/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/019d2471-bb09-76a3-8579-65d9425a91f6/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/openstreetmap/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "outdoor/dark": {
+      "fontStacks": [
+        [
+          "Open Sans Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Open Sans Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Open Sans Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Open Sans Semi Condensed Medium",
+          "Noto Sans Semi Condensed Medium"
+        ],
+        [
+          "Open Sans Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Open Sans Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Open Sans Semi Bold",
+          "Noto Sans Semi Bold"
+        ],
+        [
+          "Noto Sans Regular"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "landform",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/landform/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "outdoor",
+          "maxZoom": 14,
+          "minZoom": 5,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/outdoor/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain-rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "contours",
+          "maxZoom": 14,
+          "minZoom": 9,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/contours-v2/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "misc",
+          "url": "https://api.maptiler.eu/sprites/misc/sprite"
+        },
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/outdoor-v4-dark/style.json"
+    },
+    "outdoor/default": {
+      "fontStacks": [
+        [
+          "Open Sans Semi Condensed Medium",
+          "Noto Sans Semi Condensed Medium"
+        ],
+        [
+          "Open Sans Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Open Sans Semi Bold",
+          "Noto Sans Semi Bold"
+        ],
+        [
+          "Noto Sans Regular"
+        ],
+        [
+          "Open Sans Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Open Sans Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Open Sans Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Open Sans Italic",
+          "Noto Sans Italic"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "terrain-rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "landform",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/landform/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "contours",
+          "maxZoom": 14,
+          "minZoom": 9,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/contours-v2/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "outdoor",
+          "maxZoom": 14,
+          "minZoom": 5,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/outdoor/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        },
+        {
+          "id": "misc",
+          "url": "https://api.maptiler.eu/sprites/misc/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/outdoor-v4/style.json"
+    },
+    "satellite/default": {
+      "fontStacks": [
+        [
+          "Noto Sans Regular"
+        ],
+        [
+          "Noto Sans Bold"
+        ],
+        [
+          "Noto Sans Italic"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "satellite",
+          "maxZoom": 22,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/satellite-v2/{z}/{x}/{y}",
+          "type": "raster"
+        },
+        {
+          "id": "maptiler_planet",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v3/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/maps/satellite/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/satellite/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "streets/dark": {
+      "fontStacks": [
+        [
+          "Roboto Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Condensed Italic"
+        ],
+        [
+          "Roboto Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Mono Medium",
+          "Noto Sans Medium"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "subway",
+          "url": "https://api.maptiler.eu/sprites/subway/sprite"
+        },
+        {
+          "id": "transportation",
+          "url": "https://api.maptiler.eu/sprites/transportation/sprite"
+        },
+        {
+          "id": "misc",
+          "url": "https://api.maptiler.eu/sprites/misc/sprite"
+        },
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/streets-v4-dark/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "streets/default": {
+      "fontStacks": [
+        [
+          "Roboto Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Mono Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Condensed Italic"
+        ],
+        [
+          "Roboto Bold",
+          "Noto Sans Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "transportation",
+          "url": "https://api.maptiler.eu/sprites/transportation/sprite"
+        },
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        },
+        {
+          "id": "subway",
+          "url": "https://api.maptiler.eu/sprites/subway/sprite"
+        },
+        {
+          "id": "misc",
+          "url": "https://api.maptiler.eu/sprites/misc/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/streets-v4/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "streets/pastel": {
+      "fontStacks": [
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Mono Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Condensed Italic"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Medium"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "subway",
+          "url": "https://api.maptiler.eu/sprites/subway/sprite"
+        },
+        {
+          "id": "misc",
+          "url": "https://api.maptiler.eu/sprites/misc/sprite"
+        },
+        {
+          "id": "transportation",
+          "url": "https://api.maptiler.eu/sprites/transportation/sprite"
+        },
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/streets-v4-pastel/style.json",
+      "terrainSource": {
+        "id": "maptiler-terrain",
+        "maxZoom": 14,
+        "minZoom": 0,
+        "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+        "type": "raster-dem"
+      }
+    },
+    "topo/default": {
+      "fontStacks": [
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Condensed Medium"
+        ],
+        [
+          "Roboto Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Bold Italic",
+          "Noto Sans Bold Italic"
+        ],
+        [
+          "Roboto Condensed Regular",
+          "Noto Sans Condensed Regular"
+        ],
+        [
+          "Roboto Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Roboto Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Condensed Italic"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Medium"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "landform",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/landform/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "contours",
+          "maxZoom": 14,
+          "minZoom": 9,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/contours-v2/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/topo-v4/style.json"
+    },
+    "topo/pastel": {
+      "fontStacks": [
+        [
+          "Roboto Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Condensed Medium"
+        ],
+        [
+          "Roboto Bold Italic",
+          "Noto Sans Bold Italic"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Condensed Italic"
+        ],
+        [
+          "Roboto Condensed Regular",
+          "Noto Sans Condensed Regular"
+        ],
+        [
+          "Roboto Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Medium"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "contours",
+          "maxZoom": 14,
+          "minZoom": 9,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/contours-v2/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "landform",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/landform/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/topo-v4-pastel/style.json"
+    },
+    "topo/topographique": {
+      "fontStacks": [
+        [
+          "Roboto Bold Italic",
+          "Noto Sans Bold Italic"
+        ],
+        [
+          "Roboto Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Condensed Regular",
+          "Noto Sans Condensed Regular"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Condensed Medium"
+        ],
+        [
+          "Roboto Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Roboto Condensed Italic",
+          "Noto Sans Condensed Italic"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Medium"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "contours",
+          "maxZoom": 14,
+          "minZoom": 9,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/contours-v2/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain_rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "landform",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/landform/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/topo-v4-topographique/style.json"
+    },
+    "winter/dark": {
+      "fontStacks": [
+        [
+          "Roboto Condensed Regular",
+          "Noto Sans Condensed Regular"
+        ],
+        [
+          "Roboto Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Open Sans Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Open Sans Semi Condensed Bold",
+          "Noto Sans Semi Condensed Bold"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Condensed Medium"
+        ],
+        [
+          "Roboto Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Open Sans Semi Bold Italic",
+          "Noto Sans Semi Bold Italic"
+        ],
+        [
+          "Roboto Black",
+          "Noto Sans Black"
+        ],
+        [
+          "Roboto Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Open Sans Semi Condensed Medium",
+          "Noto Sans Semi Condensed Medium"
+        ],
+        [
+          "Open Sans Semi Bold",
+          "Noto Sans Semi Bold"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Roboto Regular",
+          "Noto Sans Regular"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "contours",
+          "maxZoom": 14,
+          "minZoom": 9,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/contours-v2/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain-rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "outdoor",
+          "maxZoom": 14,
+          "minZoom": 5,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/outdoor/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "landform",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/landform/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/winter-v4-dark/style.json"
+    },
+    "winter/default": {
+      "fontStacks": [
+        [
+          "Roboto Italic",
+          "Noto Sans Italic"
+        ],
+        [
+          "Roboto Condensed Regular",
+          "Noto Sans Condensed Regular"
+        ],
+        [
+          "Roboto Medium",
+          "Noto Sans Medium"
+        ],
+        [
+          "Open Sans Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Open Sans Semi Condensed Medium",
+          "Noto Sans Semi Condensed Medium"
+        ],
+        [
+          "Roboto Medium Italic",
+          "Noto Sans Medium Italic"
+        ],
+        [
+          "Roboto Bold",
+          "Noto Sans Bold"
+        ],
+        [
+          "Open Sans Semi Bold Italic",
+          "Noto Sans Semi Bold Italic"
+        ],
+        [
+          "Open Sans Semi Condensed Bold",
+          "Noto Sans Semi Condensed Bold"
+        ],
+        [
+          "Roboto Condensed Medium",
+          "Noto Sans Condensed Medium"
+        ],
+        [
+          "Roboto Regular",
+          "Noto Sans Regular"
+        ],
+        [
+          "Roboto Black",
+          "Noto Sans Black"
+        ],
+        [
+          "Open Sans Semi Bold",
+          "Noto Sans Semi Bold"
+        ]
+      ],
+      "glyphsTemplate": "https://api.maptiler.eu/fonts/{fontstack}/{range}.pbf",
+      "sources": [
+        {
+          "id": "maptiler_planet_v4",
+          "maxZoom": 15,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/v4/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "outdoor",
+          "maxZoom": 14,
+          "minZoom": 5,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/outdoor/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "landform",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/landform/{z}/{x}/{y}",
+          "type": "vector"
+        },
+        {
+          "id": "terrain-rgb",
+          "maxZoom": 14,
+          "minZoom": 0,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/terrain-rgb-v2/{z}/{x}/{y}",
+          "type": "raster-dem"
+        },
+        {
+          "id": "contours",
+          "maxZoom": 14,
+          "minZoom": 9,
+          "tileURLTemplate": "https://api.maptiler.eu/tiles/contours-v2/{z}/{x}/{y}",
+          "type": "vector"
+        }
+      ],
+      "sprites": [
+        {
+          "id": "default",
+          "url": "https://api.maptiler.eu/sprites/general/sprite"
+        }
+      ],
+      "styleURL": "https://api.maptiler.eu/maps/winter-v4/style.json"
+    }
+  },
+  "version": 1
+}

@@ -71,8 +71,8 @@ internal struct MTOfflineRouter {
         let fontstack = components[0]
         let rangePbf = components[1]
 
-        // Handle fontstack lists by picking the first available font directory.
-        let fonts = fontstack.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        // Packs store glyphs under the whole font stack; fall back to the individual fonts of the stack.
+        let fonts = [fontstack] + fontstack.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
         let glyphsDir = packDir.appendingPathComponent("glyphs", isDirectory: true)
 
         for font in fonts {
@@ -84,6 +84,15 @@ internal struct MTOfflineRouter {
         }
 
         return nil
+    }
+
+    // Whether the path requests a glyph range of a pack. Ranges that were not downloaded are answered with an
+    // empty glyph set, so the map renders the characters it has instead of failing the request.
+    func isGlyphRequest(path: String) -> Bool {
+        let components = path.components(separatedBy: "/")
+        // "", "offline", <packID>, "glyphs", <fontstack>, <range>.pbf
+        return path.hasPrefix("/offline/") && components.count == 6 && components[3] == "glyphs"
+            && components[5].hasSuffix(".pbf")
     }
 
     private func resolveTiles(packDir: URL, tilePath: String) -> (url: URL, mimeType: String)? {

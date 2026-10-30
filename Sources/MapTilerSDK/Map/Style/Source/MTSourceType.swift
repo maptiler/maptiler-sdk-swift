@@ -10,7 +10,7 @@
 /// Types of sources.
 ///
 /// Sources state which data the map should display.
-public enum MTSourceType: String, Codable {
+public enum MTSourceType: String, Codable, Sendable {
     /// Vector tile source.
     case vector
 

@@ -10,7 +10,7 @@ function setUpMapEventsWithLevel(map, level, throttleMs) {
             return {
                 message: String(err && err.message ? err.message : err),
                 status: (err && err.status) ? err.status : (err && err.error && err.error.status) ? err.error.status : undefined,
-                url: (err && err.url) ? err.url : (err && err.resource && err.resource.url) ? err.resource.url : undefined,
+                url: (err && err.url) ? err.url : (err && err.error && err.error.url) ? err.error.url : (err && err.resource && err.resource.url) ? err.resource.url : undefined,
                 sourceId: err && err.sourceId ? err.sourceId : undefined
             };
         } catch (_) {

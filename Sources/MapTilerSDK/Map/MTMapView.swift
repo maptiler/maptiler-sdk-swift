@@ -65,6 +65,8 @@ open class MTMapView: UIView, Sendable {
 
     private var referenceStyleProxy: MTMapReferenceStyle = .streets
     private var styleVariantProxy: MTMapStyleVariant?
+    private var initializedReferenceStyle: MTMapReferenceStyle?
+    private var initializedStyleVariant: MTMapStyleVariant?
 
     /// Current options of the map object.
     public var options: MTMapOptions? = MTMapOptions()
@@ -402,6 +404,32 @@ extension MTMapView {
         }
     }
 
+    private func showErrorOverlay(message: String) {
+        guard self.viewWithTag(9999) == nil else { return }
+
+        let overlayView = UIView(frame: self.bounds)
+        overlayView.tag = 9999
+        overlayView.backgroundColor = UIColor.white
+        overlayView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+        let label = UILabel()
+        label.text = message
+        label.textColor = UIColor.black
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        overlayView.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: overlayView.leadingAnchor, constant: 16),
+            label.trailingAnchor.constraint(equalTo: overlayView.trailingAnchor, constant: -16),
+            label.centerYAnchor.constraint(equalTo: overlayView.centerYAnchor)
+        ])
+
+        self.addSubview(overlayView)
+    }
+
     package func initializeMap() {
         Task {
             guard let apiKey = await MTConfig.shared.getAPIKey() else {
@@ -412,29 +440,7 @@ extension MTMapView {
                 )
 
                 await MainActor.run {
-                    guard self.viewWithTag(9999) == nil else { return }
-
-                    let overlayView = UIView(frame: self.bounds)
-                    overlayView.tag = 9999
-                    overlayView.backgroundColor = UIColor.white
-                    overlayView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
-                    let label = UILabel()
-                    label.text = errorMessage
-                    label.textColor = UIColor.black
-                    label.textAlignment = .center
-                    label.numberOfLines = 0
-                    label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-                    label.translatesAutoresizingMaskIntoConstraints = false
-
-                    overlayView.addSubview(label)
-                    NSLayoutConstraint.activate([
-                        label.leadingAnchor.constraint(equalTo: overlayView.leadingAnchor, constant: 16),
-                        label.trailingAnchor.constraint(equalTo: overlayView.trailingAnchor, constant: -16),
-                        label.centerYAnchor.constraint(equalTo: overlayView.centerYAnchor)
-                    ])
-
-                    self.addSubview(overlayView)
+                    self.showErrorOverlay(message: errorMessage)
                 }
 
                 return
@@ -445,6 +451,9 @@ extension MTMapView {
             }
 
             let isSessionLogicEnabled = await MTConfig.shared.isSessionLogicEnabled
+
+            initializedReferenceStyle = referenceStyleProxy
+            initializedStyleVariant = styleVariantProxy
 
             do {
                 try await _ = bridge?.execute(InitializeMap(
@@ -488,6 +497,12 @@ extension MTMapView {
 }
 
 extension MTMapView: EventProcessorDelegate {
+    package func eventProcessorDidDetectInvalidAPIKey(_ processor: EventProcessor) {
+        let errorMessage = "Map Init Failed - API key is invalid or not authorized! Check MTConfig.shared.setAPIKey."
+        MTLogger.log(errorMessage, type: .criticalError)
+        showErrorOverlay(message: errorMessage)
+    }
+
     package func eventProcessor(_ processor: EventProcessor, didTriggerEvent event: MTEvent, with data: MTData?) {
         MTLogger.log("MTEvent triggered: \(event)", type: .event)
 
@@ -510,7 +525,16 @@ extension MTMapView: EventProcessorDelegate {
         }
 
         if event == .didLoad {
-            style = MTStyle(for: self, with: referenceStyleProxy, and: styleVariantProxy)
+            // Re-applying the style the map was initialized with would diff away
+            // any sources/layers added right after load, so only do it if the proxy changed.
+            let styleChanged = referenceStyleProxy != initializedReferenceStyle
+                || styleVariantProxy != initializedStyleVariant
+            style = MTStyle(
+                for: self,
+                with: referenceStyleProxy,
+                and: styleVariantProxy,
+                applyStyle: styleChanged
+            )
         }
 
         if event == .isReady {

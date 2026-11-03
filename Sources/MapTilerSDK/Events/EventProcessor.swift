@@ -18,6 +18,7 @@ package protocol EventProcessorDelegate: AnyObject {
         for moduleId: String,
         with data: [String: Any]?
     )
+    func eventProcessorDidDetectInvalidAPIKey(_ processor: EventProcessor)
 }
 
 @MainActor
@@ -46,6 +47,10 @@ package class EventProcessor {
 
     func registerModuleEvent(_ event: String, for moduleId: String, with data: [String: Any]? = nil) {
         delegate?.eventProcessor(self, didTriggerModuleEvent: event, for: moduleId, with: data)
+    }
+
+    func registerInvalidAPIKey() {
+        delegate?.eventProcessorDidDetectInvalidAPIKey(self)
     }
 
     private func processEventIfNeeded(_ event: MTEvent, with data: MTData? = nil) {

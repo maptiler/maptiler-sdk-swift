@@ -42,9 +42,21 @@ extension WebViewManager: WKScriptMessageHandler {
             let data = json.data(using: .utf8),
             let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
             if let msg = dict[Constants.Error.message] as? String { handleContextFailure(message: msg) }
+            if let error = dict[Constants.Error.error] as? [String: Any] { handleInvalidAPIKey(error: error) }
         } else if let error = message.body as? String {
             handleContextFailure(message: error)
         }
+    }
+
+    // MapTiler API responds with 401/403 when the API key is invalid or not authorized.
+    private func handleInvalidAPIKey(error: [String: Any]) {
+        guard let status = error[Constants.Error.status] as? Int, status == 401 || status == 403,
+            let url = error[Constants.Error.url] as? String,
+            let host = URL(string: url)?.host, host.hasPrefix("api.maptiler.") else {
+            return
+        }
+
+        eventProcessor?.registerInvalidAPIKey()
     }
 
     private func handleContextFailure(message: String) {

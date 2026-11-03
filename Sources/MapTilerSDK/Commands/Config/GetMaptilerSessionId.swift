@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct GetMaptilerSessionId: MTCommand {
+package struct GetMaptilerSessionId: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).getMaptilerSessionId();"
     }

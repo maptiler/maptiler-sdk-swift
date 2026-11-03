@@ -80,12 +80,7 @@ package final class WebViewExecutor: MTCommandExecutable {
                 )
                 return try MTBridgeReturnType(from: result)
             } catch {
-                if isVerbose {
-                    MTLogger.log(
-                        "Bridging error occurred for: \(command): \(error)",
-                        type: .warning
-                    )
-                }
+                logAsyncJavaScriptError(error, for: command, isVerbose: isVerbose)
                 return .unsupportedType
             }
         } else {
@@ -130,6 +125,20 @@ package final class WebViewExecutor: MTCommandExecutable {
                     }
                 }
             }
+        }
+    }
+
+    // JS exceptions are logged regardless of verbosity so they don't get silently
+    // swallowed as an unsupported return type.
+    private func logAsyncJavaScriptError(_ error: Error, for command: MTCommand, isVerbose: Bool) {
+        if let error = error as? WKError, error.code == .javaScriptExceptionOccurred {
+            let reason = error.errorUserInfo[exceptionKey] as? String ?? "\(error)"
+            MTLogger.log("Exception occurred for: \(command): \(reason)", type: .error)
+        } else if isVerbose {
+            MTLogger.log(
+                "Bridging error occurred for: \(command): \(error)",
+                type: .warning
+            )
         }
     }
 }

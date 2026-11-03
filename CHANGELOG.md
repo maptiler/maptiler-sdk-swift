@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.3.1](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.3.1)
+Released on 2026-11-03.
+### Fixed
+- The `getMapTilerSessionID` now returns proper type.
+- MTMapView `commonInit` duplicate is removed.
+
 ## [2.3.0](https://github.com/maptiler/maptiler-sdk-swift/releases/tag/2.3.0)
 Released on 2026-10-30.
 ### Added

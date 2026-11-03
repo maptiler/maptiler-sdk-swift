@@ -137,6 +137,9 @@ extension WebViewManager {
         enum Error {
             static let handler = "errorHandler"
             static let message = "message"
+            static let error = "error"
+            static let status = "status"
+            static let url = "url"
             static let unknown = "Unknown Error"
         }
 

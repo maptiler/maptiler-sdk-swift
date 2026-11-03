@@ -37,9 +37,14 @@ public class MTStyle {
     package init(
         for mapView: MTMapView,
         with referenceStyle: MTMapReferenceStyle,
-        and styleVariant: MTMapStyleVariant?
+        and styleVariant: MTMapStyleVariant?,
+        applyStyle: Bool = true
     ) {
         self.mapView = mapView
+        self.referenceStyle = referenceStyle
+        self.styleVariant = styleVariant
+
+        guard applyStyle else { return }
 
         Task { [weak self] in
             await self?.setStyle(referenceStyle, styleVariant: styleVariant)
@@ -79,6 +84,11 @@ public class MTStyle {
     ) {
         self.referenceStyle = referenceStyle
         self.styleVariant = styleVariant
+
+        // Setting the style drops custom sources and layers on the JS side, keep tracking in sync.
+        mapSources.removeAll()
+        mapLayers.removeAll()
+        queue.removeAll()
 
         mapView.runCommand(
             SetStyle(
@@ -284,7 +294,13 @@ extension MTStyle {
                     }
                 case .failure(let error):
                     mapLayers[layer.identifier] = nil
-                    completionHandler?(.failure(error))
+
+                    // isSourceLoaded returns undefined when the source is missing on the JS side.
+                    if case .unsupportedReturnType = error {
+                        completionHandler?(.failure(MTError.missingParent))
+                    } else {
+                        completionHandler?(.failure(error))
+                    }
                 }
             }
         } else {

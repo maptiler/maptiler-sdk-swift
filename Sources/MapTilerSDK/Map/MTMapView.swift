@@ -120,8 +120,6 @@ open class MTMapView: UIView, Sendable {
 
         self.referenceStyleProxy = referenceStyle
         self.styleVariantProxy = styleVariant
-
-        commonInit()
     }
 
     /// Initializes the map with the options.
@@ -129,8 +127,6 @@ open class MTMapView: UIView, Sendable {
         self.init()
 
         self.options = options
-
-        commonInit()
     }
 
     deinit {
@@ -658,7 +654,7 @@ extension MTMapView {
     }
 
     package func runCommandWithDoubleReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<Double, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -687,7 +683,7 @@ extension MTMapView {
     }
 
     package func runCommandWithDoubleArrayReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<[Double], MTError>) -> Void)? = nil
     ) {
         Task {
@@ -717,7 +713,7 @@ extension MTMapView {
     }
 
     package func runCommandWithOptionalStringReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<String?, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -748,7 +744,7 @@ extension MTMapView {
     }
 
     package func runCommandWithStringReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<String, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -763,7 +759,8 @@ extension MTMapView {
                     completion?(.success(commandValue))
                 } else {
                     MTLogger.log("\(command) returned invalid type.", type: .error)
-                    completion?(.failure(MTError.unsupportedReturnType(description: "Expected double, got NaN.")))
+                    let errorDesc = "Expected string, got \(value)."
+                    completion?(.failure(MTError.unsupportedReturnType(description: errorDesc)))
                 }
             } catch {
                 MTLogger.log("\(error)", type: .error)
@@ -777,7 +774,7 @@ extension MTMapView {
     }
 
     package func runCommandWithProjectionReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<MTProjectionType, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -808,7 +805,7 @@ extension MTMapView {
     }
 
     package func runCommandWithBoolReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<Bool, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -837,7 +834,7 @@ extension MTMapView {
     }
 
     package func runCommandWithCoordinateReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<CLLocationCoordinate2D, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -882,7 +879,7 @@ extension MTMapView {
     }
 
     package func runCommandWithPointReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<MTPoint, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -925,7 +922,7 @@ extension MTMapView {
     }
 
     package func runCommandWithBoundsReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<MTBounds, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -960,7 +957,7 @@ extension MTMapView {
     }
 
     package func runCommandWithOptionalBoundsReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<MTBounds?, MTError>) -> Void)? = nil
     ) {
         Task {
@@ -1011,7 +1008,7 @@ extension MTMapView {
     }
 
     package func runCommandWithPaddingReturnValue(
-        _ command: MTCommand,
+        _ command: MTValueCommand,
         completion: ((Result<MTPaddingOptions, MTError>) -> Void)? = nil
     ) {
         Task {

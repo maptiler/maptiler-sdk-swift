@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct IsGlobeProjection: MTCommand {
+package struct IsGlobeProjection: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).isGlobeProjection();"
     }

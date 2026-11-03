@@ -7,7 +7,7 @@
 //  MapTilerSDK
 //
 
-package struct HasTerrain: MTCommand {
+package struct HasTerrain: MTValueCommand {
     package func toJS() -> JSString {
         return "\(MTBridge.mapObject).hasTerrain();"
     }

@@ -48,6 +48,7 @@ class MainViewController: UIViewController {
     @IBOutlet private weak var benchmarkButton: UIButton!
     @IBOutlet private weak var loadingActivityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var layerViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var layersButton: UIButton!
 
     @IBOutlet private weak var layerView: LayerView! {
         didSet {
@@ -80,6 +81,7 @@ class MainViewController: UIViewController {
         setUpLongPress()
 
         setUpLayers()
+        setUpLegendButton()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -110,6 +112,39 @@ class MainViewController: UIViewController {
 
         satelliteLayer = MTRasterLayer(identifier: "satellitelayer", sourceIdentifier: "satellitesource")
         satelliteLayer.opacity = 0.7
+    }
+
+    private func setUpLegendButton() {
+        var configuration = UIButton.Configuration.filled()
+        configuration.image = UIImage(systemName: "list.bullet.rectangle")
+        configuration.baseForegroundColor = UIColor(white: 0.33, alpha: 1)
+        configuration.baseBackgroundColor = .white
+
+        let legendButton = UIButton(configuration: configuration, primaryAction: UIAction { [weak self] _ in
+            self?.presentLegend()
+        })
+        legendButton.accessibilityLabel = "Legend"
+        legendButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(legendButton)
+
+        NSLayoutConstraint.activate([
+            legendButton.leadingAnchor.constraint(equalTo: layersButton.trailingAnchor, constant: 8),
+            legendButton.centerYAnchor.constraint(equalTo: layersButton.centerYAnchor),
+            legendButton.heightAnchor.constraint(equalTo: layersButton.heightAnchor)
+        ])
+    }
+
+    /// Presents the legend as a half height sheet
+    private func presentLegend() {
+        let legendController = UIHostingController(rootView: LegendView(viewModel: LegendViewModel(mapView: mapView)))
+
+        if let sheet = legendController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.prefersGrabberVisible = true
+        }
+
+        present(legendController, animated: true)
     }
 
     private func setUpLongPress() {

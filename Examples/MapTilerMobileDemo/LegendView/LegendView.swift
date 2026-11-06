@@ -16,12 +16,14 @@ final class LegendViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private weak var mapView: MTMapView?
+    private let buildingDimmer: BuildingDimmer
 
     private let labelsQuery = MTLayerQuery(types: [.symbol])
     private let legendQuery = MTLayerQuery(categories: Set(MTLayerCategory.allCases))
 
-    init(mapView: MTMapView) {
+    init(mapView: MTMapView, buildingDimmer: BuildingDimmer) {
         self.mapView = mapView
+        self.buildingDimmer = buildingDimmer
     }
 
     func load() async {
@@ -33,6 +35,7 @@ final class LegendViewModel: ObservableObject {
         do {
             items = try await style.getLegend()
             labelsVisible = try await style.getStyleLayers(matching: labelsQuery).contains { $0.isVisible }
+            buildingsDimmed = try await buildingDimmer.isDimmed(in: style)
         } catch {
             errorMessage = "\(error)"
         }
@@ -52,17 +55,7 @@ final class LegendViewModel: ObservableObject {
 
     func setBuildingsDimmed(_ dimmed: Bool) async {
         buildingsDimmed = dimmed
-        await run { style in
-            let opacity = MTPropertyValue.number(dimmed ? 0.25 : 1.0)
-            try await style.setPaintProperty("fill-opacity", value: opacity, matching: MTLayerQuery(
-                types: [.fill],
-                categories: [.buildings]
-            ))
-            try await style.setPaintProperty("fill-extrusion-opacity", value: opacity, matching: MTLayerQuery(
-                types: [.fillExtrusion],
-                categories: [.buildings]
-            ))
-        }
+        await run { style in try await self.buildingDimmer.setDimmed(dimmed, in: style) }
     }
 
     /// Runs a style mutation, then reloads the legend
@@ -78,8 +71,81 @@ final class LegendViewModel: ObservableObject {
     }
 }
 
+/// Dims building layers and restores the style's own opacities afterwards.
+///
+/// Keep one per map, so the switch stays in sync across sheet presentations and style changes.
+/// Calls run one at a time, so fast toggling always ends in the last requested state.
+@MainActor
+final class BuildingDimmer {
+    private static let dimmedOpacity = 0.1
+    private static let query = MTLayerQuery(types: [.fill, .fillExtrusion], categories: [.buildings])
+
+    /// Opacity property and its original value as JSON, by layer id. Empty while not dimmed.
+    private var originals: [String: (property: String, json: String)] = [:]
+    private var pending: Task<Void, Never>?
+
+    func isDimmed(in style: MTStyle) async throws -> Bool {
+        try await serialized { try await self.currentlyDimmed(in: style) }
+    }
+
+    func setDimmed(_ dimmed: Bool, in style: MTStyle) async throws {
+        try await serialized { try await self.apply(dimmed, in: style) }
+    }
+
+    private func serialized<T>(_ work: @escaping @MainActor () async throws -> T) async throws -> T {
+        let previous = pending
+        let task = Task { @MainActor in
+            await previous?.value
+            return try await work()
+        }
+        pending = Task { _ = await task.result }
+        return try await task.value
+    }
+
+    private func currentlyDimmed(in style: MTStyle) async throws -> Bool {
+        for (id, original) in originals {
+            let value = try await style.getPaintProperty(layerId: id, name: original.property)
+            if (value as? NSNumber)?.doubleValue == Self.dimmedOpacity { return true }
+        }
+        // Nothing is dimmed anymore (e.g. the style was reloaded), so the stored values are stale
+        originals = [:]
+        return false
+    }
+
+    private func apply(_ dimmed: Bool, in style: MTStyle) async throws {
+        guard try await dimmed != currentlyDimmed(in: style) else { return }
+
+        if dimmed {
+            for layer in try await style.getStyleLayers(matching: Self.query) {
+                let property = layer.type == .fillExtrusion ? "fill-extrusion-opacity" : "fill-opacity"
+                let value = try await style.getPaintProperty(layerId: layer.id, name: property)
+                originals[layer.id] = (property, Self.json(value))
+                await style.setPaintProperty(layerId: layer.id, name: property, value: .number(Self.dimmedOpacity))
+            }
+        } else {
+            for (id, original) in originals {
+                // `null` resets a property the style left unset to its default
+                await style.setPaintProperty(layerId: id, name: original.property, value: .rawExpression(original.json))
+            }
+            originals = [:]
+        }
+    }
+
+    private static func json(_ value: Any?) -> String {
+        guard
+            let value,
+            let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed),
+            let json = String(bytes: data, encoding: .utf8)
+        else {
+            return "null"
+        }
+        return json
+    }
+}
+
 struct LegendView: View {
     @ObservedObject var viewModel: LegendViewModel
+    var onOpenShowcase: (() -> Void)?
 
     var body: some View {
         NavigationView {
@@ -115,6 +181,14 @@ struct LegendView: View {
             .navigationTitle("Layers")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                if let onOpenShowcase {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: onOpenShowcase) {
+                            Label("Showcase", systemImage: "arrow.up.left.and.arrow.down.right")
+                                .labelStyle(.titleAndIcon)
+                        }
+                    }
+                }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Menu {
                         Button("Show all") { Task { await viewModel.setAllVisible(true) } }

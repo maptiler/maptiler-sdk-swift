@@ -63,6 +63,7 @@ class MainViewController: UIViewController {
     private var terrainEnabled = false
 
     private var layerViewIsVisible = false
+    private let buildingDimmer = BuildingDimmer()
 
     var contoursLayer: MTLineLayer!
     var aerowayLayer: MTFillLayer!
@@ -136,7 +137,13 @@ class MainViewController: UIViewController {
 
     /// Presents the legend as a half height sheet
     private func presentLegend() {
-        let legendController = UIHostingController(rootView: LegendView(viewModel: LegendViewModel(mapView: mapView)))
+        let viewModel = LegendViewModel(mapView: mapView, buildingDimmer: buildingDimmer)
+        let legendView = LegendView(viewModel: viewModel) { [weak self] in
+            self?.dismiss(animated: true) {
+                self?.presentLayersShowcase()
+            }
+        }
+        let legendController = UIHostingController(rootView: legendView)
 
         if let sheet = legendController.sheetPresentationController {
             sheet.detents = [.medium(), .large()]
@@ -145,6 +152,15 @@ class MainViewController: UIViewController {
         }
 
         present(legendController, animated: true)
+    }
+
+    /// Presents the layers showcase full screen, hiding the tab bar.
+    private func presentLayersShowcase() {
+        let showcaseController = UIHostingController(rootView: LayersShowcaseView { [weak self] in
+            self?.dismiss(animated: true)
+        })
+        showcaseController.modalPresentationStyle = .fullScreen
+        present(showcaseController, animated: true)
     }
 
     private func setUpLongPress() {

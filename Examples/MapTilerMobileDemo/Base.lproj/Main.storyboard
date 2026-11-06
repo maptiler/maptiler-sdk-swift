@@ -169,6 +169,7 @@
                         <outlet property="benchmarkButton" destination="vcA-jg-OMy" id="IjZ-nh-RZ0"/>
                         <outlet property="jumpContainerView" destination="JMD-r8-val" id="zW0-Rd-P2l"/>
                         <outlet property="layerView" destination="aRW-VD-Sgs" id="24v-GW-KzS"/>
+                        <outlet property="layersButton" destination="G0X-Sh-jol" id="Lgd-Bt-n01"/>
                         <outlet property="layerViewLeadingConstraint" destination="SCH-tk-7at" id="zJG-VN-vES"/>
                         <outlet property="loadingActivityIndicator" destination="ope-7I-6c4" id="rYf-gi-imh"/>
                         <outlet property="mapControlView" destination="bPo-zQ-sJh" id="t9H-nD-HJn"/>

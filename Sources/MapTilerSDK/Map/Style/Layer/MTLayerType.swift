@@ -8,7 +8,7 @@
 //
 
 /// Types of layers.
-public enum MTLayerType: String, Codable {
+public enum MTLayerType: String, Codable, Sendable {
     /// A filled polygon with an optional stroked border.
     case fill
 

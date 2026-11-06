@@ -48,6 +48,7 @@ class MainViewController: UIViewController {
     @IBOutlet private weak var benchmarkButton: UIButton!
     @IBOutlet private weak var loadingActivityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var layerViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var layersButton: UIButton!
 
     @IBOutlet private weak var layerView: LayerView! {
         didSet {
@@ -62,6 +63,7 @@ class MainViewController: UIViewController {
     private var terrainEnabled = false
 
     private var layerViewIsVisible = false
+    private let buildingDimmer = BuildingDimmer()
 
     var contoursLayer: MTLineLayer!
     var aerowayLayer: MTFillLayer!
@@ -80,6 +82,7 @@ class MainViewController: UIViewController {
         setUpLongPress()
 
         setUpLayers()
+        setUpLegendButton()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -110,6 +113,54 @@ class MainViewController: UIViewController {
 
         satelliteLayer = MTRasterLayer(identifier: "satellitelayer", sourceIdentifier: "satellitesource")
         satelliteLayer.opacity = 0.7
+    }
+
+    private func setUpLegendButton() {
+        var configuration = UIButton.Configuration.filled()
+        configuration.image = UIImage(systemName: "list.bullet.rectangle")
+        configuration.baseForegroundColor = UIColor(white: 0.33, alpha: 1)
+        configuration.baseBackgroundColor = .white
+
+        let legendButton = UIButton(configuration: configuration, primaryAction: UIAction { [weak self] _ in
+            self?.presentLegend()
+        })
+        legendButton.accessibilityLabel = "Legend"
+        legendButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(legendButton)
+
+        NSLayoutConstraint.activate([
+            legendButton.leadingAnchor.constraint(equalTo: layersButton.trailingAnchor, constant: 8),
+            legendButton.centerYAnchor.constraint(equalTo: layersButton.centerYAnchor),
+            legendButton.heightAnchor.constraint(equalTo: layersButton.heightAnchor)
+        ])
+    }
+
+    /// Presents the legend as a half height sheet
+    private func presentLegend() {
+        let viewModel = LegendViewModel(mapView: mapView, buildingDimmer: buildingDimmer)
+        let legendView = LegendView(viewModel: viewModel) { [weak self] in
+            self?.dismiss(animated: true) {
+                self?.presentLayersShowcase()
+            }
+        }
+        let legendController = UIHostingController(rootView: legendView)
+
+        if let sheet = legendController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.prefersGrabberVisible = true
+        }
+
+        present(legendController, animated: true)
+    }
+
+    /// Presents the layers showcase full screen, hiding the tab bar.
+    private func presentLayersShowcase() {
+        let showcaseController = UIHostingController(rootView: LayersShowcaseView { [weak self] in
+            self?.dismiss(animated: true)
+        })
+        showcaseController.modalPresentationStyle = .fullScreen
+        present(showcaseController, animated: true)
     }
 
     private func setUpLongPress() {

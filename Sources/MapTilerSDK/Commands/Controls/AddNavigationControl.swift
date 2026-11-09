@@ -10,6 +10,7 @@
 import Foundation
 
 package struct AddNavigationControl: MTCommand {
+    var id: String
     var position: MTMapCorner
     var showCompass: Bool
     var showZoom: Bool
@@ -26,8 +27,8 @@ package struct AddNavigationControl: MTCommand {
         let json = opts.toJSON() ?? "{}"
 
         return """
-        \(MTBridge.mapObject).addControl(\
-        new \(MTBridge.sdkObject).MaptilerNavigationControl(\(json)), '\(position.rawValue)');
+        window['\(id)'] = new \(MTBridge.sdkObject).MaptilerNavigationControl(\(json));
+        \(MTBridge.mapObject).addControl(window['\(id)'], '\(position.rawValue)');
         """
     }
 }

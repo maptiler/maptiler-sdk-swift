@@ -15,14 +15,14 @@ public protocol MTControllable {
     /// Adds the MapTiler logo control to the map.
     ///  - Parameters:
     ///     - position: Map position to add the control to.
-    func addMapTilerLogoControl(position: MTMapCorner) async
+    func addMapTilerLogoControl(id: String, position: MTMapCorner) async
 
     /// Adds the logo control to the map.
     ///  - Parameters:
     ///     - logoURL: URL of the logo image resource.
     ///     - linkURL: URL of the anchor link.
     ///     - position: Map position to add the control to.
-    func addLogoControl(name: String, logoURL: URL, linkURL: URL, position: MTMapCorner) async
+    func addLogoControl(id: String, name: String, logoURL: URL, linkURL: URL, position: MTMapCorner) async
 
     /// Adds the navigation control to the map.
     ///  - Parameters:
@@ -30,7 +30,13 @@ public protocol MTControllable {
     ///     - showCompass: If true the compass button is included.
     ///     - showZoom: If true the zoom-in and zoom-out buttons are included.
     ///     - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
-    func addNavigationControl(position: MTMapCorner, showCompass: Bool, showZoom: Bool, visualizePitch: Bool) async
+    func addNavigationControl(
+        id: String,
+        position: MTMapCorner,
+        showCompass: Bool,
+        showZoom: Bool,
+        visualizePitch: Bool
+    ) async
 
     /// Toggles the compass visibility on the navigation control.
     /// - Parameters:
@@ -50,7 +56,7 @@ public protocol MTControllable {
     /// Adds the terrain control to the map.
     /// - Parameters:
     ///   - position: Map position to add the control to.
-    func addTerrainControl(position: MTMapCorner) async
+    func addTerrainControl(id: String, position: MTMapCorner) async
 
     /// Adds the attribution control to the map.
     /// - Parameters:
@@ -59,7 +65,7 @@ public protocol MTControllable {
     ///              control. The default is a responsive attribution that collapses when the map is less than 640
     ///              pixels wide.
     ///   - customAttribution: String or strings to show in addition to any other attributions.
-    func addAttributionControl(position: MTMapCorner, compact: Bool?, customAttribution: [String]?) async
+    func addAttributionControl(id: String, position: MTMapCorner, compact: Bool?, customAttribution: [String]?) async
 
     /// Adds the attribution control to the map.
     /// - Parameters:
@@ -68,12 +74,23 @@ public protocol MTControllable {
     ///              control. The default is a responsive attribution that collapses when the map is less than 640
     ///              pixels wide.
     ///   - customAttribution: String to show in addition to any other attributions.
-    func addAttributionControl(position: MTMapCorner, compact: Bool?, customAttribution: String?) async
+    func addAttributionControl(id: String, position: MTMapCorner, compact: Bool?, customAttribution: String?) async
 
     /// Adds the scale control to the map.
     /// - Parameters:
     ///   - position: Map position to add the control to.
     ///   - maxWidth: The maximum length of the scale control in pixels.
     ///   - unit: Unit of the distance.
-    func addScaleControl(position: MTMapCorner, maxWidth: Int?, unit: MTUnit?) async
+    func addScaleControl(id: String, position: MTMapCorner, maxWidth: Int?, unit: MTUnit?) async
+
+    /// Checks if a control is added to the map.
+    /// - Parameters:
+    ///   - id: The id of the control.
+    /// - Returns: True if the control is present.
+    func hasControl(id: String) async -> Result<Bool, MTError>
+
+    /// Removes a control from the map.
+    /// - Parameters:
+    ///   - id: The id of the control.
+    func removeControl(id: String) async
 }

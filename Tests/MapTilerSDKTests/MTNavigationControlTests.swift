@@ -18,6 +18,7 @@ struct MTNavigationControlTests {
         let visualizePitch = true
 
         let command = AddNavigationControl(
+            id: "test-id",
             position: position,
             showCompass: showCompass,
             showZoom: showZoom,
@@ -25,7 +26,10 @@ struct MTNavigationControlTests {
         )
 
         let expectedJSON = "{\"showCompass\":true,\"showZoom\":false,\"visualizePitch\":true}"
-        let expectedJS = "\(MTBridge.mapObject).addControl(new \(MTBridge.sdkObject).MaptilerNavigationControl(\(expectedJSON)), 'bottom-left');"
+        let expectedJS = """
+        window['test-id'] = new \(MTBridge.sdkObject).MaptilerNavigationControl(\(expectedJSON));
+        \(MTBridge.mapObject).addControl(window['test-id'], 'bottom-left');
+        """
 
         #expect(command.toJS() == expectedJS)
     }

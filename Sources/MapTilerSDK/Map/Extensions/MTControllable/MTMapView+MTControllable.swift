@@ -16,13 +16,14 @@ extension MTMapView: MTControllable {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addMapTilerLogoControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         if let url = URL(string: "\(MTConfig.shared.apiURL)resources/logo.svg"),
             let linkURL = URL(string: "https://www.maptiler.com") {
             runCommand(
-                AddLogoControl(name: "MapTilerLogo", url: url, linkURL: linkURL, position: position),
+                AddLogoControl(id: id, name: "MapTilerLogo", url: url, linkURL: linkURL, position: position),
                 completion: completionHandler
             )
 
@@ -39,6 +40,7 @@ extension MTMapView: MTControllable {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addLogoControl(
+        id: String = UUID().uuidString,
         name: String,
         logoURL: URL,
         linkURL: URL,
@@ -46,7 +48,7 @@ extension MTMapView: MTControllable {
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(
-            AddLogoControl(name: name, url: logoURL, linkURL: linkURL, position: position),
+            AddLogoControl(id: id, name: name, url: logoURL, linkURL: linkURL, position: position),
             completion: completionHandler
         )
 
@@ -62,6 +64,7 @@ extension MTMapView: MTControllable {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addNavigationControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .topRight,
         showCompass: Bool = true,
         showZoom: Bool = true,
@@ -70,6 +73,7 @@ extension MTMapView: MTControllable {
     ) {
         runCommand(
             AddNavigationControl(
+                id: id,
                 position: position,
                 showCompass: showCompass,
                 showZoom: showZoom,
@@ -121,10 +125,11 @@ extension MTMapView: MTControllable {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addTerrainControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .topRight,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
-        runCommand(AddTerrainControl(position: position), completion: completionHandler)
+        runCommand(AddTerrainControl(id: id, position: position), completion: completionHandler)
     }
 
     /// Adds the attribution control to the map.
@@ -137,13 +142,14 @@ extension MTMapView: MTControllable {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addAttributionControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .bottomRight,
         compact: Bool? = nil,
         customAttribution: [String]? = nil,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(
-            AddAttributionControl(position: position, compact: compact, customAttribution: customAttribution),
+            AddAttributionControl(id: id, position: position, compact: compact, customAttribution: customAttribution),
             completion: completionHandler
         )
     }
@@ -158,6 +164,7 @@ extension MTMapView: MTControllable {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addAttributionControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .bottomRight,
         compact: Bool? = nil,
         customAttribution: String? = nil,
@@ -165,6 +172,7 @@ extension MTMapView: MTControllable {
     ) {
         let attributions = customAttribution.map { [$0] }
         addAttributionControl(
+            id: id,
             position: position,
             compact: compact,
             customAttribution: attributions,
@@ -180,15 +188,40 @@ extension MTMapView: MTControllable {
     ///   - completionHandler: A handler block to execute when function finishes.
     @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
     public func addScaleControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .bottomLeft,
         maxWidth: Int? = nil,
         unit: MTUnit? = nil,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(
-            AddScaleControl(position: position, maxWidth: maxWidth, unit: unit),
+            AddScaleControl(id: id, position: position, maxWidth: maxWidth, unit: unit),
             completion: completionHandler
         )
+    }
+
+    /// Checks if a control is added to the map.
+    /// - Parameters:
+    ///   - id: The id of the control.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func hasControl(
+        id: String,
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(HasControl(id: id), completion: completionHandler)
+    }
+
+    /// Removes a control from the map.
+    /// - Parameters:
+    ///   - id: The id of the control.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeControl(
+        id: String,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(RemoveControl(id: id), completion: completionHandler)
     }
 }
 
@@ -198,9 +231,9 @@ extension MTMapView {
     /// - Parameters:
     ///   - name: Unique name of the logo.
     ///   - position: The corner position of the logo.
-    public func addMapTilerLogoControl(position: MTMapCorner) async {
+    public func addMapTilerLogoControl(id: String = UUID().uuidString, position: MTMapCorner) async {
         await withCheckedContinuation { continuation in
-            addMapTilerLogoControl(position: position) { _ in
+            addMapTilerLogoControl(id: id, position: position) { _ in
                 continuation.resume()
             }
         }
@@ -212,9 +245,15 @@ extension MTMapView {
     ///    - logoURL: URL of logo image.
     ///    - linkURL: URL of logo link.
     ///   - position: The corner position of the logo.
-    public func addLogoControl(name: String, logoURL: URL, linkURL: URL, position: MTMapCorner) async {
+    public func addLogoControl(
+        id: String = UUID().uuidString,
+        name: String,
+        logoURL: URL,
+        linkURL: URL,
+        position: MTMapCorner
+    ) async {
         await withCheckedContinuation { continuation in
-            addLogoControl(name: name, logoURL: logoURL, linkURL: linkURL, position: position) { _ in
+            addLogoControl(id: id, name: name, logoURL: logoURL, linkURL: linkURL, position: position) { _ in
                 continuation.resume()
             }
         }
@@ -227,6 +266,7 @@ extension MTMapView {
     ///   - showZoom: If true the zoom-in and zoom-out buttons are included.
     ///   - visualizePitch: If true the pitch is visualized by rotating X-axis of compass.
     public func addNavigationControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .topRight,
         showCompass: Bool = true,
         showZoom: Bool = true,
@@ -234,6 +274,7 @@ extension MTMapView {
     ) async {
         await withCheckedContinuation { continuation in
             addNavigationControl(
+                id: id,
                 position: position,
                 showCompass: showCompass,
                 showZoom: showZoom,
@@ -280,9 +321,9 @@ extension MTMapView {
     /// Adds the terrain control to the map.
     /// - Parameters:
     ///   - position: The corner position of the control.
-    public func addTerrainControl(position: MTMapCorner = .topRight) async {
+    public func addTerrainControl(id: String = UUID().uuidString, position: MTMapCorner = .topRight) async {
         await withCheckedContinuation { continuation in
-            addTerrainControl(position: position) { _ in
+            addTerrainControl(id: id, position: position) { _ in
                 continuation.resume()
             }
         }
@@ -296,12 +337,14 @@ extension MTMapView {
     ///              pixels wide.
     ///   - customAttribution: String or strings to show in addition to any other attributions.
     public func addAttributionControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .bottomRight,
         compact: Bool? = nil,
         customAttribution: [String]? = nil
     ) async {
         await withCheckedContinuation { continuation in
             addAttributionControl(
+                id: id,
                 position: position,
                 compact: compact,
                 customAttribution: customAttribution
@@ -319,12 +362,14 @@ extension MTMapView {
     ///              pixels wide.
     ///   - customAttribution: String to show in addition to any other attributions.
     public func addAttributionControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .bottomRight,
         compact: Bool? = nil,
         customAttribution: String? = nil
     ) async {
         await withCheckedContinuation { continuation in
             addAttributionControl(
+                id: id,
                 position: position,
                 compact: compact,
                 customAttribution: customAttribution
@@ -340,16 +385,41 @@ extension MTMapView {
     ///   - maxWidth: The maximum length of the scale control in pixels.
     ///   - unit: Unit of the distance.
     public func addScaleControl(
+        id: String = UUID().uuidString,
         position: MTMapCorner = .bottomLeft,
         maxWidth: Int? = nil,
         unit: MTUnit? = nil
     ) async {
         await withCheckedContinuation { continuation in
             addScaleControl(
+                id: id,
                 position: position,
                 maxWidth: maxWidth,
                 unit: unit
             ) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Checks if a control is added to the map.
+    /// - Parameters:
+    ///   - id: The id of the control.
+    /// - Returns: True if the control is present.
+    public func hasControl(id: String) async -> Result<Bool, MTError> {
+        await withCheckedContinuation { continuation in
+            hasControl(id: id) { result in
+                continuation.resume(returning: result)
+            }
+        }
+    }
+
+    /// Removes a control from the map.
+    /// - Parameters:
+    ///   - id: The id of the control.
+    public func removeControl(id: String) async {
+        await withCheckedContinuation { continuation in
+            removeControl(id: id) { _ in
                 continuation.resume()
             }
         }

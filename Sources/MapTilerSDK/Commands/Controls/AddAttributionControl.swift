@@ -10,6 +10,7 @@
 import Foundation
 
 package struct AddAttributionControl: MTCommand {
+    var id: String
     var position: MTMapCorner
     var compact: Bool?
     var customAttribution: [String]?
@@ -24,8 +25,8 @@ package struct AddAttributionControl: MTCommand {
         let json = opts.toJSON() ?? "{}"
 
         return """
-        \(MTBridge.mapObject).addControl(\
-        new \(MTBridge.sdkObject).AttributionControl(\(json)), '\(position.rawValue)');
+        window['\(id)'] = new \(MTBridge.sdkObject).AttributionControl(\(json));
+        \(MTBridge.mapObject).addControl(window['\(id)'], '\(position.rawValue)');
         """
     }
 }

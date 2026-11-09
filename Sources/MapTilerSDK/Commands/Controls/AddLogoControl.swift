@@ -10,6 +10,7 @@
 import Foundation
 
 package struct AddLogoControl: MTCommand {
+    var id: String
     var name: String
     var url: URL
     var linkURL: URL
@@ -17,11 +18,11 @@ package struct AddLogoControl: MTCommand {
 
     package func toJS() -> JSString {
         let addLogoCommand = """
-            const \(name) = new \(MTBridge.sdkObject).MaptilerLogoControl({
+            window['\(id)'] = new \(MTBridge.sdkObject).MaptilerLogoControl({
                 logoURL: "\(url)",
                 linkURL: "\(linkURL)"
             });
-            \("\(MTBridge.mapObject).addControl(\(name), '\(position.rawValue)');")
+            \(MTBridge.mapObject).addControl(window['\(id)'], '\(position.rawValue)');
             """
 
         return addLogoCommand

@@ -10,12 +10,13 @@
 import Foundation
 
 package struct AddTerrainControl: MTCommand {
+    var id: String
     var position: MTMapCorner
 
     package func toJS() -> JSString {
         return """
-        \(MTBridge.mapObject).addControl(\
-        new \(MTBridge.sdkObject).MaptilerTerrainControl(), '\(position.rawValue)');
+        window['\(id)'] = new \(MTBridge.sdkObject).MaptilerTerrainControl();
+        \(MTBridge.mapObject).addControl(window['\(id)'], '\(position.rawValue)');
         """
     }
 }

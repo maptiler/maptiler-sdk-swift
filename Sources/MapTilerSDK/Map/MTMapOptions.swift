@@ -225,6 +225,28 @@ public struct MTMapOptions: Sendable {
     /// [MTEventLevel.all] or [MTEventLevel.cameraOnly]. A value of 0 disables throttling.
     public private(set) var highFrequencyEventThrottleMs: Int? = 10
 
+    /// The map locale.
+    ///
+    /// Overrides the UI strings of built-in controls (used as accessibility labels).
+    public private(set) var locale: [String: String]?
+
+    private var _maxCanvasSize: [Double]?
+
+    /// Maximum WebGL canvas size in pixels.
+    public var maxCanvasSize: CGSize? {
+        get {
+            guard let size = _maxCanvasSize, size.count == 2 else { return nil }
+            return CGSize(width: size[0], height: size[1])
+        }
+        set {
+            if let newValue = newValue {
+                _maxCanvasSize = [newValue.width, newValue.height]
+            } else {
+                _maxCanvasSize = nil
+            }
+        }
+    }
+
     /// Initializes the map options with center and zoom.
     public init(center: CLLocationCoordinate2D?, zoom: Double?) {
         self.center = center
@@ -306,7 +328,9 @@ public struct MTMapOptions: Sendable {
         space: MTSpaceOption? = nil,
         halo: MTHaloOption? = nil,
         eventLevel: MTEventLevel = .cameraOnly,
-        highFrequencyEventThrottleMs: Int? = 10
+        highFrequencyEventThrottleMs: Int? = 10,
+        locale: [String: String]? = nil,
+        maxCanvasSize: CGSize? = nil
     ) {
         self.language = language
         self.secondaryLanguage = secondaryLanguage
@@ -359,6 +383,10 @@ public struct MTMapOptions: Sendable {
         self.halo = halo
         self.eventLevel = eventLevel
         self.highFrequencyEventThrottleMs = highFrequencyEventThrottleMs
+        self.locale = locale
+        if let maxCanvasSize = maxCanvasSize {
+            self._maxCanvasSize = [maxCanvasSize.width, maxCanvasSize.height]
+        }
     }
 }
 
@@ -414,6 +442,8 @@ extension MTMapOptions: Codable {
         case halo
         case eventLevel
         case highFrequencyEventThrottleMs
+        case locale
+        case _maxCanvasSize = "maxCanvasSize"
     }
 }
 
@@ -616,5 +646,13 @@ extension MTMapOptions {
 
     package mutating func setHighFrequencyEventThrottleMs(_ highFrequencyEventThrottleMs: Int?) {
         self.highFrequencyEventThrottleMs = highFrequencyEventThrottleMs
+    }
+
+    package mutating func setLocale(_ locale: [String: String]?) {
+        self.locale = locale
+    }
+
+    package mutating func setMaxCanvasSize(_ maxCanvasSize: CGSize?) {
+        self.maxCanvasSize = maxCanvasSize
     }
 }

@@ -13,20 +13,26 @@ struct MTAttributionControlTests {
 
     @Test func addAttributionControlCommand_withOptions_shouldMatchJS() async throws {
         let position = MTMapCorner.bottomLeft
-        let command = AddAttributionControl(position: position, compact: true, customAttribution: ["MapTiler", "OpenStreetMap"])
+        let command = AddAttributionControl(id: "test-id", position: position, compact: true, customAttribution: ["MapTiler", "OpenStreetMap"])
         
         let expectedJSON = "{\"compact\":true,\"customAttribution\":[\"MapTiler\",\"OpenStreetMap\"]}"
-        let expectedJS = "\(MTBridge.mapObject).addControl(new \(MTBridge.sdkObject).AttributionControl(\(expectedJSON)), 'bottom-left');"
+        let expectedJS = """
+        window['test-id'] = new \(MTBridge.sdkObject).AttributionControl(\(expectedJSON));
+        \(MTBridge.mapObject).addControl(window['test-id'], 'bottom-left');
+        """
         
         #expect(command.toJS() == expectedJS)
     }
 
     @Test func addAttributionControlCommand_withoutOptions_shouldMatchJS() async throws {
         let position = MTMapCorner.bottomRight
-        let command = AddAttributionControl(position: position, compact: nil, customAttribution: nil)
+        let command = AddAttributionControl(id: "test-id2", position: position, compact: nil, customAttribution: nil)
         
         let expectedJSON = "{}"
-        let expectedJS = "\(MTBridge.mapObject).addControl(new \(MTBridge.sdkObject).AttributionControl(\(expectedJSON)), 'bottom-right');"
+        let expectedJS = """
+        window['test-id2'] = new \(MTBridge.sdkObject).AttributionControl(\(expectedJSON));
+        \(MTBridge.mapObject).addControl(window['test-id2'], 'bottom-right');
+        """
         
         #expect(command.toJS() == expectedJS)
     }

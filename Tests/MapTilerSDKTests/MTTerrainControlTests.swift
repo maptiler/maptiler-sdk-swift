@@ -13,9 +13,12 @@ struct MTTerrainControlTests {
 
     @Test func addTerrainControlCommand_shouldMatchJS() async throws {
         let position = MTMapCorner.bottomLeft
-        let command = AddTerrainControl(position: position)
+        let command = AddTerrainControl(id: "test-id", position: position)
         
-        let expectedJS = "\(MTBridge.mapObject).addControl(new \(MTBridge.sdkObject).MaptilerTerrainControl(), 'bottom-left');"
+        let expectedJS = """
+        window['test-id'] = new \(MTBridge.sdkObject).MaptilerTerrainControl();
+        \(MTBridge.mapObject).addControl(window['test-id'], 'bottom-left');
+        """
         #expect(command.toJS() == expectedJS)
     }
 }

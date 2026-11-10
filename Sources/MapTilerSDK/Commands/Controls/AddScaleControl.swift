@@ -10,6 +10,7 @@
 import Foundation
 
 package struct AddScaleControl: MTCommand {
+    var id: String
     var position: MTMapCorner
     var maxWidth: Int?
     var unit: MTUnit?
@@ -24,8 +25,8 @@ package struct AddScaleControl: MTCommand {
         let json = opts.toJSON() ?? "{}"
 
         return """
-        \(MTBridge.mapObject).addControl(\
-        new \(MTBridge.sdkObject).ScaleControl(\(json)), '\(position.rawValue)');
+        window['\(id)'] = new \(MTBridge.sdkObject).ScaleControl(\(json));
+        \(MTBridge.mapObject).addControl(window['\(id)'], '\(position.rawValue)');
         """
     }
 }

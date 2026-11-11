@@ -197,6 +197,18 @@ open class MTMapView: UIView, Sendable {
 }
 
 extension MTMapView {
+    /// Dynamically updates the request transform rules on the map.
+    /// - Parameters:
+    ///   - rules: A declarative set of rules for transforming network requests.
+    ///   - completion: Optional completion handler with `Result<Void, MTError>`.
+    public func setTransformRequest(
+        _ rules: [MTRequestTransformRule]?,
+        completion: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        options?.setTransformRequest(rules)
+        runCommand(SetTransformRequest(rules: rules), completion: completion)
+    }
+
     /// Reloads the map view.
     public func reload() {
         if let webView = webViewExecutor?.getWebView() {

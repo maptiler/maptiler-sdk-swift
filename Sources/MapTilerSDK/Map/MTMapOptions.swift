@@ -225,6 +225,9 @@ public struct MTMapOptions: Sendable {
     /// [MTEventLevel.all] or [MTEventLevel.cameraOnly]. A value of 0 disables throttling.
     public private(set) var highFrequencyEventThrottleMs: Int? = 10
 
+    /// A declarative set of rules for transforming network requests.
+    public private(set) var transformRequest: [MTRequestTransformRule]?
+
     /// The map locale.
     ///
     /// Overrides the UI strings of built-in controls (used as accessibility labels).
@@ -329,6 +332,7 @@ public struct MTMapOptions: Sendable {
         halo: MTHaloOption? = nil,
         eventLevel: MTEventLevel = .cameraOnly,
         highFrequencyEventThrottleMs: Int? = 10,
+        transformRequest: [MTRequestTransformRule]? = nil,
         locale: [String: String]? = nil,
         maxCanvasSize: CGSize? = nil
     ) {
@@ -383,6 +387,7 @@ public struct MTMapOptions: Sendable {
         self.halo = halo
         self.eventLevel = eventLevel
         self.highFrequencyEventThrottleMs = highFrequencyEventThrottleMs
+        self.transformRequest = transformRequest
         self.locale = locale
         if let maxCanvasSize = maxCanvasSize {
             self._maxCanvasSize = [maxCanvasSize.width, maxCanvasSize.height]
@@ -442,6 +447,7 @@ extension MTMapOptions: Codable {
         case halo
         case eventLevel
         case highFrequencyEventThrottleMs
+        case transformRequest
         case locale
         case _maxCanvasSize = "maxCanvasSize"
     }
@@ -646,6 +652,10 @@ extension MTMapOptions {
 
     package mutating func setHighFrequencyEventThrottleMs(_ highFrequencyEventThrottleMs: Int?) {
         self.highFrequencyEventThrottleMs = highFrequencyEventThrottleMs
+    }
+
+    package mutating func setTransformRequest(_ transformRequest: [MTRequestTransformRule]?) {
+        self.transformRequest = transformRequest
     }
 
     package mutating func setLocale(_ locale: [String: String]?) {

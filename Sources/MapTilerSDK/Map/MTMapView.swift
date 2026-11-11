@@ -1060,6 +1060,73 @@ extension MTMapView {
         }
     }
 
+    package func runCommandWithCameraOptionsReturnValue(
+        _ command: MTValueCommand,
+        completion: ((Result<MTCameraOptions, MTError>) -> Void)? = nil
+    ) {
+        Task {
+            do {
+                guard let bridge = bridge else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                    return
+                }
+                let value = try await bridge.execute(command)
+                switch value {
+                case .string(let jsonString):
+                    if jsonString == "null" {
+                        completion?(
+                            .failure(
+                                MTError.unsupportedReturnType(
+                                    description: "Got null, expected MTCameraOptions"
+                                )
+                            )
+                        )
+                        return
+                    }
+                    guard let data = jsonString.data(using: .utf8) else {
+                        completion?(
+                            .failure(
+                                MTError.unsupportedReturnType(
+                                    description: "Failed to parse MTCameraOptions JSON string"
+                                )
+                            )
+                        )
+                        return
+                    }
+                    do {
+                        let options = try JSONDecoder().decode(MTCameraOptions.self, from: data)
+                        completion?(.success(options))
+                    } catch {
+                        MTLogger.log("Error decoding camera options: \(error)", type: .error)
+                        completion?(
+                            .failure(
+                                MTError.unsupportedReturnType(
+                                    description: "Failed to parse MTCameraOptions JSON: \(error)"
+                                )
+                            )
+                        )
+                    }
+                default:
+                    MTLogger.log("\(command) returned invalid type.", type: .error)
+                    completion?(
+                        .failure(
+                            MTError.unsupportedReturnType(
+                                description: "Expected string, got invalid type."
+                            )
+                        )
+                    )
+                }
+            } catch {
+                MTLogger.log("\(error)", type: .error)
+                if let error = error as? MTError {
+                    completion?(.failure(error))
+                } else {
+                    completion?(.failure(MTError.bridgeNotLoaded))
+                }
+            }
+        }
+    }
+
     private func decodeBounds(from string: String) -> MTBounds? {
         guard let data = string.data(using: .utf8) else {
             return nil

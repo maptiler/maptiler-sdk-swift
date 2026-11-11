@@ -170,7 +170,7 @@ internal actor MTOfflineDownloader {
         for assetTask: any MTDownloadTask,
         in group: inout ThrowingTaskGroup<(String, Error?), Error>
     ) {
-        let childTask = Task { () -> (String, Error?) in
+        let childTask = Task.detached { () -> (String, Error?) in
             if Task.isCancelled {
                 return (assetTask.id, CancellationError())
             }

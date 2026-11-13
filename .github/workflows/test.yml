@@ -51,3 +51,17 @@ jobs:
           -scheme MapTilerSDK \
           -destination 'platform=iOS Simulator,name=iPhone 17' \
           -retry-tests-on-failure -test-iterations 3
+
+  version-consistency:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Verify MTConfig.version has a CHANGELOG entry
+      run: |
+        VERSION=$(sed -nE 's/.*public static let version = "([^"]+)".*/\1/p' Sources/MapTilerSDK/MTConfig.swift)
+        [ -n "$VERSION" ] || { echo "MTConfig.version not found"; exit 1; }
+        grep -qF "## [$VERSION]" CHANGELOG.md || { echo "CHANGELOG.md has no entry for $VERSION"; exit 1; }
+        echo "Version consistency OK: $VERSION"

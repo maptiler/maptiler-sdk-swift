@@ -15,6 +15,7 @@ struct MTMapOptionsTests {
         var options = MTMapOptions()
         options.setLocale(["en": "Hello"])
         options.setMaxCanvasSize(CGSize(width: 800, height: 600))
+        options.setCooperativeGestures(true)
 
         guard let jsonString = options.toJSON(),
               let data = jsonString.data(using: .utf8),
@@ -28,5 +29,8 @@ struct MTMapOptionsTests {
 
         let encodedMaxCanvasSize = json["maxCanvasSize"] as? [Double]
         #expect(encodedMaxCanvasSize == [800.0, 600.0])
+
+        let encodedCooperativeGestures = json["cooperativeGestures"] as? Bool
+        #expect(encodedCooperativeGestures == true)
     }
 }

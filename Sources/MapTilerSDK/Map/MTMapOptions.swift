@@ -173,6 +173,9 @@ public struct MTMapOptions: Sendable {
     /// Boolean indicating whether the double tap to zoom interaction is enabled.
     public private(set) var doubleTapShouldZoom: Bool?
 
+    /// Boolean indicating whether cooperative gestures are enabled (panning requires two fingers).
+    public private(set) var cooperativeGestures: Bool?
+
     /// Boolean indicating whether the drag to pan interaction is enabled.
     public private(set) var dragPanIsEnabled: Bool?
 
@@ -317,6 +320,7 @@ public struct MTMapOptions: Sendable {
         shouldDragToPitch: Bool? = nil,
         shouldPinchToRotateAndZoom: Bool? = nil,
         doubleTapShouldZoom: Bool? = nil,
+        cooperativeGestures: Bool? = nil,
         dragPanIsEnabled: Bool? = nil,
         dragRotateIsEnabled: Bool? = nil,
         shouldValidateStyle: Bool? = nil,
@@ -372,6 +376,7 @@ public struct MTMapOptions: Sendable {
         self.shouldDragToPitch = shouldDragToPitch
         self.shouldPinchToRotateAndZoom = shouldPinchToRotateAndZoom
         self.doubleTapShouldZoom = doubleTapShouldZoom
+        self.cooperativeGestures = cooperativeGestures
         self.dragPanIsEnabled = dragPanIsEnabled
         self.dragRotateIsEnabled = dragRotateIsEnabled
         self.shouldValidateStyle = shouldValidateStyle
@@ -433,6 +438,7 @@ extension MTMapOptions: Codable {
         case shouldDragToPitch = "touchPitch"
         case shouldPinchToRotateAndZoom = "touchZoomRotate"
         case doubleTapShouldZoom = "doubleClickZoom"
+        case cooperativeGestures
         case dragPanIsEnabled = "dragPan"
         case dragRotateIsEnabled = "dragRotate"
         case shouldValidateStyle
@@ -596,6 +602,10 @@ extension MTMapOptions {
 
     package mutating func setDoubleTapShouldZoom(_ doubleTapShouldZoom: Bool) {
         self.doubleTapShouldZoom = doubleTapShouldZoom
+    }
+
+    package mutating func setCooperativeGestures(_ cooperativeGestures: Bool) {
+        self.cooperativeGestures = cooperativeGestures
     }
 
     package mutating func setDragPanIsEnabled(_ dragPanIsEnabled: Bool) {

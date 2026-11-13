@@ -59,9 +59,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Verify MTConfig.version has a CHANGELOG entry
+    - name: Verify MTConfig.version matches the latest CHANGELOG entry
       run: |
         VERSION=$(sed -nE 's/.*public static let version = "([^"]+)".*/\1/p' Sources/MapTilerSDK/MTConfig.swift)
         [ -n "$VERSION" ] || { echo "MTConfig.version not found"; exit 1; }
-        grep -qF "## [$VERSION]" CHANGELOG.md || { echo "CHANGELOG.md has no entry for $VERSION"; exit 1; }
+        LATEST=$(sed -nE 's/^## \[([^]]+)\].*/\1/p' CHANGELOG.md | head -n 1)
+        [ "$LATEST" = "$VERSION" ] || { echo "CHANGELOG.md latest entry is '$LATEST', expected $VERSION"; exit 1; }
         echo "Version consistency OK: $VERSION"

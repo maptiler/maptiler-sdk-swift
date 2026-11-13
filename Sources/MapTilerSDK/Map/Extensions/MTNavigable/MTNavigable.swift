@@ -210,4 +210,39 @@ public protocol MTNavigable {
 
     /// Returns true while the map is zooming.
     func isZooming() async -> Bool
+
+    /// Returns camera options for fitting the provided bounds.
+    /// - Parameters:
+    ///   - bounds: Geographic bounds to fit.
+    ///   - options: Additional fit configuration.
+    func cameraForBounds(_ bounds: MTBounds, options: MTFitBoundsOptions?) async -> MTCameraOptions?
+
+    /// Calculates camera options for an animation from a starting coordinate
+    /// and altitude to a target coordinate and altitude.
+    /// - Parameters:
+    ///   - from: Starting geographical coordinate.
+    ///   - altitudeFrom: Starting altitude in meters.
+    ///   - to: Target geographical coordinate.
+    ///   - altitudeTo: Target altitude in meters.
+    func calculateCameraOptionsFromTo(
+        from: CLLocationCoordinate2D,
+        altitudeFrom: Double,
+        to: CLLocationCoordinate2D,
+        altitudeTo: Double
+    ) async -> MTCameraOptions?
+
+    /// Calculates camera options given a point, altitude, and rotation parameters.
+    /// - Parameters:
+    ///   - lngLat: Geographical coordinate.
+    ///   - altitude: Altitude in meters.
+    ///   - bearing: Camera bearing.
+    ///   - pitch: Camera pitch.
+    ///   - roll: Camera roll.
+    func calculateCameraOptionsFromCameraLngLatAltRotation(
+        lngLat: CLLocationCoordinate2D,
+        altitude: Double,
+        bearing: Double,
+        pitch: Double,
+        roll: Double
+    ) async -> MTCameraOptions?
 }

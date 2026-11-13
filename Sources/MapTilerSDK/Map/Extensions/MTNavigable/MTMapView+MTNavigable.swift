@@ -971,6 +971,53 @@ extension MTMapView: MTNavigable {
     public func isZooming(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
         runCommandWithBoolReturnValue(IsZooming(), completion: completionHandler)
     }
+
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func cameraForBounds(
+        _ bounds: MTBounds,
+        options: MTFitBoundsOptions? = nil,
+        completionHandler: @escaping (Result<MTCameraOptions, MTError>) -> Void
+    ) {
+        let command = CameraForBounds(bounds: bounds, options: options)
+        runCommandWithCameraOptionsReturnValue(command, completion: completionHandler)
+    }
+
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func calculateCameraOptionsFromTo(
+        from: CLLocationCoordinate2D,
+        altitudeFrom: Double,
+        to: CLLocationCoordinate2D,
+        altitudeTo: Double,
+        completionHandler: @escaping (Result<MTCameraOptions, MTError>) -> Void
+    ) {
+        let command = CalculateCameraOptionsFromTo(
+            from: from,
+            altitudeFrom: altitudeFrom,
+            to: to,
+            altitudeTo: altitudeTo
+        )
+        runCommandWithCameraOptionsReturnValue(command, completion: completionHandler)
+    }
+
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    // swiftlint:disable:next function_parameter_count
+    public func calculateCameraOptionsFromCameraLngLatAltRotation(
+        lngLat: CLLocationCoordinate2D,
+        altitude: Double,
+        bearing: Double,
+        pitch: Double,
+        roll: Double,
+        completionHandler: @escaping (Result<MTCameraOptions, MTError>) -> Void
+    ) {
+        let command = CalculateCameraOptionsFromCamera(
+            lngLat: lngLat,
+            altitude: altitude,
+            bearing: bearing,
+            pitch: pitch,
+            roll: roll
+        )
+        runCommandWithCameraOptionsReturnValue(command, completion: completionHandler)
+    }
 }
 
 // Concurrency
@@ -2019,6 +2066,67 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    public func cameraForBounds(_ bounds: MTBounds, options: MTFitBoundsOptions? = nil) async -> MTCameraOptions? {
+        await withCheckedContinuation { continuation in
+            cameraForBounds(bounds, options: options) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    public func calculateCameraOptionsFromTo(
+        from: CLLocationCoordinate2D,
+        altitudeFrom: Double,
+        to: CLLocationCoordinate2D,
+        altitudeTo: Double
+    ) async -> MTCameraOptions? {
+        await withCheckedContinuation { continuation in
+            calculateCameraOptionsFromTo(
+                from: from,
+                altitudeFrom: altitudeFrom,
+                to: to,
+                altitudeTo: altitudeTo
+            ) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    public func calculateCameraOptionsFromCameraLngLatAltRotation(
+        lngLat: CLLocationCoordinate2D,
+        altitude: Double,
+        bearing: Double,
+        pitch: Double,
+        roll: Double
+    ) async -> MTCameraOptions? {
+        await withCheckedContinuation { continuation in
+            calculateCameraOptionsFromCameraLngLatAltRotation(
+                lngLat: lngLat,
+                altitude: altitude,
+                bearing: bearing,
+                pitch: pitch,
+                roll: roll
+            ) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
                 }
             }
         }

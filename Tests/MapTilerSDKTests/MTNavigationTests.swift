@@ -869,6 +869,35 @@ struct MTNavigationTests {
 
         #expect(executor.lastCommand is ResetNorthPitch)
     }
+
+    @Test func cameraForBoundsCommand_shouldMatchJS() async throws {
+        let bounds = MTBounds(
+            southWest: CLLocationCoordinate2D(latitude: 10, longitude: 20),
+            northEast: CLLocationCoordinate2D(latitude: 30, longitude: 40)
+        )
+        let options = MTFitBoundsOptions(padding: .uniform(10), maxZoom: 15)
+        let json = options.toJSON() ?? "{}"
+        let sw = bounds.southWest.toLngLat().toJSON() ?? "{}"
+        let ne = bounds.northEast.toLngLat().toJSON() ?? "{}"
+        let js = "JSON.stringify(\(MTBridge.mapObject).cameraForBounds([\(sw), \(ne)], \(json)));"
+        #expect(CameraForBounds(bounds: bounds, options: options).toJS() == js)
+    }
+
+    @Test func calculateCameraOptionsFromToCommand_shouldMatchJS() async throws {
+        let from = CLLocationCoordinate2D(latitude: 10, longitude: 20)
+        let to = CLLocationCoordinate2D(latitude: 30, longitude: 40)
+        let fromLngLat = from.toLngLat().toJSON() ?? "{}"
+        let toLngLat = to.toLngLat().toJSON() ?? "{}"
+        let js = "JSON.stringify(\(MTBridge.mapObject).calculateCameraOptionsFromTo(\(fromLngLat), 100.0, \(toLngLat), 200.0));"
+        #expect(CalculateCameraOptionsFromTo(from: from, altitudeFrom: 100.0, to: to, altitudeTo: 200.0).toJS() == js)
+    }
+
+    @Test func calculateCameraOptionsFromCameraCommand_shouldMatchJS() async throws {
+        let lngLat = CLLocationCoordinate2D(latitude: 10, longitude: 20)
+        let lngLatJSON = lngLat.toLngLat().toJSON() ?? "{}"
+        let js = "JSON.stringify(\(MTBridge.mapObject).calculateCameraOptionsFromCameraLngLatAltRotation(\(lngLatJSON), 100.0, 90.0, 45.0, 10.0));"
+        #expect(CalculateCameraOptionsFromCamera(lngLat: lngLat, altitude: 100.0, bearing: 90.0, pitch: 45.0, roll: 10.0).toJS() == js)
+    }
 }
 
 private final class MockExecutor: MTCommandExecutable {

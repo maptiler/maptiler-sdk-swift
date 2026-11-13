@@ -56,6 +56,23 @@ extension MTCameraOptions: Codable {
         }
     }
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        if let lngLat = try? container.decodeIfPresent(LngLat.self, forKey: .center) {
+            self.center = CLLocationCoordinate2D.fromLngLat(lngLat: lngLat)
+        } else if let centerArray = try? container.decodeIfPresent([Double].self, forKey: .center),
+                  centerArray.count == 2 {
+            self.center = CLLocationCoordinate2D(latitude: centerArray[1], longitude: centerArray[0])
+        } else {
+            self.center = try container.decodeIfPresent(CLLocationCoordinate2D.self, forKey: .center)
+        }
+
+        self.zoom = try container.decodeIfPresent(Double.self, forKey: .zoom)
+        self.bearing = try container.decodeIfPresent(Double.self, forKey: .bearing)
+        self.pitch = try container.decodeIfPresent(Double.self, forKey: .pitch)
+    }
+
     enum CodingKeys: String, CodingKey {
         case center
         case zoom

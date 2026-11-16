@@ -197,4 +197,28 @@ public protocol MTStylable {
 
     /// Returns the value of a paint property in the specified layer.
     func getPaintProperty(layerId: String, name: String) async -> MTPropertyValue?
+
+    /// Returns the sky configuration.
+    func getSky() async -> MTSky?
+
+    /// Returns the source with the given ID.
+    func getSource(id: String) async -> String?
+
+    /// Returns the map's sprite URL.
+    func getSprite() async -> String?
+
+    /// Returns the current map style.
+    func getStyle() async -> String?
+
+    /// Returns the 3D terrain specification.
+    func getTerrain() async -> MTTerrain?
+
+    /// Returns the current terrain exaggeration.
+    func getTerrainExaggeration() async -> Double
+
+    /// Returns the vertical field of view in degrees.
+    func getVerticalFieldOfView() async -> Double
+
+    /// Returns whether the language is updated.
+    func isLanguageUpdated() async -> Bool
 }

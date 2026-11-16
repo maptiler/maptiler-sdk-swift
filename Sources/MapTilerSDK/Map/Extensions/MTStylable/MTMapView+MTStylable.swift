@@ -1117,6 +1117,105 @@ extension MTMapView: MTStylable {
             }
         }
     }
+
+    /// Returns the sky configuration.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getSky(completionHandler: @escaping (Result<MTSky?, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetSky()) { result in
+            switch result {
+            case .success(let jsonString):
+                if jsonString == "null" {
+                    completionHandler(.success(nil))
+                } else if let data = jsonString.data(using: .utf8),
+                          let sky = try? JSONDecoder().decode(MTSky.self, from: data) {
+                    completionHandler(.success(sky))
+                } else {
+                    completionHandler(.failure(.unknown(description: "Failed to parse sky")))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the source with the given ID.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getSource(id: String, completionHandler: @escaping (Result<String?, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetSource(id: id)) { result in
+            switch result {
+            case .success(let str):
+                completionHandler(.success(str == "null" ? nil : str))
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the map's sprite URL.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getSprite(completionHandler: @escaping (Result<String?, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetSprite()) { result in
+            switch result {
+            case .success(let str):
+                // Note: The sprite could be a single string or an array of objects.
+                // We just return the stringified JSON.
+                completionHandler(.success(str == "null" ? nil : str))
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the current map style.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getStyle(completionHandler: @escaping (Result<String?, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetStyle()) { result in
+            switch result {
+            case .success(let str):
+                completionHandler(.success(str == "null" ? nil : str))
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the 3D terrain specification.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getTerrain(completionHandler: @escaping (Result<MTTerrain?, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetTerrain()) { result in
+            switch result {
+            case .success(let jsonString):
+                if jsonString == "null" {
+                    completionHandler(.success(nil))
+                } else if let data = jsonString.data(using: .utf8),
+                          let terrain = try? JSONDecoder().decode(MTTerrain.self, from: data) {
+                    completionHandler(.success(terrain))
+                } else {
+                    completionHandler(.failure(.unknown(description: "Failed to parse terrain")))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the current terrain exaggeration.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getTerrainExaggeration(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetTerrainExaggeration(), completion: completionHandler)
+    }
+
+    /// Returns the vertical field of view in degrees.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getVerticalFieldOfView(completionHandler: @escaping (Result<Double, MTError>) -> Void) {
+        runCommandWithDoubleReturnValue(GetVerticalFieldOfView(), completion: completionHandler)
+    }
+
+    /// Returns whether the language is updated.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func isLanguageUpdated(completionHandler: @escaping (Result<Bool, MTError>) -> Void) {
+        runCommandWithBoolReturnValue(IsLanguageUpdated(), completion: completionHandler)
+    }
 }
 
 // Concurrency: style property setters
@@ -1798,6 +1897,118 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the sky configuration.
+    public func getSky() async -> MTSky? {
+        await withCheckedContinuation { continuation in
+            getSky { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the source with the given ID.
+    public func getSource(id: String) async -> String? {
+        await withCheckedContinuation { continuation in
+            getSource(id: id) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the map's sprite URL.
+    public func getSprite() async -> String? {
+        await withCheckedContinuation { continuation in
+            getSprite { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the current map style.
+    public func getStyle() async -> String? {
+        await withCheckedContinuation { continuation in
+            getStyle { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the 3D terrain specification.
+    public func getTerrain() async -> MTTerrain? {
+        await withCheckedContinuation { continuation in
+            getTerrain { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the current terrain exaggeration.
+    public func getTerrainExaggeration() async -> Double {
+        await withCheckedContinuation { continuation in
+            getTerrainExaggeration { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0.0)
+                }
+            }
+        }
+    }
+
+    /// Returns the vertical field of view in degrees.
+    public func getVerticalFieldOfView() async -> Double {
+        await withCheckedContinuation { continuation in
+            getVerticalFieldOfView { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: 0.0)
+                }
+            }
+        }
+    }
+
+    /// Returns whether the language is updated.
+    public func isLanguageUpdated() async -> Bool {
+        await withCheckedContinuation { continuation in
+            isLanguageUpdated { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: false)
                 }
             }
         }

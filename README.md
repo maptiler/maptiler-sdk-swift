@@ -4,7 +4,7 @@
 
 The MapTiler SDK Swift is a native SDK written in Swift, designed to work with the well-established MapTiler Cloud service, which provides all the data required to fuel a complete mobile mapping experience: vector tiles, geojson, map interaction, custom styles, data visualization and more.
 
-[![](https://img.shields.io/endpoint?style=for-the-badge&logo=swift&labelColor=D3DBEC&logoColor=333359&color=f2f6ff&url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmaptiler%2Fmaptiler-sdk-swift%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/maptiler/maptiler-sdk-swift) [![](https://img.shields.io/badge/Platforms-iOS-f2f6ff?style=for-the-badge&labelColor=D3DBEC&logo=apple&logoColor=333359)](https://swiftpackageindex.com/maptiler/maptiler-sdk-swift)
+[![](https://img.shields.io/github/v/release/maptiler/maptiler-sdk-swift?style=for-the-badge&labelColor=D3DBEC&color=f2f6ff&label=Release)](https://github.com/maptiler/maptiler-sdk-swift/releases) [![](https://img.shields.io/endpoint?style=for-the-badge&logo=swift&labelColor=D3DBEC&logoColor=333359&color=f2f6ff&url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmaptiler%2Fmaptiler-sdk-swift%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/maptiler/maptiler-sdk-swift) [![](https://img.shields.io/badge/Platforms-iOS-f2f6ff?style=for-the-badge&labelColor=D3DBEC&logo=apple&logoColor=333359)](https://swiftpackageindex.com/maptiler/maptiler-sdk-swift)
 
 ---
 
@@ -40,6 +40,8 @@ MapTiler Swift SDK is a Swift Package and can be added as dependency through **S
 
 - File -> Add Package Dependencies
 - Add https://github.com/maptiler/maptiler-sdk-swift.git
+
+For latest version visit https://github.com/maptiler/maptiler-sdk-swift/releases.
 
 <br>
 

@@ -1018,6 +1018,26 @@ extension MTMapView: MTNavigable {
         )
         runCommandWithCameraOptionsReturnValue(command, completion: completionHandler)
     }
+
+    /// Returns the camera hash representing the current map camera state.
+    /// - Parameter completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getCameraHash(completionHandler: @escaping (Result<String, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetCameraHash()) { result in
+            switch result {
+            case .success(let jsonString):
+                if jsonString == "null" {
+                    // map "null" to error or empty string? The hash is usually a string. Let's return error if null?
+                    // Actually, camera hash shouldn't be null, but let's safely return an error if it is.
+                    completionHandler(.failure(.unknown(description: "Failed to get camera hash")))
+                } else {
+                    completionHandler(.success(jsonString))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
 }
 
 // Concurrency
@@ -2122,6 +2142,20 @@ extension MTMapView {
                 pitch: pitch,
                 roll: roll
             ) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the camera hash representing the current map camera state.
+    public func getCameraHash() async -> String? {
+        await withCheckedContinuation { continuation in
+            getCameraHash { result in
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)

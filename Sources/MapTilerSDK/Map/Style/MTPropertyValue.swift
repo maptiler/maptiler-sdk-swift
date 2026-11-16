@@ -47,4 +47,24 @@ public enum MTPropertyValue: Sendable {
             return "\"\(uiColor.toHex())\""
         }
     }
+
+    /// Parses a JSON string natively if possible, otherwise falls back to a raw JSON expression.
+    package static func from(jsonString: String) -> MTPropertyValue? {
+        guard let data = jsonString.data(using: .utf8) else { return nil }
+        guard let jsonObject = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) else {
+            return .string(jsonString)
+        }
+        return from(any: jsonObject) ?? .rawExpression(jsonString)
+    }
+
+    private static func from(any: Any) -> MTPropertyValue? {
+        if let b = any as? Bool { return .bool(b) }
+        if let n = any as? Double { return .number(n) }
+        if let s = any as? String { return .string(s) }
+        if let a = any as? [Any] {
+            let mapped = a.compactMap { from(any: $0) }
+            if mapped.count == a.count { return .array(mapped) }
+        }
+        return nil
+    }
 }

@@ -179,4 +179,22 @@ public protocol MTStylable {
     ///  - Parameters:
     ///    - id: The id of the source.
     func isSourceLoaded(id: String) async -> Bool
+
+    /// Returns the filter applied to the specified layer.
+    func getFilter(layerId: String) async -> MTPropertyValue?
+
+    /// Returns the map's glyphs URL.
+    func getGlyphs() async -> String?
+
+    /// Returns an array of layer IDs representing the current layer order.
+    func getLayersOrder() async -> [String]
+
+    /// Returns the value of a layout property in the specified layer.
+    func getLayoutProperty(layerId: String, name: String) async -> MTPropertyValue?
+
+    /// Returns the map's light configuration.
+    func getLight() async -> MTLight?
+
+    /// Returns the value of a paint property in the specified layer.
+    func getPaintProperty(layerId: String, name: String) async -> MTPropertyValue?
 }

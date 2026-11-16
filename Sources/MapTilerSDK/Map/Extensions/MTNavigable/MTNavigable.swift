@@ -245,4 +245,7 @@ public protocol MTNavigable {
         pitch: Double,
         roll: Double
     ) async -> MTCameraOptions?
+
+    /// Returns the camera hash representing the current map camera state.
+    func getCameraHash() async -> String?
 }

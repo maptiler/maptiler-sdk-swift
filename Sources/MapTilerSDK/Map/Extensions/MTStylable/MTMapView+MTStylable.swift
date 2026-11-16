@@ -14,6 +14,8 @@ import AppKit
 #endif
 import CoreLocation
 
+// swiftlint:disable file_length
+
 extension MTMapView: MTStylable {
     /// Sets the value of the style's glyphs property.
     /// - Parameters:
@@ -1002,6 +1004,119 @@ extension MTMapView: MTStylable {
     package func pause(_ source: MTVideoSource, completionHandler: ((Result<Void, MTError>) -> Void)? = nil) {
         runCommand(PauseVideoSource(source: source), completion: completionHandler)
     }
+
+    /// Returns the filter applied to the specified layer.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getFilter(
+        layerId: String,
+        completionHandler: @escaping (Result<MTPropertyValue?, MTError>) -> Void
+    ) {
+        runCommandWithStringReturnValue(GetFilter(layerId: layerId)) { result in
+            switch result {
+            case .success(let jsonString):
+                if jsonString == "null" {
+                    completionHandler(.success(nil))
+                } else {
+                    completionHandler(.success(MTPropertyValue.from(jsonString: jsonString)))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the map's glyphs URL.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getGlyphs(completionHandler: @escaping (Result<String?, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetGlyphs()) { result in
+            switch result {
+            case .success(let str):
+                completionHandler(.success(str == "null" ? nil : str))
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns an array of layer IDs representing the current layer order.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getLayersOrder(completionHandler: @escaping (Result<[String], MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetLayersOrder()) { result in
+            switch result {
+            case .success(let jsonString):
+                if let data = jsonString.data(using: .utf8),
+                   let array = try? JSONDecoder().decode([String].self, from: data) {
+                    completionHandler(.success(array))
+                } else {
+                    completionHandler(.failure(.unknown(description: "Failed to parse layers order")))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the value of a layout property in the specified layer.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getLayoutProperty(
+        layerId: String,
+        name: String,
+        completionHandler: @escaping (Result<MTPropertyValue?, MTError>) -> Void
+    ) {
+        runCommandWithStringReturnValue(GetLayoutProperty(layerId: layerId, name: name)) { result in
+            switch result {
+            case .success(let jsonString):
+                if jsonString == "null" {
+                    completionHandler(.success(nil))
+                } else {
+                    completionHandler(.success(MTPropertyValue.from(jsonString: jsonString)))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the map's light configuration.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getLight(completionHandler: @escaping (Result<MTLight?, MTError>) -> Void) {
+        runCommandWithStringReturnValue(GetLight()) { result in
+            switch result {
+            case .success(let jsonString):
+                if jsonString == "null" {
+                    completionHandler(.success(nil))
+                } else if let data = jsonString.data(using: .utf8),
+                          let light = try? JSONDecoder().decode(MTLight.self, from: data) {
+                    completionHandler(.success(light))
+                } else {
+                    completionHandler(.failure(.unknown(description: "Failed to parse light")))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    /// Returns the value of a paint property in the specified layer.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getPaintProperty(
+        layerId: String,
+        name: String,
+        completionHandler: @escaping (Result<MTPropertyValue?, MTError>) -> Void
+    ) {
+        runCommandWithStringReturnValue(GetPaintProperty(layerId: layerId, name: name)) { result in
+            switch result {
+            case .success(let jsonString):
+                if jsonString == "null" {
+                    completionHandler(.success(nil))
+                } else {
+                    completionHandler(.success(MTPropertyValue.from(jsonString: jsonString)))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
 }
 
 // Concurrency: style property setters
@@ -1600,6 +1715,90 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             setTiles(tiles: tiles, to: source) { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Returns the filter applied to the specified layer.
+    public func getFilter(layerId: String) async -> MTPropertyValue? {
+        await withCheckedContinuation { continuation in
+            getFilter(layerId: layerId) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the map's glyphs URL.
+    public func getGlyphs() async -> String? {
+        await withCheckedContinuation { continuation in
+            getGlyphs { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns an array of layer IDs representing the current layer order.
+    public func getLayersOrder() async -> [String] {
+        await withCheckedContinuation { continuation in
+            getLayersOrder { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: [])
+                }
+            }
+        }
+    }
+
+    /// Returns the value of a layout property in the specified layer.
+    public func getLayoutProperty(layerId: String, name: String) async -> MTPropertyValue? {
+        await withCheckedContinuation { continuation in
+            getLayoutProperty(layerId: layerId, name: name) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the map's light configuration.
+    public func getLight() async -> MTLight? {
+        await withCheckedContinuation { continuation in
+            getLight { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    /// Returns the value of a paint property in the specified layer.
+    public func getPaintProperty(layerId: String, name: String) async -> MTPropertyValue? {
+        await withCheckedContinuation { continuation in
+            getPaintProperty(layerId: layerId, name: name) { result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
             }
         }
     }

@@ -605,6 +605,51 @@ extension MTMapView: MTStylable {
         )
     }
 
+    /// Awaits for _this_ Map instance to be "loaded"
+    /// If _this_ Map instance is already loaded, it resolves directly,
+    /// otherwise, it resolves as a result of the "load" event.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func onLoadAsync(
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            OnLoadAsync(),
+            completion: completionHandler
+        )
+    }
+
+    /// Awaits for _this_ Map instance to be "ready"
+    /// If _this_ Map instance is already ready, it resolves directly,
+    /// otherwise, it resolves as a result of the "ready" event.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func onReadyAsync(
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            OnReadyAsync(),
+            completion: completionHandler
+        )
+    }
+
+    /// Awaits for _this_ Map instance to be "loaded" as well as with terrain being non-null for the first time
+    /// If _this_ Map instance is already loaded with terrain, it resolves directly,
+    /// otherwise, it resolves as a result of the "loadWithTerrain" event.
+    ///  - Parameters:
+    ///    - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func onLoadWithTerrainAsync(
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(
+            OnLoadWithTerrainAsync(),
+            completion: completionHandler
+        )
+    }
+
     /// Returns true when no ongoing operations remain and all sources/tiles are loaded.
     ///  - Parameters:
     ///    - completionHandler: A handler block to execute when function finishes.
@@ -1811,6 +1856,54 @@ extension MTMapView {
                     continuation.resume(returning: result)
                 case .failure:
                     continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Awaits for _this_ Map instance to be "loaded"
+    /// If _this_ Map instance is already loaded, it resolves directly,
+    /// otherwise, it resolves as a result of the "load" event.
+    public func onLoadAsync() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            onLoadAsync { result in
+                switch result {
+                case .success:
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Awaits for _this_ Map instance to be "ready"
+    /// If _this_ Map instance is already ready, it resolves directly,
+    /// otherwise, it resolves as a result of the "ready" event.
+    public func onReadyAsync() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            onReadyAsync { result in
+                switch result {
+                case .success:
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Awaits for _this_ Map instance to be "loaded" as well as with terrain being non-null for the first time
+    /// If _this_ Map instance is already loaded with terrain, it resolves directly,
+    /// otherwise, it resolves as a result of the "loadWithTerrain" event.
+    public func onLoadWithTerrainAsync() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            onLoadWithTerrainAsync { result in
+                switch result {
+                case .success:
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
                 }
             }
         }

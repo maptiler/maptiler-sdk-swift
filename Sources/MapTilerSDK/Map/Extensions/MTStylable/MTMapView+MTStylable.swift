@@ -2013,4 +2013,71 @@ extension MTMapView {
             }
         }
     }
+
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func setFeatureState(
+        _ feature: MTFeatureIdentifier,
+        state: [String: MTFeatureStateValue],
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(SetFeatureState(feature: feature, state: state), completion: completionHandler)
+    }
+
+    public func setFeatureState(_ feature: MTFeatureIdentifier, state: [String: MTFeatureStateValue]) async {
+        await withCheckedContinuation { continuation in
+            setFeatureState(feature, state: state) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getFeatureState(
+        _ feature: MTFeatureIdentifier,
+        completionHandler: @escaping (Result<[String: MTFeatureStateValue]?, MTError>) -> Void
+    ) {
+        runCommandWithStringReturnValue(GetFeatureState(feature: feature)) { result in
+            switch result {
+            case .success(let jsonString):
+                if let data = jsonString.data(using: .utf8),
+                   let state = try? JSONDecoder().decode([String: MTFeatureStateValue].self, from: data) {
+                    completionHandler(.success(state))
+                } else {
+                    completionHandler(.success(nil))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    public func getFeatureState(_ feature: MTFeatureIdentifier) async -> [String: MTFeatureStateValue]? {
+        await withCheckedContinuation { continuation in
+            getFeatureState(feature) { result in
+                switch result {
+                case .success(let state):
+                    continuation.resume(returning: state)
+                case .failure:
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func removeFeatureState(
+        _ feature: MTFeatureIdentifier,
+        key: String? = nil,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(RemoveFeatureState(feature: feature, key: key), completion: completionHandler)
+    }
+
+    public func removeFeatureState(_ feature: MTFeatureIdentifier, key: String? = nil) async {
+        await withCheckedContinuation { continuation in
+            removeFeatureState(feature, key: key) { _ in
+                continuation.resume()
+            }
+        }
+    }
 }

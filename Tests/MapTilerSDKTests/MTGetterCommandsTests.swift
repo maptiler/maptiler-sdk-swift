@@ -37,4 +37,46 @@ final class MTGetterCommandsTests: XCTestCase {
         let command = GetPaintProperty(layerId: "water", name: "fill-color")
         XCTAssertEqual(command.toJS(), "JSON.stringify(map.getPaintProperty('water', 'fill-color')) ?? 'null';")
     }
+
+    func testGetSkyCommandToJS() {
+        let command = GetSky()
+        XCTAssertEqual(command.toJS(), "JSON.stringify(map.getSky()) ?? 'null';")
+    }
+
+    func testGetSourceCommandToJS() {
+        let command = GetSource(id: "my-source")
+        let expected = "JSON.stringify(map.getSource('my-source') ? "
+            + "map.getSource('my-source').serialize() : null) ?? 'null';"
+        XCTAssertEqual(command.toJS(), expected)
+    }
+
+    func testGetSpriteCommandToJS() {
+        let command = GetSprite()
+        XCTAssertEqual(command.toJS(), "JSON.stringify(map.getSprite()) ?? 'null';")
+    }
+
+    func testGetStyleCommandToJS() {
+        let command = GetStyle()
+        XCTAssertEqual(command.toJS(), "JSON.stringify(map.getStyle()) ?? 'null';")
+    }
+
+    func testGetTerrainCommandToJS() {
+        let command = GetTerrain()
+        XCTAssertEqual(command.toJS(), "JSON.stringify(map.getTerrain()) ?? 'null';")
+    }
+
+    func testGetTerrainExaggerationCommandToJS() {
+        let command = GetTerrainExaggeration()
+        XCTAssertEqual(command.toJS(), "map.getTerrainExaggeration();")
+    }
+
+    func testGetVerticalFieldOfViewCommandToJS() {
+        let command = GetVerticalFieldOfView()
+        XCTAssertEqual(command.toJS(), "map.getVerticalFieldOfView();")
+    }
+
+    func testIsLanguageUpdatedCommandToJS() {
+        let command = IsLanguageUpdated()
+        XCTAssertEqual(command.toJS(), "map.isLanguageUpdated();")
+    }
 }

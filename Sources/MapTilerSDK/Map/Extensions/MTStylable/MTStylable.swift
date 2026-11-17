@@ -221,4 +221,21 @@ public protocol MTStylable {
 
     /// Returns whether the language is updated.
     func isLanguageUpdated() async -> Bool
+    /// Sets the state of a feature.
+    /// - Parameters:
+    ///   - feature: The feature identifier.
+    ///   - state: The state dictionary to apply.
+    func setFeatureState(_ feature: MTFeatureIdentifier, state: [String: MTFeatureStateValue]) async
+
+    /// Gets the state of a feature.
+    /// - Parameters:
+    ///   - feature: The feature identifier.
+    /// - Returns: The state dictionary of the feature.
+    func getFeatureState(_ feature: MTFeatureIdentifier) async -> [String: MTFeatureStateValue]?
+
+    /// Removes the state of a feature.
+    /// - Parameters:
+    ///   - feature: The feature identifier.
+    ///   - key: The key of the state to remove. If nil, all state properties are removed.
+    func removeFeatureState(_ feature: MTFeatureIdentifier, key: String?) async
 }

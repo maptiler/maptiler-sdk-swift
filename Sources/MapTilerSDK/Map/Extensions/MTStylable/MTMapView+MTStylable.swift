@@ -202,6 +202,42 @@ extension MTMapView: MTStylable {
         runCommand(RemoveImage(name: name), completion: completionHandler)
     }
 
+    /// Checks whether an image exists.
+    /// - Parameters:
+    ///   - id: The ID of the image.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func hasImage(
+        id: String,
+        completionHandler: ((Result<Bool, MTError>) -> Void)? = nil
+    ) {
+        runCommandWithBoolReturnValue(HasImage(id: id), completion: completionHandler)
+    }
+
+    /// Lists all images in the style.
+    /// - Parameters:
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func listImages(
+        completionHandler: @escaping (Result<[String], MTError>) -> Void
+    ) {
+        runCommandWithStringReturnValue(ListImages()) { result in
+            switch result {
+            case .success(let jsonString):
+                if jsonString == "null" {
+                    completionHandler(.success([]))
+                } else if let data = jsonString.data(using: .utf8),
+                          let array = try? JSONDecoder().decode([String].self, from: data) {
+                    completionHandler(.success(array))
+                } else {
+                    completionHandler(.failure(.unknown(description: "Failed to parse images list")))
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
     /// Updates an image in a style.
     /// - Parameters:
     ///   - name: Unique identifier for the image to update.
@@ -1423,6 +1459,36 @@ extension MTMapView {
         await withCheckedContinuation { continuation in
             removeImage(name: name) { _ in
                 continuation.resume()
+            }
+        }
+    }
+
+    /// Checks whether an image exists.
+    /// - Parameters:
+    ///   - id: The ID of the image.
+    public func hasImage(id: String) async -> Bool {
+        await withCheckedContinuation { continuation in
+            hasImage(id: id) { result in
+                switch result {
+                case .success(let value):
+                    continuation.resume(returning: value)
+                case .failure:
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+    }
+
+    /// Lists all images in the style.
+    public func listImages() async -> [String] {
+        await withCheckedContinuation { continuation in
+            listImages { result in
+                switch result {
+                case .success(let value):
+                    continuation.resume(returning: value)
+                case .failure:
+                    continuation.resume(returning: [])
+                }
             }
         }
     }

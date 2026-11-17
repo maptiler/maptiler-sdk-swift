@@ -87,6 +87,16 @@ public protocol MTStylable {
     ///   - name: Unique identifier for the image to remove.
     func removeImage(name: String) async
 
+    /// Checks whether an image exists.
+    /// - Parameters:
+    ///   - id: The ID of the image.
+    /// - Returns: True if the image exists, false otherwise.
+    func hasImage(id: String) async -> Bool
+
+    /// Lists all images in the style.
+    /// - Returns: An array of image IDs.
+    func listImages() async -> [String]
+
     /// Registers a sprite with the current style so it can be referenced by layers and annotations.
     /// - Parameters:
     ///   - id: Unique identifier for the sprite.

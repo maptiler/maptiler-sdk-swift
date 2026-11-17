@@ -899,6 +899,86 @@ struct MTStyleTests {
         #expect(clearCommand?.sourceId == nil)
         #expect(clearCommand?.exaggeration == nil)
     }
+
+    @Test func hasImageCommand_shouldMatchJS() async throws {
+        let command = HasImage(id: "test-image")
+        let expectedJS = "\(MTBridge.mapObject).hasImage(\"test-image\");"
+        #expect(command.toJS() == expectedJS)
+    }
+
+    @MainActor
+    @Test func hasImageWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge?.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.hasImage(id: "test-image") { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let hasImage):
+            #expect(hasImage)
+        case .failure(let error):
+            Issue.record("Expected hasImage wrapper to succeed, but failed with \(error)")
+        }
+
+        let command = executor.lastCommand as? HasImage
+        #expect(command?.id == "test-image")
+    }
+
+    @MainActor
+    @Test func hasImageAsyncWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .bool(true))
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge?.executor = executor
+
+        let hasImage = await mapView.hasImage(id: "test-image")
+        #expect(hasImage)
+        let command = executor.lastCommand as? HasImage
+        #expect(command?.id == "test-image")
+    }
+
+    @Test func listImagesCommand_shouldMatchJS() async throws {
+        let command = ListImages()
+        let expectedJS = "JSON.stringify(\(MTBridge.mapObject).listImages()) ?? 'null';"
+        #expect(command.toJS() == expectedJS)
+    }
+
+    @MainActor
+    @Test func listImagesWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .string("[\"image1\",\"image2\"]"))
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge?.executor = executor
+
+        let result = await withCheckedContinuation { continuation in
+            mapView.listImages { outcome in
+                continuation.resume(returning: outcome)
+            }
+        }
+
+        switch result {
+        case .success(let images):
+            #expect(images == ["image1", "image2"])
+        case .failure(let error):
+            Issue.record("Expected listImages wrapper to succeed, but failed with \(error)")
+        }
+
+        #expect(executor.lastCommand is ListImages)
+    }
+
+    @MainActor
+    @Test func listImagesAsyncWrapper_shouldReturnBridgeValue() async throws {
+        let executor = MockExecutor(result: .string("[\"image1\",\"image2\"]"))
+        let mapView = MTMapView(frame: .zero)
+        mapView.bridge?.executor = executor
+
+        let images = await mapView.listImages()
+        #expect(images == ["image1", "image2"])
+        #expect(executor.lastCommand is ListImages)
+    }
 }
 
 private extension MTStyleTests {

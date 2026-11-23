@@ -236,6 +236,13 @@ public struct MTMapOptions: Sendable {
     /// Overrides the UI strings of built-in controls (used as accessibility labels).
     public private(set) var locale: [String: String]?
 
+    /// Experimental: boolean indicating whether tile preloading is enabled.
+    ///
+    /// When true, camera animations (fly, ease, pan, zoom, fit bounds) honor
+    /// ``MTAnimationOptions/experimentalPreload`` and fetch the needed tiles before the animation starts.
+    ///  - Note: Every preloaded tile counts against your MapTiler Cloud API key quota. Defaults to false.
+    public private(set) var useExperimentalTilePreloading: Bool?
+
     private var _maxCanvasSize: [Double]?
 
     /// Maximum WebGL canvas size in pixels.
@@ -338,7 +345,8 @@ public struct MTMapOptions: Sendable {
         highFrequencyEventThrottleMs: Int? = 10,
         transformRequest: [MTRequestTransformRule]? = nil,
         locale: [String: String]? = nil,
-        maxCanvasSize: CGSize? = nil
+        maxCanvasSize: CGSize? = nil,
+        useExperimentalTilePreloading: Bool? = nil
     ) {
         self.language = language
         self.secondaryLanguage = secondaryLanguage
@@ -394,6 +402,7 @@ public struct MTMapOptions: Sendable {
         self.highFrequencyEventThrottleMs = highFrequencyEventThrottleMs
         self.transformRequest = transformRequest
         self.locale = locale
+        self.useExperimentalTilePreloading = useExperimentalTilePreloading
         if let maxCanvasSize = maxCanvasSize {
             self._maxCanvasSize = [maxCanvasSize.width, maxCanvasSize.height]
         }
@@ -456,6 +465,7 @@ extension MTMapOptions: Codable {
         case transformRequest
         case locale
         case _maxCanvasSize = "maxCanvasSize"
+        case useExperimentalTilePreloading
     }
 }
 
@@ -606,6 +616,11 @@ extension MTMapOptions {
 
     package mutating func setCooperativeGestures(_ cooperativeGestures: Bool) {
         self.cooperativeGestures = cooperativeGestures
+    }
+
+    /// Enables or disables experimental tile preloading. Must be set before the map is initialized.
+    public mutating func setUseExperimentalTilePreloading(_ isEnabled: Bool) {
+        self.useExperimentalTilePreloading = isEnabled
     }
 
     package mutating func setDragPanIsEnabled(_ dragPanIsEnabled: Bool) {

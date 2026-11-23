@@ -62,6 +62,7 @@ public struct MTFitBoundsOptions: Sendable, Codable {
         case shouldAnimate
         case isEssential
         case easing
+        case experimentalPreload = "experimental_preload"
     }
 
     public init(from decoder: any Decoder) throws {
@@ -77,6 +78,10 @@ public struct MTFitBoundsOptions: Sendable, Codable {
         let offset = try container.decodeIfPresent(MTPoint.self, forKey: .offset)
         let shouldAnimate = try container.decodeIfPresent(Bool.self, forKey: .shouldAnimate)
         let isEssential = try container.decodeIfPresent(Bool.self, forKey: .isEssential)
+        let experimentalPreload = try container.decodeIfPresent(
+            MTTilePreloadOptions.self,
+            forKey: .experimentalPreload
+        )
 
         var easingValue: MTEasing?
         if let easing = try? container.decode(MTEasing.self, forKey: .easing) {
@@ -92,19 +97,24 @@ public struct MTFitBoundsOptions: Sendable, Codable {
             }
         }
 
-        if duration != nil || offset != nil || shouldAnimate != nil || isEssential != nil || easingValue != nil {
+        let hasAnimationOptions = duration != nil || offset != nil || shouldAnimate != nil
+            || isEssential != nil || easingValue != nil || experimentalPreload != nil
+
+        if hasAnimationOptions {
             self.animationOptions = MTAnimationOptions(
                 duration: duration,
                 offset: offset,
                 shouldAnimate: shouldAnimate,
                 isEssential: isEssential,
-                easing: easingValue
+                easing: easingValue,
+                experimentalPreload: experimentalPreload
             )
         } else {
             self.animationOptions = nil
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -146,6 +156,10 @@ public struct MTFitBoundsOptions: Sendable, Codable {
 
         if let easing = animationOptions?.easing {
             try container.encode(easing.toJS(), forKey: .easing)
+        }
+
+        if let experimentalPreload = animationOptions?.experimentalPreload {
+            try container.encode(experimentalPreload, forKey: .experimentalPreload)
         }
     }
 }

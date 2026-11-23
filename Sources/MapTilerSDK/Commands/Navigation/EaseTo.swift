@@ -94,6 +94,10 @@ package struct EaseToOptions: Codable {
         if let easing = animationOptions?.easing {
             try container.encode(easing.toJS(), forKey: .easing)
         }
+
+        if let experimentalPreload = animationOptions?.experimentalPreload {
+            try container.encode(experimentalPreload, forKey: .experimentalPreload)
+        }
     }
 
     package enum CodingKeys: String, CodingKey {
@@ -106,5 +110,6 @@ package struct EaseToOptions: Codable {
         case shouldAnimate
         case isEssential
         case easing
+        case experimentalPreload = "experimental_preload"
     }
 }

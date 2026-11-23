@@ -48,6 +48,10 @@ package struct ZoomToOptions: Encodable {
         if let easing = animationOptions?.easing {
             try container.encode(easing.toJS(), forKey: .easing)
         }
+
+        if let experimentalPreload = animationOptions?.experimentalPreload {
+            try container.encode(experimentalPreload, forKey: .experimentalPreload)
+        }
     }
 
     package enum CodingKeys: String, CodingKey {
@@ -55,5 +59,6 @@ package struct ZoomToOptions: Encodable {
         case offset
         case animate
         case easing
+        case experimentalPreload = "experimental_preload"
     }
 }

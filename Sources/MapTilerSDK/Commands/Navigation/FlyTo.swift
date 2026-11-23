@@ -92,6 +92,10 @@ package struct FlyToOptions: Codable {
         if let easing = animationOptions?.easing {
             try container.encode(easing.toJS(), forKey: .easing)
         }
+
+        if let experimentalPreload = animationOptions?.experimentalPreload {
+            try container.encode(experimentalPreload, forKey: .experimentalPreload)
+        }
     }
     // swiftlint:enable cyclomatic_complexity
 
@@ -107,5 +111,6 @@ package struct FlyToOptions: Codable {
         case shouldAnimate
         case isEssential
         case easing
+        case experimentalPreload = "experimental_preload"
     }
 }

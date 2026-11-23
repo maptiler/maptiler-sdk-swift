@@ -72,6 +72,18 @@ extension MTMapView: MTNavigable {
         animationOptions: MTAnimationOptions?,
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
+        var animationOptions = animationOptions
+
+        // The JS flyTo skips the animation entirely when a preload is requested without
+        // useExperimentalTilePreloading, so drop the preload request in that case.
+        if animationOptions?.experimentalPreload != nil && self.options?.useExperimentalTilePreloading != true {
+            MTLogger.log(
+                "flyTo: experimentalPreload ignored. Set MTMapOptions.useExperimentalTilePreloading to true.",
+                type: .warning
+            )
+            animationOptions?.experimentalPreload = nil
+        }
+
         runCommand(
             FlyTo(center: center, options: options, animationOptions: animationOptions),
             completion: completionHandler
@@ -496,6 +508,21 @@ extension MTMapView: MTNavigable {
         completionHandler: ((Result<Void, MTError>) -> Void)? = nil
     ) {
         runCommand(PanTo(coordinates: coordinates), completion: completionHandler)
+    }
+
+    /// Pans the map to the specified location with an animated transition.
+    /// - Parameters:
+    ///   - coordinates: The location to pan the map to.
+    ///   - animationOptions: Animation options. Set ``MTAnimationOptions/experimentalPreload``
+    ///   to preload tiles along the path before the animation starts.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func panTo(
+        _ coordinates: CLLocationCoordinate2D,
+        animationOptions: MTAnimationOptions?,
+        completionHandler: ((Result<Void, MTError>) -> Void)? = nil
+    ) {
+        runCommand(PanTo(coordinates: coordinates, animationOptions: animationOptions), completion: completionHandler)
     }
 
     /// Stops any ongoing animated transition.
@@ -1465,6 +1492,19 @@ extension MTMapView {
     public func panTo(_ coordinates: CLLocationCoordinate2D) async {
         await withCheckedContinuation { continuation in
             panTo(coordinates) { _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    /// Pans the map to the specified location with an animated transition.
+    /// - Parameters:
+    ///   - coordinates: The location to pan the map to.
+    ///   - animationOptions: Animation options. Set ``MTAnimationOptions/experimentalPreload``
+    ///   to preload tiles along the path before the animation starts.
+    public func panTo(_ coordinates: CLLocationCoordinate2D, animationOptions: MTAnimationOptions?) async {
+        await withCheckedContinuation { continuation in
+            panTo(coordinates, animationOptions: animationOptions) { _ in
                 continuation.resume()
             }
         }

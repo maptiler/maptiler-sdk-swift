@@ -62,6 +62,16 @@ extension MTVideoSource {
     ) {
         mapView.setCoordinates(coordinates, to: self, completionHandler: completionHandler)
     }
+
+    /// Retrieves the serialized source definition from the map.
+    /// - Parameters:
+    ///   - mapView: MTMapView which holds the source.
+    ///   - completionHandler: A handler block to execute when function finishes.
+    @MainActor
+    @available(iOS, deprecated: 16.0, message: "Prefer the async version for modern concurrency handling")
+    public func getSource(in mapView: MTMapView, completionHandler: @escaping (Result<String?, MTError>) -> Void) {
+        mapView.getSource(id: self.identifier, completionHandler: completionHandler)
+    }
 }
 
 // MARK: - Concurrency
@@ -77,6 +87,14 @@ extension MTVideoSource {
                 continuation.resume()
             }
         }
+    }
+
+    /// Retrieves the serialized source definition from the map.
+    /// - Parameters:
+    ///   - mapView: MTMapView which holds the source.
+    @MainActor
+    public func getSource(in mapView: MTMapView) async -> String? {
+        await mapView.getSource(id: self.identifier)
     }
 }
 
